@@ -1,4 +1,5 @@
-	.include "asm/macros.inc"
+	.syntax unified
+	.text
 
 	thumb_func_start open_init_8055A00
 open_init_8055A00: @ 08055A00

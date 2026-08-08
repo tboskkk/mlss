@@ -1,2 +1,3 @@
 # Python dependencies for MLSS decomp tooling (matching, splits, progress tracking).
-# Populated in Phase 2 (asm-differ, decomp-permuter).
+PyYAML>=6.0
+

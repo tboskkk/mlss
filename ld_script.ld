@@ -1,3 +1,5 @@
+/* GENERATED FILE. Do not hand-edit.
+ * Edit tools/splits.yaml and run tools/gen_ldscript.py to regenerate. */
 SECTIONS
 {
     . = 0x2000000;
@@ -19,6 +21,7 @@ SECTIONS
     .text :
     {
         asm/text08000000.o(.text);
+        src/heap.o(.text);
         asm/heap.o(.text);
         asm/text08018E24.o(.text);
         src/process.o(.text);
@@ -37,7 +40,7 @@ SECTIONS
 
         asm/mariobros.o(.text);
     }
-    
+
     /* DWARF 2 sections */
     .debug_aranges  0 : { *(.debug_aranges) }
     .debug_pubnames 0 : { *(.debug_pubnames) }

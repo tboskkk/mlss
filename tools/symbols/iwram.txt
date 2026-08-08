@@ -1,0 +1,12 @@
+/* IWRAM (0x03000000-0x03007FFF): same deal as ewram.txt, one region down. */
+
+dword_3000C78 = 0x03000C78;
+dword_3000C84 = 0x03000C84;
+stru_3000D18 = 0x03000D18;
+dword_3000D48 = 0x03000D48;
+dword_3000D4C = 0x03000D4C;
+dword_3000DA0 = 0x03000DA0;
+gGameState = 0x0300034C;
+dword_3000FFC = 0x03000FFC;
+dword_3001034 = 0x03001034;
+dword_3001038 = 0x03001038;

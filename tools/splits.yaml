@@ -1,0 +1,55 @@
+# Layout manifest for the MLSS ROM.
+#
+# This is the single source of truth for how the final .text output section
+# is assembled, in address order. ld_script.ld is GENERATED from this file —
+# do not hand-edit ld_script.ld; edit this file (or let split_func.py edit
+# it) and run:
+#
+#   tools/gen_ldscript.py
+#
+# Why this exists: previously every new split required a manual, easy-to-
+# misplace edit to ld_script.ld. Order here is address order and directly
+# determines output byte layout, so entries must stay in the order the
+# bytes actually appear in the ROM.
+#
+# Each entry claims one input-section contribution from one object file:
+#   obj: <path without extension>   e.g. "asm/heap" or "src/process"
+#        - asm/<name>  -> asm/<name>.s   (raw disassembly, not yet decompiled)
+#        - src/<name>  -> src/<name>.c   (decompiled C; may still contain
+#                          asm/nonmatching/*.s includes for functions that
+#                          don't compile to matching bytes yet)
+#   section: text | rodata          which input section of that object to pull
+#
+# 'groups' are purely organizational (they reproduce the blank-line
+# groupings the original hand-written ld_script.ld already had) and have no
+# effect on codegen — they just keep `code`, `rodata`, and the embedded
+# Mario Bros. ROM visually separate.
+#
+# tools/split_func.py maintains this file automatically when it extracts a
+# function. You generally shouldn't need to hand-edit it, except when
+# hand-creating a brand new subsystem file.
+
+groups:
+- name: code
+  entries:
+  - {obj: asm/text08000000, section: text}
+  - {obj: src/heap, section: text}
+  - {obj: asm/heap, section: text}
+  - {obj: asm/text08018E24, section: text}
+  - {obj: src/process, section: text}
+  - {obj: asm/text08019CA4, section: text}
+  - {obj: src/game_boy_player_logo, section: text}
+  - {obj: asm/text0801A548, section: text}
+  - {obj: src/option_screens, section: text}
+  - {obj: asm/option_screens, section: text}
+  - {obj: asm/text080542C4, section: text}
+  - {obj: src/title_screen, section: text}
+  - {obj: asm/text08057568, section: text}
+- name: rodata
+  entries:
+  - {obj: asm/rodata081DD790, section: rodata}
+  - {obj: src/title_screen, section: rodata}
+  - {obj: asm/rodata081E2764, section: rodata}
+- name: mariobros
+  entries:
+  - {obj: asm/mariobros, section: text}
