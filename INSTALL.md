@@ -1,32 +1,57 @@
-# Prerequisites
+# Building
 
-This project is only tested in WSL2.
+## Option A — container (recommended)
 
-Install the **devkitARM** toolchain of [devkitPro](https://devkitpro.org/wiki/Getting_Started) and add its environment variables.
+No host setup beyond `podman` or `docker`. This is what CI uses, so if it
+builds for CI it builds for you.
 
-	export DEVKITPRO=/opt/devkitpro
-	echo "export DEVKITPRO=$DEVKITPRO" >> ~/.bashrc
-	export DEVKITARM=$DEVKITPRO/devkitARM
-	echo "export DEVKITARM=$DEVKITARM" >> ~/.bashrc
+    ./container.sh make
 
-# Installation
+First run builds the toolchain image (~1-2 min: devkitARM + a from-source
+build of agbcc, pinned to the commit documented in [Containerfile](Containerfile)).
+Every run after that reuses the cached image. `./container.sh` accepts any
+command, not just `make`:
 
-To set up the repository:
+    ./container.sh make clean
+    ./container.sh bash          # interactive shell inside the toolchain
 
-	git clone https://github.com/jellees/mlss
-	git clone https://github.com/jiangzhengwenjz/agbcc
+## Option B — native
 
-	cd ./agbcc
+Only tested on WSL2 and Linux. If you'd rather not install a 1990s compiler
+onto your host, use Option A instead.
+
+Install the **devkitARM** toolchain of [devkitPro](https://devkitpro.org/wiki/Getting_Started) and add its environment variables:
+
+    export DEVKITPRO=/opt/devkitpro
+    echo "export DEVKITPRO=$DEVKITPRO" >> ~/.bashrc
+    export DEVKITARM=$DEVKITPRO/devkitARM
+    echo "export DEVKITARM=$DEVKITARM" >> ~/.bashrc
+
+Clone and build agbcc, then install it into this repo:
+
+    git clone https://github.com/jiangzhengwenjz/agbcc
+    cd agbcc
     git checkout new_newlib_pret
-	./build.sh
-	./install.sh ../mlss
+    ./build.sh
+    ./install.sh ../mlss
 
-	cd ../mlss
-
-To build run
-
+    cd ../mlss
     make
 
-# Notes
+## Verifying the result
 
-For this project I opted to use `jiangzhengwenjz/agbcc` for the debug_line fix. This project should also compile matching with `pret/agbcc`.
+`make` ends by hashing the built ROM against [rom.sha1](rom.sha1) and prints
+`mlss.gba: OK` on a match — that's the whole test suite for now, and it's
+what CI checks on every push. No retail ROM needs to be checked in or
+supplied anywhere in this process; the build reproduces one entirely from
+the sources in `asm/` and `src/`.
+
+A legally-dumped `baserom.gba` (already gitignored) is still useful to keep
+in the repo root for reference tooling — `asmdiff.sh`, asset extraction,
+sanity-checking a region you just split — even though the build itself
+never reads it.
+
+## Notes
+
+This project uses `jiangzhengwenjz/agbcc` for the `-ffix-debug-line` fix.
+It should also compile matching with `pret/agbcc`, untested.

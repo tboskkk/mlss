@@ -11,12 +11,12 @@ cmake-build-*
 *.pcm
 
 # tools
+# NOTE: tools/*.py and tools/*.pl (splits generator, matching scripts, etc.)
+# are project infrastructure and MUST be tracked — do not blanket-ignore
+# *.py/*.pl here again. See CLAUDE.md ("Landmines already hit") for why
+# this comment exists.
 tools/agbcc
 tools/binutils
-
-# scripts
-*.py
-*.pl
 
 # graphics
 *.1bpp
