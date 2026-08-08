@@ -92,8 +92,10 @@ class Entry:
 
     @property
     def object_rel(self) -> str:
-        """Path as it appears inside ld_script.ld, e.g. 'asm/heap.o'."""
-        return f"{self.obj}.o"
+        """Path as it appears inside ld_script.ld AND on the linker command
+        line (both root-relative, since the Makefile links from the project
+        root, not from build/) — e.g. 'build/asm/heap.o'."""
+        return f"build/{self.obj}.o"
 
     @property
     def is_asm(self) -> bool:

@@ -13,6 +13,11 @@
 # (swap `podman` for `docker` anywhere above — both work identically)
 FROM docker.io/devkitpro/devkitarm:latest
 
+# devkitARM's cross toolchain (arm-none-eabi-*) isn't on PATH in the base
+# image — only devkitPro's generic tools/bin is. asm-differ, decomp-permuter,
+# and our own tools/ scripts all shell out to objdump/as/nm by bare name.
+ENV PATH="${DEVKITARM}/bin:${PATH}"
+
 # Extra tooling used by matching/decomp scripts (asm-differ, decomp-permuter,
 # our own tools/ scripts). devkitarm's base image already ships build-essential,
 # git and python3 for building agbcc itself.

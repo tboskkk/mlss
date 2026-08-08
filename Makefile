@@ -24,12 +24,24 @@ LIBGCC := tools/agbcc/lib/libgcc.a
 
 # Flags
 ASFLAGS			:= -mcpu=arm7tdmi -I include
-LDFLAGS			:= -L../tools/agbcc/lib -lgcc -lc --just-symbols=../symbols.txt -g
+LDFLAGS			:= -Ltools/agbcc/lib -lgcc -lc --just-symbols=symbols.txt -g
 # -ffix-debug-line flag comes from https://github.com/jiangzhengwenjz/agbcc new_newlib_pret branch.
 # This branch fixes debug lines so they are emitted properly. If the compiler doesn't produce the
 # same output please switch back to the normal agbcc repo.
 CFLAGS			:= -O2 -mthumb-interwork -fno-common -Wimplicit -Wparentheses -Werror -g -ffix-debug-line
 CPPFLAGS 		:= -I tools/agbcc/include -nostdinc -undef -iquote include -Wno-trigraphs
+
+# `make NONMATCHING=1`: compiles the #else branch of every
+# `#ifndef NONMATCHING / asm include / #else / C attempt / #endif` block
+# (see CLAUDE.md) instead of splicing in the verbatim retail bytes. The
+# resulting ROM will NOT match retail — that's expected, this build exists
+# to test-compile and diff in-progress C, not to ship. Plain `make` (no
+# NONMATCHING) is what has to keep producing a byte-identical ROM.
+# Goes to CPPFLAGS, not CFLAGS: agbcc (CC1) only ever sees the already-
+# preprocessed .i file below, so it has no idea what -D means.
+ifdef NONMATCHING
+CPPFLAGS += -DNONMATCHING
+endif
 
 # Files
 ELF = $(ROM:.gba=.elf)
@@ -50,7 +62,6 @@ ASM_SRCS := $(wildcard $(ASM_SUBDIR)/*.s)
 ASM_OBJS := $(patsubst $(ASM_SUBDIR)/%.s,$(ASM_BUILDDIR)/%.o,$(ASM_SRCS))
 
 OBJS     := $(C_OBJS) $(ASM_OBJS)
-OBJS_REL := $(patsubst $(OBJ_DIR)/%,%,$(OBJS))
 
 SUBDIRS  := $(sort $(dir $(OBJS)))
 $(shell mkdir -p $(SUBDIRS))
@@ -80,7 +91,7 @@ $(ASM_BUILDDIR)/%.o: $(ASM_SUBDIR)/%.s
 	$(AS) $(ASFLAGS) -o $@ $<
 
 $(ELF): $(OBJS)
-	cd $(OBJ_DIR) && $(LD) -Map ../$(MAP) -T ../ld_script.ld -o ../$@ $(LDFLAGS) $(OBJS_REL)
+	$(LD) -Map $(MAP) -T ld_script.ld -o $@ $(LDFLAGS) $(OBJS)
 
 $(ROM): $(ELF)
 	$(OBJCOPY) -O binary $< $@

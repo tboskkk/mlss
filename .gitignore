@@ -18,6 +18,12 @@ cmake-build-*
 tools/agbcc
 tools/binutils
 
+# matching tools (asm-differ / decomp-permuter) — local working state,
+# regenerated from the committed sources, not meant to be committed itself
+expected/
+nonmatchings/
+tools/permute-work/
+
 # graphics
 *.1bpp
 *.4bpp

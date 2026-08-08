@@ -1,3 +1,16 @@
 # Python dependencies for MLSS decomp tooling (matching, splits, progress tracking).
 PyYAML>=6.0
 
+# asm-differ (tools/split_func.py's natural next step: `asm-differ -mwo <func>`)
+asm-differ @ git+https://github.com/simonlindholm/asm-differ.git
+colorama>=0.4.6
+watchdog>=6.0.0
+levenshtein>=0.27.1
+cxxfilt>=0.3.0
+
+# decomp-permuter-agbcc (tools/permute.py); pynacl is only needed for the
+# distributed permuter@home mode, deliberately left out here.
+# pycparser 3.0 dropped the plyparser module decomp-permuter-agbcc imports
+# directly — pin to the 2.x series it was actually written against.
+pycparser>=2.21,<3.0
+toml>=0.10.2
