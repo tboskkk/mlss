@@ -269,3 +269,60 @@ Flagged as ready but not yet done: renaming `0x083A78D4`, `0x083AAE08`,
 `0x088E08E0`, and `sub_805A00C` via `tools/rename_symbol.py`, the same
 pure-text-rename pattern already proven safe on Phase 3's library-code
 matches.
+
+### The grid really is spatial tile data — rendered and confirmed
+
+`tools/render_solidity_grids.py` resolves the chain above for all 529
+rooms (501 distinct grids after dedup — many rooms share one) purely from
+ROM data, no emulation, and renders every one whose resolved size is a
+clean multiple of 30 bytes with a small byte alphabet (2-8 distinct
+values — the "plausibly real behavior data, not noise" filter). Run it
+yourself: `./container.sh tools/render_solidity_grids.py`, then look in
+`assets/solidity/png/` (176 renders as of this pass, gitignored like every
+other `tools/extract_assets.py`-style output).
+
+**Grid width is 30 tiles** (240px — one exact GBA screen width at
+8px/tile). Not a guess: 407 of the 501 resolved grids are an *exact*
+multiple of 30 bytes — clean heights seen include 10, 20, 30, 50, 60, and
+150 tiles. 93 more are exactly 2 bytes over a multiple of 30 (equivalent
+to height 5, 15, ... plus 2 mystery bytes) — inspected the first bytes of
+several and they don't clearly distinguish "real 2-byte header" from
+"alignment padding," so that part's left open.
+
+Rendering the width-30 family at that width produces genuinely coherent
+shapes, not noise — solid rectangular blocks, floor bands spanning the
+full width, evenly-spaced vertical columns. Two clean examples, both
+30×10 (`tsolidind` is the resolved-table index, not a room number — see
+`assets/solidity/manifest.json` for which rooms point at which grid):
+
+- **`tsolidind=74`**: two elevated block/platform shapes side by side.
+  `0x18` forms each platform's top edge, `0x2D` is the solid interior
+  beneath it, `0xFD` sits as a marker on top of each — and two *other*
+  grids (`tsolidind=73` and `75`) are near-identical variants of the same
+  layout, which is exactly what you'd expect from the same room in
+  slightly different game-progress states.
+- **`tsolidind=37`**: a solid mass in one corner with a stepped platform
+  below it, two evenly-spaced single-tile-wide vertical columns sitting in
+  open floor space, and a floor band spanning the full 30-tile width along
+  the bottom two rows.
+
+**Value families that recur across unrelated rooms** (not exhaustive —
+just patterns that showed up often enough to name):
+- `0x00` / `0x01` / `0x02` — small integers, `0x00` usually dominant —
+  plausibly open space / floor / a floor variant.
+- `0x18` / `0x19` / `0x2D` — `0x18` recurring specifically as a block's
+  edge/outline and `0x2D` as that same block's solid interior, in
+  multiple unrelated rooms, not just the `74`/`73`/`75` cluster above.
+- `0xFF` with `0xFB`–`0xFD` — `0xFF` overwhelmingly the most common value
+  wherever it appears (plausible "open/default" sentinel); `0xFB`/`0xFC`/
+  `0xFD` sit numerically just below it (-5/-4/-3 as signed bytes) and only
+  ever show up in small counts — a handful of special-behavior codes
+  rather than more open-space variants, is the working guess.
+
+**Still not confirmed: what any specific value actually *does* in-game** —
+does `0x2D` block movement outright or just visually, is `0x18`
+specifically a ledge and if so which direction is passable. The shapes
+are strong evidence this is real per-tile behavior data with a small
+enum, not proof of any single value's exact behavior — that needs
+correlating specific tiles against what's actually on screen in those
+rooms, which nothing here does yet.

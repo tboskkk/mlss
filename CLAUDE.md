@@ -344,10 +344,22 @@ confirmed against the independently-reverse-engineered
 found here first via our own disassembly and only checked against theirs
 afterward. This is the natural on-ramp into the physics/collision
 decompilation this project's whole goal keeps citing (see "What this is"
-above) — but the byte VALUES in that grid (which value means "solid,"
-"ledge," etc.) and the actual height/gravity variables are still
-unlocated; that's real, unstarted follow-up work, not done here. Symbol
-renames for the newly-identified addresses are ready to apply (same safe
+above).
+
+Follow-up pass: `tools/render_solidity_grids.py` resolves and renders the
+grid for every room (529 rooms, 501 distinct grids) straight from ROM
+data, no emulation. Confirmed grid width is **30 tiles** (one GBA screen,
+407 of 501 resolved grids are an exact multiple of 30 bytes) by actually
+rendering the width-30 family and getting genuinely coherent room shapes
+— solid blocks, floor bands, evenly-spaced pillars — not noise; see
+`docs/formats/README.md` for the specific examples and the recurring
+small value-families (`0x18`/`0x2D` as an edge/interior pair, `0xFF` as a
+likely open-space sentinel, etc.). Byte-value *semantics* (which value
+means "ledge," which blocks movement outright) are still unconfirmed —
+that needs correlating tiles against actual on-screen rooms, real,
+unstarted work. Same for the height/gravity variables from Part 1 of the
+physics illusion — still a different, unlocated struct. Symbol renames
+for the newly-identified addresses are ready to apply (same safe
 `tools/rename_symbol.py` pattern as Phase 3's library-code matches) but
 not yet done.
 
