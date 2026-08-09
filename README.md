@@ -21,5 +21,6 @@ Early. Most of the ROM is still raw disassembly rather than decompiled C — run
 * `tools/progress.py` reports where things stand.
 * `asm-differ` and `tools/decomp-permuter` (a submodule — `git submodule update --init`) are set up and configured; see `diff_settings.py` / `permuter_settings.toml`.
 * Good first functions: anything in `tools/progress.py`'s "not started" list, or the front of a small file (`asm/heap.s`, `asm/text08019CA4.s`, `asm/text080542C4.s`).
+* `tools/map_raw_regions.py`, `tools/find_library_code.py`, `tools/find_compressed_blocks.py`, `tools/find_pointer_tables.py` help with the harder remaining work — finding still-undissected code and mapping the untouched data blobs. See [docs/formats/README.md](docs/formats/README.md) for what they've found so far.
 
 Contact the original author on [Discord](https://discord.com/users/164348894702993408).

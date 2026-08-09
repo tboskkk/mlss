@@ -291,16 +291,30 @@ reverse engineering.
 
 ## Data/assets (Phase 4)
 
-Not started as of this pass beyond reconnaissance. 84% of the ROM (14MB)
-is two giant, entirely-unsplit `.byte` blobs: `asm/rodata081DD790.s`
-(~20KB — small, probably one or two tables, a reasonable first target) and
-`asm/rodata081E2764.s` (~14MB — the vast majority of the ROM). Real next
-steps, not yet built: a GBA BIOS compressed-block scanner (LZ77/Huffman/RLE
-all have a distinct, easy-to-grep header byte — see GBATEK "BIOS Decompression
-Functions"), and a pointer-table scanner (walk already-disassembled code's
-literal pools for `.4byte` values that land inside the rodata address range —
-those are hard evidence of "something starts here", i.e. free table
-boundaries, without having to guess at structure first).
+Reconnaissance only — neither rodata blob (`asm/rodata081DD790.s`, ~20KB;
+`asm/rodata081E2764.s`, ~14MB, both still 100% raw `.byte`) has been split
+at all. Two scanner tools exist and found real, verified structure inside
+the untouched blobs; full findings and how to use the tools are in
+[docs/formats/README.md](docs/formats/README.md) — short version:
+
+- `tools/find_compressed_blocks.py`: finds GBA BIOS-compressed (LZ77/RLE)
+  data by actually running a real decompressor and requiring it terminate
+  cleanly at the declared size — not just a header-pattern guess. 75
+  confirmed blocks found, several 500KB+ (likely major assets). RLE turns
+  out to dominate over LZ77 in this ROM.
+- `tools/find_pointer_tables.py`: finds runs of consecutive words in raw
+  rodata that all look like valid ROM addresses, cross-referenced against
+  every `.4byte` literal already in disassembled code for independent
+  confirmation. 20 code-confirmed tables found (one over 1,000 entries),
+  337 more unconfirmed (leads, not conclusions — see the doc for why).
+
+Neither tool writes anything — no rodata bytes have been split into real
+files yet, extraction is unstarted. `docs/formats/README.md` has the
+concrete next steps for each (extracting a confirmed compressed block to a
+file is a small extension of the already-tested decompressor; cross-
+checking table *entries* — not just table start addresses — against the
+compressed-block list is the more promising unstarted idea for tying the
+two findings together).
 
 ## Housekeeping still outstanding
 
