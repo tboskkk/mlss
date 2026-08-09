@@ -82,3 +82,6 @@ types_*.taghl
 *.zip
 *.sna
 __pycache__
+
+# scratch working data for tools/find_library_code.py
+.libsig-tmp/

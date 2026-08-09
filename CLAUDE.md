@@ -224,11 +224,91 @@ progress numbers.
   the asm-differ section above. Use `-o`.
 - **`pycparser>=3.0` breaks decomp-permuter-agbcc** — see above.
 
-## Things that are still fully manual (i.e., don't assume tooling exists)
+## Finishing the disassembly (Phase 3)
 
-- Data/asset splitting. 84% of the ROM (14MB) is still two giant `.byte`
-  blobs (`asm/rodata081DD790.s`, `asm/rodata081E2764.s`). Nothing in this
-  pass touches data — it's all been about code-splitting infrastructure.
-- ~642KB of `.text` was never reached by the original disassembly pass and
-  is still raw `.byte` data of unknown code/data status.
+`tools/map_raw_regions.py` walks every asm/*.s file's actual address space
+(not a whole-file average) and lists every still-raw `.byte` run with exact
+addresses — that's the real starting point for this phase, not the
+642KB-ish estimate quoted early in this project (that number came from a
+coarser per-file heuristic; run the tool for the current true figure).
+
+**Important finding: most raw-`.byte` bytes are not "unreached code".**
+The instinct is to assume a `.byte` run means Luvdis missed a function.
+In practice most of what's left in `asm/text0801A548.s` and
+`asm/text08057568.s` is data sitting between real, already-disassembled
+functions — sprite/tile/palette tables, jump tables Luvdis didn't
+recognize as such, that kind of thing. Don't assume "raw" means "missed
+code" without looking; `map_raw_regions.py --min-size N` combined with
+actually reading a region is the way to check, not the byte count alone.
+
+**A second, bigger finding: some "raw" functions were already
+disassembled — just anonymously.** `tools/find_library_code.py` byte-
+matches our own pinned agbcc's compiled libgcc/libc against the retail
+ROM (self-contained leaf routines only — no relocations to go wrong, see
+its docstring). Every hit so far turned out to already be a properly
+disassembled `thumb_func_start sub_XXXXXXX` function, just never
+identified — Luvdis had already found the code, it just couldn't know
+that `sub_81DCD38` was `memcpy`. Confirmed and renamed with
+`tools/rename_symbol.py` (pure whole-word text rename — zero risk to
+bytes, since the disassembly was already correct): `_lshrdi3`, `_muldi3`,
+`_negdi2`, `memcpy`, `memset`, `strcmp`, `strlen`, and `abort` (which
+turned out to bundle two more 2-4 byte stubs, `isatty` and `alarm`, that
+Luvdis had left as unlabeled trailing `.byte` — those got hand-split
+since they were too small for `find_library_code.py` to match on their
+own). All in `asm/text08057568.s`, clustered right before rodata begins
+(0x081DC710-0x081DD5B0) — exactly where a linker places pulled-in library
+code. **The `_call_via_rX` interworking-veneer matches found by the same
+scan were NOT applied** — they're a real binutils feature (auto-generated
+ARM/Thumb call stubs) but the specific addresses matched didn't correspond
+to any real label or raw-run boundary in our source; likely spurious
+matches of a very low-entropy repeating byte pattern (`bx rN` / `nop`
+pairs). Left alone rather than guessed at.
+
+Also labeled (not "found", just transcribed correctly): the 192-byte GBA
+cartridge header at `_08000000` in `asm/text08000000.s` — its exact layout
+comes straight from `tools/gbafix/gbafix.c`'s own `Header` struct, not
+reverse engineering.
+
+**Still open, and the actual bulk of this phase:**
+
+- `asm/text08000000.s`'s first ~94.5KB (0x08000000-0x08017A00, right after
+  the header) — almost certainly crt0/interrupt vectors plus the m4a
+  ("Sappy") sound driver, given this file is ARM-mode and only 4.2%
+  disassembled. `find_library_code.py` found nothing here — it isn't
+  libgcc/libc, and there's no pinned reference build of m4a in this repo
+  to signature-match against the way libgcc/libc could be. Matching it
+  against a known m4a disassembly (pret projects have fully decompiled
+  copies) is real, unstarted work, not a quick follow-up.
+- Two enormous, nearly-adjacent runs in `asm/text08057568.s`
+  (0x0818A658-0x081AFAAA and 0x081AFAAC-0x081C91BC, ~257KB combined) —
+  large enough that they're much more likely a big data table (dialogue?
+  event/script data? — this file holds "nearly the whole game" per the
+  original audit) than 257KB of missed code. Not yet inspected byte-by-
+  byte; don't assume either way without looking.
+- `asm/mariobros.s` has its own huge raw runs (led by one 433,882-byte
+  block) — out of scope per the Mario Bros. decision above, noted here
+  only so nobody "discovers" it as a surprise.
+
+## Data/assets (Phase 4)
+
+Not started as of this pass beyond reconnaissance. 84% of the ROM (14MB)
+is two giant, entirely-unsplit `.byte` blobs: `asm/rodata081DD790.s`
+(~20KB — small, probably one or two tables, a reasonable first target) and
+`asm/rodata081E2764.s` (~14MB — the vast majority of the ROM). Real next
+steps, not yet built: a GBA BIOS compressed-block scanner (LZ77/Huffman/RLE
+all have a distinct, easy-to-grep header byte — see GBATEK "BIOS Decompression
+Functions"), and a pointer-table scanner (walk already-disassembled code's
+literal pools for `.4byte` values that land inside the rodata address range —
+those are hard evidence of "something starts here", i.e. free table
+boundaries, without having to guess at structure first).
+
+## Housekeeping still outstanding
+
 - No CI job runs `tools/progress.py` or posts a progress badge yet.
+- `tools/apply_library_matches.py` (byte-level raw-region splicing, driven
+  by `tools/disasm_object.py`) was built and round-trip-verified for this
+  phase but ended up unused — every match this pass found was the "rename
+  an existing label" case instead. It's real, tested infrastructure for
+  whenever a `find_library_code.py` match *does* land in a genuine raw
+  `.byte` run rather than an already-labeled function; don't delete it as
+  dead code.

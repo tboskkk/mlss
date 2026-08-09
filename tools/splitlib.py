@@ -222,7 +222,9 @@ def write_ld_script(manifest: Manifest, path: Path = LD_SCRIPT) -> None:
 # --------------------------------------------------------------------------
 
 _MAP_ENTRY_HEADER_RE = re.compile(r"^ (\S+\.o)\((\.\w+)\)\s*$")
-_MAP_SECTION_SUMMARY_RE = re.compile(r"^ \.\w+\s+0x[0-9a-fA-F]+\s+0x[0-9a-fA-F]+\s+\S+\s*$")
+_MAP_SECTION_SUMMARY_RE = re.compile(
+    r"^ \.\w+\s+0x([0-9a-fA-F]+)\s+0x([0-9a-fA-F]+)\s+(\S+)\s*$"
+)
 _MAP_SYMBOL_RE = re.compile(r"^\s+0x([0-9a-fA-F]+)\s+(\S+)\s*$")
 
 
@@ -241,10 +243,33 @@ class MapSymbol:
 
 
 def parse_map(path: Path = MAP_FILE) -> list:
+    symbols, _ = _parse_map_full(path)
+    if not symbols:
+        raise SystemExit(f"parsed 0 symbols from {path} — map format may have changed")
+    return symbols
+
+
+def parse_object_bases(path: Path = MAP_FILE) -> dict:
+    """{(obj_path, section): base_address} for every object contribution,
+    e.g. {("build/asm/heap.o", "text"): 0x08018CEC}."""
+    _, bases = _parse_map_full(path)
+    return bases
+
+
+def file_base_address(entry: "Entry", path: Path = MAP_FILE) -> int:
+    """Base address of one splits.yaml entry's contribution, per the map
+    file. Returns None if this build doesn't happen to link that object
+    (shouldn't happen for anything actually in splits.yaml, but fail soft
+    here — callers can decide how loud to be)."""
+    return parse_object_bases(path).get((entry.object_rel, entry.section))
+
+
+def _parse_map_full(path: Path):
     if not path.exists():
         raise SystemExit(f"{path} not found. Build first: ./container.sh make")
 
     symbols = []
+    bases = {}
     cur_obj = None
     cur_section = None
     for line in path.read_text().splitlines():
@@ -253,16 +278,17 @@ def parse_map(path: Path = MAP_FILE) -> list:
             cur_obj, section_dot = m.group(1), m.group(2)
             cur_section = section_dot.lstrip(".")
             continue
-        if _MAP_SECTION_SUMMARY_RE.match(line):
+        m = _MAP_SECTION_SUMMARY_RE.match(line)
+        if m:
+            addr_hex, _size_hex, objpath = m.groups()
+            bases[(objpath, cur_section)] = int(addr_hex, 16)
             continue
         m = _MAP_SYMBOL_RE.match(line)
         if m and cur_obj is not None:
             symbols.append(
                 MapSymbol(addr=int(m.group(1), 16), name=m.group(2), obj=cur_obj, section=cur_section)
             )
-    if not symbols:
-        raise SystemExit(f"parsed 0 symbols from {path} — map format may have changed")
-    return symbols
+    return symbols, bases
 
 
 def find_symbol(token: str, symbols: list) -> MapSymbol:
