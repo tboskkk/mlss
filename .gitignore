@@ -85,3 +85,9 @@ __pycache__
 
 # scratch working data for tools/find_library_code.py
 .libsig-tmp/
+.tmp-preview/
+
+# tools/extract_assets.py output — decompressed/rendered game data, derived
+# straight from the copyrighted ROM (like baserom.gba itself, never
+# committed) and fully regenerable by re-running the tool
+assets/

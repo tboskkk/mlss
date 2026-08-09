@@ -1,9 +1,10 @@
 # Data formats — findings so far
 
-Phase 4 (splitting the 14MB of still-100%-raw rodata) barely started this
-pass — this is reconnaissance, not a catalog. Two tools, real findings,
-neither blob touched yet. See [CLAUDE.md](../../CLAUDE.md) for how this
-fits into the overall project phasing.
+Phase 4 (splitting the 14MB of still-100%-raw rodata) is reconnaissance
+plus a first real extraction pass — not a catalog, and neither rodata blob
+is actually *split* (turned into committed, buildable source) yet. See
+[CLAUDE.md](../../CLAUDE.md) for how this fits into the overall project
+phasing.
 
 ## Compressed blocks — `tools/find_compressed_blocks.py`
 
@@ -34,11 +35,62 @@ are large enough to be major assets, not incidental data:
 (full list from a live run — re-run the tool rather than trusting this
 snapshot as it ages)
 
-Next step this doesn't do yet: nothing decompresses these to a file. The
-validator's decompressor is real and tested (every "confirmed" row above
-ran to completion) but only outputs a byte count right now — turning it
-into `tools/extract_asset.py <addr> -o out.bin` is a small extension of
-the same code, not a new investigation.
+The decompressor moved to `tools/gba_compress.py` (shared with the
+extraction tool below, so the two can't drift out of sync).
+
+## Extracting to real files — `tools/extract_assets.py`
+
+Runs the same confirmed-block scan and actually writes the decompressed
+bytes out, instead of just reporting a size.
+
+Run: `./container.sh tools/extract_assets.py` (writes to `assets/` —
+gitignored, like `baserom.gba`: this is decompressed copyrighted game
+data, regenerate it locally, never commit it)
+
+- `assets/raw/<addr>_<type>.bin` — every one of the 75 confirmed blocks,
+  decompressed for real.
+- `assets/png/<addr>_<w>x<h>[_synth].png` — a rendered preview for every
+  block whose decompressed size is a clean multiple of 32 bytes (one 4bpp
+  GBA tile), on the reasoning that a real tile-graphics asset almost
+  always sizes out that way. Rendered as a flat 16-tiles-wide grid — **not**
+  necessarily the game's actual on-screen layout, which needs a tilemap
+  this pass doesn't have; same raw-content preview any GBA tile viewer
+  gives you before you know the real arrangement.
+- `assets/manifest.json` — every block's address, type, sizes, file
+  paths, and (for rendered ones) which palette got used and its
+  `nibble_dominance` score.
+
+**The tile decoder itself is verified correct**, not just "seems to
+work": rendered against `dword_81DD9F4`, the Game Boy Player boot-logo
+tile data — real, uncompressed, 4bpp GBA tiles with a known address,
+already documented in `src/game_boy_player_logo.c` (copied straight to
+`BG_CHAR_ADDR` via `sub_8018218`, so there's no ambiguity about what it
+is). That render shows a clearly structured, dithered texture, not noise
+— confirms the nibble order (low nibble = left pixel) and byte layout are
+right.
+
+**What's *not* verified: which of the 75 confirmed compressed blocks are
+actually tile graphics at all.** "Decompressed size is a multiple of 32"
+is a weak classifier on its own — plenty of non-graphics data (event
+tables, that sort of thing) will coincidentally satisfy it. Tried both
+several alternate grid widths and an 8bpp reinterpretation on the first
+few candidates; none produced an obviously coherent picture the way the
+validated Game Boy Player logo render does. That doesn't rule them out
+(wrong width alone can make real tile data look like noise — that's normal
+for this technique, not a red flag by itself), it just means none of them
+are *confirmed* yet the way `0x0851F9E8`'s pointer table was confirmed by
+an independent code cross-reference.
+
+`nibble_dominance` (in the manifest, and in the tool's own sorted summary
+output) is a cheap secondary signal worth prioritizing by: real GBA tiles
+usually have a dominant background/transparent color, so a high share of
+one nibble value is at least *suggestive*. Highest-scoring candidate this
+pass: `0x08820273` at 60% (25,856 decompressed bytes, real nearby palette
+found) — worth a closer manual look before the others.
+
+Bottom line: extraction infrastructure is solid and verified end to end
+(decompress → write file → render → confirmed-correct decode). Confidently
+labeling *which* files are which kind of asset is real, unstarted work.
 
 ## Pointer tables — `tools/find_pointer_tables.py`
 

@@ -14,3 +14,6 @@ cxxfilt>=0.3.0
 # directly — pin to the 2.x series it was actually written against.
 pycparser>=2.21,<3.0
 toml>=0.10.2
+
+# tools/extract_assets.py — rendering decompressed GBA tile data to PNG
+Pillow>=10.0

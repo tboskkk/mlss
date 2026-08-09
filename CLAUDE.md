@@ -291,30 +291,39 @@ reverse engineering.
 
 ## Data/assets (Phase 4)
 
-Reconnaissance only — neither rodata blob (`asm/rodata081DD790.s`, ~20KB;
-`asm/rodata081E2764.s`, ~14MB, both still 100% raw `.byte`) has been split
-at all. Two scanner tools exist and found real, verified structure inside
-the untouched blobs; full findings and how to use the tools are in
-[docs/formats/README.md](docs/formats/README.md) — short version:
+Neither rodata blob (`asm/rodata081DD790.s`, ~20KB; `asm/rodata081E2764.s`,
+~14MB, both still 100% raw `.byte`) has been *split* (turned into real,
+committed, buildable source) yet — but real bytes have now been pulled out
+and written to files, which is further than pure recon. Full findings and
+how to use the tools are in [docs/formats/README.md](docs/formats/README.md)
+— short version:
 
-- `tools/find_compressed_blocks.py`: finds GBA BIOS-compressed (LZ77/RLE)
-  data by actually running a real decompressor and requiring it terminate
-  cleanly at the declared size — not just a header-pattern guess. 75
-  confirmed blocks found, several 500KB+ (likely major assets). RLE turns
-  out to dominate over LZ77 in this ROM.
+- `tools/find_compressed_blocks.py` / `tools/gba_compress.py`: finds GBA
+  BIOS-compressed (LZ77/RLE) data with a real decompressor requiring clean
+  termination at the declared size — not a header-pattern guess. 75
+  confirmed blocks, several 500KB+. RLE dominates over LZ77 in this ROM.
+- `tools/extract_assets.py`: decompresses all 75 to `assets/raw/*.bin`
+  (gitignored — decompressed copyrighted game data, same treatment as
+  `baserom.gba`) and renders a tile-grid PNG preview for anything sized as
+  a clean multiple of 32 bytes. **The tile decoder is verified correct**
+  against `dword_81DD9F4` — known, already-documented, uncompressed GBA
+  tile data (see `src/game_boy_player_logo.c`) — not just "looks plausible."
+  **Which of the 75 blocks are actually graphics is not verified** — the
+  32-byte-size classifier alone is weak; treat PNG output as leads, ranked
+  by a `nibble_dominance` heuristic, not conclusions. `0x08820273` is the
+  current best unconfirmed candidate (60% dominance).
 - `tools/find_pointer_tables.py`: finds runs of consecutive words in raw
   rodata that all look like valid ROM addresses, cross-referenced against
   every `.4byte` literal already in disassembled code for independent
   confirmation. 20 code-confirmed tables found (one over 1,000 entries),
-  337 more unconfirmed (leads, not conclusions — see the doc for why).
+  337 more unconfirmed.
 
-Neither tool writes anything — no rodata bytes have been split into real
-files yet, extraction is unstarted. `docs/formats/README.md` has the
-concrete next steps for each (extracting a confirmed compressed block to a
-file is a small extension of the already-tested decompressor; cross-
-checking table *entries* — not just table start addresses — against the
-compressed-block list is the more promising unstarted idea for tying the
-two findings together).
+Concrete unstarted next steps in `docs/formats/README.md`: confirming
+which extracted blocks are really graphics (vs. some other RLE-compressed
+data that happened to size out to a multiple of 32); cross-checking
+pointer table *entries* (not just table start addresses) against the
+compressed-block address list, which came up empty at the table-address
+level but was never tried at the entry level.
 
 ## Housekeeping still outstanding
 

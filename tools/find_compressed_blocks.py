@@ -10,12 +10,16 @@ nibble is the type (1=LZ77, 2=Huffman, 3=RLE); bytes 1-3 are the 24-bit
 decompressed size, little-endian. That header alone is a weak signal (1 in
 ~4096 random 4-byte windows would coincidentally look like *something*'s
 header) — LZ77 and RLE candidates here are only reported after actually
-running them through a real decompressor and confirming it terminates
-cleanly at exactly the claimed size with no out-of-bounds or invalid
-back-references. That's about as strong as validation gets without a
-cross-reference (a pointer to the block from code, which
+running them through tools/gba_compress.py's real decompressors and
+confirming a clean decode at exactly the claimed size, with no out-of-
+bounds or invalid back-references. That's about as strong as validation
+gets without a cross-reference (a pointer to the block from code, which
 tools/find_pointer_tables.py looks for separately). Huffman candidates are
 header-only (no decoder here yet) and noted as lower-confidence.
+
+To actually get the decompressed bytes onto disk (not just a size in this
+report), see tools/extract_assets.py — it uses the same gba_compress.py
+codecs.
 
 Defaults to scanning both rodata blobs' address range; pass --start/--end
 to scan anywhere else (e.g. inside asm/text0801A548.s's sprite data).
@@ -28,6 +32,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import splitlib
+from gba_compress import scan as scan_compressed
 
 BASEROM = splitlib.ROOT / "baserom.gba"
 ROM_BASE = 0x08000000
@@ -36,78 +41,6 @@ ROM_BASE = 0x08000000
 # rodata — see tools/splits.yaml's "rodata" group.
 DEFAULT_START = 0x081DD790
 DEFAULT_END = 0x08F50000  # asm/mariobros.s picks up from here; see CLAUDE.md
-
-
-def try_lz77(data: bytes, off: int, max_size: int):
-    if off + 4 > len(data) or (data[off] & 0x0F) != 0 or (data[off] & 0xF0) != 0x10:
-        return None
-    size = data[off + 1] | (data[off + 2] << 8) | (data[off + 3] << 16)
-    if size == 0 or size > max_size:
-        return None
-    pos = off + 4
-    out_len = 0
-    out = bytearray()
-    end = min(len(data), off + 4 + max_size * 2)  # sane upper bound on scan
-    while out_len < size:
-        if pos >= end:
-            return None
-        flags = data[pos]
-        pos += 1
-        for bit in range(7, -1, -1):
-            if out_len >= size:
-                break
-            if flags & (1 << bit):
-                if pos + 2 > end:
-                    return None
-                b1, b2 = data[pos], data[pos + 1]
-                pos += 2
-                length = (b1 >> 4) + 3
-                disp = ((b1 & 0x0F) << 8 | b2) + 1
-                if disp > out_len:
-                    return None
-                for _ in range(length):
-                    if out_len >= size:
-                        break
-                    out.append(out[out_len - disp])
-                    out_len += 1
-            else:
-                if pos >= end:
-                    return None
-                out.append(data[pos])
-                pos += 1
-                out_len += 1
-    return pos - off, size
-
-
-def try_rle(data: bytes, off: int, max_size: int):
-    if off + 4 > len(data) or (data[off] & 0x0F) != 0 or (data[off] & 0xF0) != 0x30:
-        return None
-    size = data[off + 1] | (data[off + 2] << 8) | (data[off + 3] << 16)
-    if size == 0 or size > max_size:
-        return None
-    pos = off + 4
-    out_len = 0
-    end = min(len(data), off + 4 + max_size * 2)
-    while out_len < size:
-        if pos >= end:
-            return None
-        flag = data[pos]
-        pos += 1
-        length = (flag & 0x7F)
-        if flag & 0x80:
-            length += 3
-            if pos >= end:
-                return None
-            pos += 1
-        else:
-            length += 1
-            if pos + length > end:
-                return None
-            pos += length
-        out_len += length
-    if out_len != size:
-        return None
-    return pos - off, size
 
 
 def huffman_candidate(data: bytes, off: int, max_size: int):
@@ -141,30 +74,21 @@ def main() -> None:
     rom = BASEROM.read_bytes()
 
     lo, hi = args.start - ROM_BASE, args.end - ROM_BASE
-    found = []
-    off = lo
-    while off < hi:
-        r = try_lz77(rom, off, args.max_size)
-        if r:
-            consumed, size = r
-            found.append((ROM_BASE + off, "LZ77", consumed, size))
-            off += consumed
-            continue
-        r = try_rle(rom, off, args.max_size)
-        if r:
-            consumed, size = r
-            found.append((ROM_BASE + off, "RLE", consumed, size))
-            off += consumed
-            continue
-        if args.show_huffman_candidates:
+    all_hits = scan_compressed(rom, lo, hi, min_size=1, max_size=args.max_size)
+    confirmed = [(ROM_BASE + off, kind, consumed, len(dec)) for off, kind, consumed, dec in all_hits
+                 if len(dec) >= args.min_size]
+    hidden = len(all_hits) - len(confirmed)
+
+    huffman = []
+    if args.show_huffman_candidates:
+        # Not worth excluding bytes already covered by a confirmed LZ77/RLE
+        # hit here — this output is already caveated as noisy and off by
+        # default; a byte coincidentally looking like *both* is rare enough
+        # not to bother with the interval bookkeeping.
+        for off in range(lo, hi):
             size = huffman_candidate(rom, off, args.max_size)
             if size:
-                found.append((ROM_BASE + off, "Huffman?", None, size))
-        off += 1
-
-    confirmed = [f for f in found if f[1] != "Huffman?" and f[3] >= args.min_size]
-    huffman = [f for f in found if f[1] == "Huffman?"]
-    hidden = len(found) - len(confirmed) - len(huffman)
+                huffman.append((ROM_BASE + off, "Huffman?", None, size))
 
     print(f"{'address':<12}{'type':<10}{'compressed':>12}{'decompressed':>14}")
     for addr, kind, consumed, size in confirmed + huffman:
