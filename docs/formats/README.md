@@ -144,3 +144,128 @@ address) against the compressed-block address list is real, unstarted
 work and the more promising version of this idea — a table of pointers to
 compressed per-level or per-character assets is a very ordinary GBA data
 layout, and would be a strong found-a-real-structure result if it's here.
+
+## Room properties and the solidity/collision pipeline
+
+Not from either scanner above — found by hand, prompted by cross-
+referencing a community ROM-hacking tool's UI against our own disassembly.
+Unlike the tile-graphics classification question above, this one is
+address-level confirmed, not a heuristic guess.
+
+### The room record table — `0x083A78D4`
+
+A flat array of 24-byte (`0x18`) fixed-stride records, one per room. At
+least five call sites in `text08057568.s` (`sub_8059704`, `sub_8059EC8`,
+`sub_805D914`, `sub_80EEE08`, `sub_8123308`) compute
+`0x083A78D4 + room_index * 0x18` and load/copy the record wholesale
+(`ldm`/`stm` of 6 words) into fixed IWRAM staging addresses (`0x03000DD0`
+and `0x03000DE8` — two adjacent 24-byte slots).
+
+This is the exact same table the community
+[Yoshi Magic](https://github.com/CaptainSwag101/YoshiMagic) editor calls
+`rpbank` (`Dim rpbank As Integer = &H83A78D4`, in its
+`Yoshi Magic/roomproperties.vb`) — found independently here via
+disassembly first, and only cross-checked against their source afterward.
+Their code reads the 24 bytes as a sequence of named fields, which lines
+up exactly with the stride and gives a complete field layout for free.
+Verified byte-for-byte against a live ROM dump of record 35 — chosen
+because that's the exact room a screenshot of their editor's Room
+Properties screen happened to show (its "Room Props. Offset: 3A7C1C"
+readout is exactly `0x083A78D4 + 35*0x18`):
+
+| Offset | Field (their name) | Type | Record 35's value |
+|---|---|---|---:|
+| `0x00` | `rnind` — room name index | u8 | 2 |
+| `0x01` | `mlind` — Mario/Luigi | u8 | 1 |
+| `0x02` | `underwaterflag` | u8 | 0 |
+| `0x03` | `ctind` — compressed tile group | u8 | 5 |
+| `0x04` | `tsind` — tileset | u8 | 5 |
+| `0x05` | `palind` — palette | u8 | 7 |
+| `0x06` | `solidind` | u8 | 3 |
+| `0x07` | `aniind` — animation | u8 | 3 |
+| `0x08` | `unk1ind` | u8 | 0 |
+| `0x09` | `laybind` — layer binding | u8 | 2 |
+| `0x0A` | `tmodsind` — tile mods | u8 | 0 |
+| `0x0B` | `unk2ind` | u8 | 0 |
+| `0x0C` | `ls1ind` | u8 | 0 |
+| `0x0D` | `ls2ind` | u8 | 0 |
+| `0x0E` | `mapscrind` — map scroll | u16 | 35 |
+| `0x10` | `npcind` — NPC set | u16 | 35 |
+| `0x12` | `ls3ind` | u8 | 0 |
+| `0x13` | `ls4ind` | u8 | 0 |
+| `0x14` | `songind` — background music | u8 | 8 |
+| `0x15` | `unk3ind` | u8 | 0 |
+| `0x16` | `itmbkind` — item bank | u16 | 35 |
+
+The `+0x10` field is a nice independent tie-breaker for the whole table:
+`sub_80EEE08` (a generic function operating on an unrelated caller struct)
+separately reads a record's `+0x10` halfword and uses it as an index into
+the already-confirmed 1,024-entry pointer table at `0x083D6C58` (see
+above) — exactly matching what the field is named for in the community
+source (`npcind`, an NPC-set index).
+
+### The solidity data itself is not `solidind` — it's a separate two-level chain
+
+The obvious guess — byte `solidind` at `+0x06`, a small 0-255 index — turns
+out to be a dead end that the tool's own authors apparently abandoned
+mid-development: `roomproperties.vb` has commented-out code that tried
+`solidind` as an index into a table at `0x083AADD0`, sitting right next to
+the *active* code, which uses a completely different chain:
+
+```
+room_index (ctx+0x1E)
+  -> RoomSolidityIndexTable @ 0x083AAE08   (8 bytes/room)
+       read u16 at +0x06  =  tsolidind
+  -> SolidityPointerTable  @ 0x088E08E0   (4 bytes/entry, indexed by tsolidind)
+       read u32            =  a *relative* offset, not an absolute pointer
+  -> solidity grid base = 0x088E08E0 + that offset
+```
+
+Both tables are real, heavily-used code in our own disassembly, not just
+the community tool's claim — `0x083AAE08` alone is referenced from **17
+separate call sites** in `text08057568.s`, and one of them (`sub_805A00C`)
+walks the *entire* chain in a single function, then does a straight
+row-major byte copy from the resolved ROM address into a working RAM
+buffer:
+
+```c
+// sub_805A00C, translated to readable pseudo-C from the real Thumb
+// disassembly — not a matched decompilation attempt, just a translation
+void stage_room_solidity_grid(RoomCtx *ctx) {
+    u16 tsolidind = RoomSolidityIndexTable[ctx->room_index].field_0x06;
+    s32 rel_off   = SolidityPointerTable[tsolidind];
+    u8 *grid      = (u8 *)(0x088E08E0 + rel_off);
+
+    for (u16 row = 0; row < ctx->grid_height; row++)
+        for (u16 col = 0; col < ctx->grid_width; col++)
+            ctx->working_grid[row * ctx->grid_width + col] =
+                grid[row * ctx->grid_width + col];
+}
+```
+
+`ctx` (still an unidentified pointer — most likely a "current room/map
+state" singleton) now has four known field offsets from this alone:
+`+0x1E` room index (also used to index the `0x083A78D4` table above — same
+ID space, confirmed by both functions agreeing), `+0x26` grid width,
+`+0x28` grid height, `+0x9C` pointer to the destination working buffer.
+
+**What this confirms:** where the per-room collision/solidity grid lives
+in ROM, and the exact two-level indirection the retail game uses to reach
+it — cross-validated two independent ways (our own disassembly first; the
+community tool's decade-plus-old, independently-reverse-engineered source
+second, consulted only after the addresses were already found here).
+
+**What this does *not* yet tell us:** what the individual grid byte
+VALUES mean (which value is "solid," which is "ledge," etc.) — the
+community tool just renders them as raw hex in a color-coded grid for a
+human to eyeball, it doesn't decode them either. Also still unlocated: the
+actual height/gravity/jump-velocity variables that drive the vertical half
+of the walk-behind-scenery illusion (see [CLAUDE.md](../../CLAUDE.md) for
+why this matters to the project). Both are now much more tractable
+follow-ups than before this table was found — the hard part, locating the
+data and the code path that reaches it, is done.
+
+Flagged as ready but not yet done: renaming `0x083A78D4`, `0x083AAE08`,
+`0x088E08E0`, and `sub_805A00C` via `tools/rename_symbol.py`, the same
+pure-text-rename pattern already proven safe on Phase 3's library-code
+matches.

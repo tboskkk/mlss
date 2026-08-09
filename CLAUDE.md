@@ -325,6 +325,32 @@ pointer table *entries* (not just table start addresses) against the
 compressed-block address list, which came up empty at the table-address
 level but was never tried at the entry level.
 
+## Room properties table & the solidity/collision data pipeline
+
+Found while answering a question about the community `Yoshi Magic`
+editor's "Solidity Map" feature, not from a planned phase step — but it's
+real, address-level-confirmed reverse engineering, not just discussion, so
+it's recorded here like any other finding. Full writeup with the field
+table and pointer-chain detail is in
+[docs/formats/README.md](docs/formats/README.md#room-properties-and-the-soliditycollision-pipeline).
+
+Short version: the per-room properties table (`0x083A78D4`, 24 bytes/room,
+full field layout known) and the two-level pointer chain that resolves
+each room's actual solidity/collision tile-grid (`0x083AAE08` →
+`0x088E08E0` → a row-major byte-per-tile grid, staged into RAM by
+`sub_805A00C`) are now both located and structurally understood — cross-
+confirmed against the independently-reverse-engineered
+[Yoshi Magic](https://github.com/CaptainSwag101/YoshiMagic) tool's source,
+found here first via our own disassembly and only checked against theirs
+afterward. This is the natural on-ramp into the physics/collision
+decompilation this project's whole goal keeps citing (see "What this is"
+above) — but the byte VALUES in that grid (which value means "solid,"
+"ledge," etc.) and the actual height/gravity variables are still
+unlocated; that's real, unstarted follow-up work, not done here. Symbol
+renames for the newly-identified addresses are ready to apply (same safe
+`tools/rename_symbol.py` pattern as Phase 3's library-code matches) but
+not yet done.
+
 ## Housekeeping still outstanding
 
 - No CI job runs `tools/progress.py` or posts a progress badge yet.
