@@ -337,6 +337,29 @@ def function_starts(path: Path):
     return lines, starts
 
 
+_HEADER_LINE_RES = [
+    re.compile(r'^\s*\.include\s+"asm/macros\.inc"\s*$'),
+    re.compile(r'^\s*$'),
+    re.compile(r'^\s*\.syntax\s+unified\s*$'),
+    re.compile(r'^\s*\.text\s*$'),
+    re.compile(r'^\s*$'),
+]
+
+
+def _header_end(lines) -> Optional[int]:
+    """Line index right after the fixed 5-line file header (.include
+    macros.inc / blank / .syntax unified / .text / blank) every asm/*.s
+    blob starts with — or None if the first lines don't match it (leaves
+    callers free to fall back to the old, conservative behavior rather than
+    guess on a format this hasn't seen)."""
+    if len(lines) < len(_HEADER_LINE_RES):
+        return None
+    for line, pattern in zip(lines, _HEADER_LINE_RES):
+        if not pattern.match(line):
+            return None
+    return len(_HEADER_LINE_RES)
+
+
 def extract_function_lines(path: Path, name: str):
     """Return (all_lines, start_index, end_index) for `name`'s definition in `path`.
 
@@ -344,6 +367,9 @@ def extract_function_lines(path: Path, name: str):
     remaining function-start directive in the file — this tool only supports
     front-to-back extraction, matching how every split in this project has
     been done so far (see CLAUDE.md).
+
+    start_index is usually just `name`'s own thumb_func_start line, but see
+    the leading-unlabeled-data handling below: it can be earlier than that.
     """
     lines, starts = function_starts(path)
     idx = next((i for i, (n, _) in enumerate(starts) if n == name), None)
@@ -360,5 +386,20 @@ def extract_function_lines(path: Path, name: str):
             f"split_func.py only extracts front-to-back within a file (see CLAUDE.md for why).\n"
             f"Extract {earlier[0]!r} first — it's currently first in this file."
         )
+
+    # Luvdis sometimes left a run of raw, never-labeled .byte data (real
+    # code or data it didn't recognize as a function) sitting between the
+    # file header and the first labeled function — CLAUDE.md's own Phase 3
+    # notes flag this as common. That data has to stay immediately before
+    # this function in the final byte order. If it's left behind in
+    # `remaining`, it silently ends up placed *after* wherever this
+    # extraction's new destination file lands instead — a real, previously
+    # unnoticed extraction bug (found via a fresh pilot agent hitting it on
+    # text08019CA4.s; also present verbatim in text080542C4.s). Detect it
+    # and fold it into this extraction instead of leaving it behind.
+    header_end = _header_end(lines)
+    if header_end is not None and header_end < start_line:
+        if any(line.strip() for line in lines[header_end:start_line]):
+            start_line = header_end
 
     return lines, start_line, end_line
