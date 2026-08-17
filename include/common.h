@@ -202,6 +202,7 @@ void sub_800063C();
 void sub_8017E34(void);
 void sub_8018218(void*, void*, size_t, int, int);
 void sub_8018B78(int, void (*)(void));
+void* alloc_heap_8018CEC(bool32 heapId, u32 size, char* tag);
 void free_heap_8018D9C(void*);
 void free_heap_8018DA8(void* ptr);
 void* alloc_zero_8018DB4(int, bool32, char*, int);
@@ -273,6 +274,7 @@ extern int (*dword_3001038)();
 // ROM
 extern int loc_8198220();
 extern int loc_819832C(int, int);
+extern u8 str_FREE_81DD7C8[4];
 extern u8 dword_81DD7F4[];
 extern u8 dword_81DD9F4[16384];
 extern u8 dword_81E19F4[1280];

@@ -31,6 +31,8 @@ dword_3001038 = 0x03001038;
 sub_800063C = 0x0800063C;
 loc_8198220 = 0x08198220;
 loc_819832C = 0x0819832C;
+str_FREE_81DD7C8 = 0x081DD7C8;  /* 4-byte ASCII "FREE" tag, written into every free heap
+                                  * block's label field by alloc_heap_8018CEC/free_heap_memory_8018C68 */
 dword_81DD7F4 = 0x081DD7F4;
 dword_81DD9F4 = 0x081DD9F4;
 dword_81E19F4 = 0x081E19F4;
