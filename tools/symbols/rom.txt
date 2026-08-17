@@ -32,6 +32,16 @@ word_83A7530 = 0x083A7530;
 word_83A7574 = 0x083A7574;
 word_83A75B8 = 0x083A75B8;
 word_83A75C8 = 0x083A75C8;
+
+/* Room properties / solidity-collision pipeline — see
+ * docs/formats/README.md#room-properties-and-the-soliditycollision-pipeline
+ * for the full derivation. All four confirmed by live call sites in
+ * text08057568.s, not guessed from address proximity alone. */
+room_props_table = 0x083A78D4;            /* 24 bytes/room; solidind @ +0x06 selects col_set_ptr_table */
+col_set_ptr_table = 0x083AADD0;           /* 14 x u32 pointers to 256-entry coldef arrays (081E2860 family) */
+room_solidity_index_table = 0x083AAE08;   /* 8 bytes/room; tsolidind @ +0x06 selects solidity_grid_offset_table */
+solidity_grid_offset_table = 0x088E08E0;  /* indexed by tsolidind; each entry is a *relative* offset, not an absolute pointer */
+
 stru_8CDBD68 = 0x08CDBD68;
 stru_8CDBD78 = 0x08CDBD78;
 stru_8CDC1F8 = 0x08CDC1F8;

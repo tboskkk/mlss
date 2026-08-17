@@ -334,12 +334,13 @@ it's recorded here like any other finding. Full writeup with the field
 table and pointer-chain detail is in
 [docs/formats/README.md](docs/formats/README.md#room-properties-and-the-soliditycollision-pipeline).
 
-Short version: the per-room properties table (`0x083A78D4`, 24 bytes/room,
-full field layout known) and the two-level pointer chain that resolves
-each room's actual solidity/collision tile-grid (`0x083AAE08` →
-`0x088E08E0` → a row-major byte-per-tile grid, staged into RAM by
-`sub_805A00C`) are now both located and structurally understood — cross-
-confirmed against the independently-reverse-engineered
+Short version: the per-room properties table (`room_props_table`, was
+`0x083A78D4`, 24 bytes/room, full field layout known) and the two-level
+pointer chain that resolves each room's actual solidity/collision
+tile-grid (`room_solidity_index_table` → `solidity_grid_offset_table` → a
+row-major byte-per-tile grid, staged into RAM by
+`stage_room_solidity_grid`) are now both located and structurally
+understood — cross-confirmed against the independently-reverse-engineered
 [Yoshi Magic](https://github.com/CaptainSwag101/YoshiMagic) tool's source,
 found here first via our own disassembly and only checked against theirs
 afterward. This is the natural on-ramp into the physics/collision
@@ -354,14 +355,34 @@ rendering the width-30 family and getting genuinely coherent room shapes
 — solid blocks, floor bands, evenly-spaced pillars — not noise; see
 `docs/formats/README.md` for the specific examples and the recurring
 small value-families (`0x18`/`0x2D` as an edge/interior pair, `0xFF` as a
-likely open-space sentinel, etc.). Byte-value *semantics* (which value
-means "ledge," which blocks movement outright) are still unconfirmed —
-that needs correlating tiles against actual on-screen rooms, real,
-unstarted work. Same for the height/gravity variables from Part 1 of the
-physics illusion — still a different, unlocated struct. Symbol renames
-for the newly-identified addresses are ready to apply (same safe
-`tools/rename_symbol.py` pattern as Phase 3's library-code matches) but
-not yet done.
+likely open-space sentinel, etc.).
+
+**The "what do grid byte values mean" gap is now closed at the structural
+level.** A grid byte is not a self-contained enum — it's an index (0-255)
+into one of 14 possible 256-entry × 4-byte "coldef" arrays, selected per
+room by `room_props_table`'s `solidind` field via a newly found pointer
+table (`col_set_ptr_table`, `0x083AADD0` — the same address the Yoshi
+Magic authors tried and apparently abandoned per their own commented-out
+code, but it's live, heavily-used code here). Full derivation, the coldef
+struct's byte layout, and the one confirmed live caller are in
+`docs/formats/README.md`'s "missing link" subsection. Still open: what a
+coldef's individual bytes *do* (which is height/offset, which is a
+slope/edge type enum) — traced the struct shape, not yet the semantics.
+Same open status for the height/gravity variables from Part 1 of the
+physics illusion — still a different, unlocated struct.
+
+Symbol renames for the room-properties addresses **have been applied**:
+`sub_805A00C` → `stage_room_solidity_grid`; `room_props_table`,
+`col_set_ptr_table`, `room_solidity_index_table`,
+`solidity_grid_offset_table` added to `tools/symbols/rom.txt`. Rebuild
+verified byte-identical (`mlss.gba: OK`) afterward. Worth knowing this is
+a *new* rename pattern for this project, not quite the same safety
+argument as Phase 3's: these four addresses only ever appear as raw hex
+literals inside still-raw, unextracted `asm/text08057568.s`, so the
+rename relies on the linker's `--just-symbols=symbols.txt` resolving an
+undefined symbol reference from inside a standalone-assembled `.s` file —
+mechanically different from Phase 3's local-label-only renames, though
+confirmed working the same way.
 
 ## Housekeeping still outstanding
 

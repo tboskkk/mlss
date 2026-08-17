@@ -326,3 +326,91 @@ are strong evidence this is real per-tile behavior data with a small
 enum, not proof of any single value's exact behavior — that needs
 correlating specific tiles against what's actually on screen in those
 rooms, which nothing here does yet.
+
+### The missing link: grid bytes are indices into a per-room coldef array
+
+Found by reading the three functions clustered immediately after
+`stage_room_solidity_grid` (renamed from `sub_805A00C`, see above) in
+`text08057568.s` — `load_col_set_to_dest`, `get_coldef_ptr_by_idx`,
+`get_coldef_ptr_by_xz` — names the original decompilation pass had
+already given these functions (unlike the `sub_XXXXXXX` default) even
+though nobody had extracted or explained them yet. That was the tell
+that they were worth reading closely.
+
+`get_coldef_ptr_by_xz(ctx, x, z)` computes `width*z + x` and indexes
+straight into `ctx->working_grid` (`ctx+0x9C`) — **the exact same buffer**
+`stage_room_solidity_grid` fills from the spatial solidity grid (confirmed
+by the identical `+0x9C` field offset, not just similar code shape). It
+reads one grid byte, then passes it as `idx` to:
+
+```c
+get_coldef_ptr_by_idx(ctx, idx) { return ctx->active_coldef_array /* ctx+0xA0 */ + idx * 4; }
+```
+
+So a solidity grid byte is not a self-contained enum tag — **it's an index
+(0-255) into a 256-entry array of 4-byte structs**, one array "staged" per
+room. `load_col_set_to_dest` does that staging: it reads the room's
+`solidind` field (room_props_table `+0x06` — the field the community
+Yoshi Magic tool's own source tried and apparently gave up on, per its
+commented-out code, see above) as an index into a **newly found** 14-entry
+pointer table at `0x083AADD0` (renamed `col_set_ptr_table`), each entry
+pointing at one 256-entry × 4-byte coldef array:
+
+```
+room_props_table[room].solidind (+0x06)
+  -> col_set_ptr_table @ 0x083AADD0   (14 x u32, indexed by solidind)
+       -> one of 14 coldef arrays (081E2860, 081E2F78, 081E2B78, 081E3378, ...)
+            each 256 entries x 4 bytes, copied wholesale into ctx+0xA0
+
+grid_byte = working_grid[z * width + x]        (the spatial byte from stage_room_solidity_grid)
+coldef    = active_coldef_array[grid_byte]      (get_coldef_ptr_by_idx/by_xz)
+```
+
+This closes the exact gap the section above called "the actual bulk of
+this phase... unstarted": **why grid byte values recur across unrelated
+rooms with the same apparent visual role.** They're not universal — each
+room selects one of 14 possible 256-entry lookup tables via `solidind`,
+and the grid byte is the lookup key, not the meaning itself. `0x18`/`0x2D`
+looking like a consistent edge/interior pair across many rooms just means
+those rooms happen to share (or coincidentally agree on) the same
+`solidind`.
+
+**The coldef struct itself, read across all 14 arrays (3,584 entries)**:
+4 bytes, `{b0, b1, b2, b3}`. `b3 & 0x7F` clusters into small runs of 3
+consecutive values (`5,6,7` / `9,10,11` / `13,14,15` / `21,22,23` / ... up
+to `101,102,103`, plus two lone values `47` and `74`) — consistent with a
+"type" field that's actually `base_type*4 + facing_or_edge_variant`, three
+variants per type (a slope's up/down/flat, or three passable-edge
+directions, is the working guess; not confirmed). `b3 & 0x80` is set for
+roughly half of all entries and looks like an independent flag layered on
+top of the same type numbering (same `5/6/7`-style clusters appear both
+with and without the high bit set). `b2` is nonzero in 1,541/3,584
+entries (43%) — real data, not alignment padding. `b0`/`b1` vary
+per-entry and are the leading candidates for the still-unlocated
+height/offset value the physics illusion needs (see CLAUDE.md's "walk
+behind scenery" framing) but that's not confirmed — nothing here traces a
+coldef's `b0`/`b1` into an actual Y-position or gravity calculation yet.
+
+One live caller found so far: `sub_80F0618` (`text08057568.s`, deep in
+still-raw territory, nowhere near being split) calls
+`get_coldef_ptr_by_xz(ctx, x, z)` and feeds the returned 4-byte pointer
+straight into another not-yet-understood function (`sub_80E9C4C`) — a
+real gameplay-code call site, not a dead code path, but tracing what
+`sub_80E9C4C` does with the coldef fields is unstarted work.
+
+**Symbol renames applied for this finding** (verified byte-identical
+rebuild afterward — `mlss.gba: OK`): `sub_805A00C` ->
+`stage_room_solidity_grid`; new `tools/symbols/rom.txt` entries
+`room_props_table` (`0x083A78D4`), `col_set_ptr_table` (`0x083AADD0`),
+`room_solidity_index_table` (`0x083AAE08`), `solidity_grid_offset_table`
+(`0x088E08E0`). This is a new pattern for this project worth noting: these
+four addresses only ever appear as raw hex literals inside still-*raw*,
+unextracted `asm/text08057568.s` (not decompiled C), so renaming them to
+symbolic names relies on the linker's `--just-symbols=symbols.txt`
+resolving an otherwise-undefined symbol reference *inside a `.s` file
+that's assembled standalone before linking* — mechanically different from
+Phase 3's renames, which were all local `thumb_func_start` labels needing
+no cross-file resolution at all. It works (confirmed by the rebuild), but
+it's worth knowing this is a slightly different safety argument than the
+one CLAUDE.md documents for Phase 3, in case a future rename of this kind
+ever does something surprising.

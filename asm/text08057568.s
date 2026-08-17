@@ -1180,7 +1180,7 @@ sub_8057FCC:
 	adds r4, r0, #0x0
 	movs r2, #0x02
 _08057FDA:
-	ldr r3, _08058084 @ =0x083AAE08
+	ldr r3, _08058084 @ =room_solidity_index_table
 	lsls r2, r2, #0x10
 	asrs r5, r2, #0x10
 	movs r1, #0x02
@@ -1265,7 +1265,7 @@ _08057FDA:
 	subs r1, r1, r0
 	strh r1, [r2, #0x00]
 	b _0805809E
-_08058084: .4byte 0x083AAE08
+_08058084: .4byte room_solidity_index_table
 _08058088: .4byte 0x0000FFFF
 _0805808C:
 	lsls r1, r5, #0x01
@@ -1377,7 +1377,7 @@ sub_8058148:
 	movs r0, #0x00
 	mov r9, r0
 _0805815A:
-	ldr r2, _08058214 @ =0x083AAE08
+	ldr r2, _08058214 @ =room_solidity_index_table
 	movs r1, #0x02
 	mov r0, r9
 	subs r1, r1, r0
@@ -1471,7 +1471,7 @@ _08058206:
 	ldr r0, [sp, #0x000]
 	add r0, r8
 	b _08058256
-_08058214: .4byte 0x083AAE08
+_08058214: .4byte room_solidity_index_table
 _08058218: .4byte 0x0000FFFF
 _0805821C: .4byte 0x083A75DC
 _08058220: .4byte 0x083A75EC
@@ -1593,7 +1593,7 @@ _080582EE:
 	ldrh r1, [r2, #0x1E]
 	lsls r1, r1, #0x03
 	adds r0, r0, r1
-	ldr r5, _0805833C @ =0x083AAE08
+	ldr r5, _0805833C @ =room_solidity_index_table
 	adds r1, r0, r5
 	ldrh r0, [r1, #0x00]
 	ldr r2, _08058340 @ =0x0000FFFF
@@ -1625,7 +1625,7 @@ _0805830C:
 	adds r4, r1, #0x0
 	b _0805835E
 	.byte 0x00, 0x00
-_0805833C: .4byte 0x083AAE08
+_0805833C: .4byte room_solidity_index_table
 _08058340: .4byte 0x0000FFFF
 _08058344: .4byte 0x08754D74
 _08058348:
@@ -1780,7 +1780,7 @@ _08058454:
 _08058464:
 	movs r5, #0x00
 	str r5, [sp, #0x000]
-	ldr r4, _080584F4 @ =0x083AAE08
+	ldr r4, _080584F4 @ =room_solidity_index_table
 	ldr r3, _080584F0 @ =0x0000FFFF
 _0805846C:
 	movs r0, #0x02
@@ -1851,7 +1851,7 @@ _080584D2:
 	pop {r0}
 	bx r0
 _080584F0: .4byte 0x0000FFFF
-_080584F4: .4byte 0x083AAE08
+_080584F4: .4byte room_solidity_index_table
 	thumb_func_start sub_80584F8
 sub_80584F8:
 	push {r4, r5, r6, r7, lr}
@@ -1868,7 +1868,7 @@ sub_80584F8:
 	movs r1, #0x00
 	str r1, [sp, #0x004]
 _08058512:
-	ldr r2, _08058678 @ =0x083AAE08
+	ldr r2, _08058678 @ =room_solidity_index_table
 	movs r1, #0x02
 	ldr r3, [sp, #0x004]
 	subs r1, r1, r3
@@ -2052,7 +2052,7 @@ _08058662:
 	blt _08058588
 	b _0805879C
 _08058674: .4byte 0x00000579
-_08058678: .4byte 0x083AAE08
+_08058678: .4byte room_solidity_index_table
 _0805867C: .4byte 0x0000FFFF
 _08058680:
 	ldr r4, [sp, #0x004]
@@ -3204,7 +3204,7 @@ sub_8058ED0:
 	lsls r0, r0, #0x10
 	lsrs r0, r0, #0x10
 	mov r10, r0
-	ldr r2, _08058FD4 @ =0x083AAE08
+	ldr r2, _08058FD4 @ =room_solidity_index_table
 	movs r0, #0x02
 	mov r1, r12
 	subs r0, r0, r1
@@ -3285,7 +3285,7 @@ _08058F84:
 	b _08059016
 	.byte 0x00, 0x00
 _08058FD0: .4byte 0x00000579
-_08058FD4: .4byte 0x083AAE08
+_08058FD4: .4byte room_solidity_index_table
 _08058FD8: .4byte 0x0000FFFF
 _08058FDC:
 	movs r0, #0x0F
@@ -3392,7 +3392,7 @@ sub_805905C:
 	lsls r0, r0, #0x10
 	lsrs r0, r0, #0x10
 	str r0, [sp, #0x004]
-	ldr r2, _0805910C @ =0x083AAE08
+	ldr r2, _0805910C @ =room_solidity_index_table
 	movs r0, #0x02
 	subs r0, r0, r5
 	lsls r0, r0, #0x01
@@ -3445,7 +3445,7 @@ _080590EE:
 	b _08059116
 	.byte 0x00, 0x00
 _08059108: .4byte 0x00000579
-_0805910C: .4byte 0x083AAE08
+_0805910C: .4byte room_solidity_index_table
 _08059110: .4byte 0x0000FFFF
 _08059114:
 	ldr r0, [sp, #0x000]
@@ -3540,7 +3540,7 @@ sub_8059190:
 	adds r1, r5, r0
 	movs r0, #0x01
 	strb r0, [r1, #0x00]
-	ldr r2, _08059208 @ =0x083AAE08
+	ldr r2, _08059208 @ =room_solidity_index_table
 	movs r0, #0x02
 	mov r1, r9
 	subs r0, r0, r1
@@ -3573,7 +3573,7 @@ sub_8059190:
 	adds r0, r0, r3
 	b _08059220
 _08059204: .4byte 0x00000579
-_08059208: .4byte 0x083AAE08
+_08059208: .4byte room_solidity_index_table
 _0805920C: .4byte 0x0000FFFF
 _08059210:
 	adds r0, r5, #0x0
@@ -3699,7 +3699,7 @@ sub_80592C8:
 	adds r1, r5, r0
 	movs r0, #0x01
 	strb r0, [r1, #0x00]
-	ldr r2, _08059344 @ =0x083AAE08
+	ldr r2, _08059344 @ =room_solidity_index_table
 	movs r0, #0x02
 	mov r1, r10
 	subs r0, r0, r1
@@ -3735,7 +3735,7 @@ sub_80592C8:
 	b _08059362
 	.byte 0x00, 0x00
 _08059340: .4byte 0x00000579
-_08059344: .4byte 0x083AAE08
+_08059344: .4byte room_solidity_index_table
 _08059348: .4byte 0x0000FFFF
 _0805934C:
 	adds r1, r5, #0x0
@@ -4156,7 +4156,7 @@ sub_8059704:
 	lsls r1, r0, #0x01
 	adds r1, r1, r0
 	lsls r1, r1, #0x03
-	ldr r2, _08059804 @ =0x083A78D4
+	ldr r2, _08059804 @ =room_props_table
 	ldr r0, _08059808 @ =0x03000DE8
 	adds r1, r1, r2
 	ldm r1!, {r2, r3, r5}
@@ -4203,7 +4203,7 @@ _080597F4: .4byte 0x01000C00
 _080597F8: .4byte 0x01001800
 _080597FC: .4byte 0x01000080
 _08059800: .4byte 0x00007FFF
-_08059804: .4byte 0x083A78D4
+_08059804: .4byte room_props_table
 _08059808: .4byte 0x03000DE8
 	thumb_func_start sub_805980C
 sub_805980C:
@@ -4260,7 +4260,7 @@ sub_8059924:
 	movs r0, #0x00
 	str r0, [sp, #0x004]
 _08059936:
-	ldr r2, _08059A84 @ =0x083AAE08
+	ldr r2, _08059A84 @ =room_solidity_index_table
 	movs r1, #0x02
 	ldr r3, [sp, #0x004]
 	subs r1, r1, r3
@@ -4436,7 +4436,7 @@ _08059A72:
 	pop {r0}
 	bx r0
 	.byte 0x00, 0x00
-_08059A84: .4byte 0x083AAE08
+_08059A84: .4byte room_solidity_index_table
 _08059A88: .4byte 0x0000FFFF
 	thumb_func_start sub_8059A8C
 sub_8059A8C:
@@ -4512,7 +4512,7 @@ _08059B06:
 	ldrh r1, [r2, #0x1E]
 	lsls r1, r1, #0x03
 	adds r0, r0, r1
-	ldr r5, _08059B54 @ =0x083AAE08
+	ldr r5, _08059B54 @ =room_solidity_index_table
 	adds r1, r0, r5
 	ldrh r0, [r1, #0x00]
 	ldr r2, _08059B58 @ =0x0000FFFF
@@ -4544,7 +4544,7 @@ _08059B24:
 	adds r4, r1, #0x0
 	b _08059B76
 	.byte 0x00, 0x00
-_08059B54: .4byte 0x083AAE08
+_08059B54: .4byte room_solidity_index_table
 _08059B58: .4byte 0x0000FFFF
 _08059B5C: .4byte 0x08754D74
 _08059B60:
@@ -4693,7 +4693,7 @@ _08059C60:
 _08059C70:
 	movs r5, #0x00
 	str r5, [sp, #0x000]
-	ldr r4, _08059D00 @ =0x083AAE08
+	ldr r4, _08059D00 @ =room_solidity_index_table
 	ldr r3, _08059CFC @ =0x0000FFFF
 _08059C78:
 	movs r0, #0x02
@@ -4764,7 +4764,7 @@ _08059CDE:
 	pop {r0}
 	bx r0
 _08059CFC: .4byte 0x0000FFFF
-_08059D00: .4byte 0x083AAE08
+_08059D00: .4byte room_solidity_index_table
 	thumb_func_start sub_8059D04
 sub_8059D04:
 	push {r4, r5, r6, r7, lr}
@@ -4966,7 +4966,7 @@ sub_8059EC8:
 	lsls r2, r1, #0x01
 	adds r2, r2, r1
 	lsls r2, r2, #0x03
-	ldr r1, _08059EE8 @ =0x083A78D4
+	ldr r1, _08059EE8 @ =room_props_table
 	ldr r0, _08059EEC @ =0x03000DD0
 	adds r2, r2, r1
 	ldm r2!, {r1, r3, r4}
@@ -4976,7 +4976,7 @@ sub_8059EC8:
 	pop {r4}
 	pop {r0}
 	bx r0
-_08059EE8: .4byte 0x083A78D4
+_08059EE8: .4byte room_props_table
 _08059EEC: .4byte 0x03000DD0
 	thumb_func_start sub_8059EF0
 sub_8059EF0:
@@ -5095,12 +5095,12 @@ sub_8059FE4:
 	pop {r4}
 	pop {r0}
 	bx r0
-	thumb_func_start sub_805A00C
-sub_805A00C:
+	thumb_func_start stage_room_solidity_grid
+stage_room_solidity_grid:
 	push {r4, r5, r6, r7, lr}
 	adds r3, r0, #0x0
-	ldr r2, _0805A028 @ =0x088E08E0
-	ldr r1, _0805A02C @ =0x083AAE08
+	ldr r2, _0805A028 @ =solidity_grid_offset_table
+	ldr r1, _0805A02C @ =room_solidity_index_table
 	ldrh r0, [r3, #0x1E]
 	lsls r0, r0, #0x03
 	adds r0, r0, r1
@@ -5111,8 +5111,8 @@ sub_805A00C:
 	adds r7, r0, r2
 	movs r5, #0x00
 	b _0805A056
-_0805A028: .4byte 0x088E08E0
-_0805A02C: .4byte 0x083AAE08
+_0805A028: .4byte solidity_grid_offset_table
+_0805A02C: .4byte room_solidity_index_table
 _0805A030:
 	movs r2, #0x00
 	ldrh r0, [r3, #0x26]
@@ -5148,7 +5148,7 @@ load_col_set_to_dest: @ 0805A064
 	push {r4, lr}
 	ldr r1, _0805A0E4 @ =0x03000DD0
 	ldrb r1, [r1, #0x06]
-	ldr r2, _0805A0E8 @ =0x083AADD0
+	ldr r2, _0805A0E8 @ =col_set_ptr_table
 	lsls r1, r1, #0x02
 	adds r1, r1, r2
 	movs r4, #0x00
@@ -5211,7 +5211,7 @@ _0805A078:
 	pop {r0}
 	bx r0
 _0805A0E4: .4byte 0x03000DD0
-_0805A0E8: .4byte 0x083AADD0
+_0805A0E8: .4byte col_set_ptr_table
 	thumb_func_start sub_805A0EC
 sub_805A0EC:
 	push {r4, lr}
@@ -10313,7 +10313,7 @@ _0805D0EE:
 	ldrh r1, [r2, #0x1E]
 	lsls r1, r1, #0x03
 	adds r0, r0, r1
-	ldr r2, _0805D144 @ =0x083AAE08
+	ldr r2, _0805D144 @ =room_solidity_index_table
 	adds r1, r0, r2
 	ldrh r0, [r1, #0x00]
 	ldr r2, [sp, #0x000]
@@ -10349,7 +10349,7 @@ _0805D112:
 	adds r4, r1, #0x0
 	b _0805D166
 	.byte 0x00, 0x00
-_0805D144: .4byte 0x083AAE08
+_0805D144: .4byte room_solidity_index_table
 _0805D148: .4byte 0x0000FFFF
 _0805D14C: .4byte 0x08754D74
 _0805D150:
@@ -10535,7 +10535,7 @@ _0805D29A:
 	ldrh r1, [r2, #0x1E]
 	lsls r1, r1, #0x03
 	adds r0, r0, r1
-	ldr r1, _0805D314 @ =0x083AAE08
+	ldr r1, _0805D314 @ =room_solidity_index_table
 	adds r0, r0, r1
 	ldrh r0, [r0, #0x00]
 	ldr r2, _0805D318 @ =0x0000FFFF
@@ -10589,7 +10589,7 @@ _0805D2DA:
 	cmp r0, #0x0F
 	ble _0805D2CA
 	b _0805D32A
-_0805D314: .4byte 0x083AAE08
+_0805D314: .4byte room_solidity_index_table
 _0805D318: .4byte 0x0000FFFF
 _0805D31C:
 	ldr r0, _0805D348 @ =0x00000A5A
@@ -11280,7 +11280,7 @@ sub_805D914:
 	lsls r2, r1, #0x01
 	adds r2, r2, r1
 	lsls r2, r2, #0x03
-	ldr r1, _0805D934 @ =0x083A78D4
+	ldr r1, _0805D934 @ =room_props_table
 	ldr r0, _0805D938 @ =0x03000DD0
 	adds r2, r2, r1
 	ldm r2!, {r1, r3, r4}
@@ -11290,7 +11290,7 @@ sub_805D914:
 	pop {r4}
 	pop {r0}
 	bx r0
-_0805D934: .4byte 0x083A78D4
+_0805D934: .4byte room_props_table
 _0805D938: .4byte 0x03000DD0
 	thumb_func_start sub_805D93C
 sub_805D93C:
@@ -297898,7 +297898,7 @@ sub_80EEE08:
 	lsls r0, r1, #0x01
 	adds r0, r0, r1
 	lsls r0, r0, #0x03
-	ldr r1, _080EEE7C @ =0x083A78D4
+	ldr r1, _080EEE7C @ =room_props_table
 	adds r0, r0, r1
 	adds r5, #0x04
 	ldrh r0, [r0, #0x10]
@@ -297945,7 +297945,7 @@ sub_80EEE08:
 	b _080EEEBA
 	.byte 0x00, 0x00
 _080EEE78: .4byte 0x000003FF
-_080EEE7C: .4byte 0x083A78D4
+_080EEE7C: .4byte room_props_table
 _080EEE80: .4byte 0x083D6C58
 _080EEE84:
 	ldr r0, _080EEEC4 @ =0x03000FC0
@@ -387167,7 +387167,7 @@ sub_8123308:
 	lsls r0, r0, #0x10
 	lsrs r0, r0, #0x10
 	ldr r3, _08123334 @ =0x083C03E8
-	ldr r2, _08123338 @ =0x083A78D4
+	ldr r2, _08123338 @ =room_props_table
 	lsls r1, r0, #0x01
 	adds r1, r1, r0
 	lsls r1, r1, #0x03
@@ -387187,7 +387187,7 @@ sub_8123308:
 	ldr r0, [r0, #0x00]
 	bx lr
 _08123334: .4byte 0x083C03E8
-_08123338: .4byte 0x083A78D4
+_08123338: .4byte room_props_table
 _0812333C: .4byte 0x0300034C
 	thumb_func_start sub_8123340
 sub_8123340:
