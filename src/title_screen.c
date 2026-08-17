@@ -1262,3 +1262,39 @@ void sub_80574FC(void) {
     REG_IF |= INTR_FLAG_SERIAL;
     REG_IME = 1;
 }
+
+u8 sub_8057568(void) {
+    struct struc_203FFF8* s;
+    struct struc_203FFF8* s2;
+    u32 f0;
+    u8 f4;
+    bool8 changed;
+    u8 result;
+
+    s = sub_81251DC();
+    f0 = s->field_0;
+    f4 = s->field_4;
+    changed = FALSE;
+
+    if (stru_203FFF8.field_0 > f0) {
+        changed = TRUE;
+        s->field_0 = stru_203FFF8.field_0;
+    }
+    if (stru_203FFF8.field_4 > f4) {
+        changed = TRUE;
+        s->field_4 = stru_203FFF8.field_4;
+    }
+
+    if (changed) {
+        result = sub_8124740(s, 0);
+        if (result == 0) {
+            s2 = sub_81251DC();
+            s2->field_0 = 20000;
+            s2->field_4 = 3;
+            stru_203FFF8.field_0 = 20000;
+            stru_203FFF8.field_4 = s2->field_4;
+        }
+        return result;
+    }
+    return 1;
+}

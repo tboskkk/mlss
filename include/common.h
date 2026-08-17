@@ -234,6 +234,7 @@ void sub_80574B4(void);
 void sub_80574FC(void);
 int sub_812454C(void);
 struct struc_203FFF8* sub_81251DC();
+u8 sub_8124740(struct struc_203FFF8*, u8);
 struct Process* load_init_812538C(struct Process*, u8, char*, int);
 u16 sub_8199624(struct struc_15*);
 void sub_8199D5C(struct struc_15*, int, u8, int);
