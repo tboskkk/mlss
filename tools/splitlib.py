@@ -276,6 +276,14 @@ def _parse_map_full(path: Path):
         m = _MAP_ENTRY_HEADER_RE.match(line)
         if m:
             cur_obj, section_dot = m.group(1), m.group(2)
+            # The map file's object paths carry a "build/" prefix (the
+            # Makefile links from the repo root — see CLAUDE.md "Landmines"),
+            # but MapSymbol.obj is meant to match Entry.obj / splits.yaml
+            # conventions, which never do. Strip it here so obj_stem lines up
+            # with real asm/*.s and src/*.c paths for every downstream user
+            # (split_func.py's "already claimed" check in particular).
+            if cur_obj.startswith("build/"):
+                cur_obj = cur_obj[len("build/"):]
             cur_section = section_dot.lstrip(".")
             continue
         m = _MAP_SECTION_SUMMARY_RE.match(line)

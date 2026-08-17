@@ -33,6 +33,28 @@ WORKDIRS = splitlib.ROOT / "tools" / "permute-work"
 INCLUDE_RE = re.compile(r'^\s*#include\b')
 
 
+def resolve_local_includes(c_path: Path, include_lines: list) -> list:
+    """Rewrite #include "X.h" lines that resolve next to c_path (e.g.
+    title_screen.c's own title_screen.h) to absolute paths.
+
+    cpp's quote-include rule is "search the including file's own directory
+    first" — that's how these resolve for the real src/*.c file, but
+    import.py copies the isolated function into tools/permute-work/, a
+    different directory, where that same-directory lookup no longer finds
+    them (import.py's cpp invocation only adds -iquote include, not -iquote
+    src). Includes that resolve via that existing search path (global.h,
+    common.h, ...) are left untouched."""
+    resolved = []
+    for line in include_lines:
+        m = re.match(r'^(\s*#include\s*")([^"]+)(".*)$', line)
+        if m:
+            candidate = c_path.parent / m.group(2)
+            if candidate.exists():
+                line = f"{m.group(1)}{candidate.resolve()}{m.group(3)}\n"
+        resolved.append(line)
+    return resolved
+
+
 def find_stub_block(name: str):
     """Search src/*.c for the split_func.py-style stub for `name`, return
     (c_path, includes_text, else_body_text)."""
@@ -42,7 +64,7 @@ def find_stub_block(name: str):
         if needle not in text:
             continue
         lines = text.splitlines(keepends=True)
-        include_lines = [l for l in lines if INCLUDE_RE.match(l)]
+        include_lines = resolve_local_includes(c_path, [l for l in lines if INCLUDE_RE.match(l)])
 
         idx = next(i for i, l in enumerate(lines) if needle in l)
         try:
