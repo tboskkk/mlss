@@ -241,18 +241,48 @@ progress numbers.
   `#include "X.h"` stops finding a same-directory header once the copy
   lives somewhere else. Fixed: local includes get rewritten to absolute
   paths before the isolated `.c` is written.
-- **`title_screen.c` doesn't compile under `NONMATCHING=1` right now**,
-  which means the normal `asm-differ -mwo <name>` workflow (it always
-  rebuilds with `NONMATCHING=1` first) doesn't work for *any* function in
-  this file, matched or not — the whole translation unit has to compile,
-  and several of its pre-existing in-progress attempts
-  (`open_init_8055A00`/`text08055A00`, `open_8055F74`/`text08055F74`,
-  `open_8056224`/`text08056224` at least) have real bugs (a conflicting
-  prototype in `common.h` for one). Worked around for `sub_8057568` via
-  `tools/permute.py`, which isolates one function into its own
-  translation unit and sidesteps the broken siblings entirely — use that
-  path for any other `title_screen.c` function until someone actually
-  fixes the other in-progress attempts.
+- **`title_screen.c` didn't compile under `NONMATCHING=1`**, which meant
+  the normal `asm-differ -mwo <name>` workflow (it always rebuilds with
+  `NONMATCHING=1` first) didn't work for *any* function in this file,
+  matched or not — the whole translation unit has to compile, and three
+  pre-existing in-progress attempts (`open_init_8055A00`, `open_8055F74`,
+  `open_8056224`) had real bugs: a conflicting prototype in `common.h`
+  for `open_init_8055A00`, missing prototypes for `mbsv_init` /
+  `open_8055F74` / `sub_8019308` at their call sites, `dword_3000DA0`
+  typed as a bare `int*` when `open_8056224` uses it as a struct pointer,
+  and `dword_83A74E4` referenced but never declared or given a symbol
+  table entry. **Fixed** — all four addressed with real types/prototypes
+  (`dword_83A74E4`'s size confirmed by checking the actual ROM bytes, not
+  guessed), file now compiles clean under `NONMATCHING=1`. Worked around
+  for `sub_8057568` via `tools/permute.py` before this fix landed — that
+  workaround (isolating one function into its own translation unit,
+  sidestepping broken siblings) is still the right move for *any other*
+  file that turns out to have the same problem.
+- **`split_func.py` silently corrupted the ROM by leaving orphaned
+  leading data behind.** Its front-to-back check only looked for an
+  earlier *labeled* function before the extraction target — not raw
+  `.byte` data Luvdis never gave a function to, which the Phase 3 section
+  below already notes is common. That data has to stay immediately
+  before the function it precedes in final byte order; the old code kept
+  it in the shrunk `asm/*.s` file instead, where it silently landed
+  *after* the new destination file — wrong order, wrong ROM. Caught by a
+  pilot agent running the documented workflow cold on `text08019CA4.s`
+  (symbol landed at the wrong address; the "`make` must still say OK
+  before touching any C" step in the workflow caught it immediately, so
+  nothing bad actually shipped — that safety check is exactly why this
+  didn't turn into a real problem). `text080542C4.s` has the identical
+  pattern, so this wasn't a one-off; a full scan found it's *also*
+  present in `text08000000.s` (6,076 leading unlabeled lines — expected,
+  matches this doc's own note below about that file's unidentified
+  crt0/m4a region) and `mariobros.s` (out of scope, noted only so it's
+  not a surprise later). Fixed in `splitlib.extract_function_lines` —
+  detects the fixed 5-line file header exactly and folds any real content
+  between it and the front-most labeled function into that function's
+  extraction. Verified against the real bug case (`sub_8019F24`) landing
+  at the correct address afterward. Caveat worth knowing: when someone
+  eventually extracts `AgbMain` from `text08000000.s`, this fix will pull
+  that entire 6,076-line preamble into one giant fragment alongside it —
+  correct, but organizationally ugly; nobody's hit that yet.
 
 ## Finishing the disassembly (Phase 3)
 
