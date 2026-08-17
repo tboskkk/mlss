@@ -2,6 +2,8 @@
 #include "common.h"
 #include "process.h"
 
+asm_unified(".include \"asm/macros.inc\"");
+
 #define PROCESS_DISABLED 0
 #define PROCESS_ENABLED  1
 
@@ -202,3 +204,9 @@ void process_remove(struct Process* process, u32 flags) {
         free_heap_8018DA8(process);
     }
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8019F24.s\"");
+#else
+#error "TODO: write sub_8019F24 to match asm/nonmatching/sub_8019F24.s, then delete this #error"
+#endif
