@@ -223,6 +223,36 @@ progress numbers.
 - **`asm-differ -f` (whole-ROM mode) doesn't work on this project** — see
   the asm-differ section above. Use `-o`.
 - **`pycparser>=3.0` breaks decomp-permuter-agbcc** — see above.
+- **`split_func.py` couldn't extract anything — "already claimed" on
+  every symbol, including brand new ones.** Regression from the `cd
+  build/` fix above: once `mlss.map`'s object paths gained a `build/`
+  prefix, `splitlib.py`'s map parser never stripped it back off, so
+  `MapSymbol.obj` (`"build/asm/text08057568.o"`) silently stopped
+  matching the `asm/`-prefix check `split_func.py` uses to tell "raw
+  blob" from "already in a `src/*.c`". Nobody had run `split_func.py`
+  since that fix landed, so it went unnoticed. Fixed in
+  `_parse_map_full`. If this ever regresses again the symptom is exactly
+  this: every target, even ones that were never touched, reports
+  "already claimed."
+- **`tools/permute.py` can't isolate a function from a file with its own
+  local header** (currently only `title_screen.c`/`title_screen.h`).
+  It copies `#include` lines verbatim into `tools/permute-work/`, and
+  cpp's "search the including file's own directory first" rule for
+  `#include "X.h"` stops finding a same-directory header once the copy
+  lives somewhere else. Fixed: local includes get rewritten to absolute
+  paths before the isolated `.c` is written.
+- **`title_screen.c` doesn't compile under `NONMATCHING=1` right now**,
+  which means the normal `asm-differ -mwo <name>` workflow (it always
+  rebuilds with `NONMATCHING=1` first) doesn't work for *any* function in
+  this file, matched or not — the whole translation unit has to compile,
+  and several of its pre-existing in-progress attempts
+  (`open_init_8055A00`/`text08055A00`, `open_8055F74`/`text08055F74`,
+  `open_8056224`/`text08056224` at least) have real bugs (a conflicting
+  prototype in `common.h` for one). Worked around for `sub_8057568` via
+  `tools/permute.py`, which isolates one function into its own
+  translation unit and sidesteps the broken siblings entirely — use that
+  path for any other `title_screen.c` function until someone actually
+  fixes the other in-progress attempts.
 
 ## Finishing the disassembly (Phase 3)
 
