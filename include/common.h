@@ -228,13 +228,16 @@ int try_save_options(struct OPTNProcess*);
 void sub_8052EFC(struct OPTNProcess*);
 void sub_805420C(struct OPTNProcess*);
 void option_screen_set_ok_button(struct OPTNProcess*, int, int);
-void open_init_8055A00(void*, int, char*, int);
+struct TitleScreen* open_init_8055A00(struct TitleScreen*, u8, char*, int);
+void open_8055F74(struct TitleScreen*, int);
 void open_8056224();
 void sub_80574B4(void);
 void sub_80574FC(void);
 int sub_812454C(void);
 struct struc_203FFF8* sub_81251DC();
 u8 sub_8124740(struct struc_203FFF8*, u8);
+struct MarioBrosScoreVisual* mbsv_init(struct MarioBrosScoreVisual*, u8, char*, u32, u8);
+void sub_8019308(int, int, int);
 struct Process* load_init_812538C(struct Process*, u8, char*, int);
 u16 sub_8199624(struct struc_15*);
 void sub_8199D5C(struct struc_15*, int, u8, int);
@@ -245,10 +248,20 @@ void sub_81DA6C8(int);
 extern struct struc_203FFB8 stru_203FFB8;
 extern struct struc_203FFF8 stru_203FFF8;
 
+// The buffer open_init_8055A00 allocates into dword_3000DA0 (340 bytes,
+// tag "ORST") — only the fields open_8056224 actually touches are known
+// so far; extend as more of its consumers get decompiled.
+struct struc_3000DA0 {
+    s8 field_0[5];
+    u8 field_5[0xF];
+    u16 field_14;
+    u16 field_16;
+};
+
 // IWRAM
 extern void (*dword_3000D48)(int, int);
 extern int (*dword_3000D4C)(int, int);
-extern int* dword_3000DA0;
+extern struct struc_3000DA0* dword_3000DA0;
 extern struct EeprStruct1* dword_3000FFC;
 extern struct GameState gGameState;
 extern void (*dword_3000C78)();
@@ -279,6 +292,7 @@ extern int dword_83A6C5C[];
 extern int dword_83A7140[];
 extern int dword_83A7300[];
 extern u16 word_83A74C0[];
+extern u8 dword_83A74E4[];
 extern u8 byte_83A74E9[];
 extern s16 word_83A74EC[];
 extern s16 word_83A7530[];
