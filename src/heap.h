@@ -16,4 +16,6 @@ struct HeapBlock {
 #define HEAP_BLOCK_FREE 1
 #define HEAP_HEADER_SIZE 0x10
 
+void free_heap_memory_8018C68(void* ptr);
+
 #endif
