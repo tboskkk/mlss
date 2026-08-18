@@ -210,3 +210,40 @@ asm_unified(".include \"asm/nonmatching/sub_8019F24.s\"");
 #else
 #error "TODO: write sub_8019F24 to match asm/nonmatching/sub_8019F24.s, then delete this #error"
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_801A1D4.s\"");
+#else
+u8 sub_801A1D4(void* dest) {
+    s32 i;
+    struct struc_3000D0C_channel* channel;
+    s16 sum;
+    u32 zero;
+    u8 gotData;
+
+    gotData = dword_3000D0C->field_180();
+    dword_3000D0C->field_3 = 0;
+
+    if (gotData) {
+        for (i = 0; i <= 3; i++) {
+            channel = &dword_3000D0C->field_2C[i];
+            sum = channel->field_0 + channel->field_2 + channel->field_4 + channel->field_6
+                + channel->field_8 + channel->field_A + channel->field_C + channel->field_E
+                + channel->field_10 + channel->field_12;
+
+            if (sum == -13) {
+                gotData = i * 16;
+                CpuSet(&channel->field_4, (u8*)dest + gotData, CPU_SET_32BIT | 4);
+                dword_3000D0C->field_3 |= 1 << i;
+            }
+
+            zero = 0;
+            CpuSet(&zero, &channel->field_4, CPU_SET_32BIT | CPU_SET_SRC_FIXED | 4);
+        }
+    }
+
+    dword_3000D0C->field_2 |= dword_3000D0C->field_3;
+    return dword_3000D0C->field_3;
+}
+#endif
+

@@ -70,6 +70,57 @@ struct struc_3000D18 {
     u32 field_C;
 };
 
+// One 24-byte record per link-cable channel (up to 4, indexed 0-3 in
+// sub_801A1D4). field_0/field_2..field_12 (10 halfwords) are summed and
+// the sum checked against a fixed sentinel to validate an incoming
+// packet; only field_2..field_10 (8 halfwords, 16 bytes) get copied out
+// to the caller's buffer. Trailing 4 bytes at field_14 unread by anything
+// decompiled so far.
+struct struc_3000D0C_channel {
+    u16 field_0;
+    u16 field_2;
+    u16 field_4;
+    u16 field_6;
+    u16 field_8;
+    u16 field_A;
+    u16 field_C;
+    u16 field_E;
+    u16 field_10;
+    u16 field_12;
+    u8 field_14[4];
+};
+
+// Link-cable/multiplayer communication state, pointed to by dword_3000D0C.
+// Heavily used by asm/mariobros.s (the embedded Mario Bros. minigame's
+// multiplayer support, out of scope for this repo's "game proper"
+// progress) and referenced once in still-raw asm/text08000000.s. Only the
+// fields sub_801A1D4/sub_801A2A0 actually touch are known; field_180 (a
+// zero-arg polling callback, "is there new link data?") implies the
+// struct is much bigger than what's mapped here — pad1 exists purely to
+// get field_180 to the right offset, not because its contents are known.
+struct struc_3000D0C {
+    u8 field_0;
+    u8 field_1;
+    u8 field_2;
+    u8 field_3;
+    u8 field_4;
+    u8 field_5;
+    u8 field_6;
+    u8 field_7;
+    u8 field_8;
+    u8 field_9;
+    u8 pad_A[0xA];
+    u32 field_14;
+    s32 field_18;
+    u32 field_1C;
+    u32 field_20;
+    u32 field_24;
+    u32 field_28;
+    struct struc_3000D0C_channel* field_2C;
+    u8 pad_30[0x150];
+    u8 (*field_180)(void);
+};
+
 struct Sprite {
     s16 xPosition;
     s16 yPosition;
@@ -239,6 +290,7 @@ struct struc_203FFF8* sub_81251DC();
 u8 sub_8124740(struct struc_203FFF8*, u8);
 struct MarioBrosScoreVisual* mbsv_init(struct MarioBrosScoreVisual*, u8, char*, u32, u8);
 void sub_8019308(int, int, int);
+u8 sub_801A1D4(void* dest);
 struct Process* load_init_812538C(struct Process*, u8, char*, int);
 u16 sub_8199624(struct struc_15*);
 void sub_8199D5C(struct struc_15*, int, u8, int);
@@ -260,6 +312,7 @@ struct struc_3000DA0 {
 };
 
 // IWRAM
+extern struct struc_3000D0C* dword_3000D0C;
 extern void (*dword_3000D48)(int, int);
 extern int (*dword_3000D4C)(int, int);
 extern struct struc_3000DA0* dword_3000DA0;
