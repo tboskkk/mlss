@@ -305,6 +305,31 @@ progress numbers.
   eventually extracts `AgbMain` from `text08000000.s`, this fix will pull
   that entire 6,076-line preamble into one giant fragment alongside it —
   correct, but organizationally ugly; nobody's hit that yet.
+- **The same bug, mirrored: trailing orphaned data on the *last* function
+  extracted from a file.** When `split_func.py` pulls the last remaining
+  function out of an `asm/*.s` blob, it correctly grabs every remaining
+  byte to end-of-file (needed for correctness — nothing else claims
+  them). But those trailing bytes aren't always padding: twice now, in
+  two different files, they turned out to include a second, real,
+  never-labeled function Luvdis missed. Found independently by two
+  parallel pilot agents in the same session: `text08019CA4.s`'s
+  `sub_801A2A0` carried 24 such trailing bytes, decoded by hand and
+  split out as `sub_801A33C` (commit `d15a2ed`) before the fragment was
+  deleted — no bytes lost. `text080542C4.s`'s `sub_805516C` has the same
+  shape (~100 trailing bytes, starts with what reads as a
+  `push {r4,lr}`-ish prologue) but is *not yet* resolved — `sub_805516C`
+  itself isn't matched yet, so nobody's hit the actual "delete the
+  fragment" moment, but there's an explicit warning comment directly in
+  `asm/nonmatching/sub_805516C.s` so it doesn't get deleted carelessly
+  once it does match. **Not yet fixed at the tool level** — unlike the
+  leading-data case, a general fix here needs real instruction decoding
+  to find function boundaries inside unlabeled trailing bytes (telling
+  "this is a second function" from "this is genuinely just padding/a
+  literal pool" isn't a fixed-pattern check the way the file header
+  was). Until then: treat "delete the nonmatching fragment" as unsafe by
+  default for any function that was the *last* one extracted from its
+  file — check the fragment's own tail for unexplained bytes after the
+  function's real `bx lr`/`pop {..., pc}` first.
 
 ## Finishing the disassembly (Phase 3)
 
