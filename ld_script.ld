@@ -31,6 +31,7 @@ SECTIONS
         build/asm/text0801A548.o(.text);
         build/src/option_screens.o(.text);
         build/asm/option_screens.o(.text);
+        build/src/opening_sequence.o(.text);
         build/asm/text080542C4.o(.text);
         build/src/title_screen.o(.text);
         build/asm/text08057568.o(.text);
