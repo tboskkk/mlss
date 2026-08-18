@@ -291,6 +291,7 @@ u8 sub_8124740(struct struc_203FFF8*, u8);
 struct MarioBrosScoreVisual* mbsv_init(struct MarioBrosScoreVisual*, u8, char*, u32, u8);
 void sub_8019308(int, int, int);
 u8 sub_801A1D4(void* dest);
+void sub_801A2A0(void);
 struct Process* load_init_812538C(struct Process*, u8, char*, int);
 u16 sub_8199624(struct struc_15*);
 void sub_8199D5C(struct struc_15*, int, u8, int);

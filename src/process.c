@@ -247,3 +247,52 @@ u8 sub_801A1D4(void* dest) {
 }
 #endif
 
+void sub_801A2A0(void) {
+    u32 temp;
+    u8 flag0;
+    vu32* sioReg;
+    s32 sendData;
+
+    if (dword_3000D0C == NULL) {
+        return;
+    }
+
+    if ((flag0 = dword_3000D0C->field_0) != 0) {
+        if (dword_3000D0C->field_1 == 0) {
+            return;
+        }
+
+        if (dword_3000D0C->field_6 == 0) {
+            return;
+        }
+
+        dword_3000D0C->field_18 = -2;
+
+        temp = dword_3000D0C->field_28;
+        dword_3000D0C->field_28 = dword_3000D0C->field_24;
+        dword_3000D0C->field_24 = temp;
+
+        if (dword_3000D0C->field_4 != 0) {
+            temp = dword_3000D0C->field_20;
+            dword_3000D0C->field_20 = dword_3000D0C->field_1C;
+            dword_3000D0C->field_1C = temp;
+            dword_3000D0C->field_4 = 0;
+            dword_3000D0C->field_14 = 0;
+        }
+
+        dword_3000D0C->field_7 = (*(vu32*)0x04000128 << 25) >> 31;
+        sioReg = (vu32*)0x04000128;
+        sendData = 0xFEFE;
+        *(vu16*)((u8*)sioReg + 2) = sendData;
+        *(vu16*)sioReg |= 0x80;
+        REG_TM3CNT_H = 0xC0;
+    } else {
+        if (dword_3000D0C->field_9 == 0) {
+            REG_IME = flag0;
+            INTR_CHECK |= INTR_FLAG_SERIAL;
+            REG_IME = 1;
+        }
+
+        dword_3000D0C->field_9 = flag0;
+    }
+}
