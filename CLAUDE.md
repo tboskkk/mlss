@@ -148,6 +148,17 @@ baseline:
 ./container.sh make && rm -rf expected && mkdir expected && cp -r build expected/
 ```
 
+**Also refresh it right after every `split_func.py` extraction, not just
+after a match** — found by a parallel pilot agent on `sub_8018E88`.
+Extracting a function changes which object a symbol lives in (moves it
+from the raw `asm/*.s` blob into a new/growing `src/*.c`), so a stale
+`expected/` predating the extraction has the *wrong* object for that
+symbol — `asm-differ` then silently diffs against nothing/wrong content
+and reports the new attempt as ~100% "extra" rather than a real diff
+against retail. Cheap habit: run the refresh command above right after
+step 2 of the workflow below (the "make must say OK" check), not just at
+the end.
+
 **decomp-permuter** (`tools/decomp-permuter`, a submodule pinned to
 `WhenGryphonsFly/decomp-permuter-agbcc` — the mainline
 `simonlindholm/decomp-permuter` only targets MIPS/PPC/AArch32, not this
@@ -165,6 +176,17 @@ an existing attempt, it doesn't write one from scratch.
 `plyparser` module this permuter fork imports directly. If a fresh
 container build ever fails on `ModuleNotFoundError: pycparser.plyparser`,
 this pin lapsed; re-pin it.
+
+**decomp-permuter's parser doesn't fully understand nested/tagged unions**
+— found on `sub_8018E88`, which needed a union of a plain byte, a u16, and
+two different bitfield structs layered over the same `GameState` offset to
+model how retail code accesses it three different ways. The permuter
+logged ~1,500 "accessing field X of undefined struct" parse errors across
+an 18k-iteration run and never got past a score of 1195 (from a 1590
+baseline) — not proof the C is wrong, but a real, measurable reduction in
+how much of the search space it can actually explore whenever a function
+needs this kind of union trick. Worth knowing before assuming a permuter
+plateau on a union-heavy function means "this is as good as it gets."
 
 ## Scope decision: Mario Bros. minigame
 
