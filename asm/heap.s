@@ -3,13 +3,6 @@
 	.syntax unified
 	.text
 
-	thumb_func_start free_heap_8018DA8
-free_heap_8018DA8: @ 08018DA8
-	push {lr}
-	bl free_heap_memory_8018C68
-	pop {r0}
-	bx r0
-	.byte 0x00, 0x00
 	thumb_func_start alloc_zero_8018DB4
 alloc_zero_8018DB4: @ 08018DB4
 	push {r4, r5, r6, lr}
