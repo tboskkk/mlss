@@ -104,6 +104,7 @@ pick_target_file() {
 }
 
 SKIP_FILES=""
+ESCALATED_FUNCS=""  # functions that hit MAX_RETRIES_PER_FUNC this run -- don't auto-continue them even if their WIP checkpoint is still at the branch tip
 FUNC_RETRY_COUNT=""  # "func1:count1 func2:count2 ..." poor-man's assoc array, bash 3-compatible
 
 get_retry_count() {
@@ -157,7 +158,10 @@ for ((i=1; i<=MAX_ITER; i++)); do
   if [[ "$LAST_SUBJECT" =~ $WIP_RE ]]; then
     CANDIDATE="${BASH_REMATCH[1]}"
     CANDIDATE_DEST=$(grep -l "asm/nonmatching/${CANDIDATE}\.s" src/*.c 2>/dev/null | head -1)
-    if [[ -n "$CANDIDATE_DEST" ]]; then
+    # Don't auto-continue a function that already burned its retry budget
+    # and got escalated -- its WIP commit is deliberately left in place as
+    # a handoff for a human/Claude to read, not something to keep hammering.
+    if [[ -n "$CANDIDATE_DEST" ]] && [[ " $ESCALATED_FUNCS " != *" $CANDIDATE "* ]]; then
       TARGET_FUNC="$CANDIDATE"
       DEST_FILE="$CANDIDATE_DEST"
       IS_CONTINUATION=1
@@ -179,24 +183,24 @@ for ((i=1; i<=MAX_ITER; i++)); do
 
   RETRY_COUNT=$(get_retry_count "$TARGET_FUNC")
   if [[ "$RETRY_COUNT" -ge "$MAX_RETRIES_PER_FUNC" ]]; then
-    log "$TARGET_FUNC has failed $RETRY_COUNT times already -- auto-escalating to mailbox, resetting it, and skipping its file for the rest of this run"
+    log "$TARGET_FUNC has failed $RETRY_COUNT times already -- auto-escalating to mailbox and moving on"
+    # Deliberately NOT resetting: if a real, clean-building WIP checkpoint
+    # exists (IS_CONTINUATION=1 got this far, meaning it survived every
+    # prior timeout), it stays at the tip of the branch as a genuine
+    # handoff for a human or Claude to read and finish, rather than
+    # discarding however many attempts' worth of real progress just because
+    # the retry budget ran out. It doesn't block anything else: the
+    # function is already out of its raw asm file, so front-to-back
+    # extraction naturally moves on to whatever's next there. Only the
+    # continuation-detector needs to know not to keep re-selecting it,
+    # which ESCALATED_FUNCS (checked above) handles.
     if [[ ! -f "$MAILBOX/requests/${TARGET_FUNC}.md" ]]; then
       cat > "$MAILBOX/requests/${TARGET_FUNC}.md" <<EOF
-Auto-escalated by qwen_pilot.sh after $RETRY_COUNT unsuccessful attempts (timeouts or genuine non-matches), not written by the model itself. Check .claude/qwen-autopilot-logs/ for this function's transcripts to see what was actually tried. The worktree has been reset to a clean state before moving on -- nothing is currently in progress for this function.
+Auto-escalated by qwen_pilot.sh after $RETRY_COUNT unsuccessful attempts (timeouts or genuine non-matches), not written by the model itself. Check .claude/qwen-autopilot-logs/ for this function's transcripts to see what was actually tried.
+$( [[ "$IS_CONTINUATION" == "1" ]] && echo "A real, clean-building (but not yet matching) attempt survived every attempt and is preserved at the tip of the ${BRANCH} branch, in ${DEST_FILE:-the destination file} -- read that before starting over, it may just need finishing rather than redoing." || echo "No in-progress C attempt survived to hand off -- every attempt either timed out before producing anything salvageable, or was a genuine non-match reset back to a clean state." )
 EOF
     fi
-    if [[ "$IS_CONTINUATION" == "1" ]]; then
-      # Walk back past however many consecutive WIP checkpoints this
-      # function accumulated (each timed-out-but-salvageable retry adds
-      # one more on top) to the real commit underneath, and reset there --
-      # not just HEAD~1, which would only undo the most recent one.
-      BASE=$(git log --format='%H %s' | awk -v re="WIP: ${TARGET_FUNC} " '$0 !~ re {print $1; exit}')
-      git reset --hard "$BASE" >/dev/null 2>&1
-      git clean -fd >/dev/null 2>&1
-      rm -rf "nonmatchings/${TARGET_FUNC}" "tools/permute-work/${TARGET_FUNC}"*
-      TARGET_FILE=$(pick_target_file)
-    fi
-    [[ -n "${TARGET_FILE:-}" ]] && SKIP_FILES="$SKIP_FILES $TARGET_FILE"
+    ESCALATED_FUNCS="$ESCALATED_FUNCS $TARGET_FUNC"
     unset TARGET_FUNC
     continue
   fi
@@ -253,7 +257,19 @@ EOF
   # files nobody's explicitly flagged yet.
   rm -f "build/${DEST_FILE%.c}.o" "build/${DEST_FILE%.c}.i" "build/${DEST_FILE%.c}.s" 2>/dev/null
   NEEDS_PERMUTE=""
-  if ./container.sh make NONMATCHING=1 2>&1 | tail -30 | grep -qE "^agbcc:|Error|error:"; then
+  # Capture into a variable first, then grep it separately -- with
+  # pipefail (set at the top of this script) a direct
+  # `if cmd | tail | grep -q; then` is broken exactly when it matters
+  # here: `make` legitimately exiting non-zero on a real #error (the
+  # signal this check exists to catch) poisons the whole pipeline's exit
+  # status ahead of grep's own success, so the `if` reads as false even
+  # when grep DID match. Verified this is real, not theoretical: it's why
+  # NEEDS_PERMUTE never got set for heap.c despite its #error siblings
+  # being right there -- Qwen was told to use plain asm-differ on a file
+  # that genuinely needs permute.py, and burned two 20-minute timeouts
+  # hitting the same compile failure asm-differ can't work around.
+  PERMUTE_TEST_OUT=$(./container.sh make NONMATCHING=1 2>&1 | tail -30)
+  if echo "$PERMUTE_TEST_OUT" | grep -qE "^agbcc:|Error|error:"; then
     NEEDS_PERMUTE=1
   fi
   rm -f "build/${DEST_FILE%.c}.o" "build/${DEST_FILE%.c}.i" "build/${DEST_FILE%.c}.s" 2>/dev/null
