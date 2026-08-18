@@ -90,3 +90,7 @@ void* alloc_heap_8018CEC(bool32 heapId, u32 size, char* tag) {
 void free_heap_8018D9C(void* ptr) {
     free_heap_memory_8018C68(ptr);
 }
+
+void free_heap_8018DA8(void* ptr) {
+    free_heap_memory_8018C68(ptr);
+}
