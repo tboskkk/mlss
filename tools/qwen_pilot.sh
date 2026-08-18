@@ -254,8 +254,19 @@ EOF
   # unit, or are there other not-started #error siblings blocking it (see
   # CLAUDE.md's title_screen.c / heap.c landmines)? Tested for real
   # instead of relying on a hardcoded file list, so this generalizes to
-  # files nobody's explicitly flagged yet.
-  rm -f "build/${DEST_FILE%.c}.o" "build/${DEST_FILE%.c}.i" "build/${DEST_FILE%.c}.s" 2>/dev/null
+  # files nobody's explicitly flagged yet. Targets the exact object
+  # (`make ... build/src/heap.o`, not a bare whole-project `make`) --
+  # confirmed this project's Makefile supports that directly via its
+  # normal pattern rule. Two real reasons this matters, not just neatness:
+  # a whole-project build could pick up an UNRELATED file's own #error
+  # elsewhere in the codebase (there are usually a few "extracted, still
+  # #error" functions scattered around at any given time) and falsely
+  # blame it on THIS file; and a whole-project build is dramatically
+  # slower whenever it actually succeeds and has to walk the entire
+  # dependency graph, including the ~1.6MB text08057568.s blob, every
+  # single iteration just to answer a yes/no question about one object.
+  DEST_OBJ="build/${DEST_FILE%.c}.o"
+  rm -f "$DEST_OBJ" "build/${DEST_FILE%.c}.i" "build/${DEST_FILE%.c}.s" 2>/dev/null
   NEEDS_PERMUTE=""
   # Capture into a variable first, then grep it separately -- with
   # pipefail (set at the top of this script) a direct
@@ -268,11 +279,11 @@ EOF
   # being right there -- Qwen was told to use plain asm-differ on a file
   # that genuinely needs permute.py, and burned two 20-minute timeouts
   # hitting the same compile failure asm-differ can't work around.
-  PERMUTE_TEST_OUT=$(./container.sh make NONMATCHING=1 2>&1 | tail -30)
+  PERMUTE_TEST_OUT=$(./container.sh make NONMATCHING=1 "$DEST_OBJ" 2>&1 | tail -30)
   if echo "$PERMUTE_TEST_OUT" | grep -qE "^agbcc:|Error|error:"; then
     NEEDS_PERMUTE=1
   fi
-  rm -f "build/${DEST_FILE%.c}.o" "build/${DEST_FILE%.c}.i" "build/${DEST_FILE%.c}.s" 2>/dev/null
+  rm -f "$DEST_OBJ" "build/${DEST_FILE%.c}.i" "build/${DEST_FILE%.c}.s" 2>/dev/null
 
   # Pick up any answered mailbox request for this exact function from a
   # previous stuck attempt.
@@ -353,13 +364,39 @@ If any step fails with an error you did not expect, explain what the error actua
       git reset --soft "$HEAD_BEFORE"
       git commit -m "Match $TARGET_FUNC"
     fi
+    # Everything from here on used to run unchecked -- log a cheerful
+    # "done: MATCHED and merged" regardless of whether the merge, the
+    # post-merge build, or the worktree re-sync actually succeeded. Real
+    # risk, not theoretical: REPO_ROOT is the same checkout other work
+    # (including editing this very script) happens in directly, so a
+    # match landing while REPO_ROOT has uncommitted changes sitting in it
+    # is a genuinely plausible collision, not an edge case invented for
+    # its own sake. The verified match itself is never at risk either way
+    # -- it's already a real commit on $BRANCH -- only whether it actually
+    # made it to master gets checked now instead of assumed.
     cd "$REPO_ROOT"
-    git merge --no-ff -m "Merge autopilot match: $TARGET_FUNC" "$BRANCH" 2>&1
-    rm -rf build/
-    ./container.sh make 2>&1 | tail -3
-    cd "$WORKTREE"
-    git merge --ff-only master 2>&1
-    log "done: $TARGET_FUNC MATCHED and merged"
+    if [[ -n "$(git status --short)" ]]; then
+      log "!! $REPO_ROOT has uncommitted changes right now -- not safe to merge there automatically. The verified match is safe on $BRANCH (commit $(cd "$WORKTREE" && git rev-parse --short HEAD)) -- merge it to master by hand once $REPO_ROOT is clean."
+      cd "$WORKTREE"
+    elif ! git merge --no-ff -m "Merge autopilot match: $TARGET_FUNC" "$BRANCH" 2>&1; then
+      log "!! merge into master failed -- the verified match is still safe on $BRANCH (commit $(cd "$WORKTREE" && git rev-parse --short HEAD)), just not merged. Resolve by hand."
+      cd "$WORKTREE"
+    else
+      rm -rf build/
+      MERGE_BUILD_OUT=$(./container.sh make 2>&1)
+      if ! echo "$MERGE_BUILD_OUT" | grep -q "mlss.gba: OK"; then
+        log "!! merged $TARGET_FUNC to master but the post-merge from-scratch build did NOT say mlss.gba: OK -- master may be broken right now, investigate immediately:"
+        echo "$MERGE_BUILD_OUT" | tail -10
+        cd "$WORKTREE"
+      else
+        cd "$WORKTREE"
+        if git merge --ff-only master 2>&1 >/dev/null; then
+          log "done: $TARGET_FUNC MATCHED and merged to master, worktree back in sync"
+        else
+          log "!! $TARGET_FUNC matched and merged to master fine, but the worktree branch failed to fast-forward back in sync afterward -- master itself is fine, investigate the worktree by hand"
+        fi
+      fi
+    fi
   elif [[ "$IN_PROGRESS_SALVAGEABLE" == "1" && "$QWEN_EXIT" == "124" ]]; then
     log "$TARGET_FUNC not matched yet but a real, clean-building attempt exists -- checkpointing as WIP for the next attempt instead of discarding"
     git add -A && git commit -m "WIP: $TARGET_FUNC (autopilot: in-progress attempt, not yet matching)" >/dev/null
