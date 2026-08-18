@@ -403,6 +403,25 @@ doesn't count toward headline progress numbers unless that changes.
   diagnosed; a missing prerequisite plus a task scoped too rigidly to
   allow the obvious recovery step. See the workflow section above for the
   fix (`make` once, right after creating any new worktree).
+- **`git reset --hard` / `git clean -fd` on a worktree do not un-stale its
+  `mlss.map`, and `split_func.py`'s "already claimed" check trusts that
+  map unconditionally.** `mlss.map` (like `build/` and `expected/`) is a
+  gitignored build artifact, so resetting or cleaning a worktree's tracked
+  source back to an earlier commit leaves whatever map was last generated
+  completely untouched — it can keep describing a function as living in
+  `src/whatever.o` long after the source-level change that put it there
+  has been reset away. Next `split_func.py <that function>` then refuses
+  with `already claimed by src/whatever.o — nothing to extract`, even
+  though the current source tree has never seen that function at all. Hit
+  for real in `tools/qwen_pilot.sh`'s autopilot worktree: a prior run's
+  in-progress extraction was reset at the git level, but the stale map
+  survived and blocked the very next attempt on that same function. Fixed
+  in `qwen_pilot.sh`: a plain `./container.sh make` (not a full `rm -rf
+  build/` — this is a real source content change with real new mtimes,
+  not the NONMATCHING-flag staleness case Make can't see, see above) now
+  runs immediately before every `split_func.py` call, not just once at
+  worktree creation. Doing this by hand: after resetting/cleaning a
+  worktree, `./container.sh make` before trusting `split_func.py` again.
 
 ## Finishing the disassembly (Phase 3)
 

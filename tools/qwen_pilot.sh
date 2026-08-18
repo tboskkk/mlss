@@ -205,6 +205,18 @@ EOF
   # delegate a mechanical step to the model) -- unless this is a WIP
   # continuation, where it's already done. ------------------------------
   if [[ "$IS_CONTINUATION" == "0" ]]; then
+    # Refresh the build before extracting. mlss.map -- which split_func.py's
+    # "already claimed" check trusts to tell raw asm from already-extracted
+    # C -- is a gitignored build artifact, so it silently goes stale
+    # relative to the real source tree after ANY git reset/clean (neither
+    # touches gitignored files). Hit this for real: a worktree reset left a
+    # map still describing a function as living in src/heap.o from a run
+    # that had since been reset away at the source level, and split_func.py
+    # refused to extract it with an "already claimed" false positive. A
+    # plain (non -rm -rf) make is enough here -- this is a genuine source
+    # content change with real new mtimes, not the NONMATCHING-flag
+    # staleness case Make can't see (see CLAUDE.md's landmines).
+    ./container.sh make >/dev/null 2>&1
     log "extracting $TARGET_FUNC from $TARGET_FILE"
     EXTRACT_OUT=$(./container.sh tools/split_func.py "$TARGET_FUNC" 2>&1)
     if ! echo "$EXTRACT_OUT" | grep -q '^done\.'; then
