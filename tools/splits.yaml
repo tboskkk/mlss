@@ -42,6 +42,7 @@ groups:
   - {obj: asm/text0801A548, section: text}
   - {obj: src/option_screens, section: text}
   - {obj: asm/option_screens, section: text}
+  - {obj: src/opening_sequence, section: text}
   - {obj: asm/text080542C4, section: text}
   - {obj: src/title_screen, section: text}
   - {obj: asm/text08057568, section: text}

@@ -4,8 +4,17 @@
  * needs an entry here until that blob gets a real label. */
 
 sub_800063C = 0x0800063C;
+dword_84E8A3C = 0x084E8A3C;
+dword_84F4740 = 0x084F4740;
 loc_8198220 = 0x08198220;
 loc_819832C = 0x0819832C;
+sub_8198784 = 0x08198784;  /* referenced only for its address (size-of-blob-via-label-
+                              * subtraction), same idiom as option_screens.c's optn_init;
+                              * not actually called */
+sub_819941C = 0x0819941C;  /* see sub_8198784 */
+loc_8198350 = 0x08198350;  /* third member of the loc_8198220/loc_819832C trio (see
+                              * title_screen.c's open_update for the established
+                              * "dword_3001038 + (&loc_X - &loc_8198220)" call idiom) */
 str_FREE_81DD7C8 = 0x081DD7C8;  /* 4-byte ASCII "FREE" tag, written into every free heap
                                   * block's label field by alloc_heap_8018CEC/free_heap_memory_8018C68 */
 dword_81DD7F4 = 0x081DD7F4;
