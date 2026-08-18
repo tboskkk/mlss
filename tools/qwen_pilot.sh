@@ -135,10 +135,12 @@ $(cat "$RESPONSE_FILE")"
 2. ./container.sh make -- must still say mlss.gba: OK. If it does NOT, explain what actually happened rather than guessing, and stop -- do not attempt to fix the extraction tool.
 3. Read asm/nonmatching/${TARGET_FUNC}.s carefully to understand what the function does (this file is raw assembly reference only -- never edit it directly, it's not where your C goes). split_func.py's own output above told you which src/*.c file it appended a stub to; open THAT file, find the #ifndef NONMATCHING / #else / #error block for $TARGET_FUNC in it, and replace the #error line with real C. Reuse existing types/structs/prototypes from include/common.h and relevant src/*.h wherever the function touches something already named -- grep before inventing new declarations.
 $( [[ -n "$NEEDS_PERMUTE" ]] && echo "4. This file has other not-started functions with real #error placeholders in it, so a plain NONMATCHING=1 build of the whole file will NOT work. Use ./container.sh tools/permute.py $TARGET_FUNC to isolate just this function, then check the score/diff it reports." || echo "4. Iterate with ./container.sh asm-differ -mwo $TARGET_FUNC." )
-5. If you reach an exact match (score 0 / 100%): remove the #ifndef NONMATCHING/#else/#endif wrapper, delete asm/nonmatching/${TARGET_FUNC}.s, run a PLAIN ./container.sh make (no NONMATCHING=1) and confirm mlss.gba: OK one more time -- that is the real proof, nothing else counts. Then git add -A && git commit -m \"Match $TARGET_FUNC\" (no attribution trailers).
-6. If you do NOT reach an exact match after a genuine effort: leave the guard in place, confirm a plain ./container.sh make still says mlss.gba: OK, do NOT commit, and write a clear description of what you tried and exactly where you got stuck to $MAILBOX/requests/${TARGET_FUNC}.md (what the remaining diff looks like, what you already tried, what specifically would help) -- then stop. Do not loop trying the same thing repeatedly.
+5. If you reach an exact match (score 0 / 100%): remove the #ifndef NONMATCHING/#else/#endif wrapper (leave just the plain function), delete asm/nonmatching/${TARGET_FUNC}.s, then run: rm -rf build/ && ./container.sh make -- must say mlss.gba: OK. The rm -rf build/ matters: a plain make can report OK against a stale cached object even when the real result is broken (see CLAUDE.md's landmines if curious why) -- only a from-scratch build is real proof. Do NOT commit -- leave the working tree as-is once you've confirmed this and stop. A supervisor process handles committing after its own independent check.
+6. If you do NOT reach an exact match after a genuine effort: leave the guard in place, confirm a plain ./container.sh make still says mlss.gba: OK, and write a clear description of what you tried and exactly where you got stuck to $MAILBOX/requests/${TARGET_FUNC}.md (what the remaining diff looks like, what you already tried, what specifically would help) -- then stop. Do not loop trying the same thing repeatedly. Do NOT commit either way -- never run git commit yourself.
 
-If any step fails with an error you did not expect, explain what the error actually said rather than guessing or silently skipping ahead to a later step.$EXTRA_CONTEXT"
+If any step fails with an error you did not expect, explain what the error actually said rather than guessing or silently skipping ahead to a later step. If you make an editing mistake partway through (e.g. edit the wrong file, or accidentally delete something you needed), explicitly undo that specific mistake by restoring what you deleted or changed -- do not paper over it by leaving things in whatever partial state the mistake left, and do not delete a fragment file until you are certain you have a real match confirmed by a from-scratch build.$EXTRA_CONTEXT"
+
+  HEAD_BEFORE=$(git rev-parse HEAD)
 
   ITER_LOG="$LOG_DIR/$(date +%Y%m%d-%H%M%S)-${TARGET_FUNC}.jsonl"
   log "invoking qwen-code (timeout ${PER_FUNCTION_TIMEOUT}s, log: $ITER_LOG)"
@@ -148,14 +150,26 @@ If any step fails with an error you did not expect, explain what the error actua
   QWEN_EXIT=$?
   log "qwen-code exited with code $QWEN_EXIT"
 
-  # --- Independent verification -- never trust the model's self-report ----
+  # --- Independent verification -- never trust the model's self-report,
+  # and never trust a non-from-scratch build. Both of these are real bugs
+  # that actually happened, not theoretical: (1) an earlier run had the
+  # model correctly self-commit a real match, but this script only checked
+  # for *uncommitted* changes afterward and missed it entirely; (2) a later
+  # run had the model accidentally destroy its own correct C, but every
+  # `make` it (and this script, before this fix) ran afterward reported
+  # `mlss.gba: OK` anyway because Make's dependency tracking has no idea
+  # asm `.include`s exist, so a stale cached object silently passed. See
+  # CLAUDE.md's landmines for both in full. HEAD_BEFORE catches (1);
+  # rm -rf build/ before the check catches (2).
   MATCHED=0
-  if git status --short | grep -q .; then
-    # Something changed. Is it a real, clean match?
+  HEAD_AFTER=$(git rev-parse HEAD)
+  if [[ "$HEAD_AFTER" != "$HEAD_BEFORE" ]] || git status --short | grep -q .; then
+    rm -rf build/
     BUILD_OUT=$(./container.sh make 2>&1)
     if echo "$BUILD_OUT" | grep -q "mlss.gba: OK"; then
-      # Build's clean. Was the guard actually removed for our target (a
-      # real match), or is this just an in-progress attempt still guarded?
+      # Build's clean from scratch. Was the guard actually removed for our
+      # target (a real match), or is this just an in-progress attempt
+      # still guarded?
       if ! grep -rq "asm/nonmatching/${TARGET_FUNC}\.s" src/*.c 2>/dev/null; then
         MATCHED=1
       fi
@@ -163,17 +177,20 @@ If any step fails with an error you did not expect, explain what the error actua
   fi
 
   if [[ "$MATCHED" == "1" ]]; then
-    log "verified match: $TARGET_FUNC -- merging to master"
+    log "verified match: $TARGET_FUNC (from-scratch build confirmed) -- committing and merging to master"
+    if [[ "$HEAD_AFTER" == "$HEAD_BEFORE" ]]; then
+      git add -A && git commit -m "Match $TARGET_FUNC"
+    fi
     cd "$REPO_ROOT"
     git merge --no-ff -m "Merge autopilot match: $TARGET_FUNC" "$BRANCH" 2>&1
+    rm -rf build/
     ./container.sh make 2>&1 | tail -3
     cd "$WORKTREE"
     git merge --ff-only master 2>&1
     log "done: $TARGET_FUNC MATCHED and merged"
   else
-    log "no verified match for $TARGET_FUNC this attempt -- resetting worktree, leaving any mailbox request in place"
-    cd "$WORKTREE"
-    git reset --hard HEAD 2>&1 >/dev/null
+    log "no verified match for $TARGET_FUNC this attempt -- resetting worktree to $HEAD_BEFORE (undoes any commit too), leaving any mailbox request in place"
+    git reset --hard "$HEAD_BEFORE" 2>&1 >/dev/null
     git clean -fd 2>&1 >/dev/null
     if [[ -f "$MAILBOX/requests/${TARGET_FUNC}.md" ]]; then
       log "  -> a help request was written for $TARGET_FUNC -- check $MAILBOX/requests/"
