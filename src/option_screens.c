@@ -12,12 +12,24 @@
 // break assembly of the rest. See CLAUDE.md "Landmines already hit".
 asm_unified(".include \"asm/macros.inc\"");
 
+// These two used to be missing their #else/#error/#endif entirely -- under
+// NONMATCHING=1 they simply didn't exist, producing confusing linker
+// "undefined reference" errors instead of a clear compile-time TODO. Fixed
+// to match every other not-started function's stub shape (see CLAUDE.md).
+// Doesn't fully unblock this file's NONMATCHING=1 build on its own -- same
+// "real #error siblings block the whole translation unit" situation as
+// heap.c; use tools/permute.py's isolation path for any function in this
+// file until these two get real C.
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/generate_window_bg_8051B98.s\"");
+#else
+#error "TODO: write generate_window_bg_8051B98 to match asm/nonmatching/generate_window_bg_8051B98.s, then delete this #error"
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8051EE0.s\"");
+#else
+#error "TODO: write sub_8051EE0 to match asm/nonmatching/sub_8051EE0.s, then delete this #error"
 #endif
 
 // https://decomp.me/scratch/PDUDz

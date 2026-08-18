@@ -330,6 +330,10 @@ struct MarioBrosScoreVisual* mbsv_init(struct MarioBrosScoreVisual*, u8, char*, 
 void sub_8019308(int, int, int);
 u8 sub_801A1D4(void* dest);
 void sub_801A2A0(void);
+void sub_801A548(void);
+void sub_81994EC(void*, void*);
+void sub_8052B54(struct OPTNProcess*, int);
+void sub_8052C50(struct OPTNProcess*, int);
 struct Process* load_init_812538C(struct Process*, u8, char*, int);
 u16 sub_8199624(struct struc_15*);
 void sub_8199D5C(struct struc_15*, int, u8, int);
@@ -370,10 +374,22 @@ extern int (*dword_3001038)();
 // ROM
 extern int loc_8198220();
 extern int loc_819832C(int, int);
+// Address-only idiom (see src/opening_sequence.c's identical externs) -- used
+// only via pointer subtraction (sub_8198784 - sub_819941C) for a blob size,
+// never dereferenced.
+extern u8 sub_8198784[];
+extern u8 sub_819941C[];
 extern u8 str_FREE_81DD7C8[4];
 extern u8 dword_81DD7F4[];
 extern u8 dword_81DD9F4[16384];
 extern u8 dword_81E19F4[1280];
+extern int dword_83A0E94[];
+extern int dword_83A13A0[];
+extern int dword_83A1BA0[];
+extern int dword_83A1D80[];
+extern int dword_83A1F60[];
+extern int off_83A2880[];
+extern int off_83A28C0[];
 extern u16 word_83A2900[];
 extern int* off_83A2920[];
 extern int dword_83A2B48[];
@@ -398,9 +414,12 @@ extern s16 word_83A7574[];
 extern s16 word_83A75B8[];
 extern s16 word_83A75C8[];
 extern u8* off_839EC80;
+// 518-entry pointer table, code-confirmed (see docs/formats/README.md).
+extern void* off_851F9E8[];
 extern struct ProcessDefinition stru_8CDBD68;
 extern struct ProcessDefinition stru_8CDBD78;
 extern struct ProcessDefinition stru_8CDC1F8;
+extern struct ProcessDefinition stru_8CDC208;
 extern struct ProcessDefinition stru_8CDC238;
 extern struct ProcessDefinition stru_8CDC248;
 extern struct ProcessDefinition stru_8CDC258;
