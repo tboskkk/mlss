@@ -213,14 +213,13 @@ plateau on a union-heavy function means "this is as good as it gets."
 `asm/mariobros.s` (~712KB, 923 functions, address range
 `0x08F502B8`–end of ROM) is a **complete, separate Mario Bros. classic
 minigame ROM** (different game code, different original developers),
-embedded whole for the multiplayer minigame. Recommendation, not yet
-confirmed by the maintainer: scope it **out** of "100%" and keep it as an
-opaque binary blob — every decomp tool in this repo (`progress.py`,
-`splits.yaml`'s `mariobros` group) already tracks it separately from "game
-proper" on that assumption. If the maintainer wants it decompiled too,
-that's a straightforward "start splitting `asm/mariobros.s` like any other
-blob" — nothing here blocks it, it's just not counted in headline
-progress numbers.
+embedded whole for the multiplayer minigame. **Confirmed by the
+maintainer: excluded from "100%".** Every decomp tool in this repo
+(`progress.py`, `splits.yaml`'s `mariobros` group) tracks it separately
+from "game proper" on that basis. If the maintainer ever wants it
+decompiled too, that's a straightforward "start splitting
+`asm/mariobros.s` like any other blob" — nothing here blocks it, it just
+doesn't count toward headline progress numbers unless that changes.
 
 ## Landmines already hit (read before you rediscover these)
 
