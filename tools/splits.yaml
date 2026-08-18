@@ -35,6 +35,7 @@ groups:
   - {obj: asm/text08000000, section: text}
   - {obj: src/heap, section: text}
   - {obj: asm/heap, section: text}
+  - {obj: src/sound, section: text}
   - {obj: asm/text08018E24, section: text}
   - {obj: src/process, section: text}
   - {obj: asm/text08019CA4, section: text}

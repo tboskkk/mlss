@@ -60,6 +60,19 @@ struct GameState {
     s32 field_88A_5 : 3;
     u32 field_88B_0 : 1;
     u32 field_88B_1 : 7;
+
+    // Sound-system state; only the fields sub_8018E24 actually touches are
+    // known so far, extend as more of this region's consumers get
+    // decompiled (see src/sound.c).
+    u8 field_88C;
+    u8 pad88D[3];
+    u16 field_890;
+    u8 pad892[10];
+    u16 field_89C;
+    u16 field_89E;
+    u8 pad8A0[4];
+    u16 field_8A4;
+    u16 field_8A6;
 };
 
 struct struc_3000D18 {
@@ -207,6 +220,10 @@ void free_heap_8018D9C(void*);
 void free_heap_8018DA8(void* ptr);
 void* alloc_zero_8018DB4(int, bool32, char*, int);
 void* alloc_Zero(int, bool32, char*, int);
+void sub_8018E24(void);
+void sub_8018E88(int, int);
+void sub_819A43C(void);
+void sub_819AFA8(void*);
 void sub_80193B4(int, int, int);
 void play_sfx_80195B4(int, int);
 u32 sub_80198B0(int*);

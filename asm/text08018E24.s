@@ -3,50 +3,6 @@
 	.syntax unified
 	.text
 
-	thumb_func_start sub_8018E24
-sub_8018E24:
-	push {r4, lr}
-	ldr r4, _08018E74 @ =0x0300034C
-	movs r1, #0x89
-	lsls r1, r1, #0x04
-	adds r0, r4, r1
-	movs r1, #0xFF
-	lsls r1, r1, #0x08
-	strh r1, [r0, #0x00]
-	ldr r2, _08018E78 @ =0x0000089C
-	adds r0, r4, r2
-	strh r1, [r0, #0x00]
-	adds r2, #0x02
-	adds r0, r4, r2
-	strh r1, [r0, #0x00]
-	ldr r1, _08018E7C @ =0x000008A4
-	adds r0, r4, r1
-	movs r1, #0x96
-	lsls r1, r1, #0x07
-	strh r1, [r0, #0x00]
-	adds r2, #0x08
-	adds r0, r4, r2
-	strh r1, [r0, #0x00]
-	bl sub_819A43C
-	ldr r0, _08018E80 @ =0x02000480
-	bl sub_819AFA8
-	ldr r0, _08018E84 @ =0x0000088C
-	adds r4, r4, r0
-	ldrb r0, [r4, #0x00]
-	movs r1, #0x06
-	orrs r0, r1
-	strb r0, [r4, #0x00]
-	movs r0, #0x00
-	movs r1, #0x64
-	bl sub_8018E88
-	pop {r4}
-	pop {r0}
-	bx r0
-_08018E74: .4byte 0x0300034C
-_08018E78: .4byte 0x0000089C
-_08018E7C: .4byte 0x000008A4
-_08018E80: .4byte 0x02000480
-_08018E84: .4byte 0x0000088C
 	thumb_func_start sub_8018E88
 sub_8018E88:
 	push {r4, r5, r6, r7, lr}

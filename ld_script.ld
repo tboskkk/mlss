@@ -23,6 +23,7 @@ SECTIONS
         build/asm/text08000000.o(.text);
         build/src/heap.o(.text);
         build/asm/heap.o(.text);
+        build/src/sound.o(.text);
         build/asm/text08018E24.o(.text);
         build/src/process.o(.text);
         build/asm/text08019CA4.o(.text);
