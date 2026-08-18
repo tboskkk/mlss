@@ -298,7 +298,9 @@ $(cat "$RESPONSE_FILE")"
     STAGE_TEXT="The function $TARGET_FUNC has ALREADY been extracted for you: the raw assembly reference is at asm/nonmatching/${TARGET_FUNC}.s (read-only, never edit it), and the C goes in $DEST_FILE, in its #ifndef NONMATCHING / #else / #error block -- replace the #error line with real C. Do not run split_func.py again, it's already done."
   fi
 
-  PROMPT="This repo is already built (mlss.gba: OK confirmed). $STAGE_TEXT
+  PROMPT="Your working directory for every single command, Read/Edit path, and Bash \`cd\`, with no exceptions, is exactly: $WORKTREE -- this is a git worktree, a separate real checkout, not the same directory as /home/tyler/Desktop/mlss (that's a DIFFERENT checkout of the same repo that other work happens in; it does NOT have this function extracted and reading or cd-ing there will show you stale or missing files that look like errors but aren't). Use paths relative to $WORKTREE, or the exact absolute prefix $WORKTREE/... -- never /home/tyler/Desktop/mlss/... on its own. If a file ever looks missing or a command's own output claims something isn't extracted yet, check you're actually operating under $WORKTREE before concluding anything is wrong.
+
+This repo is already built (mlss.gba: OK confirmed). $STAGE_TEXT
 
 Reuse existing types/structs/prototypes from include/common.h and relevant src/*.h wherever the function touches something already named -- grep before inventing new declarations.
 
