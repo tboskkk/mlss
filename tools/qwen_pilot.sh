@@ -327,7 +327,17 @@ If any step fails with an error you did not expect, explain what the error actua
 
   ITER_LOG="$LOG_DIR/$(date +%Y%m%d-%H%M%S)-${TARGET_FUNC}.jsonl"
   log "invoking qwen-code (timeout ${PER_FUNCTION_TIMEOUT}s, log: $ITER_LOG)"
-  timeout "$PER_FUNCTION_TIMEOUT" ~/.local/bin/qwen-code --bare --dangerously-skip-permissions \
+  # -k 30: without a kill-after grace period, `timeout` sends TERM once the
+  # clock expires and then just WAITS for the child to actually exit -- it
+  # does not return control on its own. Found for real: manually killing a
+  # qwen-code process stuck inside a synchronous compaction call, TERM
+  # didn't take effect promptly and a follow-up KILL was needed. If that
+  # happens on a genuine, unattended timeout (not a manual kill) instead,
+  # a bare `timeout N` here would leave the whole orchestrator hung well
+  # past the configured budget, possibly indefinitely. -k 30 escalates to
+  # KILL 30s after TERM if the child hasn't exited by then, so this call
+  # always returns in a bounded time no matter what state the child is in.
+  timeout -k 30 "$PER_FUNCTION_TIMEOUT" ~/.local/bin/qwen-code --bare --dangerously-skip-permissions \
     --output-format stream-json --verbose -p "$PROMPT" \
     > "$ITER_LOG" 2>&1
   QWEN_EXIT=$?
