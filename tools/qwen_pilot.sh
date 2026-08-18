@@ -192,6 +192,14 @@ If any step fails with an error you did not expect, explain what the error actua
     log "no verified match for $TARGET_FUNC this attempt -- resetting worktree to $HEAD_BEFORE (undoes any commit too), leaving any mailbox request in place"
     git reset --hard "$HEAD_BEFORE" 2>&1 >/dev/null
     git clean -fd 2>&1 >/dev/null
+    # nonmatchings/ and tools/permute-work/ are gitignored (decomp-permuter
+    # scratch state), so `git clean -fd` alone never touches them -- an
+    # interrupted run leaves a stale nonmatchings/<name>/ behind that makes
+    # permute.py refuse to re-import next time ("already exists"), and the
+    # error it prints is a container-internal /workspace/... path that
+    # doesn't exist on the host, so even a careful recovery attempt copying
+    # that path verbatim silently no-ops. Found live watching a real run.
+    rm -rf "nonmatchings/${TARGET_FUNC}" "tools/permute-work/${TARGET_FUNC}"*
     if [[ -f "$MAILBOX/requests/${TARGET_FUNC}.md" ]]; then
       log "  -> a help request was written for $TARGET_FUNC -- check $MAILBOX/requests/"
     fi
