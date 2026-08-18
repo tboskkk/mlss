@@ -210,3 +210,89 @@ asm_unified(".include \"asm/nonmatching/sub_8019F24.s\"");
 #else
 #error "TODO: write sub_8019F24 to match asm/nonmatching/sub_8019F24.s, then delete this #error"
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_801A1D4.s\"");
+#else
+u8 sub_801A1D4(void* dest) {
+    s32 i;
+    struct struc_3000D0C_channel* channel;
+    s16 sum;
+    u32 zero;
+    u8 gotData;
+
+    gotData = dword_3000D0C->field_180();
+    dword_3000D0C->field_3 = 0;
+
+    if (gotData) {
+        for (i = 0; i <= 3; i++) {
+            channel = &dword_3000D0C->field_2C[i];
+            sum = channel->field_0 + channel->field_2 + channel->field_4 + channel->field_6
+                + channel->field_8 + channel->field_A + channel->field_C + channel->field_E
+                + channel->field_10 + channel->field_12;
+
+            if (sum == -13) {
+                gotData = i * 16;
+                CpuSet(&channel->field_4, (u8*)dest + gotData, CPU_SET_32BIT | 4);
+                dword_3000D0C->field_3 |= 1 << i;
+            }
+
+            zero = 0;
+            CpuSet(&zero, &channel->field_4, CPU_SET_32BIT | CPU_SET_SRC_FIXED | 4);
+        }
+    }
+
+    dword_3000D0C->field_2 |= dword_3000D0C->field_3;
+    return dword_3000D0C->field_3;
+}
+#endif
+
+void sub_801A2A0(void) {
+    u32 temp;
+    u8 flag0;
+    vu32* sioReg;
+    s32 sendData;
+
+    if (dword_3000D0C == NULL) {
+        return;
+    }
+
+    if ((flag0 = dword_3000D0C->field_0) != 0) {
+        if (dword_3000D0C->field_1 == 0) {
+            return;
+        }
+
+        if (dword_3000D0C->field_6 == 0) {
+            return;
+        }
+
+        dword_3000D0C->field_18 = -2;
+
+        temp = dword_3000D0C->field_28;
+        dword_3000D0C->field_28 = dword_3000D0C->field_24;
+        dword_3000D0C->field_24 = temp;
+
+        if (dword_3000D0C->field_4 != 0) {
+            temp = dword_3000D0C->field_20;
+            dword_3000D0C->field_20 = dword_3000D0C->field_1C;
+            dword_3000D0C->field_1C = temp;
+            dword_3000D0C->field_4 = 0;
+            dword_3000D0C->field_14 = 0;
+        }
+
+        dword_3000D0C->field_7 = (*(vu32*)0x04000128 << 25) >> 31;
+        sioReg = (vu32*)0x04000128;
+        sendData = 0xFEFE;
+        *(vu16*)((u8*)sioReg + 2) = sendData;
+        *(vu16*)sioReg |= 0x80;
+        REG_TM3CNT_H = 0xC0;
+    } else {
+        if (dword_3000D0C->field_9 == 0) {
+            REG_IME = flag0;
+            INTR_CHECK |= INTR_FLAG_SERIAL;
+            REG_IME = 1;
+        }
+
+        dword_3000D0C->field_9 = flag0;
+    }
+}
