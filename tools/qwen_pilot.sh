@@ -52,6 +52,12 @@ log() { echo "[$(date +%H:%M:%S)] $*"; }
 if [[ ! -d "$WORKTREE" ]]; then
   log "creating persistent autopilot worktree"
   git worktree add "$WORKTREE" -b "$BRANCH" master
+  # Submodules are per-worktree too, same deal as mlss.map -- a fresh
+  # worktree doesn't inherit tools/decomp-permuter's checkout. Found the
+  # hard way: Qwen correctly self-recovered from this one on its own
+  # (cloned it, moved on), but it's cheap to just not make it re-discover
+  # this every time.
+  ( cd "$WORKTREE" && git submodule update --init tools/decomp-permuter )
   ( cd "$WORKTREE" && ./container.sh make )
 else
   log "reusing existing autopilot worktree, syncing with master"
@@ -127,7 +133,7 @@ $(cat "$RESPONSE_FILE")"
 
 1. ./container.sh tools/split_func.py $TARGET_FUNC
 2. ./container.sh make -- must still say mlss.gba: OK. If it does NOT, explain what actually happened rather than guessing, and stop -- do not attempt to fix the extraction tool.
-3. Read asm/nonmatching/${TARGET_FUNC}.s carefully and write real C in its #else branch, replacing the #error. Reuse existing types/structs/prototypes from include/common.h and relevant src/*.h wherever the function touches something already named -- grep before inventing new declarations.
+3. Read asm/nonmatching/${TARGET_FUNC}.s carefully to understand what the function does (this file is raw assembly reference only -- never edit it directly, it's not where your C goes). split_func.py's own output above told you which src/*.c file it appended a stub to; open THAT file, find the #ifndef NONMATCHING / #else / #error block for $TARGET_FUNC in it, and replace the #error line with real C. Reuse existing types/structs/prototypes from include/common.h and relevant src/*.h wherever the function touches something already named -- grep before inventing new declarations.
 $( [[ -n "$NEEDS_PERMUTE" ]] && echo "4. This file has other not-started functions with real #error placeholders in it, so a plain NONMATCHING=1 build of the whole file will NOT work. Use ./container.sh tools/permute.py $TARGET_FUNC to isolate just this function, then check the score/diff it reports." || echo "4. Iterate with ./container.sh asm-differ -mwo $TARGET_FUNC." )
 5. If you reach an exact match (score 0 / 100%): remove the #ifndef NONMATCHING/#else/#endif wrapper, delete asm/nonmatching/${TARGET_FUNC}.s, run a PLAIN ./container.sh make (no NONMATCHING=1) and confirm mlss.gba: OK one more time -- that is the real proof, nothing else counts. Then git add -A && git commit -m \"Match $TARGET_FUNC\" (no attribution trailers).
 6. If you do NOT reach an exact match after a genuine effort: leave the guard in place, confirm a plain ./container.sh make still says mlss.gba: OK, do NOT commit, and write a clear description of what you tried and exactly where you got stuck to $MAILBOX/requests/${TARGET_FUNC}.md (what the remaining diff looks like, what you already tried, what specifically would help) -- then stop. Do not loop trying the same thing repeatedly.
