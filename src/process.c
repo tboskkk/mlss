@@ -296,3 +296,9 @@ void sub_801A2A0(void) {
         dword_3000D0C->field_9 = flag0;
     }
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_801A33C.s\"");
+#else
+#error "TODO: write sub_801A33C to match asm/nonmatching/sub_801A33C.s, then delete this #error"
+#endif
