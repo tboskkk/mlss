@@ -61,11 +61,31 @@ struct GameState {
     u32 field_88B_0 : 1;
     u32 field_88B_1 : 7;
 
-    // Sound-system state; only the fields sub_8018E24 actually touches are
-    // known so far, extend as more of this region's consumers get
-    // decompiled (see src/sound.c).
-    u8 field_88C;
-    u8 pad88D[3];
+    // Sound-system state; only the fields sub_8018E24/sub_8018E88 actually
+    // touch are known so far, extend as more of this region's consumers
+    // get decompiled (see src/sound.c). field_88C is accessed both as a
+    // plain byte (bits 1-2 set/cleared together via a mask) and as a
+    // 2-bit sub-field on its own (bit-position 1, width 2) -- confirmed
+    // against retail via a probe compile, see git history for sub_8018E88.
+    union GameStateU88C {
+        u8 field_88C;
+        u16 field_88C_word; // combined field_88C (low byte) + field_88D (high byte)
+        struct {
+            u8 field_88C_0 : 1;
+            u8 field_88C_1 : 2;
+            u8 field_88C_3 : 5;
+        } bits;
+        struct {
+            u16 field_88C_0 : 1;
+            u16 field_88C_1 : 2;
+            u16 field_88C_3 : 7;
+            u16 field_88D_2 : 6;
+        } wordBits;
+    } u_88C; // logically 2 bytes (0x88C-0x88D) but the u16-bitfield sibling
+             // forces 4-byte (int) storage allocation in this compiler --
+             // confirmed via probe compile, see git history for sub_8018E88.
+             // No explicit padding needed before field_890: this union's
+             // sizeof already covers 0x88C-0x88F.
     u16 field_890;
     u8 pad892[10];
     u16 field_89C;
@@ -224,6 +244,7 @@ void sub_8018E24(void);
 void sub_8018E88(int, int);
 void sub_819A43C(void);
 void sub_819AFA8(void*);
+void sub_80196BC(void);
 void sub_80193B4(int, int, int);
 void play_sfx_80195B4(int, int);
 u32 sub_80198B0(int*);
@@ -265,6 +286,10 @@ void sub_81DA6C8(int);
 // EWRAM
 extern struct struc_203FFB8 stru_203FFB8;
 extern struct struc_203FFF8 stru_203FFF8;
+// Some kind of sound-driver shared state word, read/written under
+// REG_IME==0 critical sections by the sound wrapper in src/sound.c;
+// reloaded every access in retail code so treated as volatile here.
+extern vu16 word_2000004;
 
 // The buffer open_init_8055A00 allocates into dword_3000DA0 (340 bytes,
 // tag "ORST") — only the fields open_8056224 actually touches are known

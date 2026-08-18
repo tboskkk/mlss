@@ -9,6 +9,7 @@
 
 stru_203FFB8 = 0x0203FFB8;
 stru_203FFF8 = 0x0203FFF8;
+word_2000004 = 0x02000004;
 
 /* IWRAM (0x03000000-0x03007FFF): same deal as ewram.txt, one region down. */
 
