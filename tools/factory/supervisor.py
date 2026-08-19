@@ -90,6 +90,45 @@ def restart_llama():
     return False
 
 
+REAP_INTERVAL_SECONDS = 300  # check every 5 min
+REAP_STALE_MINUTES = 45      # only touch claims stuck well past tier2's own default stall window
+
+
+# Clearing worker_id alone is NOT enough to recover a stuck claim: nothing
+# ever claims FROM "permuting" or "validating" (tier2 claims from
+# tier2_ready and transitions itself; the validator claims from
+# validating) -- a row left in one of those states with worker_id cleared
+# is invisible to every claim_for_worker() call forever, worse off than
+# before the reap. Each stuck state needs to go back to wherever it can
+# actually be picked up again. validating specifically goes to
+# needs_human rather than being retried automatically: it means the
+# validator died mid-splice, and the repo's real state at that point isn't
+# known from here -- safer for a human/Claude to look than to guess.
+REAP_RECOVERY = {
+    "permuting": "tier2_ready",
+    "validating": "needs_human",
+}
+
+
+def reap_stale_claims(stale_minutes: float) -> int:
+    conn = db.connect()
+    cutoff = time.time() - stale_minutes * 60
+    n = 0
+    with db.tx(conn):
+        rows = conn.execute(
+            "SELECT name, state FROM functions WHERE worker_id IS NOT NULL AND updated_at < ?",
+            (cutoff,),
+        ).fetchall()
+        for row in rows:
+            recovery_state = REAP_RECOVERY.get(row["state"], row["state"])
+            db.set_state(conn, row["name"], recovery_state, worker_id=None,
+                         notes=f"reaped: stuck claim from state={row['state']}, "
+                                f"worker_id set but no live worker for >{stale_minutes:.0f} min")
+            n += 1
+    conn.close()
+    return n
+
+
 def clean_slate():
     log("clean slate: stopping any stray factory processes from a previous session")
     for pyname, _args, _needs_llm in PROCESSES.values():
@@ -98,10 +137,14 @@ def clean_slate():
     for pyname, _args, _needs_llm in PROCESSES.values():
         subprocess.run(["pkill", "-KILL", "-f", f"tools/factory/{pyname}"])
 
-    conn = db.connect()
-    with db.tx(conn):
-        n = conn.execute("UPDATE functions SET worker_id = NULL WHERE worker_id IS NOT NULL").rowcount
-    conn.close()
+    # 0 minutes: at this exact point every factory process was just killed
+    # above, so ANY claim still on the board is unconditionally orphaned --
+    # no need to wait out a staleness window the way the periodic reaper
+    # does. Uses the same per-state recovery mapping (see REAP_RECOVERY) so
+    # a claim from "permuting" doesn't just get worker_id cleared and left
+    # permanently unclaimable -- that bug existed here too before this
+    # was unified with reap_stale_claims().
+    n = reap_stale_claims(0)
     log(f"reaped {n} orphaned worker claim(s)")
 
 
@@ -149,11 +192,28 @@ def main():
     signal.signal(signal.SIGINT, _handle_sigterm)
 
     log("=== supervisor running -- all processes launched ===")
+    last_reap = time.time()
     while not stopping:
         if deadline and time.time() >= deadline:
             log("wall-clock budget reached, stopping")
             break
         time.sleep(args.check_interval)
+
+        # Periodic reaper, not just the startup one: a process surviving
+        # its own errors (see the resilient-loop fix in every tier's
+        # main()) is good for uptime, but it also means the supervisor's
+        # crash-triggered restart -- which used to be what caught an
+        # orphaned worker_id claim -- may never fire. A claim genuinely
+        # stuck (a hang, or a crash the tier's own try/except couldn't
+        # fully clean up after) needs its own safety net. 45 minutes is
+        # deliberately generous -- tier2's default --stall-min is 15,
+        # so a legitimate permuting claim can sit that long before tier2
+        # itself resolves it; this only catches things well past that.
+        if time.time() - last_reap > REAP_INTERVAL_SECONDS:
+            n = reap_stale_claims(REAP_STALE_MINUTES)
+            if n:
+                log(f"reaper: released {n} stale worker claim(s) (stuck > {REAP_STALE_MINUTES} min)")
+            last_reap = time.time()
 
         for name, (pyname, _args, needs_llm) in PROCESSES.items():
             proc = procs.get(name)
