@@ -9,3 +9,6 @@ asm_unified(".include \"asm/macros.inc\"");
 
 void nullsub_5(void) {
 }
+
+void nullsub_6(void) {
+}

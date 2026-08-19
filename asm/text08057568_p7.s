@@ -3,10 +3,6 @@
 	.syntax unified
 	.text
 
-	thumb_func_start nullsub_6
-nullsub_6: @ 081DCDF0
-	bx lr
-	.byte 0x00, 0x00
 	thumb_func_start sub_81DCDF4
 sub_81DCDF4:
 	push {r4, r5, lr}
