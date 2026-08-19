@@ -329,6 +329,64 @@ EOF
   fi
   rm -f "$DEST_OBJ" "build/${DEST_FILE%.c}.i" "build/${DEST_FILE%.c}.s" 2>/dev/null
 
+  # --- Surgical-context setup: the actual dominant cost found by analyzing
+  # a full night's transcripts + the server's own log wasn't decompilation
+  # difficulty -- it was that most attempts spent their whole budget on
+  # full-file reads (a 545-line src/*.c, a 426-line common.h) that took
+  # 4-5 minutes EACH to re-prefill (no KV cache reuse across turns once the
+  # cache-ram budget was oversubscribed -- see serve.sh's own fix for that
+  # half of it). At ~5 min/turn against a 35-min budget that's ~7 turns
+  # total, nowhere near enough to reach permute.py, let alone converge it.
+  # Bigger the context, bigger the KV entry, more turns get spent building
+  # it, more eviction pressure, more compactions -- all four costs share
+  # the same root, so cutting context size hard attacks all of them at
+  # once. The orchestrator already knows exactly where this function's
+  # guard block lives (it just extracted it, or read DEST_FILE at
+  # continuation-detection time) -- handing over that exact line number
+  # means the model never has to read the whole file to find it.
+  # Matches the .include reference line (always present, guard open or not)
+  # and, for a not-yet-attempted function, also its #error line -- head -1
+  # takes whichever comes first, which is always the .include line, i.e.
+  # the actual start of the guard block. Verified this exact pattern
+  # against real file content before trusting it: an earlier version tried
+  # to also match the line's trailing escaped quote and silently matched
+  # nothing at all (grep exit 1, TARGET_LINE always empty) because the
+  # quote-escaping logic through two layers of interpretation -- this
+  # script's own bash double-quotes, then grep's regex -- didn't produce
+  # what it looked like it would on paper. This simpler pattern doesn't
+  # need to match the trailing quote at all to be unique enough.
+  TARGET_LINE=$(grep -n "asm/nonmatching/${TARGET_FUNC}\.s" "$DEST_FILE" 2>/dev/null | head -1 | cut -d: -f1)
+
+  # Persistent working notes, kept OUTSIDE the tracked tree (.claude/ is
+  # gitignored specifically for this -- see .gitignore) so it survives
+  # both a full worktree reset (git clean -fd skips ignored paths, same
+  # reason nonmatchings/ needs its own explicit rm -rf below) and doesn't
+  # ever risk getting swept into a WIP commit's `git add -A`. The point:
+  # if a compaction wipes the model's conversation, re-reading this one
+  # small file is enough to reorient -- cheap -- instead of re-reading the
+  # whole codebase from scratch, which is what was actually happening.
+  # Only created fresh on a genuinely new attempt; left untouched on a
+  # continuation so whatever the model itself appended survives.
+  NOTES_DIR="$WORKTREE/.claude/pilot-notes"
+  NOTES_FILE="$NOTES_DIR/${TARGET_FUNC}.md"
+  mkdir -p "$NOTES_DIR"
+  if [[ ! -f "$NOTES_FILE" ]]; then
+    cat > "$NOTES_FILE" <<EOF
+# Working notes: $TARGET_FUNC
+
+- Destination: $DEST_FILE, guard block starts at line ${TARGET_LINE:-unknown}
+- Raw assembly reference (read-only): asm/nonmatching/${TARGET_FUNC}.s
+- Needs permute.py isolation: $( [[ -n "$NEEDS_PERMUTE" ]] && echo yes || echo no )
+
+## Scratchpad
+(Append your own brief notes here as you learn things or make progress --
+what the function does, what you've tried, current diff score if you have
+one. If your context ever gets compacted or you're unsure where you left
+off, re-read THIS file first instead of re-reading the whole codebase --
+it's small and has everything you need to reorient.)
+EOF
+  fi
+
   # Pick up any answered mailbox request for this exact function from a
   # previous stuck attempt.
   EXTRA_CONTEXT=""
@@ -355,9 +413,16 @@ $(cat "$RESPONSE_FILE")"
 
   PROMPT="Your working directory for every single command, Read/Edit path, and Bash \`cd\`, with no exceptions, is exactly: $WORKTREE -- this is a git worktree, a separate real checkout, not the same directory as /home/tyler/Desktop/mlss (that's a DIFFERENT checkout of the same repo that other work happens in; it does NOT have this function extracted and reading or cd-ing there will show you stale or missing files that look like errors but aren't). Use paths relative to $WORKTREE, or the exact absolute prefix $WORKTREE/... -- never /home/tyler/Desktop/mlss/... on its own. If a file ever looks missing or a command's own output claims something isn't extracted yet, check you're actually operating under $WORKTREE before concluding anything is wrong.
 
+FIRST, before anything else: read $NOTES_FILE. It's small and has exactly what you need to get oriented -- where the code goes, whether you need permute.py, and (if this is a retry) what a previous attempt already found. If you ever feel unsure where you left off later in this session -- especially right after anything resembling a context/conversation summary -- re-read that same small file again before re-reading anything else. It is much cheaper than rediscovering things from the full codebase.
+
+CONTEXT BUDGET MATTERS A LOT HERE -- this model runs locally on CPU, and a single full-file Read of a few hundred lines can cost several minutes to process. Follow this or you will run out of time before writing any code:
+- To read $DEST_FILE: do NOT read the whole file. Use Read with offset=$(( ${TARGET_LINE:-1} > 5 ? ${TARGET_LINE:-1} - 5 : 1 )) and limit=60 -- that's exactly where this function's guard block starts. Only widen it if the function genuinely runs longer than that.
+- To use anything from another file (a header, a struct definition, a constant): grep -n for the specific identifier first, then Read just a small window (~20-30 lines) around the line grep finds. Do not open a whole header file end to end looking for something.
+- Append a short note to $NOTES_FILE whenever you learn or decide something worth remembering (what the function does, what you tried, a diff score) -- cheap insurance against losing that if your context gets summarized later.
+
 This repo is already built (mlss.gba: OK confirmed). $STAGE_TEXT
 
-Reuse existing types/structs/prototypes from include/common.h and relevant src/*.h wherever the function touches something already named -- grep before inventing new declarations.
+Reuse existing types/structs/prototypes from include/common.h and relevant src/*.h wherever the function touches something already named -- grep before inventing new declarations (grep + a small windowed Read, per above -- not a full read of the header).
 
 $( [[ -n "$NEEDS_PERMUTE" ]] && echo "This translation unit does NOT compile under NONMATCHING=1 as a whole (other not-started #error siblings block it) -- use ./container.sh tools/permute.py $TARGET_FUNC to isolate just this function, then ./container.sh tools/decomp-permuter/permuter.py nonmatchings/$TARGET_FUNC to search for an exact match. Let the search actually run for a real amount of time before concluding it's stuck -- register-allocation gaps often need many iterations, not a handful." || echo "Iterate with ./container.sh asm-differ -mwo $TARGET_FUNC." )
 

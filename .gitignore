@@ -24,6 +24,13 @@ expected/
 nonmatchings/
 tools/permute-work/
 
+# per-machine tool state (worktrees, autopilot logs/notes/retry state) —
+# was untracked-but-not-ignored before, which meant a stray file placed
+# here (e.g. a per-attempt notes scratch file) could get silently swept
+# into a qwen_pilot.sh WIP commit's `git add -A`. Genuinely local machine
+# state, never repo content.
+.claude/
+
 # graphics
 *.1bpp
 *.4bpp
