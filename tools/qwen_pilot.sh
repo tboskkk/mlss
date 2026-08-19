@@ -58,7 +58,22 @@ BRANCH="worktree-qwen-autopilot"
 MAILBOX="$HOME/Desktop/ai-training/qwen-coder/mailbox"
 LOG_DIR="$REPO_ROOT/.claude/qwen-autopilot-logs"
 MAX_ITER="${1:-8}"
-PER_FUNCTION_TIMEOUT="${QWEN_PILOT_TIMEOUT:-1200}"  # 20 min -- CPU inference is genuinely slow, don't cut it off early
+# 35 min, not 20. Auto-compact keeps firing early (~12k tokens, well under
+# any configured window) despite two real, verified-reaching-the-process
+# fix attempts -- CLAUDE_CODE_AUTO_COMPACT_WINDOW (env var) and --autocompact
+# (the documented CLI flag), both confirmed present in the actual running
+# process's own args/environ, neither actually preventing it. Root cause
+# still genuinely unknown after checking the obvious levers (env var, CLI
+# flag, settings.json, the model server's own reported n_ctx -- all
+# consistent, none explain it). What IS known: compaction itself now
+# succeeds (not the earlier "aborted, stuck forever" bug from earlier this
+# session) but costs a real, consistent ~7 minutes, which is over a third
+# of a 20-minute budget -- so a run was regularly getting cut off right
+# after paying that tax, before any of the remaining time could go to real
+# work. This doesn't fix WHY it compacts early; it just stops that being
+# fatal to a whole attempt by giving real working time a chance to happen
+# after the tax is paid instead of ending right when it's paid.
+PER_FUNCTION_TIMEOUT="${QWEN_PILOT_TIMEOUT:-2100}"
 MAX_RETRIES_PER_FUNC="${QWEN_PILOT_MAX_RETRIES:-3}" # after this many unsuccessful attempts on the same function, auto-escalate to the mailbox and move on rather than burn the whole run's budget on one hard function
 
 mkdir -p "$MAILBOX/requests" "$MAILBOX/responses" "$MAILBOX/archive" "$LOG_DIR"
