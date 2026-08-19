@@ -94,3 +94,56 @@ void free_heap_8018D9C(void* ptr) {
 void free_heap_8018DA8(void* ptr) {
     free_heap_memory_8018C68(ptr);
 }
+
+// The overnight autopilot's C attempt here had two compounding bugs, found
+// by re-deriving the true parameter order straight from the assembly
+// rather than trusting the existing (plausible-looking, wrong) attempt:
+// param order was actually (size, heapId, tag, clear), not (heapId, clear,
+// tag, size) -- the retail code shuffles r0/r1 before calling
+// alloc_heap_8018CEC specifically to swap this function's own (size,
+// heapId) into that callee's (heapId, size) order, which is easy to
+// misread as "this function's params are already in callee order" if you
+// don't trace the register moves carefully. That single swap cascaded:
+// the old attempt used the shift-computed word-count value as CpuSet's
+// SOURCE POINTER (cast an integer to void*) instead of a real address, and
+// used the wrong local variable (heapId instead of size) in the shift
+// itself. Per the assembly: source is &local zero-initialized u32 (mov r0,
+// sp after storing 0 there), not a bit-mangled pointer.
+void* alloc_zero_8018DB4(u32 size, bool32 heapId, char* tag, u8 clear) {
+    // Unused, but load-bearing for matching: declaring it here (before
+    // alloc_heap_8018CEC's call) is what gets agbcc's register allocator to
+    // assign r5/r6 the same way retail does (size in r5, ptr in r6) --
+    // without it they land swapped. Confirmed via decomp-permuter search,
+    // not guessed; same category of "not idiomatic but load-bearing" quirk
+    // documented on alloc_heap_8018CEC just above.
+    int unused;
+    void* ptr = alloc_heap_8018CEC(heapId, size, tag);
+
+    if (clear) {
+        u32 zero = 0;
+        unused = 19;
+        CpuSet(&zero, ptr, ((size << 9) >> 11) | (0xA0 << unused));
+    }
+
+    return ptr;
+}
+
+// Same fix as alloc_zero_8018DB4 immediately above -- this is a byte-for-
+// byte identical sibling function in the retail binary (adjacent address,
+// same instruction sequence), so the same parameter-order/CpuSet-argument
+// bug applied here too. Verified independently against this function's
+// own asm/nonmatching/alloc_Zero.s rather than assumed from the sibling.
+void* alloc_Zero(u32 size, bool32 heapId, char* tag, u8 clear) {
+    // See alloc_zero_8018DB4's identical comment above -- same load-bearing
+    // register-allocation nudge, confirmed independently for this function.
+    int unused;
+    void* ptr = alloc_heap_8018CEC(heapId, size, tag);
+
+    if (clear) {
+        u32 zero = 0;
+        unused = 19;
+        CpuSet(&zero, ptr, ((size << 9) >> 11) | (0xA0 << unused));
+    }
+
+    return ptr;
+}
