@@ -24,6 +24,15 @@ LD_SCRIPT = ROOT / "ld_script.ld"
 MAP_FILE = ROOT / "mlss.map"
 NONMATCHING_DIR = ROOT / "asm" / "nonmatching"
 
+# The exact 5-line header every raw asm/*.s blob starts with. Kept in sync
+# with _HEADER_LINE_RES below (which *recognizes* this shape); this constant
+# is for *writing* a new blob, e.g. the tail half produced by a mid-file
+# split. Each blob is assembled as its own translation unit, so each needs
+# its own macros.inc include — that's unrelated to (and safe from) the
+# "one macros.inc per src/*.c" landmine in CLAUDE.md, which is about
+# multiple fragments included into a single C file.
+BLOB_HEADER = '\t.include "asm/macros.inc"\n\n\t.syntax unified\n\t.text\n\n'
+
 FUNC_START_RE = re.compile(
     r"^\s*(thumb_func_start|arm_func_start|non_word_aligned_thumb_func_start)\s+(\S+)\s*$"
 )
@@ -360,13 +369,33 @@ def _header_end(lines) -> Optional[int]:
     return len(_HEADER_LINE_RES)
 
 
-def extract_function_lines(path: Path, name: str):
+def next_blob_part_name(stem: str, manifest: "Manifest") -> str:
+    """Pick an unused `asm/<base>_pN` name for the tail half of a blob that's
+    being split around a mid-file extraction.
+
+    Splits can nest (extract from a blob, then extract from the tail it
+    produced), so this always counts from the ORIGINAL base name rather than
+    appending another suffix to an already-suffixed name — otherwise you'd
+    get asm/text08057568_p2_p2_p3-style pileups after a few extractions.
+    """
+    base = re.sub(r"_p\d+$", "", stem)
+    used = {e.obj for e in manifest.iter_entries()}
+    n = 2
+    while f"{base}_p{n}" in used or (ROOT / f"{base}_p{n}.s").exists():
+        n += 1
+    return f"{base}_p{n}"
+
+
+def extract_function_lines(path: Path, name: str, allow_midfile: bool = False):
     """Return (all_lines, start_index, end_index) for `name`'s definition in `path`.
 
-    end_index is exclusive. Raises SystemExit if `name` isn't the first
-    remaining function-start directive in the file — this tool only supports
-    front-to-back extraction, matching how every split in this project has
-    been done so far (see CLAUDE.md).
+    end_index is exclusive. By default raises SystemExit if `name` isn't the
+    first remaining function-start directive in the file. Pass
+    allow_midfile=True to permit extracting from anywhere in the blob — the
+    caller is then responsible for splitting the blob into before/after
+    objects and placing them correctly in the manifest, since the bytes
+    before and after this function must keep their exact ROM positions
+    (see split_func.py's mid-file path).
 
     start_index is usually just `name`'s own thumb_func_start line, but see
     the leading-unlabeled-data handling below: it can be earlier than that.
@@ -379,7 +408,7 @@ def extract_function_lines(path: Path, name: str):
     start_line = starts[idx][1]
     end_line = starts[idx + 1][1] if idx + 1 < len(starts) else len(lines)
 
-    earlier = [n for n, ln in starts if ln < start_line]
+    earlier = [] if allow_midfile else [n for n, ln in starts if ln < start_line]
     if earlier:
         raise SystemExit(
             f"{name!r} is not the first remaining function in {path.name}.\n"
@@ -397,9 +426,16 @@ def extract_function_lines(path: Path, name: str):
     # unnoticed extraction bug (found via a fresh pilot agent hitting it on
     # text08019CA4.s; also present verbatim in text080542C4.s). Detect it
     # and fold it into this extraction instead of leaving it behind.
-    header_end = _header_end(lines)
-    if header_end is not None and header_end < start_line:
-        if any(line.strip() for line in lines[header_end:start_line]):
-            start_line = header_end
+    #
+    # ONLY valid for a front-most extraction. In mid-file mode everything
+    # between the header and this function is earlier *functions*, which
+    # stay in the before-part and keep their own ROM positions — folding
+    # them in here would silently swallow every preceding function into
+    # this one extraction and wreck the layout.
+    if not allow_midfile:
+        header_end = _header_end(lines)
+        if header_end is not None and header_end < start_line:
+            if any(line.strip() for line in lines[header_end:start_line]):
+                start_line = header_end
 
     return lines, start_line, end_line

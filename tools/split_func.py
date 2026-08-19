@@ -103,9 +103,26 @@ def main() -> None:
         )
 
     source_path = splitlib.ROOT / f"{sym.obj_stem}.s"
-    lines, start, end = splitlib.extract_function_lines(source_path, sym.name)
+
+    # Is this the front-most remaining function (the classic, cheap case) or
+    # somewhere in the middle (needs the blob split around it)? Decided here
+    # rather than inside extract_function_lines so the caller can set up the
+    # very different manifest surgery each case needs.
+    _all_lines, _starts = splitlib.function_starts(source_path)
+    _idx = next((i for i, (n, _) in enumerate(_starts) if n == sym.name), None)
+    if _idx is None:
+        raise SystemExit(
+            f"{sym.name!r}: no thumb_func_start/arm_func_start directive found in {source_path}"
+        )
+    midfile = any(ln < _starts[_idx][1] for _, ln in _starts)
+
+    lines, start, end = splitlib.extract_function_lines(
+        source_path, sym.name, allow_midfile=midfile
+    )
     extracted = lines[start:end]
-    remaining = lines[:start] + lines[end:]
+    before_lines = lines[:start]
+    after_lines = lines[end:]
+    remaining = before_lines + after_lines
 
     manifest = splitlib.load_manifest()
     loc = manifest.locate(sym.obj_stem, sym.section)
@@ -118,8 +135,24 @@ def main() -> None:
     gi, ei = loc
     group = manifest.groups[gi]
 
-    creating_new = ei == 0 or not group.entries[ei - 1].obj.startswith("src/")
-    if creating_new:
+    if midfile:
+        # A mid-file extraction can't append to whatever src/*.c happens to
+        # sit before this blob: each object contributes its .text exactly
+        # once, at one point in the link order, so every function inside a
+        # given src/*.c must be contiguous in the ROM. This function isn't
+        # adjacent to that file's existing contents — it's in the middle of
+        # a blob — so it needs its own object, placed exactly here, with the
+        # blob's tail following it.
+        dest_obj = f"src/{args.dest}" if args.dest else f"src/{sym.name}"
+        dest_path = splitlib.ROOT / f"{dest_obj}.c"
+        if dest_path.exists() or manifest.locate(dest_obj, sym.section) is not None:
+            raise SystemExit(
+                f"{dest_path} (or a splits.yaml entry for it) already exists — "
+                f"pass a different --dest NAME."
+            )
+        creating_new = True
+    elif ei == 0 or not group.entries[ei - 1].obj.startswith("src/"):
+        creating_new = True
         if not args.dest:
             raise SystemExit(
                 f"{sym.name} is the first function being pulled out of {sym.obj_stem}.s — "
@@ -131,6 +164,7 @@ def main() -> None:
         if dest_path.exists() or manifest.locate(dest_obj, sym.section) is not None:
             raise SystemExit(f"{dest_path} (or a splits.yaml entry for it) already exists.")
     else:
+        creating_new = False
         dest_entry = group.entries[ei - 1]
         if args.dest and f"src/{args.dest}" != dest_entry.obj:
             raise SystemExit(
@@ -146,15 +180,41 @@ def main() -> None:
 
     stub = STUB_TEMPLATE.format(name=sym.name)
 
+    # Mid-file: the blob has to be cut in three (before / this function /
+    # after), because the bytes on either side must keep their exact ROM
+    # positions and each object's .text lands at exactly one point in the
+    # link order. The before-half keeps the original filename (so its
+    # existing splits.yaml entry and position stay valid) and the after-half
+    # becomes a new object listed immediately after this function's.
+    tail_obj = tail_path = None
+    if midfile:
+        tail_has_content = any(line.strip() for line in after_lines)
+        if tail_has_content:
+            tail_obj = splitlib.next_blob_part_name(sym.obj_stem, manifest)
+            tail_path = splitlib.ROOT / f"{tail_obj}.s"
+
     print(f"{sym.name}  0x{sym.addr:08X}  {source_path.relative_to(splitlib.ROOT)}"
           f" (lines {start + 1}-{end})")
     print(f"  -> {frag_path.relative_to(splitlib.ROOT)}  ({end - start} lines)")
-    if creating_new:
+    if midfile:
+        print(f"  -> MID-FILE extraction (not the front-most function in this blob)")
+        print(f"  -> {dest_path.relative_to(splitlib.ROOT)}  (NEW FILE)")
+        print(f"  -> {source_path.relative_to(splitlib.ROOT)}: keeps the "
+              f"{len(before_lines)} lines before it")
+        if tail_obj:
+            print(f"  -> {tail_path.relative_to(splitlib.ROOT)}: NEW, gets the "
+                  f"{len(after_lines)} lines after it")
+            print(f"  -> splits.yaml: {sym.obj_stem!r} -> {dest_obj!r} -> {tail_obj!r}")
+        else:
+            print(f"  -> (nothing but blank lines after it; no tail object needed)")
+            print(f"  -> splits.yaml: insert {dest_obj!r} after {sym.obj_stem!r}")
+    elif creating_new:
         print(f"  -> {dest_path.relative_to(splitlib.ROOT)}  (NEW FILE)")
         print(f"  -> splits.yaml: insert {dest_obj!r} before {sym.obj_stem!r} in group {group.name!r}")
     else:
         print(f"  -> {dest_path.relative_to(splitlib.ROOT)}  (append)")
-    print(f"  -> {source_path.relative_to(splitlib.ROOT)}: shrinks by {end - start} lines")
+    if not midfile:
+        print(f"  -> {source_path.relative_to(splitlib.ROOT)}: shrinks by {end - start} lines")
 
     if args.dry_run:
         print("(dry run, nothing written)")
@@ -163,12 +223,24 @@ def main() -> None:
     frag_path.parent.mkdir(parents=True, exist_ok=True)
     frag_path.write_text(FRAGMENT_PREAMBLE + "".join(extracted))
 
-    source_path.write_text("".join(remaining))
-
-    if creating_new:
+    if midfile:
+        # Before-half keeps the original name; tail becomes its own blob.
+        source_path.write_text("".join(before_lines))
+        dest_path.write_text(NEW_FILE_HEADER.format(name=sym.name) + stub)
+        # Insert AFTER the original blob's entry: [orig blob][this func][tail]
+        insert_at = ei + 1
+        group.entries.insert(insert_at, splitlib.Entry(obj=dest_obj, section=sym.section))
+        if tail_obj:
+            tail_path.write_text(splitlib.BLOB_HEADER + "".join(after_lines))
+            group.entries.insert(
+                insert_at + 1, splitlib.Entry(obj=tail_obj, section=sym.section)
+            )
+    elif creating_new:
+        source_path.write_text("".join(remaining))
         dest_path.write_text(NEW_FILE_HEADER.format(name=sym.name) + stub)
         group.entries.insert(ei, splitlib.Entry(obj=dest_obj, section=sym.section))
     else:
+        source_path.write_text("".join(remaining))
         text = dest_path.read_text()
         text = ensure_macros_bootstrap(text)
         if not text.endswith("\n"):

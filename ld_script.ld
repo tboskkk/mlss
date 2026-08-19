@@ -35,6 +35,8 @@ SECTIONS
         build/asm/text080542C4.o(.text);
         build/src/title_screen.o(.text);
         build/asm/text08057568.o(.text);
+        build/src/nullsub_7.o(.text);
+        build/asm/text08057568_p2.o(.text);
 
         build/asm/rodata081DD790.o(.rodata);
         build/src/title_screen.o(.rodata);
