@@ -92,7 +92,8 @@ def validate_one(conn) -> str | None:
         f"Verified with a from-scratch build before commit, per the project's standing rule.",
     )
     with db.tx(conn):
-        db.set_state(conn, name, "matched", worker_id=None, candidate_body=None)
+        db.set_state(conn, name, "matched", worker_id=None, candidate_body=None,
+                     notes=f"matched via {source}")
     db.log_event(conn, name, "matched", f"source={source}, committed={committed}")
     return name
 
