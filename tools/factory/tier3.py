@@ -197,7 +197,12 @@ def main():
     while True:
         did_any = False
         while args.limit is None or processed < args.limit:
-            name = process_one(conn, args.max_escalations)
+            try:
+                name = process_one(conn, args.max_escalations)
+            except Exception as e:
+                # See scanner.py's main() for why this matters.
+                print(f"[{time.strftime('%H:%M:%S')}] !! tier3 process_one() failed, skipping: {e}")
+                break
             if name is None:
                 break
             did_any = True
