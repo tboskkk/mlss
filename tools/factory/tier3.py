@@ -196,16 +196,25 @@ def main():
     while True:
         did_any = False
         while args.limit is None or processed < args.limit:
+            # Fresh connection every iteration, closed at the end -- see
+            # tier1.py's main() and its immediately-following commit: a
+            # long-lived connection can wedge after early lock contention,
+            # and reassigning without closing just leaks one connection
+            # per cycle instead. Worth noting here specifically: the
+            # connection stays open for the whole LLM call (60-90+ seconds
+            # observed) since process_one() holds it throughout -- that's
+            # fine, an idle open connection isn't itself a problem, it just
+            # has to actually get closed afterward, which is the part that
+            # was missing.
+            conn = db.connect()
             try:
-                # Fresh connection every iteration -- see tier1.py's main()
-                # for why: a long-lived connection can wedge silently after
-                # an early lock-contention error and never recover.
-                conn = db.connect()
                 name = process_one(conn, args.max_escalations)
             except Exception as e:
                 # See scanner.py's main() for why this matters.
                 print(f"[{time.strftime('%H:%M:%S')}] !! tier3 process_one() failed, skipping: {e}")
                 break
+            finally:
+                conn.close()
             if name is None:
                 break
             did_any = True
