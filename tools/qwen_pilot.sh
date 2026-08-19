@@ -96,26 +96,46 @@ fi
 
 cd "$WORKTREE"
 
-pick_target_file() {
-  # Smallest remaining raw file first, skipping known-problematic ones for
-  # now (giant files needing dedicated attention, not autopilot fodder):
-  # text08057568.s (5000+, the main blob), text0801A548.s (462, untested at
-  # this scale), text08000000.s (front function drags in the 6k-line
-  # unidentified crt0/m4a preamble -- see CLAUDE.md, not safe to touch
-  # blind). progress.py sorts its list largest-first, so this has to
-  # collect every eligible candidate and pick the minimum, not just take
-  # the first line that matches. Skips anything named in $SKIP_FILES
-  # (space-separated), used to move past a function that's exhausted its
-  # retry budget for this run.
-  python3 tools/progress.py 2>/dev/null | awk -v skip="$SKIP_FILES" '
-    BEGIN { n = split(skip, arr, " "); for (i = 1; i <= n; i++) skipset[arr[i]] = 1 }
-    /raw functions remaining/{found=1; next}
-    found && /^$/{exit}
-    found && $2 !~ /text08057568\.s|text0801A548\.s|text08000000\.s/ {
-      sub(/^asm\//, "", $2)
-      if (!($2 in skipset)) print $1, $2
-    }
-  ' | sort -n | head -1 | awk '{print $2}'
+pick_target_func() {
+  # Ask tools/triage.py for the most tractable unmatched function, rather
+  # than the old heuristic (smallest remaining raw blob, take whatever's at
+  # its front). That heuristic was actively harmful once measured: every
+  # front-of-blob function scores as hard (best 231.5, where <50 is
+  # 'tractable'; AgbMain is 943), so the autopilot was being handed nothing
+  # but the worst available problems by construction -- which is the real
+  # reason it ground through an entire overnight run without a single
+  # match, on functions whose callees were themselves undecompiled.
+  #
+  # triage.py ranks by what actually makes matching hard: unmatched callees
+  # first (dominant), then indirect calls, size, r8-r11 pressure, stack
+  # frame. Combined with split_func.py's mid-file extraction, that means
+  # this can now pick genuinely easy work (4-line `bx lr` stubs and other
+  # leaf functions) from anywhere in any blob.
+  #
+  # $SKIP_FUNCS holds functions to pass over (retry budget exhausted this
+  # run). ESCALATED_FUNCS is deliberately separate: those keep their WIP
+  # commit for a human/Claude, and are filtered the same way.
+  python3 tools/triage.py --json --limit 60 2>/dev/null \
+    | SKIP="$SKIP_FUNCS $ESCALATED_FUNCS" python3 -c '
+import json, os, sys
+skip = set(os.environ.get("SKIP", "").split())
+try:
+    rows = json.load(sys.stdin)
+except Exception:
+    sys.exit(1)
+for r in rows:
+    if r["name"] in skip:
+        continue
+    # Never hand the local model something with unmatched dependencies --
+    # it cannot read what those callees do, so it ends up guessing at
+    # parameter semantics. That exact situation burned an entire overnight
+    # run on option_screens.s functions whose three helpers are all still
+    # raw assembly.
+    if r["unknown_callees"]:
+        continue
+    print(r["name"])
+    break
+'
 }
 
 SKIP_FILES=""

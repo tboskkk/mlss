@@ -93,7 +93,7 @@ INDIRECT_RE = re.compile(r"^\s*bl\s+_call_via_r\d+")
 class Func:
     __slots__ = (
         "name", "file", "start", "end", "lines", "callees", "indirect_calls",
-        "high_regs", "stack_bytes", "status", "callers",
+        "high_regs", "stack_bytes", "status", "callers", "not_c_reason",
     )
 
     def __init__(self, name, file, start):
@@ -108,6 +108,10 @@ class Func:
         self.stack_bytes = 0
         self.status = "raw"
         self.callers = set()
+        # Set when this thing can't be a normal C function at all, so it
+        # should never be handed to anyone (human or model) as "easy work"
+        # just because it's short. See _detect_not_c().
+        self.not_c_reason = None
 
 
 def _classify_sources():
@@ -122,6 +126,45 @@ def _classify_sources():
         for n in not_started:
             status[n] = "not_started"
     return status
+
+
+NWA_START_RE = re.compile(r"^\s*non_word_aligned_thumb_func_start\s+(\S+)")
+# A bare `bx rN` where rN isn't lr: an interworking veneer / trampoline
+# (jump to whatever address is in that register), not something you can
+# write in portable C. `bx lr` is different -- that's just a return, i.e. a
+# perfectly matchable empty function like the nullsub_N stubs.
+BX_REG_RE = re.compile(r"^\s*bx\s+r\d+\s*$")
+# Real instruction lines only. Must exclude label definitions ("foo:", often
+# with a trailing "@ 0819AFA4" address comment) -- they start at column 0
+# with a lowercase letter and would otherwise be counted as instructions,
+# which silently defeated the veneer check on its first test.
+LABEL_LINE_RE = re.compile(r"^\S+:")
+CODE_LINE_RE = re.compile(r"^\s*[a-z]")
+
+
+def _detect_not_c(body, declared_nwa: bool):
+    """-> reason string if this can't be a plain C function, else None.
+
+    Caught this the hard way: triage's very first pick for the autopilot was
+    sub_819A5D0, a 3-line `bx r0` veneer that scored as the single most
+    tractable function in the ROM (tiny, leaf, no dependencies) but cannot
+    be expressed as C at all. Shipping that as "easiest available work"
+    would have sent the pipeline straight into an unwinnable task -- exactly
+    the class of failure this whole tool exists to prevent.
+    """
+    if declared_nwa:
+        # Starts at a non-word-aligned address. agbcc always word-aligns
+        # function entry, so no C function can land here.
+        return "non-word-aligned entry point (C functions are always word-aligned)"
+    code = [
+        l for l in body
+        if CODE_LINE_RE.match(l)
+        and "func_start" not in l
+        and not LABEL_LINE_RE.match(l)
+    ]
+    if len(code) == 1 and BX_REG_RE.match(code[0]) and not re.match(r"^\s*bx\s+lr\s*$", code[0]):
+        return f"interworking veneer ({code[0].strip()}), not expressible in C"
+    return None
 
 
 def _scan_asm_file(path: Path, funcs: dict):
@@ -141,6 +184,8 @@ def _scan_asm_file(path: Path, funcs: dict):
         f.end = end
         body = lines[start:end]
         f.lines = len(body)
+        declared_nwa = bool(body and NWA_START_RE.match(body[0]))
+        f.not_c_reason = _detect_not_c(body, declared_nwa)
         for line in body:
             if INDIRECT_RE.match(line):
                 f.indirect_calls += 1
@@ -216,6 +261,12 @@ def score(f: Func, funcs: dict):
     reasons = []
     s = 0.0
 
+    if f.not_c_reason:
+        # Not a difficulty rating -- these should simply never be offered as
+        # work. Scored far above anything real so they sort to the bottom,
+        # and build_rows drops them from the queue entirely.
+        return 100000.0, [f"NOT MATCHABLE AS C: {f.not_c_reason}"]
+
     unknowns = unknown_callees(f, funcs)
     if unknowns:
         # The dominant term, deliberately. This is the factor that made
@@ -274,10 +325,12 @@ def extractable_now(f: Func, funcs: dict):
     return True
 
 
-def build_rows(funcs: dict):
+def build_rows(funcs: dict, include_not_c: bool = False):
     rows = []
     for name, f in funcs.items():
         if f.status == "matched":
+            continue
+        if f.not_c_reason and not include_not_c:
             continue
         s, reasons = score(f, funcs)
         rows.append({
