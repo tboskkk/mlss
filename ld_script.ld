@@ -53,6 +53,8 @@ SECTIONS
         build/asm/text08057568_p4.o(.text);
         build/src/nullsub_7.o(.text);
         build/asm/text08057568_p2.o(.text);
+        build/src/alarm.o(.text);
+        build/asm/text08057568_p9.o(.text);
         build/src/nullsub_5.o(.text);
         build/asm/text08057568_p7.o(.text);
 
