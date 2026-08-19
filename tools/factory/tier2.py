@@ -151,13 +151,20 @@ atexit.register(_cleanup_all)
 signal.signal(signal.SIGTERM, lambda *_a: sys.exit(0))  # let atexit run, don't skip it
 
 
-def run_pool(conn, jobs: int, stall_min: float, max_functions: int):
+def run_pool(jobs: int, stall_min: float, max_functions: int):
+    """No `conn` parameter on purpose -- see the module-level note below for
+    why. Every DB touch here opens, uses, and closes its own short-lived
+    connection instead."""
     claimed = []
-    for _ in range(max_functions):
-        row = db.claim_for_worker(conn, "tier2_ready", WORKER_ID)
-        if row is None:
-            break
-        claimed.append(row["name"])
+    conn = db.connect()
+    try:
+        for _ in range(max_functions):
+            row = db.claim_for_worker(conn, "tier2_ready", WORKER_ID)
+            if row is None:
+                break
+            claimed.append(row["name"])
+    finally:
+        conn.close()
 
     if not claimed:
         return 0
@@ -168,17 +175,37 @@ def run_pool(conn, jobs: int, stall_min: float, max_functions: int):
     procs = {}
     for name in claimed:
         if not ensure_isolated(name):
-            with db.tx(conn):
-                db.set_state(conn, name, "needs_human", worker_id=None,
-                             notes="tier2: couldn't isolate for permuter (permute.py failed)")
+            conn = db.connect()
+            try:
+                with db.tx(conn):
+                    db.set_state(conn, name, "needs_human", worker_id=None,
+                                 notes="tier2: couldn't isolate for permuter (permute.py failed)")
+            finally:
+                conn.close()
             continue
         proc, log_f = launch(name, threads_each)
         procs[name] = {"proc": proc, "log": log_f, "last_score": None, "last_improved": time.time()}
         _active[name] = proc
-        with db.tx(conn):
-            db.set_state(conn, name, "permuting", best_score=None, last_improved_at=time.time())
-        db.log_event(conn, name, "t2_launch", f"threads={threads_each}")
+        conn = db.connect()
+        try:
+            with db.tx(conn):
+                db.set_state(conn, name, "permuting", best_score=None, last_improved_at=time.time())
+            db.log_event(conn, name, "t2_launch", f"threads={threads_each}")
+            conn.commit()
+        finally:
+            conn.close()
 
+    # This loop can run for the full --stall-min minutes (default 15) --
+    # found live, running the whole pipeline together for the first time:
+    # a SINGLE connection held open across that entire span, doing
+    # periodic small transactions on it every 10s, was leaving every OTHER
+    # process (tier1, tier3, scanner, validator) blocked on writes the
+    # whole time -- confirmed directly, tier1's CPU time was flat to the
+    # second across a 100+-second window while a tier2 cycle was mid-run.
+    # Not just "connection per iteration" (that fixed a DIFFERENT, shorter-
+    # lived version of the same class of bug in every other tier) --
+    # HERE it has to be "connection per individual DB touch", because one
+    # iteration of THIS loop can legitimately span minutes.
     while procs:
         time.sleep(10)
         for name in list(procs):
@@ -187,9 +214,14 @@ def run_pool(conn, jobs: int, stall_min: float, max_functions: int):
             if score is not None and score != info["last_score"]:
                 info["last_score"] = score
                 info["last_improved"] = time.time()
-                with db.tx(conn):
-                    db.set_state(conn, name, "permuting", best_score=score, last_improved_at=info["last_improved"])
-                db.log_event(conn, name, "score_update", str(score))
+                conn = db.connect()
+                try:
+                    with db.tx(conn):
+                        db.set_state(conn, name, "permuting", best_score=score, last_improved_at=info["last_improved"])
+                    db.log_event(conn, name, "score_update", str(score))
+                    conn.commit()
+                finally:
+                    conn.close()
 
             exited = info["proc"].poll() is not None
             stalled = (time.time() - info["last_improved"]) > stall_min * 60
@@ -197,29 +229,40 @@ def run_pool(conn, jobs: int, stall_min: float, max_functions: int):
             if exited:
                 info["log"].close()
                 zero = has_zero(name)
-                if zero:
-                    body = trim_source(zero.read_text(), name)
-                    with db.tx(conn):
-                        db.set_state(conn, name, "validating", worker_id=None,
-                                     candidate_body=body, candidate_source="tier2")
-                    db.log_event(conn, name, "converged", f"score=0")
-                    print(f"  {name}: converged")
-                else:
-                    with db.tx(conn):
-                        db.set_state(conn, name, "stalled", worker_id=None,
-                                     notes="permuter process exited without reaching score 0")
-                    db.log_event(conn, name, "t2_exit_no_zero", "")
-                    print(f"  {name}: exited, no zero")
+                conn = db.connect()
+                try:
+                    if zero:
+                        body = trim_source(zero.read_text(), name)
+                        with db.tx(conn):
+                            db.set_state(conn, name, "validating", worker_id=None,
+                                         candidate_body=body, candidate_source="tier2")
+                        db.log_event(conn, name, "converged", f"score=0")
+                        conn.commit()
+                        print(f"  {name}: converged")
+                    else:
+                        with db.tx(conn):
+                            db.set_state(conn, name, "stalled", worker_id=None,
+                                         notes="permuter process exited without reaching score 0")
+                        db.log_event(conn, name, "t2_exit_no_zero", "")
+                        conn.commit()
+                        print(f"  {name}: exited, no zero")
+                finally:
+                    conn.close()
                 del procs[name]
                 _active.pop(name, None)
             elif stalled:
                 kill_search(name, info["proc"])
                 info["log"].close()
-                with db.tx(conn):
-                    db.set_state(conn, name, "stalled", worker_id=None,
-                                 notes=f"no score improvement for {stall_min} min "
-                                        f"(best={info['last_score']}) -- likely wrong C, needs tier3")
-                db.log_event(conn, name, "stalled", f"best_score={info['last_score']}")
+                conn = db.connect()
+                try:
+                    with db.tx(conn):
+                        db.set_state(conn, name, "stalled", worker_id=None,
+                                     notes=f"no score improvement for {stall_min} min "
+                                            f"(best={info['last_score']}) -- likely wrong C, needs tier3")
+                    db.log_event(conn, name, "stalled", f"best_score={info['last_score']}")
+                    conn.commit()
+                finally:
+                    conn.close()
                 print(f"  {name}: stalled at score {info['last_score']}, handing to tier3")
                 del procs[name]
                 _active.pop(name, None)
@@ -239,16 +282,15 @@ def main():
     args = ap.parse_args()
 
     while True:
-        # Fresh connection every iteration, closed at the end -- see
-        # tier1.py's main() for why a fresh connection matters (a wedged
-        # long-lived connection after early lock contention) and its
-        # immediately-following commit for why closing it explicitly is
-        # NOT optional (reassigning without closing just leaks one
-        # connection per cycle, which is its own path to the same kind of
-        # self-contention).
-        conn = db.connect()
+        # No connection managed at this level at all -- run_pool() now
+        # opens and closes its own short-lived connection around every
+        # individual DB touch, since one iteration of its internal poll
+        # loop can legitimately span the full --stall-min minutes. See
+        # run_pool()'s own docstring/comment for why that's a materially
+        # different fix from "one connection per --loop iteration" (which
+        # is what every other tier actually needed).
         try:
-            n = run_pool(conn, args.jobs, args.stall_min, args.max_functions)
+            n = run_pool(args.jobs, args.stall_min, args.max_functions)
         except Exception as e:
             # See scanner.py's main() for why this matters. Note this one
             # matters more than most: run_pool() owns real running
@@ -260,8 +302,6 @@ def main():
             # process where "crashed" and "orphaned containers" are close.
             print(f"[{time.strftime('%H:%M:%S')}] !! tier2 run_pool() failed, will retry next cycle: {e}")
             n = 0
-        finally:
-            conn.close()
         if args.loop is None:
             break
         if n == 0:
