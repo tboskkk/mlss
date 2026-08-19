@@ -100,8 +100,8 @@ def scan_once() -> dict:
                 active_states = {"permuting", "validating"}
                 if worker_id is not None or cur_state in active_states:
                     conn.execute(
-                        "UPDATE functions SET tractability=?, notes=?, updated_at=? WHERE name=?",
-                        (s, "; ".join(reasons), now, name),
+                        "UPDATE functions SET file=?, tractability=?, notes=?, updated_at=? WHERE name=?",
+                        (f.file, s, "; ".join(reasons), now, name),
                     )
                     stats["skipped_active"] += 1
                 elif cur_state != target_state:
@@ -116,16 +116,16 @@ def scan_once() -> dict:
                         stats["unchanged"] += 1
                         continue
                     conn.execute(
-                        "UPDATE functions SET state=?, tractability=?, notes=?, updated_at=? WHERE name=?",
-                        (target_state, s, "; ".join(reasons), now, name),
+                        "UPDATE functions SET state=?, file=?, tractability=?, notes=?, updated_at=? WHERE name=?",
+                        (target_state, f.file, s, "; ".join(reasons), now, name),
                     )
                     db.log_event(conn, name, f"state:{target_state}", f"rescan (was {cur_state})")
                     stats[target_state if target_state in stats else "queued"] = \
                         stats.get(target_state, 0) + 1
                 else:
                     conn.execute(
-                        "UPDATE functions SET tractability=?, notes=?, updated_at=? WHERE name=?",
-                        (s, "; ".join(reasons), now, name),
+                        "UPDATE functions SET file=?, tractability=?, notes=?, updated_at=? WHERE name=?",
+                        (f.file, s, "; ".join(reasons), now, name),
                     )
                     stats["unchanged"] += 1
 
