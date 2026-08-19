@@ -98,6 +98,14 @@ def connect() -> sqlite3.Connection:
     conn = sqlite3.connect(DB_PATH, timeout=30)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA journal_mode=WAL")
+    # Belt and suspenders alongside the connect() timeout= kwarg above:
+    # found live, running all 5 processes together for the first time,
+    # that write-write contention (multiple processes' loops landing on
+    # the DB within the same second) can still throw "database is locked"
+    # despite WAL mode -- explicit busy_timeout makes SQLite actually wait
+    # and retry internally before giving up, rather than surfacing the
+    # error to Python immediately.
+    conn.execute("PRAGMA busy_timeout = 30000")
     conn.execute("PRAGMA foreign_keys=OFF")  # edges/functions can reference rows not yet scanned
     conn.executescript(SCHEMA)
     existing_cols = {r[1] for r in conn.execute("PRAGMA table_info(functions)")}
