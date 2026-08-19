@@ -42,6 +42,26 @@ def validate_one(conn) -> str | None:
     if row is None:
         return None
 
+    try:
+        return _validate_claimed(conn, row)
+    except Exception as e:
+        # A crash mid-processing here is worse than in any other tier: this
+        # is the ONE process that touches git, so a half-done failure can
+        # leave the repo itself dirty (a candidate spliced in but never
+        # committed or reverted), not just a stuck DB claim. Both get
+        # cleaned up explicitly rather than trusting the generic per-loop
+        # catch in main() to be enough.
+        name = row["name"]
+        print(f"  !! {name}: validate_one crashed mid-processing, reverting repo and releasing claim: {e}")
+        gitops.revert_to_clean()
+        with db.tx(conn):
+            db.set_state(conn, name, "needs_human", worker_id=None,
+                         notes=f"validator crashed mid-processing: {e}")
+        db.log_event(conn, name, "error", f"validator crash: {e}")
+        return name
+
+
+def _validate_claimed(conn, row) -> str:
     name = row["name"]
     source = row["candidate_source"] or "unknown"
     body = row["candidate_body"]
@@ -107,7 +127,12 @@ def main():
     while True:
         did_any = False
         while True:
-            name = validate_one(conn)
+            try:
+                name = validate_one(conn)
+            except Exception as e:
+                # See scanner.py's main() for why this matters.
+                print(f"[{time.strftime('%H:%M:%S')}] !! validator validate_one() failed, skipping: {e}")
+                break
             if name is None:
                 break
             did_any = True
