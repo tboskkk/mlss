@@ -21,6 +21,8 @@ SECTIONS
     .text :
     {
         build/asm/text08000000.o(.text);
+        build/src/nullsub_17.o(.text);
+        build/asm/text08000000_p2.o(.text);
         build/src/heap.o(.text);
         build/asm/heap.o(.text);
         build/src/sound.o(.text);
