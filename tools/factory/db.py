@@ -53,6 +53,8 @@ CREATE TABLE IF NOT EXISTS functions (
     escalation_count INTEGER DEFAULT 0,
     worker_id        TEXT,
     notes            TEXT DEFAULT '',
+    candidate_body   TEXT,
+    candidate_source TEXT,
     created_at       REAL NOT NULL,
     updated_at       REAL NOT NULL
 );
@@ -80,6 +82,17 @@ CREATE INDEX IF NOT EXISTS idx_functions_state ON functions(state);
 """
 
 
+# Columns added after the table already existed somewhere. CREATE TABLE IF
+# NOT EXISTS doesn't add new columns to an existing table, and this DB
+# holds real accumulating state (worker history, candidate bodies) once
+# the tier processes are running -- wiping it to pick up a schema change
+# would throw that away. (col_name, sql_type_and_default)
+MIGRATIONS = [
+    ("candidate_body", "TEXT"),
+    ("candidate_source", "TEXT"),
+]
+
+
 def connect() -> sqlite3.Connection:
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(DB_PATH, timeout=30)
@@ -87,6 +100,11 @@ def connect() -> sqlite3.Connection:
     conn.execute("PRAGMA journal_mode=WAL")
     conn.execute("PRAGMA foreign_keys=OFF")  # edges/functions can reference rows not yet scanned
     conn.executescript(SCHEMA)
+    existing_cols = {r[1] for r in conn.execute("PRAGMA table_info(functions)")}
+    for col, sqltype in MIGRATIONS:
+        if col not in existing_cols:
+            conn.execute(f"ALTER TABLE functions ADD COLUMN {col} {sqltype}")
+    conn.commit()
     return conn
 
 
