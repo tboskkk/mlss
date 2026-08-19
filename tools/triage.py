@@ -261,17 +261,17 @@ def score(f: Func, funcs: dict):
 
 
 def extractable_now(f: Func, funcs: dict):
-    """Front-to-back extraction (see CLAUDE.md) means only the front-most
-    still-raw function in each blob can actually be pulled right now."""
-    if f.status != "raw":
-        return True  # already out of the blob
-    same_file = [
-        g for g in funcs.values()
-        if g.file == f.file and g.status == "raw"
-    ]
-    if not same_file:
-        return True
-    return min(same_file, key=lambda g: g.start).name == f.name
+    """Everything is extractable now.
+
+    This used to encode the front-to-back-only rule, and reported that only
+    5 of 1,225 tractable functions could actually be pulled. That finding is
+    exactly what motivated adding mid-file extraction to split_func.py --
+    which cuts the blob into before/function/after objects so a function can
+    come out of anywhere. Kept as a function (rather than deleted) because
+    it's the natural place for any future extraction constraint to live, and
+    because --blocked-by-order still reports against it.
+    """
+    return True
 
 
 def build_rows(funcs: dict):
@@ -375,15 +375,11 @@ def main():
               f"{r['lines']:>5}  {why}")
 
     total = len(rows)
-    actionable = sum(1 for r in rows if r["extractable_now"])
     easy = sum(1 for r in rows if r["score"] < 50)
-    easy_now = sum(1 for r in rows if r["score"] < 50 and r["extractable_now"])
-    print(f"\n{total} unmatched function(s) known; {actionable} extractable right now.")
-    print(f"{easy} scored under 50 (genuinely tractable); {easy_now} of those "
-          f"are extractable right now.")
-    if easy and easy_now / max(easy, 1) < 0.5:
-        print("NOTE: most tractable work is currently blocked by the front-to-back "
-              "extraction rule -- run with --blocked-by-order for specifics.")
+    leaves = sum(1 for r in rows if not r["unknown_callees"] and r["score"] < 50)
+    print(f"\n{total} unmatched function(s); {easy} scored under 50 (genuinely "
+          f"tractable), {leaves} of those have no unmatched dependencies at all.")
+    print("All are extractable now -- split_func.py handles mid-file extraction.")
     return 0
 
 
