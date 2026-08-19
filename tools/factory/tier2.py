@@ -26,8 +26,10 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import atexit
 import re
 import shutil
+import signal
 import subprocess
 import sys
 import time
@@ -77,6 +79,31 @@ def ensure_isolated(name: str) -> bool:
     return r.returncode == 0
 
 
+def kill_search(name: str, proc: subprocess.Popen):
+    """Actually stop a running permuter search. Popen.terminate()/.kill()
+    on our direct child (the `env`/`container.sh` wrapper) is NOT enough --
+    confirmed the hard way while testing this module: an outer timeout
+    killed tier2.py itself mid-poll, and even though its own stall-handling
+    code path DID call proc.terminate() + a 15s wait + proc.kill() for one
+    function, the real container (podman run --rm's actual crun-managed
+    process tree via conmon) survived all of it and kept burning CPU. This
+    is very likely the same root mechanism behind today's earlier incident
+    (6 abandoned permuter containers, still running 12+ hours later,
+    starving llama-server) -- killing the CLI wrapper process was never
+    enough to kill the container it launched. `podman kill` on the actual
+    container is the only version of this that's actually reliable."""
+    proc.terminate()
+    try:
+        proc.wait(timeout=5)
+    except subprocess.TimeoutExpired:
+        proc.kill()
+    r = gitops.run(["podman", "ps", "--format", "{{.ID}} {{.Command}}"])
+    for line in r.stdout.splitlines():
+        if f"nonmatchings/{name}" in line:
+            cid = line.split()[0]
+            gitops.run(["podman", "kill", cid])
+
+
 def launch(name: str, threads: int):
     log_f = open(NONMATCHINGS_DIR / name / "farm.log", "w")
     proc = subprocess.Popen(
@@ -98,6 +125,24 @@ def trim_source(source: str, fn_name: str) -> str:
         if nl != -1:
             return source[nl:]
     return source
+
+
+# Every actively-launched search this process owns right now, so a kill
+# signal (or an unhandled exception) can still clean up real containers
+# instead of orphaning them -- see kill_search()'s docstring for why that
+# matters: an outer `timeout` killing THIS process mid-poll orphaned two
+# real containers the first time this was tested, live.
+_active: dict[str, subprocess.Popen] = {}
+
+
+def _cleanup_all():
+    for name, proc in list(_active.items()):
+        print(f"  cleanup: stopping {name}'s search (process exiting)")
+        kill_search(name, proc)
+
+
+atexit.register(_cleanup_all)
+signal.signal(signal.SIGTERM, lambda *_a: sys.exit(0))  # let atexit run, don't skip it
 
 
 def run_pool(conn, jobs: int, stall_min: float, max_functions: int):
@@ -123,6 +168,7 @@ def run_pool(conn, jobs: int, stall_min: float, max_functions: int):
             continue
         proc, log_f = launch(name, threads_each)
         procs[name] = {"proc": proc, "log": log_f, "last_score": None, "last_improved": time.time()}
+        _active[name] = proc
         with db.tx(conn):
             db.set_state(conn, name, "permuting", best_score=None, last_improved_at=time.time())
         db.log_event(conn, name, "t2_launch", f"threads={threads_each}")
@@ -159,12 +205,9 @@ def run_pool(conn, jobs: int, stall_min: float, max_functions: int):
                     db.log_event(conn, name, "t2_exit_no_zero", "")
                     print(f"  {name}: exited, no zero")
                 del procs[name]
+                _active.pop(name, None)
             elif stalled:
-                info["proc"].terminate()
-                try:
-                    info["proc"].wait(timeout=15)
-                except subprocess.TimeoutExpired:
-                    info["proc"].kill()
+                kill_search(name, info["proc"])
                 info["log"].close()
                 with db.tx(conn):
                     db.set_state(conn, name, "stalled", worker_id=None,
@@ -173,6 +216,7 @@ def run_pool(conn, jobs: int, stall_min: float, max_functions: int):
                 db.log_event(conn, name, "stalled", f"best_score={info['last_score']}")
                 print(f"  {name}: stalled at score {info['last_score']}, handing to tier3")
                 del procs[name]
+                _active.pop(name, None)
 
     return len(claimed)
 
