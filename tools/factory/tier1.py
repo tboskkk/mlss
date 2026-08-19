@@ -137,11 +137,24 @@ def main():
     ap.add_argument("--loop", type=int, default=None, metavar="SECONDS")
     args = ap.parse_args()
 
-    conn = db.connect()
     while True:
         did_any = False
         while True:
             try:
+                # A fresh connection every iteration, not one reused for the
+                # whole process lifetime -- found live, running the full
+                # pipeline together for the first time: a single "database
+                # is locked" error early on (5 processes hitting the DB at
+                # once on startup) can leave a long-lived connection wedged
+                # in a way that silently hangs on every later call instead
+                # of raising again, so the try/except below never even
+                # fires. A process that looked alive (not crashed, not
+                # restarted by the supervisor) but did zero real work for
+                # 24 minutes straight is a worse failure than a clean
+                # crash-and-restart would have been. A fresh connection
+                # costs nothing meaningful and can't carry that state
+                # forward.
+                conn = db.connect()
                 name = process_one(conn)
             except Exception as e:
                 # See scanner.py's main() for why this matters: a transient
