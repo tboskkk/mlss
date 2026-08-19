@@ -98,29 +98,31 @@ def scan_once() -> dict:
                 stats["new"] += 1
                 db.log_event(conn, name, "discovered", f"initial state={target_state}")
             else:
-                # A worker currently owns this row (worker_id set, or it's in
-                # an active-work state like permuting/validating) -- the
-                # scanner updates its static metadata but never yanks it out
-                # from under an owner. Only a hands-off state gets its
-                # `state` column touched here.
-                active_states = {"permuting", "validating"}
-                if worker_id is not None or cur_state in active_states:
+                # The scanner only ever OWNS a function while it's still in
+                # one of triage's own coarse buckets (raw/queued -- purely
+                # derived from not_c_reason + unmatched-callee count, with
+                # no memory of prior pipeline progress). The instant a real
+                # process has moved it further along (tier2_ready and
+                # everything downstream: permuting, stalled, validating,
+                # needs_human), triage's cruder in_progress/not_started
+                # split can't tell "just extracted" from "stalled waiting
+                # on tier3" apart -- so the scanner must never touch
+                # `state` for those, only refresh cosmetic metadata (file,
+                # tractability, notes). Getting this wrong bounces a
+                # stalled function back into tier2_ready on every rescan,
+                # an infinite loop that looks like progress but isn't.
+                #
+                # The one exception: a genuinely matched function (someone
+                # committed a real fix by hand) is always allowed through,
+                # from any state -- that's real news, not scanner noise.
+                scanner_owned = {"raw", "queued"}
+                if worker_id is not None or (cur_state not in scanner_owned and target_state != "matched"):
                     conn.execute(
                         "UPDATE functions SET file=?, tractability=?, notes=?, updated_at=? WHERE name=?",
                         (f.file, s, "; ".join(reasons), now, name),
                     )
                     stats["skipped_active"] += 1
                 elif cur_state != target_state:
-                    # Respect terminal/manual states: never bounce something
-                    # OUT of matched (a real match can't un-match itself by
-                    # being rescanned), and never resurrect something a
-                    # human parked in needs_human.
-                    if cur_state in ("matched",):
-                        stats["unchanged"] += 1
-                        continue
-                    if cur_state == "needs_human" and target_state != "matched":
-                        stats["unchanged"] += 1
-                        continue
                     conn.execute(
                         "UPDATE functions SET state=?, file=?, tractability=?, notes=?, updated_at=? WHERE name=?",
                         (target_state, f.file, s, "; ".join(reasons), now, name),
