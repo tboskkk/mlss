@@ -1,0 +1,5093 @@
+	.include "asm/macros.inc"
+
+	.syntax unified
+	.text
+
+	thumb_func_start sub_80DE960
+sub_80DE960:
+	push {r4, r5, r6, lr}
+	adds r4, r0, #0x0
+	adds r5, r1, #0x0
+	adds r6, r2, #0x0
+	movs r0, #0x8D
+	lsls r0, r0, #0x01
+	bl stop_sfx_80195A8
+	adds r0, r4, #0x0
+	adds r1, r5, #0x0
+	adds r2, r6, #0x0
+	bl sub_8086C64
+	pop {r4, r5, r6}
+	pop {r1}
+	bx r1
+	thumb_func_start sub_80DE980
+sub_80DE980:
+	push {r4, r5, r6, lr}
+	adds r4, r0, #0x0
+	adds r5, r1, #0x0
+	adds r6, r2, #0x0
+	movs r0, #0x8D
+	lsls r0, r0, #0x01
+	bl stop_sfx_80195A8
+	adds r0, r4, #0x0
+	adds r1, r5, #0x0
+	adds r2, r6, #0x0
+	bl sub_810DD7C
+	pop {r4, r5, r6}
+	pop {r1}
+	bx r1
+	thumb_func_start sub_80DE9A0
+sub_80DE9A0:
+	push {r4, lr}
+	adds r4, r0, #0x0
+	adds r0, #0x80
+	ldr r0, [r0, #0x00]
+	cmp r0, #0x00
+	bne _080DE9E4
+	movs r0, #0x8E
+	lsls r0, r0, #0x01
+	bl stop_sfx_80195A8
+	ldr r0, [r4, #0x2C]
+	ldr r0, [r0, #0x28]
+	adds r0, #0xEC
+	movs r2, #0x00
+	ldsh r1, [r0, r2]
+	movs r0, #0x01
+	negs r0, r0
+	movs r2, #0x0F
+	cmp r1, r0
+	beq _080DE9CA
+	movs r2, #0x11
+_080DE9CA:
+	adds r0, r4, #0x0
+	adds r1, r2, #0x0
+	movs r2, #0x00
+	movs r3, #0x00
+	bl sub_8082E1C
+	adds r0, r4, #0x0
+	adds r0, #0x9C
+	ldr r1, [r0, #0x00]
+	adds r0, #0x10
+	strh r1, [r0, #0x00]
+	ldr r0, _080DE9EC @ =0x080DE781
+	str r0, [r4, #0x4C]
+_080DE9E4:
+	pop {r4}
+	pop {r0}
+	bx r0
+	.byte 0x00, 0x00
+_080DE9EC: .4byte sub_80DE780
+	thumb_func_start sub_80DE9F0
+sub_80DE9F0:
+	push {r4, lr}
+	adds r4, r0, #0x0
+	ldr r0, _080DEA24 @ =0x080DEC61
+	str r0, [r4, #0x4C]
+	ldr r0, [r4, #0x28]
+	ldr r1, _080DEA28 @ =0x00000113
+	adds r0, r0, r1
+	ldrb r1, [r0, #0x00]
+	movs r0, #0x80
+	ands r0, r1
+	cmp r0, #0x00
+	beq _080DEA1C
+	movs r0, #0x7F
+	ands r0, r1
+	movs r1, #0x01
+	bl sub_80F7068
+	ldr r0, [r4, #0x28]
+	ldr r2, _080DEA28 @ =0x00000113
+	adds r1, r0, r2
+	movs r0, #0x00
+	strb r0, [r1, #0x00]
+_080DEA1C:
+	movs r0, #0x01
+	pop {r4}
+	pop {r1}
+	bx r1
+_080DEA24: .4byte sub_80DEC60
+_080DEA28: .4byte 0x00000113
+	thumb_func_start sub_80DEA2C
+sub_80DEA2C:
+	push {r4, r5, r6, r7, lr}
+	add sp, #-0x018
+	adds r7, r0, #0x0
+	adds r1, r7, #0x0
+	adds r1, #0x98
+	ldr r0, [r7, #0x2C]
+	ldr r5, [r0, #0x28]
+	adds r0, r5, #0x0
+	adds r0, #0xE0
+	ldr r6, [r0, #0x00]
+	str r6, [r1, #0x00]
+	adds r0, r7, #0x0
+	adds r0, #0xAE
+	adds r1, #0x18
+	adds r2, r7, #0x0
+	adds r2, #0xB2
+	adds r3, r5, #0x0
+	adds r3, #0xD8
+	ldr r3, [r3, #0x00]
+	ldr r4, [r7, #0x38]
+	subs r3, r3, r4
+	adds r4, r5, #0x0
+	adds r4, #0xDC
+	ldr r4, [r4, #0x00]
+	ldr r5, [r7, #0x3C]
+	subs r4, r4, r5
+	str r4, [sp, #0x000]
+	ldr r4, [r7, #0x40]
+	subs r6, r6, r4
+	str r6, [sp, #0x004]
+	movs r4, #0xA0
+	lsls r4, r4, #0x06
+	str r4, [sp, #0x008]
+	ldr r4, _080DEA90 @ =0x000007CC
+	str r4, [sp, #0x00C]
+	movs r4, #0xFD
+	str r4, [sp, #0x010]
+	movs r4, #0x00
+	str r4, [sp, #0x014]
+	bl sub_808552C
+	adds r1, r7, #0x0
+	adds r1, #0x94
+	str r0, [r1, #0x00]
+	ldr r0, _080DEA94 @ =0x080DE5E5
+	str r0, [r7, #0x4C]
+	add sp, #0x018
+	pop {r4, r5, r6, r7}
+	pop {r0}
+	bx r0
+_080DEA90: .4byte 0x000007CC
+_080DEA94: .4byte sub_80DE5E4
+	thumb_func_start sub_80DEA98
+sub_80DEA98:
+	push {r4, lr}
+	adds r4, r0, #0x0
+	ldr r0, [r4, #0x08]
+	ldrb r1, [r0, #0x12]
+	movs r0, #0x08
+	ands r0, r1
+	cmp r0, #0x00
+	beq _080DEABA
+	adds r0, r4, #0x0
+	movs r1, #0x00
+	movs r2, #0x00
+	movs r3, #0x00
+	bl sub_8082E1C
+	adds r0, r4, #0x0
+	bl sub_8087540
+_080DEABA:
+	pop {r4}
+	pop {r0}
+	bx r0
+	thumb_func_start sub_80DEAC0
+sub_80DEAC0:
+	push {lr}
+	adds r1, r0, #0x0
+	ldr r2, [r1, #0x18]
+	movs r0, #0x80
+	lsls r0, r0, #0x02
+	cmp r2, r0
+	ble _080DEAD8
+	ldr r3, _080DEAD4 @ =0xFFFFFE00
+	adds r0, r2, r3
+	b _080DEADA
+_080DEAD4: .4byte 0xFFFFFE00
+_080DEAD8:
+	movs r0, #0x00
+_080DEADA:
+	str r0, [r1, #0x18]
+	pop {r0}
+	bx r0
+	thumb_func_start sub_80DEAE0
+sub_80DEAE0:
+	push {r4, lr}
+	adds r4, r0, #0x0
+	adds r0, #0x80
+	ldr r0, [r0, #0x00]
+	cmp r0, #0x00
+	bne _080DEB14
+	adds r0, r4, #0x0
+	movs r1, #0x00
+	movs r2, #0x00
+	movs r3, #0x00
+	bl sub_8082E1C
+	ldr r3, [r4, #0x08]
+	ldrb r2, [r3, #0x11]
+	lsls r1, r2, #0x19
+	lsrs r1, r1, #0x1F
+	movs r0, #0x01
+	eors r1, r0
+	lsls r1, r1, #0x06
+	subs r0, #0x42
+	ands r0, r2
+	orrs r0, r1
+	strb r0, [r3, #0x11]
+	adds r0, r4, #0x0
+	bl sub_8087540
+_080DEB14:
+	pop {r4}
+	pop {r0}
+	bx r0
+	.byte 0x00, 0x00
+	thumb_func_start sub_80DEB1C
+sub_80DEB1C:
+	push {r4, lr}
+	adds r4, r0, #0x0
+	adds r0, #0x80
+	ldr r0, [r0, #0x00]
+	cmp r0, #0x00
+	bne _080DEB4C
+	adds r0, r4, #0x0
+	movs r1, #0x08
+	movs r2, #0x00
+	movs r3, #0x00
+	bl sub_8082E1C
+	movs r0, #0x93
+	lsls r0, r0, #0x01
+	movs r1, #0x01
+	negs r1, r1
+	bl play_sfx_80195B4
+	adds r1, r4, #0x0
+	adds r1, #0xAC
+	movs r0, #0x30
+	strh r0, [r1, #0x00]
+	ldr r0, _080DEB54 @ =0x080DDC8D
+	str r0, [r4, #0x4C]
+_080DEB4C:
+	pop {r4}
+	pop {r0}
+	bx r0
+	.byte 0x00, 0x00
+_080DEB54: .4byte sub_80DDC8C
+	thumb_func_start sub_80DEB58
+sub_80DEB58:
+	push {r4, r5, r6, lr}
+	adds r4, r0, #0x0
+	adds r5, r1, #0x0
+	adds r6, r2, #0x0
+	movs r0, #0x8E
+	lsls r0, r0, #0x01
+	bl stop_sfx_80195A8
+	adds r0, r4, #0x0
+	adds r1, r5, #0x0
+	adds r2, r6, #0x0
+	bl sub_8087124
+	pop {r4, r5, r6}
+	pop {r1}
+	bx r1
+	thumb_func_start sub_80DEB78
+sub_80DEB78:
+	push {r4, lr}
+	adds r4, r0, #0x0
+	adds r0, #0x80
+	ldr r0, [r0, #0x00]
+	cmp r0, #0x00
+	bne _080DEBBC
+	ldr r0, [r4, #0x2C]
+	ldr r0, [r0, #0x28]
+	adds r0, #0xEC
+	movs r2, #0x00
+	ldsh r1, [r0, r2]
+	movs r0, #0x01
+	negs r0, r0
+	movs r2, #0x04
+	cmp r1, r0
+	beq _080DEB9A
+	movs r2, #0x06
+_080DEB9A:
+	adds r0, r4, #0x0
+	adds r1, r2, #0x0
+	movs r2, #0x00
+	movs r3, #0x00
+	bl sub_8082E1C
+	movs r0, #0x8E
+	lsls r0, r0, #0x01
+	bl stop_sfx_80195A8
+	adds r0, r4, #0x0
+	adds r0, #0x9C
+	ldr r1, [r0, #0x00]
+	adds r0, #0x10
+	strh r1, [r0, #0x00]
+	ldr r0, _080DEBC4 @ =0x080DDBF5
+	str r0, [r4, #0x4C]
+_080DEBBC:
+	pop {r4}
+	pop {r0}
+	bx r0
+	.byte 0x00, 0x00
+_080DEBC4: .4byte sub_80DDBF4
+	.byte 0x01, 0x49, 0xC1, 0x64, 0x01, 0x20, 0x70, 0x47, 0x45, 0xEC, 0x0D, 0x08, 0x01, 0x49, 0xC1, 0x64
+	.byte 0x01, 0x20, 0x70, 0x47, 0x6D, 0xEC, 0x0D, 0x08, 0x01, 0x49, 0xC1, 0x64, 0x01, 0x20, 0x70, 0x47
+	.byte 0xC9, 0xEC, 0x0D, 0x08, 0x01, 0x49, 0xC1, 0x64, 0x01, 0x20, 0x70, 0x47, 0x31, 0xED, 0x0D, 0x08
+	.byte 0x10, 0xB5, 0x04, 0x1C, 0xBB, 0xF0, 0x98, 0xF9, 0x01, 0x1C, 0x04, 0x20, 0xFE, 0xF0, 0xBA, 0xFD
+	.byte 0x01, 0x28, 0x0B, 0xD0, 0x01, 0x28, 0x04, 0xD3, 0x02, 0x28, 0x0B, 0xD0, 0x03, 0x28, 0x0D, 0xD0
+	.byte 0x0E, 0xE0, 0x01, 0x48, 0x0B, 0xE0, 0x00, 0x00, 0x31, 0xED, 0x0D, 0x08, 0x00, 0x48, 0x06, 0xE0
+	.byte 0xC9, 0xEC, 0x0D, 0x08, 0x00, 0x48, 0x02, 0xE0, 0x6D, 0xEC, 0x0D, 0x08, 0x02, 0x48, 0xE0, 0x64
+	.byte 0x01, 0x20, 0x10, 0xBC, 0x02, 0xBC, 0x08, 0x47, 0x45, 0xEC, 0x0D, 0x08
+	thumb_func_start sub_80DEC44
+sub_80DEC44:
+	push {r4, lr}
+	adds r4, r0, #0x0
+	bl sub_8082B00
+	cmp r0, #0x00
+	bne _080DEC54
+	ldr r0, _080DEC5C @ =0x080DE671
+	str r0, [r4, #0x4C]
+_080DEC54:
+	pop {r4}
+	pop {r0}
+	bx r0
+	.byte 0x00, 0x00
+_080DEC5C: .4byte sub_80DE670
+	thumb_func_start sub_80DEC60
+sub_80DEC60:
+	push {lr}
+	bl sub_807C298
+	pop {r0}
+	bx r0
+	.byte 0x00, 0x00
+	thumb_func_start sub_80DEC6C
+sub_80DEC6C:
+	push {r4, r5, lr}
+	adds r4, r0, #0x0
+	ldr r0, [r4, #0x28]
+	ldr r1, _080DEC8C @ =0x00000113
+	adds r1, r1, r0
+	mov r12, r1
+	ldrb r1, [r1, #0x00]
+	movs r0, #0x80
+	ands r0, r1
+	cmp r0, #0x00
+	beq _080DEC86
+	cmp r1, #0xFF
+	bne _080DEC90
+_080DEC86:
+	movs r0, #0x00
+	b _080DECB4
+	.byte 0x00, 0x00
+_080DEC8C: .4byte 0x00000113
+_080DEC90:
+	movs r0, #0x7F
+	adds r3, r4, #0x0
+	adds r3, #0xA8
+	ldr r2, _080DECBC @ =0x083BBDD0
+	mov r5, r12
+	ldrb r1, [r5, #0x00]
+	ands r0, r1
+	lsls r0, r0, #0x04
+	adds r0, r0, r2
+	ldrb r1, [r0, #0x02]
+	movs r0, #0x07
+	ands r0, r1
+	ldr r1, _080DECC0 @ =0x00004188
+	adds r0, r0, r1
+	str r0, [r3, #0x00]
+	bl sub_8082AAC
+	ldr r0, _080DECC4 @ =0x080DED4D
+_080DECB4:
+	str r0, [r4, #0x4C]
+	pop {r4, r5}
+	pop {r0}
+	bx r0
+_080DECBC: .4byte 0x083BBDD0
+_080DECC0: .4byte 0x00004188
+_080DECC4: .4byte sub_80DED4C
+	thumb_func_start sub_80DECC8
+sub_80DECC8:
+	push {r4, lr}
+	adds r4, r0, #0x0
+	ldr r0, [r4, #0x28]
+	ldr r1, _080DECE4 @ =0x00000113
+	adds r0, r0, r1
+	ldrb r3, [r0, #0x00]
+	movs r0, #0x80
+	ands r0, r3
+	cmp r0, #0x00
+	beq _080DECE0
+	cmp r3, #0xFF
+	bne _080DECE8
+_080DECE0:
+	movs r0, #0x00
+	b _080DED18
+_080DECE4: .4byte 0x00000113
+_080DECE8:
+	movs r0, #0x7F
+	ands r3, r0
+	ldr r1, _080DED20 @ =0x03000FD8
+	ldr r0, [r1, #0x00]
+	ldr r2, _080DED24 @ =0x00000349
+	adds r0, r0, r2
+	strb r3, [r0, #0x00]
+	ldr r2, [r1, #0x00]
+	movs r0, #0xB7
+	lsls r0, r0, #0x02
+	adds r2, r2, r0
+	lsls r0, r3, #0x04
+	ldr r1, _080DED28 @ =0x083BBDD0
+	adds r0, r0, r1
+	str r0, [r2, #0x00]
+	adds r0, r3, #0x0
+	bl sub_8081EAC
+	adds r1, r4, #0x0
+	adds r1, #0x7C
+	movs r0, #0x80
+	lsls r0, r0, #0x01
+	strh r0, [r1, #0x00]
+	ldr r0, _080DED2C @ =0x080DED85
+_080DED18:
+	str r0, [r4, #0x4C]
+	pop {r4}
+	pop {r0}
+	bx r0
+_080DED20: .4byte 0x03000FD8
+_080DED24: .4byte 0x00000349
+_080DED28: .4byte 0x083BBDD0
+_080DED2C: .4byte sub_80DED84
+	thumb_func_start sub_80DED30
+sub_80DED30:
+	push {r4, lr}
+	adds r4, r0, #0x0
+	bl sub_8082B00
+	cmp r0, #0x00
+	bne _080DED40
+	ldr r0, _080DED48 @ =0x080DDAE5
+	str r0, [r4, #0x4C]
+_080DED40:
+	pop {r4}
+	pop {r0}
+	bx r0
+	.byte 0x00, 0x00
+_080DED48: .4byte sub_80DDAE4
+	thumb_func_start sub_80DED4C
+sub_80DED4C:
+	push {r4, lr}
+	adds r4, r0, #0x0
+	bl sub_8082B00
+	cmp r0, #0x00
+	bne _080DED78
+	adds r0, r4, #0x0
+	movs r1, #0x0A
+	movs r2, #0x00
+	movs r3, #0x00
+	bl sub_8082E1C
+	ldr r2, [r4, #0x08]
+	ldrb r1, [r2, #0x12]
+	movs r0, #0x07
+	negs r0, r0
+	ands r0, r1
+	movs r1, #0x02
+	orrs r0, r1
+	strb r0, [r2, #0x12]
+	ldr r0, _080DED80 @ =0x080DEDB1
+	str r0, [r4, #0x4C]
+_080DED78:
+	pop {r4}
+	pop {r0}
+	bx r0
+	.byte 0x00, 0x00
+_080DED80: .4byte sub_80DEDB0
+	thumb_func_start sub_80DED84
+sub_80DED84:
+	push {r4, lr}
+	adds r4, r0, #0x0
+	movs r1, #0x0A
+	movs r2, #0x00
+	movs r3, #0x00
+	bl sub_8082E1C
+	ldr r2, [r4, #0x08]
+	ldrb r1, [r2, #0x12]
+	movs r0, #0x07
+	negs r0, r0
+	ands r0, r1
+	movs r1, #0x02
+	orrs r0, r1
+	strb r0, [r2, #0x12]
+	ldr r0, _080DEDAC @ =0x080DEDED
+	str r0, [r4, #0x4C]
+	pop {r4}
+	pop {r0}
+	bx r0
+_080DEDAC: .4byte sub_80DEDEC
+	thumb_func_start sub_80DEDB0
+sub_80DEDB0:
+	push {r4, lr}
+	adds r4, r0, #0x0
+	ldr r0, [r4, #0x08]
+	ldrb r1, [r0, #0x12]
+	movs r0, #0x08
+	ands r0, r1
+	cmp r0, #0x00
+	beq _080DEDE0
+	adds r0, r4, #0x0
+	movs r1, #0x0B
+	movs r2, #0x00
+	movs r3, #0x00
+	bl sub_8082E1C
+	ldr r2, [r4, #0x08]
+	ldrb r1, [r2, #0x12]
+	movs r0, #0x07
+	negs r0, r0
+	ands r0, r1
+	movs r1, #0x02
+	orrs r0, r1
+	strb r0, [r2, #0x12]
+	ldr r0, _080DEDE8 @ =0x080DE4A5
+	str r0, [r4, #0x4C]
+_080DEDE0:
+	pop {r4}
+	pop {r0}
+	bx r0
+	.byte 0x00, 0x00
+_080DEDE8: .4byte sub_80DE4A4
+	thumb_func_start sub_80DEDEC
+sub_80DEDEC:
+	push {r4, lr}
+	adds r4, r0, #0x0
+	ldr r0, [r4, #0x08]
+	ldrb r1, [r0, #0x12]
+	movs r0, #0x08
+	ands r0, r1
+	cmp r0, #0x00
+	beq _080DEE28
+	adds r0, r4, #0x0
+	movs r1, #0x0B
+	movs r2, #0x00
+	movs r3, #0x00
+	bl sub_8082E1C
+	ldr r2, [r4, #0x08]
+	ldrb r1, [r2, #0x12]
+	movs r0, #0x07
+	negs r0, r0
+	ands r0, r1
+	movs r1, #0x02
+	orrs r0, r1
+	strb r0, [r2, #0x12]
+	movs r0, #0x94
+	lsls r0, r0, #0x01
+	movs r1, #0x01
+	negs r1, r1
+	bl play_sfx_80195B4
+	ldr r0, _080DEE30 @ =0x080DEE35
+	str r0, [r4, #0x4C]
+_080DEE28:
+	pop {r4}
+	pop {r0}
+	bx r0
+	.byte 0x00, 0x00
+_080DEE30: .4byte sub_80DEE34
+	thumb_func_start sub_80DEE34
+sub_80DEE34:
+	push {r4, r5, lr}
+	adds r5, r0, #0x0
+	ldr r0, [r5, #0x08]
+	ldrb r1, [r0, #0x12]
+	movs r0, #0x08
+	ands r0, r1
+	cmp r0, #0x00
+	beq _080DEE76
+	bl sub_8082B00
+	adds r4, r0, #0x0
+	cmp r4, #0x00
+	bne _080DEE76
+	adds r0, r5, #0x0
+	bl sub_80DE020
+	str r4, [r5, #0x6C]
+	adds r0, r5, #0x0
+	movs r1, #0x0C
+	movs r2, #0x00
+	movs r3, #0x00
+	bl sub_8082E1C
+	ldr r2, [r5, #0x08]
+	ldrb r1, [r2, #0x12]
+	movs r0, #0x07
+	negs r0, r0
+	ands r0, r1
+	movs r1, #0x02
+	orrs r0, r1
+	strb r0, [r2, #0x12]
+	ldr r0, _080DEE7C @ =0x080DEE81
+	str r0, [r5, #0x4C]
+_080DEE76:
+	pop {r4, r5}
+	pop {r0}
+	bx r0
+_080DEE7C: .4byte sub_80DEE80
+	thumb_func_start sub_80DEE80
+sub_80DEE80:
+	push {r4, lr}
+	adds r4, r0, #0x0
+	ldr r0, [r4, #0x08]
+	ldrb r1, [r0, #0x12]
+	movs r0, #0x08
+	ands r0, r1
+	cmp r0, #0x00
+	beq _080DEEA2
+	adds r0, r4, #0x0
+	movs r1, #0x00
+	movs r2, #0x00
+	movs r3, #0x00
+	bl sub_8082E1C
+	adds r0, r4, #0x0
+	bl sub_8087540
+_080DEEA2:
+	pop {r4}
+	pop {r0}
+	bx r0
+	thumb_func_start sub_80DEEA8
+sub_80DEEA8:
+	push {r4, r5, r6, r7, lr}
+	mov r7, r10
+	mov r6, r9
+	mov r5, r8
+	push {r5, r6, r7}
+	add sp, #-0x004
+	mov r8, r0
+	mov r9, r1
+	mov r10, r2
+	str r3, [sp, #0x000]
+	ldr r0, [sp, #0x024]
+	ldr r5, [sp, #0x028]
+	ldr r6, [sp, #0x040]
+	ldr r7, [sp, #0x044]
+	bl sub_807FF98
+	adds r4, r0, #0x0
+	mov r0, r8
+	strh r0, [r4, #0x12]
+	mov r1, r9
+	strh r1, [r4, #0x14]
+	mov r2, r10
+	strh r2, [r4, #0x16]
+	mov r0, sp
+	ldrh r0, [r0, #0x00]
+	strh r0, [r4, #0x10]
+	ldr r1, [sp, #0x038]
+	lsls r2, r1, #0x07
+	ldrb r1, [r4, #0x1B]
+	movs r0, #0x7F
+	ands r0, r1
+	orrs r0, r2
+	strb r0, [r4, #0x1B]
+	lsls r5, r5, #0x10
+	lsrs r5, r5, #0x10
+	adds r0, r5, #0x0
+	ldr r1, [sp, #0x02C]
+	movs r2, #0x02
+	movs r3, #0x01
+	bl sub_8084338
+	movs r1, #0x01
+	ldr r2, [sp, #0x03C]
+	ands r2, r1
+	lsls r3, r2, #0x06
+	ldrb r2, [r0, #0x11]
+	movs r1, #0x41
+	negs r1, r1
+	ands r1, r2
+	orrs r1, r3
+	strb r1, [r0, #0x11]
+	str r0, [r4, #0x08]
+	ldr r0, [sp, #0x034]
+	mov r9, r0
+	lsls r1, r0, #0x01
+	adds r1, r1, r0
+	adds r1, r1, r7
+	lsls r1, r1, #0x02
+	ldr r2, _080DF00C @ =0x082000E0
+	movs r0, #0x01
+	bl alloc_heap_8018CEC
+	adds r5, r0, #0x0
+	str r5, [r4, #0x0C]
+	subs r7, #0x01
+	movs r0, #0x01
+	negs r0, r0
+	cmp r7, r0
+	beq _080DEF74
+	adds r1, r0, #0x0
+	movs r0, #0x03
+	bics r0, r7
+	cmp r0, #0x00
+	beq _080DEF5A
+	cmp r0, #0x03
+	bge _080DEF50
+	cmp r0, #0x02
+	bge _080DEF4A
+	ldm r6!, {r0}
+	stm r5!, {r0}
+	subs r7, #0x01
+_080DEF4A:
+	ldm r6!, {r0}
+	stm r5!, {r0}
+	subs r7, #0x01
+_080DEF50:
+	ldm r6!, {r0}
+	stm r5!, {r0}
+	subs r7, #0x01
+	cmp r7, r1
+	beq _080DEF74
+_080DEF5A:
+	ldr r0, [r6, #0x00]
+	str r0, [r5, #0x00]
+	ldr r0, [r6, #0x04]
+	str r0, [r5, #0x04]
+	ldr r0, [r6, #0x08]
+	str r0, [r5, #0x08]
+	ldr r0, [r6, #0x0C]
+	str r0, [r5, #0x0C]
+	adds r6, #0x10
+	adds r5, #0x10
+	subs r7, #0x04
+	cmp r7, r1
+	bne _080DEF5A
+_080DEF74:
+	ldr r0, [sp, #0x030]
+	cmp r0, #0x00
+	bne _080DEFFC
+	ldr r1, [sp, #0x034]
+	subs r1, #0x01
+	str r1, [sp, #0x034]
+	movs r0, #0x01
+	negs r0, r0
+	cmp r1, r0
+	beq _080DEFFC
+	ldr r2, _080DF010 @ =0x03001038
+	mov r8, r2
+	ldr r1, _080DF014 @ =0x0819832C
+	ldr r0, _080DF018 @ =0x08198220
+	subs r6, r1, r0
+	ldr r0, _080DF01C @ =0x08198584
+	mov r10, r0
+	movs r7, #0xFF
+_080DEF98:
+	mov r1, r8
+	ldr r2, [r1, #0x00]
+	adds r2, r2, r6
+	ldr r0, [sp, #0x034]
+	lsls r4, r0, #0x08
+	adds r0, r4, #0x0
+	mov r1, r9
+	bl _call_via_r2
+	adds r1, r5, #0x0
+	ands r0, r7
+	lsls r0, r0, #0x01
+	add r0, r10
+	movs r2, #0x00
+	ldsh r0, [r0, r2]
+	adds r5, #0x04
+	cmp r0, #0x00
+	bge _080DEFBE
+	adds r0, #0x3F
+_080DEFBE:
+	asrs r0, r0, #0x06
+	str r0, [r1, #0x00]
+	movs r0, #0x00
+	stm r5!, {r0}
+	mov r0, r8
+	ldr r2, [r0, #0x00]
+	adds r2, r2, r6
+	adds r0, r4, #0x0
+	mov r1, r9
+	bl _call_via_r2
+	adds r2, r5, #0x0
+	ldr r1, _080DF020 @ =0x08198504
+	ands r0, r7
+	lsls r0, r0, #0x01
+	adds r0, r0, r1
+	movs r1, #0x00
+	ldsh r0, [r0, r1]
+	adds r5, r2, #0x4
+	cmp r0, #0x00
+	bge _080DEFEA
+	adds r0, #0x3F
+_080DEFEA:
+	asrs r0, r0, #0x06
+	str r0, [r2, #0x00]
+	ldr r2, [sp, #0x034]
+	subs r2, #0x01
+	str r2, [sp, #0x034]
+	movs r0, #0x01
+	negs r0, r0
+	cmp r2, r0
+	bne _080DEF98
+_080DEFFC:
+	add sp, #0x004
+	pop {r3, r4, r5}
+	mov r8, r3
+	mov r9, r4
+	mov r10, r5
+	pop {r4, r5, r6, r7}
+	pop {r0}
+	bx r0
+_080DF00C: .4byte 0x082000E0
+_080DF010: .4byte 0x03001038
+_080DF014: .4byte 0x0819832C
+_080DF018: .4byte 0x08198220
+_080DF01C: .4byte 0x08198584
+_080DF020: .4byte 0x08198504
+	thumb_func_start sub_80DF024
+sub_80DF024:
+	push {r4, r5, r6, r7, lr}
+	mov r7, r8
+	push {r7}
+	add sp, #-0x01C
+	adds r4, r0, #0x0
+	adds r5, r1, #0x0
+	adds r6, r2, #0x0
+	adds r7, r3, #0x0
+	ldr r0, [sp, #0x034]
+	mov r8, r0
+	cmp r4, #0x00
+	bne _080DF03E
+	b _080DF2A2
+_080DF03E:
+	mov r1, r8
+	cmp r1, #0x00
+	beq _080DF04E
+	ldr r0, [r1, #0x08]
+	ldrb r0, [r0, #0x11]
+	lsls r0, r0, #0x19
+	lsrs r3, r0, #0x1F
+	b _080DF050
+_080DF04E:
+	movs r3, #0x00
+_080DF050:
+	ldr r0, _080DF064 @ =0x0000FFFD
+	cmp r4, r0
+	beq _080DF0D4
+	cmp r4, r0
+	bgt _080DF068
+	subs r0, #0x01
+	cmp r4, r0
+	beq _080DF0F0
+	b _080DF0FC
+	.byte 0x00, 0x00
+_080DF064: .4byte 0x0000FFFD
+_080DF068:
+	ldr r0, _080DF078 @ =0x0000FFFE
+	cmp r4, r0
+	beq _080DF07C
+	adds r0, #0x01
+	cmp r4, r0
+	beq _080DF09E
+	b _080DF0FC
+	.byte 0x00, 0x00
+_080DF078: .4byte 0x0000FFFE
+_080DF07C:
+	mov r2, r8
+	cmp r2, #0x00
+	bne _080DF084
+	b _080DF2A2
+_080DF084:
+	mov r3, r8
+	ldr r0, [r3, #0x28]
+	cmp r0, #0x00
+	bne _080DF08E
+	b _080DF2A2
+_080DF08E:
+	mov r4, r8
+	ldr r0, [r4, #0x08]
+	cmp r0, #0x00
+	bne _080DF098
+	b _080DF2A2
+_080DF098:
+	bl sub_807FB64
+	b _080DF2A2
+_080DF09E:
+	mov r5, r8
+	cmp r5, #0x00
+	bne _080DF0A6
+	b _080DF2A2
+_080DF0A6:
+	mov r6, r8
+	ldr r5, [r6, #0x28]
+	cmp r5, #0x00
+	bne _080DF0B0
+	b _080DF2A2
+_080DF0B0:
+	ldr r0, _080DF0D0 @ =0x00000111
+	adds r2, r5, r0
+	ldrb r0, [r2, #0x00]
+	movs r1, #0x02
+	negs r1, r1
+	ands r1, r0
+	strb r1, [r2, #0x00]
+	adds r0, r5, #0x0
+	bl sub_807FE40
+	movs r0, #0x80
+	lsls r0, r0, #0x06
+	bl sub_80F7538
+	b _080DF2A2
+	.byte 0x00, 0x00
+_080DF0D0: .4byte 0x00000111
+_080DF0D4:
+	lsls r1, r5, #0x10
+	lsrs r1, r1, #0x10
+	movs r0, #0x04
+	adds r2, r6, #0x0
+	bl sub_807F754
+	ldr r0, _080DF0EC @ =0x080E19A9
+	bl sub_807FFB8
+	strh r7, [r0, #0x10]
+	b _080DF2A4
+	.byte 0x00, 0x00
+_080DF0EC: .4byte sub_80E19A8
+_080DF0F0:
+	movs r1, #0x01
+	negs r1, r1
+	movs r0, #0x01
+	bl sub_807F6EC
+	b _080DF2A2
+_080DF0FC:
+	movs r1, #0xF0
+	lsls r1, r1, #0x08
+	adds r0, r4, #0x0
+	ands r0, r1
+	cmp r0, r1
+	bne _080DF128
+	ldr r1, _080DF120 @ =0x083B8A18
+	ldr r0, _080DF124 @ =0x00000FFF
+	ands r0, r4
+	lsls r0, r0, #0x02
+	adds r0, r0, r1
+	subs r1, r6, r7
+	negs r2, r6
+	ldr r4, [r0, #0x00]
+	adds r0, r5, #0x0
+	bl _call_via_r4
+	b _080DF2A2
+_080DF120: .4byte 0x083B8A18
+_080DF124: .4byte 0x00000FFF
+_080DF128:
+	lsls r1, r4, #0x01
+	ldr r0, _080DF150 @ =0x0838F8B0
+	adds r2, r1, r0
+	movs r1, #0x00
+	ldsh r0, [r2, r1]
+	adds r2, #0x02
+	lsls r0, r0, #0x01
+	adds r2, r2, r0
+	movs r4, #0x00
+	ldsh r0, [r2, r4]
+	adds r2, #0x02
+	cmp r0, #0x0B
+	bls _080DF144
+	b _080DF268
+_080DF144:
+	lsls r0, r0, #0x02
+	ldr r1, _080DF154 @ =0x080DF158
+	adds r0, r0, r1
+	ldr r0, [r0, #0x00]
+	mov pc, r0
+	.byte 0x00, 0x00
+_080DF150: .4byte 0x0838F8B0
+_080DF154: .4byte 0x080DF158
+	.byte 0xA2, 0xF2, 0x0D, 0x08, 0xA2, 0xF2, 0x0D, 0x08, 0xAE, 0xF1, 0x0D, 0x08, 0xB8, 0xF1, 0x0D, 0x08
+	.byte 0xC0, 0xF1, 0x0D, 0x08, 0x88, 0xF1, 0x0D, 0x08, 0xC8, 0xF1, 0x0D, 0x08, 0xD0, 0xF1, 0x0D, 0x08
+	.byte 0xD8, 0xF1, 0x0D, 0x08, 0x48, 0xF2, 0x0D, 0x08, 0x50, 0xF2, 0x0D, 0x08, 0x58, 0xF2, 0x0D, 0x08
+	.byte 0x00, 0x20, 0x14, 0x5E, 0x00, 0x2B, 0x03, 0xD0, 0x02, 0x21, 0x50, 0x5E, 0x2B, 0x1A, 0x02, 0xE0
+	.byte 0x02, 0x23, 0xD0, 0x5E, 0x2B, 0x18, 0x04, 0x25, 0x50, 0x5F, 0x06, 0x25, 0x51, 0x5F, 0x1D, 0x1C
+	.byte 0x36, 0x18, 0x7F, 0x18, 0x44, 0xE7, 0x01, 0x4B, 0x5B, 0xE0, 0x00, 0x00, 0x41, 0x19, 0x0E, 0x08
+	.byte 0x00, 0x4B, 0x56, 0xE0, 0x25, 0x19, 0x0E, 0x08, 0x00, 0x4B, 0x52, 0xE0, 0x09, 0x19, 0x0E, 0x08
+	.byte 0x00, 0x4B, 0x4E, 0xE0, 0xD9, 0x18, 0x0E, 0x08, 0x00, 0x4B, 0x4A, 0xE0, 0x95, 0xF6, 0x0D, 0x08
+	.byte 0x46, 0x46, 0xB0, 0x6A, 0xEC, 0x30, 0x00, 0x23, 0xC1, 0x5E, 0x02, 0x20, 0x40, 0x42, 0x81, 0x42
+	.byte 0x00, 0xD1, 0x04, 0x32, 0x44, 0x46, 0xA1, 0x68, 0xCC, 0x8A, 0x88, 0x7F, 0x00, 0x07, 0x00, 0x0C
+	.byte 0x80, 0x25, 0x6D, 0x01, 0x40, 0x19, 0x04, 0x43, 0x21, 0x31, 0x0E, 0x78, 0x45, 0x46, 0x70, 0x35
+	.byte 0x00, 0x20, 0x28, 0x80, 0x47, 0x46, 0x72, 0x37, 0x38, 0x80, 0x02, 0x20, 0x11, 0x5E, 0x00, 0x23
+	.byte 0xD2, 0x5E, 0x40, 0x46, 0x00, 0x23, 0xA3, 0xF7, 0xFD, 0xFD, 0x2C, 0x80, 0x3E, 0x80, 0x44, 0x46
+	.byte 0xA1, 0x68, 0x06, 0x48, 0xC8, 0x65, 0x29, 0x31, 0x0A, 0x78, 0x03, 0x20, 0x40, 0x42, 0x10, 0x40
+	.byte 0x08, 0x70, 0xA1, 0x68, 0xA0, 0x6A, 0x08, 0x66, 0x2F, 0xE0, 0x00, 0x00, 0x5D, 0x19, 0x0E, 0x08
+	.byte 0x00, 0x4B, 0x0E, 0xE0, 0x09, 0xFB, 0x0D, 0x08, 0x00, 0x4B, 0x0A, 0xE0, 0xB5, 0x13, 0x0E, 0x08
+	.byte 0x45, 0x46, 0x00, 0x2D, 0x21, 0xD0, 0xA8, 0x68, 0x11, 0x1C, 0x01, 0xF0, 0xE3, 0xFF, 0x1C, 0xE0
+_080DF268:
+	b _080DF268
+	.byte 0x68, 0x46, 0x00, 0x21, 0x45, 0x82, 0x86, 0x82, 0xC7, 0x82, 0x03, 0x92, 0x46, 0x46, 0x02, 0x96
+	.byte 0x01, 0x82, 0x01, 0x93, 0xFB, 0xF0, 0xF9, 0xFB, 0x01, 0x98, 0x00, 0x28, 0x0C, 0xD0, 0xA0, 0xF7
+	.byte 0x96, 0xFE, 0x03, 0x68, 0x02, 0x1C, 0x69, 0x46, 0x70, 0xC9, 0x70, 0xC2, 0x70, 0xC9, 0x70, 0xC2
+	.byte 0x09, 0x68, 0x11, 0x60, 0x03, 0x60, 0x00, 0xE0
+_080DF2A2:
+	movs r0, #0x00
+_080DF2A4:
+	add sp, #0x01C
+	pop {r3}
+	mov r8, r3
+	pop {r4, r5, r6, r7}
+	pop {r1}
+	bx r1
+	thumb_func_start sub_80DF2B0
+sub_80DF2B0:
+	push {r4, r5, r6, r7, lr}
+	add sp, #-0x004
+	adds r5, r0, #0x0
+_080DF2B6:
+	ldrh r1, [r5, #0x10]
+	movs r2, #0x10
+	ldsh r0, [r5, r2]
+	cmp r0, #0x00
+	ble _080DF2C6
+	subs r0, r1, #0x1
+	strh r0, [r5, #0x10]
+	b _080DF5E4
+_080DF2C6:
+	movs r3, #0x10
+	ldsh r1, [r5, r3]
+	movs r0, #0x03
+	negs r0, r0
+	cmp r1, r0
+	beq _080DF310
+	cmp r1, r0
+	bgt _080DF2DE
+	subs r0, #0x01
+	cmp r1, r0
+	beq _080DF31E
+	b _080DF340
+_080DF2DE:
+	movs r0, #0x02
+	negs r0, r0
+	cmp r1, r0
+	beq _080DF2F2
+	adds r0, #0x01
+	cmp r1, r0
+	bne _080DF340
+	movs r0, #0x00
+	str r0, [r5, #0x04]
+	b _080DF5E4
+_080DF2F2:
+	ldr r1, [r5, #0x08]
+	cmp r1, #0x00
+	beq _080DF340
+	ldr r0, [r1, #0x4C]
+	cmp r0, #0x00
+	beq _080DF340
+	adds r0, r1, #0x0
+	adds r0, #0x76
+	ldrb r1, [r0, #0x00]
+	movs r0, #0x06
+	ands r0, r1
+	cmp r0, #0x06
+	beq _080DF30E
+	b _080DF5E4
+_080DF30E:
+	b _080DF340
+_080DF310:
+	bl sub_8082B00
+	lsls r0, r0, #0x18
+	cmp r0, #0x00
+	beq _080DF31C
+	b _080DF5E4
+_080DF31C:
+	b _080DF340
+_080DF31E:
+	ldr r2, [r5, #0x08]
+	cmp r2, #0x00
+	beq _080DF340
+	adds r0, r2, #0x0
+	adds r0, #0x76
+	ldrb r1, [r0, #0x00]
+	movs r0, #0x06
+	ands r0, r1
+	cmp r0, #0x06
+	beq _080DF340
+	ldr r0, [r2, #0x28]
+	adds r0, #0xE0
+	ldr r1, [r2, #0x18]
+	ldr r0, [r0, #0x00]
+	cmp r1, r0
+	beq _080DF340
+	b _080DF5E4
+_080DF340:
+	ldr r4, [r5, #0x0C]
+	ldrh r6, [r4, #0x00]
+	adds r4, #0x02
+	ldr r7, _080DF35C @ =0xFFFF0017
+	adds r0, r6, r7
+	cmp r0, #0x16
+	bls _080DF350
+	b _080DF5B0
+_080DF350:
+	lsls r0, r0, #0x02
+	ldr r1, _080DF360 @ =0x080DF364
+	adds r0, r0, r1
+	ldr r0, [r0, #0x00]
+	mov pc, r0
+	.byte 0x00, 0x00
+_080DF35C: .4byte 0xFFFF0017
+_080DF360: .4byte 0x080DF364
+	.byte 0x9C, 0xF5, 0x0D, 0x08, 0x8C, 0xF5, 0x0D, 0x08, 0x74, 0xF5, 0x0D, 0x08, 0x64, 0xF5, 0x0D, 0x08
+	.byte 0x54, 0xF5, 0x0D, 0x08, 0x44, 0xF5, 0x0D, 0x08, 0x34, 0xF5, 0x0D, 0x08, 0x2E, 0xF5, 0x0D, 0x08
+	.byte 0x22, 0xF5, 0x0D, 0x08, 0xF8, 0xF4, 0x0D, 0x08, 0xE6, 0xF4, 0x0D, 0x08, 0xDA, 0xF4, 0x0D, 0x08
+	.byte 0xCE, 0xF4, 0x0D, 0x08, 0xC2, 0xF4, 0x0D, 0x08, 0xB0, 0xF4, 0x0D, 0x08, 0x9C, 0xF4, 0x0D, 0x08
+	.byte 0x1C, 0xF5, 0x0D, 0x08, 0x72, 0xF4, 0x0D, 0x08, 0x68, 0xF4, 0x0D, 0x08, 0x48, 0xF4, 0x0D, 0x08
+	.byte 0x0C, 0xF4, 0x0D, 0x08, 0xF4, 0xF3, 0x0D, 0x08, 0xC0, 0xF3, 0x0D, 0x08, 0xA8, 0x68, 0x00, 0x28
+	.byte 0x00, 0xD1, 0x08, 0xE1, 0x82, 0x6A, 0x00, 0x2A, 0x00, 0xD1, 0x04, 0xE1, 0x07, 0x48, 0x13, 0x18
+	.byte 0x18, 0x78, 0x02, 0x21, 0x49, 0x42, 0x01, 0x40, 0x19, 0x70, 0x10, 0x1C, 0xA0, 0xF7, 0x2E, 0xFD
+	.byte 0x80, 0x20, 0x80, 0x01, 0x18, 0xF0, 0xA6, 0xF8, 0xF5, 0xE0, 0x00, 0x00, 0x11, 0x01, 0x00, 0x00
+	.byte 0xA9, 0x68, 0x00, 0x29, 0x00, 0xD1, 0xEE, 0xE0, 0x88, 0x6A, 0x00, 0x28, 0x00, 0xD1, 0xEA, 0xE0
+	.byte 0x88, 0x68, 0xA0, 0xF7, 0xAD, 0xFB, 0xE6, 0xE0, 0x0C, 0x4E, 0x30, 0x68, 0x01, 0x7B, 0x02, 0x27
+	.byte 0x02, 0x20, 0x08, 0x40, 0x00, 0x28, 0x00, 0xD0, 0xDC, 0xE0, 0x21, 0x88, 0x02, 0x23, 0xE2, 0x5E
+	.byte 0x04, 0x20, 0xA0, 0xF7, 0x95, 0xF9, 0x06, 0x48, 0xA0, 0xF7, 0xC4, 0xFD, 0xA1, 0x88, 0x01, 0x82
+	.byte 0x31, 0x68, 0x08, 0x7B, 0x38, 0x43, 0x08, 0x73, 0xCC, 0xE0, 0x00, 0x00, 0xD8, 0x0F, 0x00, 0x03
+	.byte 0xA9, 0x19, 0x0E, 0x08, 0x01, 0x21, 0x49, 0x42, 0x01, 0x20, 0xA0, 0xF7, 0x4D, 0xF9, 0x04, 0x48
+	.byte 0x02, 0x68, 0x11, 0x7B, 0x03, 0x20, 0x40, 0x42, 0x08, 0x40, 0x10, 0x73, 0xBB, 0xE0, 0x00, 0x00
+	.byte 0xD8, 0x0F, 0x00, 0x03, 0x20, 0x88, 0x00, 0xF0, 0xAB, 0xFE, 0x02, 0x34, 0xB3, 0xE0, 0x12, 0x26
+	.byte 0xA8, 0x5F, 0x00, 0x27, 0xE1, 0x5F, 0x40, 0x18, 0x14, 0x22, 0xA9, 0x5E, 0x02, 0x23, 0xE2, 0x5E
+	.byte 0x89, 0x18, 0x16, 0x26, 0xAA, 0x5F, 0x04, 0x27, 0xE3, 0x5F, 0xD2, 0x18, 0x06, 0x26, 0xA3, 0x5F
+	.byte 0x00, 0xF0, 0x5E, 0xFF, 0x08, 0x34, 0x9E, 0xE0, 0x20, 0x88, 0x40, 0x00, 0x02, 0x49, 0x40, 0x18
+	.byte 0x02, 0xF0, 0x2C, 0xF8, 0x02, 0x34, 0x96, 0xE0, 0xB4, 0xF8, 0x38, 0x08, 0x00, 0x27, 0xE0, 0x5F
+	.byte 0x02, 0x22, 0xA1, 0x5E, 0x04, 0x23, 0xE2, 0x5E, 0x00, 0xF0, 0xCE, 0xFF, 0x8A, 0xE0, 0x00, 0x26
+	.byte 0xA0, 0x5F, 0x01, 0xF0, 0x73, 0xF8, 0x02, 0x34, 0x85, 0xE0, 0x00, 0x27, 0xE0, 0x5F, 0x01, 0xF0
+	.byte 0x2D, 0xF9, 0x02, 0x34, 0x7F, 0xE0, 0x00, 0x21, 0x60, 0x5E, 0x01, 0xF0, 0xBD, 0xF9, 0x02, 0x34
+	.byte 0x79, 0xE0, 0x00, 0x22, 0xA0, 0x5E, 0x02, 0x23, 0xE1, 0x5E, 0x04, 0x26, 0xA2, 0x5F, 0x01, 0xF0
+	.byte 0x81, 0xFF, 0x6F, 0xE0, 0x12, 0x27, 0xE8, 0x5F, 0x00, 0x22, 0xA1, 0x5E, 0x40, 0x18, 0x14, 0x23
+	.byte 0xE9, 0x5E, 0x02, 0x26, 0xA2, 0x5F, 0x89, 0x18, 0x16, 0x27, 0xEA, 0x5F, 0x04, 0x26, 0xA3, 0x5F
+	.byte 0xD2, 0x18, 0x01, 0xF0, 0x61, 0xFA, 0x5D, 0xE0, 0x00, 0xF0, 0xD0, 0xFE, 0x5B, 0xE0, 0x00, 0x27
+	.byte 0xE0, 0x5F, 0x01, 0xF0, 0xAF, 0xFB, 0x02, 0x34, 0x55, 0xE0, 0x01, 0xF0, 0x39, 0xFC, 0x52, 0xE0
+	.byte 0x00, 0x21, 0x60, 0x5E, 0x02, 0x22, 0xA1, 0x5E, 0x01, 0xF0, 0xDC, 0xFE, 0x04, 0x34, 0x4A, 0xE0
+	.byte 0x02, 0x48, 0x21, 0x1C, 0xA0, 0xF7, 0xEA, 0xFC, 0x44, 0xE0, 0x00, 0x00, 0x8D, 0x12, 0x0E, 0x08
+	.byte 0xA8, 0x68, 0x00, 0x28, 0x3E, 0xD0, 0x80, 0x68, 0x21, 0x1C, 0x01, 0xF0, 0x65, 0xFE, 0x39, 0xE0
+	.byte 0x00, 0x23, 0xE0, 0x5E, 0x01, 0x21, 0x49, 0x42, 0x3A, 0xF7, 0x22, 0xF8, 0x02, 0x34, 0x32, 0xE0
+	.byte 0xA9, 0x68, 0x04, 0x48, 0x89, 0x68, 0xA0, 0xF7, 0xE5, 0xFC, 0x00, 0x26, 0xA1, 0x5F, 0xC1, 0x60
+	.byte 0x02, 0x34, 0x28, 0xE0, 0x45, 0xBA, 0x07, 0x08, 0xA8, 0x68, 0x80, 0x68, 0x00, 0x27, 0xE1, 0x5F
+	.byte 0x9C, 0xF7, 0x22, 0xFB, 0x02, 0x34, 0x1E, 0xE0, 0xA8, 0x68, 0x02, 0x22, 0xA1, 0x5E, 0x00, 0x23
+	.byte 0xE2, 0x5E, 0x00, 0x23, 0xA3, 0xF7, 0x38, 0xFC, 0x04, 0x34, 0x14, 0xE0
+_080DF5B0:
+	movs r7, #0x12
+	ldsh r1, [r5, r7]
+	movs r2, #0x00
+	ldsh r0, [r4, r2]
+	adds r1, r1, r0
+	movs r3, #0x14
+	ldsh r2, [r5, r3]
+	movs r7, #0x02
+	ldsh r0, [r4, r7]
+	adds r2, r2, r0
+	movs r0, #0x16
+	ldsh r3, [r5, r0]
+	movs r7, #0x04
+	ldsh r0, [r4, r7]
+	adds r3, r3, r0
+	ldr r0, [r5, #0x08]
+	str r0, [sp, #0x000]
+	adds r0, r6, #0x0
+	bl sub_80DF024
+	adds r4, #0x06
+	ldrh r0, [r4, #0x00]
+	strh r0, [r5, #0x10]
+	adds r4, #0x02
+	str r4, [r5, #0x0C]
+	b _080DF2B6
+_080DF5E4:
+	add sp, #0x004
+	pop {r4, r5, r6, r7}
+	pop {r0}
+	bx r0
+	thumb_func_start sub_80DF5EC
+sub_80DF5EC:
+	push {r4, r5, r6, r7, lr}
+	add sp, #-0x004
+	adds r6, r0, #0x0
+	movs r1, #0x10
+	ldsh r0, [r6, r1]
+	cmp r0, #0x00
+	bne _080DF676
+_080DF5FA:
+	ldr r4, [r6, #0x0C]
+	ldrh r2, [r4, #0x00]
+	mov r12, r2
+	ldr r0, _080DF620 @ =0x0000FFFD
+	cmp r12, r0
+	bne _080DF624
+	movs r0, #0x02
+	ldsh r1, [r4, r0]
+	movs r0, #0x04
+	ldsh r2, [r4, r0]
+	movs r0, #0x06
+	ldsh r3, [r4, r0]
+	movs r0, #0x00
+	str r0, [sp, #0x000]
+	mov r0, r12
+	bl sub_80DF024
+	b _080DF666
+	.byte 0x00, 0x00
+_080DF620: .4byte 0x0000FFFD
+_080DF624:
+	movs r1, #0x12
+	ldsh r5, [r6, r1]
+	ldr r7, [r6, #0x08]
+	cmp r7, #0x00
+	beq _080DF642
+	ldr r0, [r7, #0x08]
+	ldrb r1, [r0, #0x11]
+	movs r0, #0x40
+	ands r0, r1
+	cmp r0, #0x00
+	beq _080DF642
+	movs r2, #0x02
+	ldsh r0, [r4, r2]
+	subs r5, r5, r0
+	b _080DF648
+_080DF642:
+	movs r1, #0x02
+	ldsh r0, [r4, r1]
+	adds r5, r5, r0
+_080DF648:
+	movs r0, #0x14
+	ldsh r2, [r6, r0]
+	movs r1, #0x04
+	ldsh r0, [r4, r1]
+	adds r2, r2, r0
+	movs r0, #0x16
+	ldsh r3, [r6, r0]
+	movs r1, #0x06
+	ldsh r0, [r4, r1]
+	adds r3, r3, r0
+	str r7, [sp, #0x000]
+	mov r0, r12
+	adds r1, r5, #0x0
+	bl sub_80DF024
+_080DF666:
+	ldrh r1, [r4, #0x08]
+	strh r1, [r6, #0x10]
+	adds r0, r4, #0x0
+	adds r0, #0x0A
+	str r0, [r6, #0x0C]
+	lsls r1, r1, #0x10
+	cmp r1, #0x00
+	beq _080DF5FA
+_080DF676:
+	ldrh r1, [r6, #0x10]
+	movs r2, #0x10
+	ldsh r0, [r6, r2]
+	cmp r0, #0x00
+	bge _080DF686
+	movs r0, #0x00
+	str r0, [r6, #0x04]
+	b _080DF68A
+_080DF686:
+	subs r0, r1, #0x1
+	strh r0, [r6, #0x10]
+_080DF68A:
+	add sp, #0x004
+	pop {r4, r5, r6, r7}
+	pop {r0}
+	bx r0
+	.byte 0x00, 0x00
+	thumb_func_start sub_80DF694
+sub_80DF694:
+	push {r4, r5, r6, r7, lr}
+	mov r7, r10
+	mov r6, r9
+	mov r5, r8
+	push {r5, r6, r7}
+	add sp, #-0x004
+	adds r5, r0, #0x0
+	ldrh r0, [r5, #0x10]
+	adds r0, #0x01
+	strh r0, [r5, #0x10]
+	lsls r0, r0, #0x10
+	asrs r0, r0, #0x10
+	cmp r0, #0x01
+	bne _080DF6C4
+	ldr r1, [r5, #0x0C]
+	ldrh r0, [r1, #0x00]
+	adds r0, #0x01
+	strh r0, [r5, #0x12]
+	ldrh r0, [r1, #0x02]
+	adds r0, #0x01
+	strh r0, [r5, #0x14]
+	ldrh r0, [r1, #0x04]
+	adds r0, #0x01
+	strh r0, [r5, #0x16]
+_080DF6C4:
+	ldr r0, [r5, #0x08]
+	mov r9, r0
+	movs r2, #0x10
+	ldsh r1, [r5, r2]
+	mov r10, r1
+	movs r0, #0x12
+	ldsh r7, [r5, r0]
+	movs r2, #0x14
+	ldsh r1, [r5, r2]
+	mov r8, r1
+	movs r1, #0x16
+	ldsh r0, [r5, r1]
+	str r0, [sp, #0x000]
+	mov r0, r9
+	adds r1, r7, #0x0
+	mov r2, r8
+	bl sub_80E1880
+	mov r2, r9
+	ldr r0, [r2, #0x28]
+	cmp r0, #0x00
+	beq _080DF746
+	adds r0, #0x08
+	cmp r0, r9
+	bne _080DF746
+	ldr r4, [r2, #0x30]
+	cmp r4, #0x00
+	beq _080DF71A
+_080DF6FC:
+	adds r0, r4, #0x0
+	adds r0, #0x79
+	ldrb r1, [r0, #0x00]
+	movs r0, #0x08
+	ands r0, r1
+	cmp r0, #0x00
+	beq _080DF714
+	adds r0, r4, #0x0
+	adds r1, r7, #0x0
+	mov r2, r8
+	bl sub_80E1880
+_080DF714:
+	ldr r4, [r4, #0x30]
+	cmp r4, #0x00
+	bne _080DF6FC
+_080DF71A:
+	mov r0, r9
+	ldr r6, [r0, #0x28]
+	ldr r0, [r6, #0x00]
+	cmp r0, #0x00
+	beq _080DF746
+	adds r4, r0, #0x0
+	cmp r4, r6
+	beq _080DF746
+_080DF72A:
+	ldr r1, [r4, #0x10]
+	mov r2, r9
+	ldr r0, [r2, #0x08]
+	cmp r1, r0
+	beq _080DF740
+	adds r0, r4, #0x0
+	adds r0, #0x08
+	adds r1, r7, #0x0
+	mov r2, r8
+	bl sub_80E1880
+_080DF740:
+	ldr r4, [r4, #0x00]
+	cmp r4, r6
+	bne _080DF72A
+_080DF746:
+	cmp r7, #0x00
+	beq _080DF76E
+	lsls r0, r7, #0x01
+	ldr r1, _080DF75C @ =0x0838F8B2
+	adds r1, r0, r1
+	movs r2, #0x04
+	ldsh r0, [r1, r2]
+	cmp r0, #0x00
+	bge _080DF760
+	movs r0, #0x00
+	b _080DF76C
+_080DF75C: .4byte 0x0838F8B2
+_080DF760:
+	movs r2, #0x04
+	ldsh r0, [r1, r2]
+	cmp r0, r10
+	bge _080DF76E
+	ldrh r0, [r5, #0x12]
+	adds r0, #0x03
+_080DF76C:
+	strh r0, [r5, #0x12]
+_080DF76E:
+	mov r0, r8
+	cmp r0, #0x00
+	beq _080DF79A
+	lsls r0, r0, #0x01
+	ldr r1, _080DF788 @ =0x0838F8B2
+	adds r2, r0, r1
+	movs r1, #0x04
+	ldsh r0, [r2, r1]
+	cmp r0, #0x00
+	bge _080DF78C
+	movs r0, #0x00
+	b _080DF798
+	.byte 0x00, 0x00
+_080DF788: .4byte 0x0838F8B2
+_080DF78C:
+	movs r1, #0x04
+	ldsh r0, [r2, r1]
+	cmp r0, r10
+	bge _080DF79A
+	ldrh r0, [r5, #0x14]
+	adds r0, #0x03
+_080DF798:
+	strh r0, [r5, #0x14]
+_080DF79A:
+	ldr r2, [sp, #0x000]
+	cmp r2, #0x00
+	beq _080DF7E8
+	lsls r1, r2, #0x01
+	ldr r0, _080DF7BC @ =0x0838F8B2
+	adds r2, r1, r0
+	movs r1, #0x00
+	ldsh r0, [r2, r1]
+	cmp r0, r10
+	bge _080DF7C8
+	movs r1, #0x04
+	ldsh r0, [r2, r1]
+	cmp r0, #0x00
+	bge _080DF7C0
+	movs r0, #0x00
+	strh r0, [r5, #0x16]
+	b _080DF7E8
+_080DF7BC: .4byte 0x0838F8B2
+_080DF7C0:
+	ldrh r0, [r5, #0x16]
+	adds r0, #0x02
+	strh r0, [r5, #0x16]
+	b _080DF7E8
+_080DF7C8:
+	cmp r0, r10
+	bne _080DF7E8
+	mov r1, r9
+	ldr r0, [r1, #0x08]
+	ldrb r1, [r0, #0x12]
+	movs r0, #0x20
+	ands r0, r1
+	cmp r0, #0x00
+	bne _080DF7E8
+	movs r0, #0x02
+	ldsh r1, [r2, r0]
+	mov r0, r9
+	movs r2, #0x00
+	movs r3, #0x00
+	bl sub_8082E1C
+_080DF7E8:
+	movs r1, #0x12
+	ldsh r0, [r5, r1]
+	cmp r0, #0x00
+	bne _080DF7F8
+	ldr r0, [r5, #0x14]
+	cmp r0, #0x00
+	bne _080DF7F8
+	str r0, [r5, #0x04]
+_080DF7F8:
+	add sp, #0x004
+	pop {r3, r4, r5}
+	mov r8, r3
+	mov r9, r4
+	mov r10, r5
+	pop {r4, r5, r6, r7}
+	pop {r0}
+	bx r0
+	thumb_func_start sub_80DF808
+sub_80DF808:
+	push {r4, r5, r6, r7, lr}
+	mov r7, r8
+	push {r7}
+	adds r5, r0, #0x0
+	mov r8, r1
+	bl sub_8199F30
+	adds r4, r0, #0x0
+	movs r7, #0xFF
+	ands r0, r7
+	lsrs r4, r4, #0x08
+	adds r6, r0, #0x0
+	muls r6, r0
+	ldr r1, _080DF8E0 @ =0x03001038
+	adds r0, r6, #0x0
+	muls r0, r6
+	mvns r0, r0
+	ldr r1, [r1, #0x00]
+	bl _call_via_r1
+	adds r3, r0, #0x0
+	adds r0, r4, #0x0
+	ands r0, r7
+	lsrs r4, r4, #0x08
+	ldr r1, _080DF8E4 @ =0x08198584
+	ands r0, r7
+	lsls r2, r0, #0x01
+	adds r0, r2, r1
+	movs r1, #0x00
+	ldsh r0, [r0, r1]
+	cmp r0, #0x00
+	bge _080DF84A
+	adds r0, #0x3F
+_080DF84A:
+	asrs r0, r0, #0x06
+	muls r0, r3
+	cmp r0, #0x00
+	bge _080DF854
+	adds r0, #0xFF
+_080DF854:
+	asrs r0, r0, #0x08
+	mov r12, r0
+	ldr r0, _080DF8E8 @ =0x08198504
+	adds r0, r2, r0
+	movs r2, #0x00
+	ldsh r0, [r0, r2]
+	cmp r0, #0x00
+	bge _080DF866
+	adds r0, #0x3F
+_080DF866:
+	asrs r0, r0, #0x06
+	muls r0, r3
+	cmp r0, #0x00
+	bge _080DF870
+	adds r0, #0xFF
+_080DF870:
+	asrs r2, r0, #0x08
+	adds r0, r4, #0x0
+	ands r0, r7
+	mov r3, r8
+	movs r7, #0x00
+	ldsh r1, [r3, r7]
+	adds r1, r0, r1
+	lsrs r4, r4, #0x08
+	movs r3, #0x01
+	ands r4, r3
+	cmp r4, #0x00
+	beq _080DF88A
+	negs r6, r6
+_080DF88A:
+	mov r0, r12
+	muls r0, r1
+	cmp r0, #0x00
+	bge _080DF896
+	ldr r4, _080DF8EC @ =0x00001FFF
+	adds r0, r0, r4
+_080DF896:
+	asrs r0, r0, #0x0D
+	str r0, [r5, #0x04]
+	adds r0, r6, #0x0
+	muls r0, r1
+	cmp r0, #0x00
+	bge _080DF8A6
+	ldr r7, _080DF8EC @ =0x00001FFF
+	adds r0, r0, r7
+_080DF8A6:
+	asrs r0, r0, #0x0D
+	str r0, [r5, #0x08]
+	adds r0, r2, #0x0
+	muls r0, r1
+	cmp r0, #0x00
+	bge _080DF8B6
+	ldr r1, _080DF8EC @ =0x00001FFF
+	adds r0, r0, r1
+_080DF8B6:
+	asrs r1, r0, #0x0D
+	mov r2, r8
+	movs r4, #0x02
+	ldsh r0, [r2, r4]
+	lsls r0, r0, #0x08
+	adds r1, r1, r0
+	str r1, [r5, #0x0C]
+	movs r0, #0x00
+	strh r0, [r5, #0x10]
+	strh r0, [r5, #0x12]
+	movs r7, #0x04
+	ldsh r0, [r2, r7]
+	lsls r0, r0, #0x08
+	strh r0, [r5, #0x14]
+	strh r3, [r5, #0x16]
+	movs r0, #0x01
+	pop {r3}
+	mov r8, r3
+	pop {r4, r5, r6, r7}
+	pop {r1}
+	bx r1
+_080DF8E0: .4byte 0x03001038
+_080DF8E4: .4byte 0x08198584
+_080DF8E8: .4byte 0x08198504
+_080DF8EC: .4byte 0x00001FFF
+	thumb_func_start sub_80DF8F0
+sub_80DF8F0:
+	push {r4, r5, r6, r7, lr}
+	adds r6, r0, #0x0
+	adds r5, r1, #0x0
+	movs r0, #0x00
+	str r0, [r6, #0x04]
+	str r0, [r6, #0x0C]
+	ldr r0, _080DF97C @ =0xFFFFFC00
+	str r0, [r6, #0x08]
+	bl sub_8199F30
+	movs r3, #0xFF
+	adds r1, r0, #0x0
+	ands r1, r3
+	movs r4, #0xC0
+	lsls r4, r4, #0x02
+	adds r1, r1, r4
+	negs r1, r1
+	lsrs r1, r1, #0x02
+	movs r7, #0x00
+	ldsh r2, [r5, r7]
+	muls r1, r2
+	lsrs r1, r1, #0x08
+	strh r1, [r6, #0x12]
+	lsrs r0, r0, #0x08
+	adds r2, r0, #0x0
+	ands r2, r3
+	lsrs r0, r0, #0x08
+	ands r0, r3
+	adds r0, r0, r4
+	lsrs r0, r0, #0x02
+	movs r4, #0x02
+	ldsh r1, [r5, r4]
+	muls r0, r1
+	lsrs r1, r0, #0x08
+	ldr r0, _080DF980 @ =0x08198584
+	ands r2, r3
+	lsls r2, r2, #0x01
+	adds r0, r2, r0
+	movs r7, #0x00
+	ldsh r0, [r0, r7]
+	cmp r0, #0x00
+	bge _080DF946
+	adds r0, #0x3F
+_080DF946:
+	asrs r0, r0, #0x06
+	muls r0, r1
+	cmp r0, #0x00
+	bge _080DF950
+	adds r0, #0xFF
+_080DF950:
+	asrs r0, r0, #0x08
+	strh r0, [r6, #0x10]
+	ldr r0, _080DF984 @ =0x08198504
+	adds r0, r2, r0
+	movs r2, #0x00
+	ldsh r0, [r0, r2]
+	cmp r0, #0x00
+	bge _080DF962
+	adds r0, #0x3F
+_080DF962:
+	asrs r0, r0, #0x06
+	muls r0, r1
+	cmp r0, #0x00
+	bge _080DF96C
+	adds r0, #0xFF
+_080DF96C:
+	asrs r0, r0, #0x08
+	strh r0, [r6, #0x14]
+	movs r0, #0x01
+	strh r0, [r6, #0x16]
+	movs r0, #0x05
+	pop {r4, r5, r6, r7}
+	pop {r1}
+	bx r1
+_080DF97C: .4byte 0xFFFFFC00
+_080DF980: .4byte 0x08198584
+_080DF984: .4byte 0x08198504
+	thumb_func_start sub_80DF988
+sub_80DF988:
+	push {r4, lr}
+	adds r2, r0, #0x0
+	adds r3, r1, #0x0
+	movs r0, #0x12
+	ldsh r1, [r2, r0]
+	ldr r0, [r2, #0x08]
+	subs r0, r0, r1
+	str r0, [r2, #0x08]
+	ldrh r0, [r2, #0x18]
+	ldrh r1, [r2, #0x10]
+	adds r0, r0, r1
+	strh r0, [r2, #0x10]
+	ldrh r0, [r3, #0x06]
+	ldrh r4, [r2, #0x14]
+	adds r0, r0, r4
+	strh r0, [r2, #0x14]
+	movs r0, #0x12
+	ldsh r1, [r2, r0]
+	movs r4, #0x08
+	ldsh r0, [r3, r4]
+	muls r0, r1
+	cmp r0, #0x00
+	bge _080DF9B8
+	adds r0, #0xFF
+_080DF9B8:
+	asrs r0, r0, #0x08
+	strh r0, [r2, #0x12]
+	movs r0, #0x18
+	ldsh r1, [r2, r0]
+	movs r4, #0x0A
+	ldsh r0, [r3, r4]
+	muls r0, r1
+	cmp r0, #0x00
+	bge _080DF9CC
+	adds r0, #0xFF
+_080DF9CC:
+	asrs r0, r0, #0x08
+	strh r0, [r2, #0x18]
+	movs r0, #0x10
+	ldsh r3, [r2, r0]
+	ldr r0, _080DFA1C @ =0x08198584
+	ldrb r1, [r2, #0x14]
+	lsls r1, r1, #0x01
+	adds r0, r1, r0
+	movs r4, #0x00
+	ldsh r0, [r0, r4]
+	cmp r0, #0x00
+	bge _080DF9E6
+	adds r0, #0x3F
+_080DF9E6:
+	asrs r0, r0, #0x06
+	muls r0, r3
+	cmp r0, #0x00
+	bge _080DF9F0
+	adds r0, #0xFF
+_080DF9F0:
+	asrs r0, r0, #0x08
+	str r0, [r2, #0x04]
+	ldr r0, _080DFA20 @ =0x08198504
+	adds r0, r1, r0
+	movs r1, #0x00
+	ldsh r0, [r0, r1]
+	cmp r0, #0x00
+	bge _080DFA02
+	adds r0, #0x3F
+_080DFA02:
+	asrs r0, r0, #0x06
+	muls r0, r3
+	cmp r0, #0x00
+	bge _080DFA0C
+	adds r0, #0xFF
+_080DFA0C:
+	asrs r0, r0, #0x08
+	str r0, [r2, #0x0C]
+	ldrh r0, [r2, #0x16]
+	subs r0, #0x01
+	strh r0, [r2, #0x16]
+	pop {r4}
+	pop {r0}
+	bx r0
+_080DFA1C: .4byte 0x08198584
+_080DFA20: .4byte 0x08198504
+	thumb_func_start sub_80DFA24
+sub_80DFA24:
+	push {r4, r5, r6, r7, lr}
+	mov r7, r10
+	mov r6, r9
+	mov r5, r8
+	push {r5, r6, r7}
+	adds r3, r0, #0x0
+	movs r1, #0x10
+	ldsh r0, [r3, r1]
+	mov r8, r0
+	movs r0, #0x12
+	ldsh r4, [r3, r0]
+	mov r9, r4
+	mov r1, r8
+	lsls r0, r1, #0x07
+	subs r0, r0, r1
+	lsls r0, r0, #0x01
+	cmp r0, #0x00
+	bge _080DFA4A
+	adds r0, #0xFF
+_080DFA4A:
+	asrs r0, r0, #0x08
+	mov r8, r0
+	movs r4, #0x04
+	add r9, r4
+	ldr r2, _080DFB00 @ =0x08198584
+	movs r0, #0xFF
+	mov r1, r9
+	ands r0, r1
+	lsls r1, r0, #0x01
+	adds r0, r1, r2
+	movs r4, #0x00
+	ldsh r0, [r0, r4]
+	cmp r0, #0x00
+	bge _080DFA68
+	adds r0, #0x3F
+_080DFA68:
+	asrs r0, r0, #0x06
+	mov r4, r8
+	muls r4, r0
+	mov r12, r4
+	ldr r4, _080DFB04 @ =0x08198504
+	adds r0, r1, r4
+	movs r1, #0x00
+	ldsh r0, [r0, r1]
+	cmp r0, #0x00
+	bge _080DFA7E
+	adds r0, #0x3F
+_080DFA7E:
+	asrs r0, r0, #0x06
+	mov r6, r8
+	muls r6, r0
+	mov r10, r6
+	movs r0, #0x28
+	ldsh r2, [r2, r0]
+	adds r0, r2, #0x0
+	cmp r0, #0x00
+	bge _080DFA92
+	adds r0, #0x3F
+_080DFA92:
+	asrs r7, r0, #0x06
+	adds r0, r6, #0x0
+	muls r0, r7
+	movs r1, #0x28
+	ldsh r4, [r4, r1]
+	adds r1, r4, #0x0
+	cmp r1, #0x00
+	bge _080DFAA4
+	adds r1, #0x3F
+_080DFAA4:
+	asrs r5, r1, #0x06
+	cmp r0, #0x00
+	bge _080DFAAC
+	adds r0, #0xFF
+_080DFAAC:
+	asrs r6, r0, #0x08
+	mov r0, r10
+	muls r0, r5
+	cmp r0, #0x00
+	bge _080DFAB8
+	adds r0, #0xFF
+_080DFAB8:
+	asrs r1, r0, #0x08
+	mov r10, r1
+	muls r1, r7
+	mov r0, r12
+	muls r0, r5
+	subs r0, r1, r0
+	cmp r0, #0x00
+	bge _080DFACA
+	adds r0, #0xFF
+_080DFACA:
+	asrs r1, r0, #0x08
+	mov r2, r12
+	muls r2, r7
+	mov r0, r10
+	muls r0, r5
+	adds r0, r2, r0
+	cmp r0, #0x00
+	bge _080DFADC
+	adds r0, #0xFF
+_080DFADC:
+	asrs r0, r0, #0x08
+	str r0, [r3, #0x04]
+	str r6, [r3, #0x08]
+	str r1, [r3, #0x0C]
+	mov r4, r8
+	strh r4, [r3, #0x10]
+	mov r0, r9
+	strh r0, [r3, #0x12]
+	ldrh r0, [r3, #0x16]
+	subs r0, #0x01
+	strh r0, [r3, #0x16]
+	pop {r3, r4, r5}
+	mov r8, r3
+	mov r9, r4
+	mov r10, r5
+	pop {r4, r5, r6, r7}
+	pop {r0}
+	bx r0
+_080DFB00: .4byte 0x08198584
+_080DFB04: .4byte 0x08198504
+	thumb_func_start sub_80DFB08
+sub_80DFB08:
+	push {r4, r5, r6, lr}
+	add sp, #-0x008
+	adds r5, r0, #0x0
+	ldr r6, [r5, #0x0C]
+	ldr r4, _080DFB60 @ =0x084FB4FC
+	movs r1, #0x02
+	ldsh r0, [r6, r1]
+	lsls r0, r0, #0x01
+	adds r0, r0, r4
+	ldrh r0, [r0, #0x00]
+	lsls r0, r0, #0x02
+	ldr r2, _080DFB64 @ =0x089F2CE0
+	adds r0, r0, r2
+	ldr r1, [r0, #0x00]
+	adds r1, r1, r2
+	ldr r2, _080DFB68 @ =0x06016800
+	movs r3, #0x80
+	lsls r3, r3, #0x01
+	movs r0, #0x00
+	str r0, [sp, #0x000]
+	str r0, [sp, #0x004]
+	movs r0, #0x02
+	bl sub_80827F0
+	ldr r2, _080DFB6C @ =0x03001034
+	ldr r0, _080DFB70 @ =0x08198154
+	ldr r1, _080DFB74 @ =0x081980D8
+	subs r0, r0, r1
+	ldr r1, [r2, #0x00]
+	adds r3, r1, r0
+	movs r1, #0x02
+	ldsh r0, [r6, r1]
+	adds r2, r0, #0x1
+	ldr r0, _080DFB78 @ =0x0300034C
+	ldr r1, _080DFB7C @ =0x00000888
+	adds r0, r0, r1
+	ldrb r1, [r0, #0x00]
+	movs r0, #0x06
+	ands r0, r1
+	cmp r0, #0x00
+	beq _080DFB80
+	adds r0, r2, #0x1
+	lsls r0, r0, #0x01
+	b _080DFB82
+_080DFB60: .4byte 0x084FB4FC
+_080DFB64: .4byte 0x089F2CE0
+_080DFB68: .4byte 0x06016800
+_080DFB6C: .4byte 0x03001034
+_080DFB70: .4byte 0x08198154
+_080DFB74: .4byte 0x081980D8
+_080DFB78: .4byte 0x0300034C
+_080DFB7C: .4byte 0x00000888
+_080DFB80:
+	lsls r0, r2, #0x01
+_080DFB82:
+	adds r0, r4, r0
+	ldrh r0, [r0, #0x00]
+	lsls r0, r0, #0x02
+	ldr r1, _080DFBD8 @ =0x089F2CE0
+	adds r0, r0, r1
+	ldr r0, [r0, #0x00]
+	adds r0, r0, r1
+	ldr r1, _080DFBDC @ =0x02000460
+	movs r2, #0x20
+	bl _call_via_r3
+	ldr r2, _080DFBE0 @ =0x0300034C
+	ldrh r1, [r2, #0x00]
+	movs r3, #0x80
+	lsls r3, r3, #0x08
+	adds r0, r3, #0x0
+	movs r4, #0x00
+	orrs r0, r1
+	strh r0, [r2, #0x00]
+	ldr r0, _080DFBE4 @ =0x03000FD8
+	ldr r3, [r0, #0x00]
+	ldrb r2, [r3, #0x09]
+	lsls r1, r2, #0x1C
+	lsrs r1, r1, #0x1C
+	adds r1, #0x01
+	movs r0, #0x0F
+	ands r1, r0
+	movs r0, #0x10
+	negs r0, r0
+	ands r0, r2
+	orrs r0, r1
+	strb r0, [r3, #0x09]
+	str r4, [r5, #0x08]
+	ldrh r0, [r6, #0x04]
+	strh r0, [r5, #0x10]
+	strh r4, [r5, #0x18]
+	ldr r0, _080DFBE8 @ =0x080DFBED
+	str r0, [r5, #0x04]
+	add sp, #0x008
+	pop {r4, r5, r6}
+	pop {r0}
+	bx r0
+	.byte 0x00, 0x00
+_080DFBD8: .4byte 0x089F2CE0
+_080DFBDC: .4byte 0x02000460
+_080DFBE0: .4byte 0x0300034C
+_080DFBE4: .4byte 0x03000FD8
+_080DFBE8: .4byte sub_80DFBEC
+	thumb_func_start sub_80DFBEC
+sub_80DFBEC:
+	push {r4, r5, r6, r7, lr}
+	mov r7, r10
+	mov r6, r9
+	mov r5, r8
+	push {r5, r6, r7}
+	add sp, #-0x028
+	mov r10, r0
+	ldr r0, _080DFC88 @ =0x0300034C
+	movs r1, #0x88
+	lsls r1, r1, #0x04
+	adds r0, r0, r1
+	ldr r0, [r0, #0x00]
+	mov r9, r0
+	mov r2, r10
+	ldr r2, [r2, #0x0C]
+	str r2, [sp, #0x00C]
+	ldrh r3, [r2, #0x00]
+	str r3, [sp, #0x010]
+	movs r0, #0x06
+	ldsh r1, [r2, r0]
+	cmp r1, #0x00
+	beq _080DFC9C
+	mov r2, r10
+	ldrh r0, [r2, #0x18]
+	adds r0, #0x01
+	strh r0, [r2, #0x18]
+	lsls r0, r0, #0x10
+	asrs r0, r0, #0x10
+	cmp r1, r0
+	bge _080DFC9C
+	ldr r5, [r2, #0x08]
+	cmp r5, #0x00
+	beq _080DFC3C
+_080DFC2E:
+	ldr r4, [r5, #0x00]
+	adds r0, r5, #0x0
+	bl sub_807FA94
+	adds r5, r4, #0x0
+	cmp r5, #0x00
+	bne _080DFC2E
+_080DFC3C:
+	ldr r0, _080DFC8C @ =0x03000FD8
+	ldr r3, [r0, #0x00]
+	ldrb r2, [r3, #0x09]
+	movs r0, #0x0F
+	ands r0, r2
+	cmp r0, #0x00
+	bne _080DFC4C
+	b _080DFFA8
+_080DFC4C:
+	lsls r0, r2, #0x1C
+	lsrs r0, r0, #0x1C
+	subs r0, #0x01
+	movs r1, #0x0F
+	ands r0, r1
+	movs r1, #0x10
+	negs r1, r1
+	ands r1, r2
+	orrs r1, r0
+	strb r1, [r3, #0x09]
+	cmp r0, #0x00
+	beq _080DFC66
+	b _080DFFA8
+_080DFC66:
+	ldr r0, _080DFC88 @ =0x0300034C
+	ldr r3, _080DFC90 @ =0x00000888
+	adds r0, r0, r3
+	ldrb r1, [r0, #0x00]
+	movs r0, #0x06
+	ands r0, r1
+	ldr r1, _080DFC94 @ =0x0839EEE4
+	cmp r0, #0x02
+	beq _080DFC7A
+	b _080DFF4C
+_080DFC7A:
+	ldr r0, [r1, #0x1C]
+	cmp r0, #0x00
+	bne _080DFC82
+	b _080DFF4C
+_080DFC82:
+	ldr r0, _080DFC98 @ =0x0839EF10
+	ldr r0, [r0, #0x1C]
+	b _080DFF4E
+_080DFC88: .4byte 0x0300034C
+_080DFC8C: .4byte 0x03000FD8
+_080DFC90: .4byte 0x00000888
+_080DFC94: .4byte 0x0839EEE4
+_080DFC98: .4byte 0x0839EF10
+_080DFC9C:
+	ldr r2, [sp, #0x00C]
+	adds r2, #0x08
+	str r2, [sp, #0x00C]
+	ldr r3, [sp, #0x010]
+	lsls r0, r3, #0x10
+	asrs r0, r0, #0x10
+	movs r1, #0xC0
+	ands r1, r0
+	str r1, [sp, #0x014]
+	movs r2, #0x3F
+	ands r2, r0
+	str r2, [sp, #0x010]
+	mov r3, r10
+	movs r1, #0x12
+	ldsh r0, [r3, r1]
+	str r0, [sp, #0x000]
+	movs r2, #0x14
+	ldsh r0, [r3, r2]
+	str r0, [sp, #0x004]
+	movs r1, #0x16
+	ldsh r0, [r3, r1]
+	str r0, [sp, #0x008]
+	add r1, sp, #0x004
+	add r2, sp, #0x008
+	mov r0, sp
+	movs r3, #0x00
+	bl sub_807FC08
+	movs r4, #0x01
+	negs r4, r4
+	mov r3, r10
+	ldrh r2, [r3, #0x10]
+	movs r1, #0x10
+	ldsh r0, [r3, r1]
+	cmp r0, #0x00
+	beq _080DFD36
+	ldr r1, _080DFD14 @ =0x083B8EEC
+	ldr r3, [sp, #0x010]
+	lsls r0, r3, #0x02
+	adds r5, r0, r1
+_080DFCEC:
+	subs r0, r2, #0x1
+	mov r1, r10
+	strh r0, [r1, #0x10]
+	bl sub_807FB04
+	adds r1, r0, #0x0
+	mov r2, r10
+	ldr r0, [r2, #0x08]
+	str r0, [r1, #0x00]
+	str r1, [r2, #0x08]
+	cmp r4, #0x00
+	bge _080DFD18
+	ldr r3, [r5, #0x00]
+	adds r0, r1, #0x0
+	ldr r1, [sp, #0x00C]
+	bl _call_via_r3
+	adds r4, r0, #0x0
+	b _080DFD24
+	.byte 0x00, 0x00
+_080DFD14: .4byte 0x083B8EEC
+_080DFD18:
+	ldr r3, [r5, #0x00]
+	adds r0, r1, #0x0
+	ldr r1, [sp, #0x00C]
+	mov r2, r10
+	bl _call_via_r3
+_080DFD24:
+	subs r4, #0x01
+	cmp r4, #0x00
+	ble _080DFD36
+	mov r3, r10
+	ldrh r2, [r3, #0x10]
+	movs r1, #0x10
+	ldsh r0, [r3, r1]
+	cmp r0, #0x00
+	bne _080DFCEC
+_080DFD36:
+	movs r2, #0x00
+	str r2, [sp, #0x018]
+	mov r3, r10
+	ldr r5, [r3, #0x08]
+	cmp r5, #0x00
+	bne _080DFD44
+	b _080DFEE4
+_080DFD44:
+	ldr r0, [r5, #0x00]
+	str r0, [sp, #0x01C]
+	movs r1, #0x16
+	ldsh r0, [r5, r1]
+	cmp r0, #0x00
+	beq _080DFD88
+	str r5, [sp, #0x018]
+	ldr r1, _080DFD84 @ =0x083B8EFC
+	ldr r2, [sp, #0x010]
+	lsls r0, r2, #0x10
+	asrs r0, r0, #0x0E
+	adds r0, r0, r1
+	ldr r3, [r0, #0x00]
+	adds r0, r5, #0x0
+	ldr r1, [sp, #0x00C]
+	mov r2, r10
+	bl _call_via_r3
+	ldr r0, [r5, #0x0C]
+	movs r3, #0x80
+	lsls r3, r3, #0x08
+	adds r7, r0, r3
+	cmp r7, #0x00
+	bgt _080DFD76
+	b _080DFEDC
+_080DFD76:
+	movs r0, #0x80
+	lsls r0, r0, #0x0B
+	cmp r7, r0
+	ble _080DFD80
+	b _080DFEDC
+_080DFD80:
+	b _080DFDA2
+	.byte 0x00, 0x00
+_080DFD84: .4byte 0x083B8EFC
+_080DFD88:
+	ldr r0, [sp, #0x018]
+	cmp r0, #0x00
+	beq _080DFD94
+	ldr r1, [sp, #0x01C]
+	str r1, [r0, #0x00]
+	b _080DFD9A
+_080DFD94:
+	ldr r2, [sp, #0x01C]
+	mov r3, r10
+	str r2, [r3, #0x08]
+_080DFD9A:
+	adds r0, r5, #0x0
+	bl sub_807FA94
+	b _080DFEDC
+_080DFDA2:
+	ldr r6, [r5, #0x04]
+	ldr r4, [r5, #0x08]
+	ldr r1, [sp, #0x014]
+	lsls r0, r1, #0x10
+	asrs r2, r0, #0x10
+	mov r8, r2
+	str r0, [sp, #0x020]
+	cmp r2, #0x00
+	beq _080DFE10
+	ldr r3, _080DFDE8 @ =0x03001038
+	ldr r1, _080DFDEC @ =0x0819832C
+	ldr r0, _080DFDF0 @ =0x08198220
+	subs r5, r1, r0
+	ldr r2, [r3, #0x00]
+	adds r2, r2, r5
+	lsls r0, r6, #0x08
+	adds r1, r7, #0x0
+	str r3, [sp, #0x024]
+	bl _call_via_r2
+	ldr r1, [sp, #0x000]
+	adds r6, r0, r1
+	ldr r3, [sp, #0x024]
+	mov r0, r8
+	cmp r0, #0x40
+	bne _080DFDF4
+	ldr r2, [r3, #0x00]
+	adds r2, r2, r5
+	lsls r0, r4, #0x08
+	adds r1, r7, #0x0
+	bl _call_via_r2
+	ldr r1, [sp, #0x004]
+	adds r4, r0, r1
+	b _080DFE2C
+_080DFDE8: .4byte 0x03001038
+_080DFDEC: .4byte 0x0819832C
+_080DFDF0: .4byte 0x08198220
+_080DFDF4:
+	ldr r2, [r3, #0x00]
+	adds r2, r2, r5
+	movs r1, #0xC0
+	lsls r1, r1, #0x06
+	adds r0, r4, r1
+	lsls r0, r0, #0x08
+	adds r1, r7, #0x0
+	bl _call_via_r2
+	ldr r1, [sp, #0x004]
+	adds r0, r0, r1
+	adds r4, r0, #0x0
+	subs r4, #0x60
+	b _080DFE2C
+_080DFE10:
+	adds r1, r6, #0x0
+	cmp r6, #0x00
+	bge _080DFE18
+	adds r1, #0x7F
+_080DFE18:
+	asrs r1, r1, #0x07
+	ldr r0, [sp, #0x000]
+	adds r6, r1, r0
+	adds r1, r4, #0x0
+	cmp r4, #0x00
+	bge _080DFE26
+	adds r1, #0x7F
+_080DFE26:
+	asrs r1, r1, #0x07
+	ldr r0, [sp, #0x004]
+	adds r4, r1, r0
+_080DFE2C:
+	movs r0, #0x08
+	negs r0, r0
+	cmp r6, r0
+	blt _080DFEDC
+	cmp r4, r0
+	blt _080DFEDC
+	cmp r6, #0xF0
+	bgt _080DFEDC
+	cmp r4, #0xA0
+	bgt _080DFEDC
+	movs r0, #0xFF
+	ands r4, r0
+	mov r2, r9
+	strh r4, [r2, #0x00]
+	ldr r3, _080DFE68 @ =0x000001FF
+	adds r0, r3, #0x0
+	ands r6, r0
+	strh r6, [r2, #0x02]
+	ldr r0, _080DFE6C @ =0x0000F340
+	adds r1, r0, #0x0
+	strh r1, [r2, #0x04]
+	ldr r2, [sp, #0x020]
+	cmp r2, #0x00
+	beq _080DFED8
+	ldr r0, _080DFE70 @ =0x00015555
+	cmp r7, r0
+	ble _080DFE74
+	adds r0, r1, #0x7
+	b _080DFED4
+	.byte 0x00, 0x00
+_080DFE68: .4byte 0x000001FF
+_080DFE6C: .4byte 0x0000F340
+_080DFE70: .4byte 0x00015555
+_080DFE74:
+	ldr r0, _080DFE80 @ =0x0000CCCC
+	cmp r7, r0
+	ble _080DFE84
+	adds r0, r1, #0x6
+	b _080DFEAC
+	.byte 0x00, 0x00
+_080DFE80: .4byte 0x0000CCCC
+_080DFE84:
+	ldr r0, _080DFE90 @ =0x00009249
+	cmp r7, r0
+	ble _080DFE94
+	adds r0, r1, #0x5
+	b _080DFEC0
+	.byte 0x00, 0x00
+_080DFE90: .4byte 0x00009249
+_080DFE94:
+	ldr r0, _080DFEA0 @ =0x000071C7
+	cmp r7, r0
+	ble _080DFEA4
+	adds r0, r1, #0x4
+	b _080DFED4
+	.byte 0x00, 0x00
+_080DFEA0: .4byte 0x000071C7
+_080DFEA4:
+	ldr r0, _080DFEB4 @ =0x00005D17
+	cmp r7, r0
+	ble _080DFEB8
+	adds r0, r1, #0x3
+_080DFEAC:
+	mov r1, r9
+	strh r0, [r1, #0x04]
+	b _080DFED8
+	.byte 0x00, 0x00
+_080DFEB4: .4byte 0x00005D17
+_080DFEB8:
+	ldr r0, _080DFEC8 @ =0x00004EC4
+	cmp r7, r0
+	ble _080DFECC
+	adds r0, r1, #0x2
+_080DFEC0:
+	mov r2, r9
+	strh r0, [r2, #0x04]
+	b _080DFED8
+	.byte 0x00, 0x00
+_080DFEC8: .4byte 0x00004EC4
+_080DFECC:
+	ldr r0, _080DFF34 @ =0x00004444
+	cmp r7, r0
+	ble _080DFED8
+	adds r0, r1, #0x1
+_080DFED4:
+	mov r3, r9
+	strh r0, [r3, #0x04]
+_080DFED8:
+	movs r0, #0x08
+	add r9, r0
+_080DFEDC:
+	ldr r5, [sp, #0x01C]
+	cmp r5, #0x00
+	beq _080DFEE4
+	b _080DFD44
+_080DFEE4:
+	ldr r4, _080DFF38 @ =0x0300034C
+	movs r1, #0x88
+	lsls r1, r1, #0x04
+	adds r0, r4, r1
+	mov r2, r9
+	str r2, [r0, #0x00]
+	mov r3, r10
+	ldr r0, [r3, #0x08]
+	cmp r0, #0x00
+	bne _080DFFAE
+	ldr r0, _080DFF3C @ =0x03000FD8
+	ldr r3, [r0, #0x00]
+	ldrb r2, [r3, #0x09]
+	lsls r1, r2, #0x1C
+	lsrs r1, r1, #0x1C
+	subs r1, #0x01
+	movs r0, #0x0F
+	ands r1, r0
+	movs r0, #0x10
+	negs r0, r0
+	ands r0, r2
+	orrs r0, r1
+	strb r0, [r3, #0x09]
+	cmp r1, #0x00
+	bne _080DFFA8
+	ldr r1, _080DFF40 @ =0x00000888
+	adds r0, r4, r1
+	ldrb r1, [r0, #0x00]
+	movs r0, #0x06
+	ands r0, r1
+	ldr r1, _080DFF44 @ =0x0839EEE4
+	cmp r0, #0x02
+	bne _080DFF4C
+	ldr r0, [r1, #0x1C]
+	cmp r0, #0x00
+	beq _080DFF4C
+	ldr r0, _080DFF48 @ =0x0839EF10
+	ldr r0, [r0, #0x1C]
+	b _080DFF4E
+	.byte 0x00, 0x00
+_080DFF34: .4byte 0x00004444
+_080DFF38: .4byte 0x0300034C
+_080DFF3C: .4byte 0x03000FD8
+_080DFF40: .4byte 0x00000888
+_080DFF44: .4byte 0x0839EEE4
+_080DFF48: .4byte 0x0839EF10
+_080DFF4C:
+	ldr r0, [r1, #0x1C]
+_080DFF4E:
+	ldr r4, [r0, #0x04]
+	ldr r7, _080DFFC0 @ =0x03001034
+	ldr r1, _080DFFC4 @ =0x08198154
+	ldr r0, _080DFFC8 @ =0x081980D8
+	subs r5, r1, r0
+	ldr r3, [r7, #0x00]
+	adds r3, r3, r5
+	ldr r1, _080DFFCC @ =0x02000460
+	adds r0, r4, #0x0
+	movs r2, #0x20
+	bl _call_via_r3
+	ldr r2, _080DFFD0 @ =0x0300034C
+	ldrh r1, [r2, #0x00]
+	movs r3, #0x80
+	lsls r3, r3, #0x08
+	adds r0, r3, #0x0
+	orrs r0, r1
+	strh r0, [r2, #0x00]
+	ldr r6, _080DFFD4 @ =0x03000FD8
+	ldr r0, [r6, #0x00]
+	movs r1, #0x92
+	lsls r1, r1, #0x02
+	adds r0, r0, r1
+	ldr r0, [r0, #0x00]
+	bl sub_8116620
+	lsls r0, r0, #0x18
+	cmp r0, #0x00
+	beq _080DFFA8
+	ldr r3, [r7, #0x00]
+	adds r3, r3, r5
+	ldr r0, [r6, #0x00]
+	movs r2, #0x92
+	lsls r2, r2, #0x02
+	adds r0, r0, r2
+	ldr r0, [r0, #0x00]
+	ldr r1, [r0, #0x1C]
+	movs r0, #0xF8
+	lsls r0, r0, #0x02
+	adds r1, r1, r0
+	adds r0, r4, #0x0
+	movs r2, #0x20
+	bl _call_via_r3
+_080DFFA8:
+	movs r0, #0x00
+	mov r1, r10
+	str r0, [r1, #0x04]
+_080DFFAE:
+	add sp, #0x028
+	pop {r3, r4, r5}
+	mov r8, r3
+	mov r9, r4
+	mov r10, r5
+	pop {r4, r5, r6, r7}
+	pop {r0}
+	bx r0
+	.byte 0x00, 0x00
+_080DFFC0: .4byte 0x03001034
+_080DFFC4: .4byte 0x08198154
+_080DFFC8: .4byte 0x081980D8
+_080DFFCC: .4byte 0x02000460
+_080DFFD0: .4byte 0x0300034C
+_080DFFD4: .4byte 0x03000FD8
+	.byte 0xF0, 0xB5, 0x4F, 0x46, 0x46, 0x46, 0xC0, 0xB4, 0x83, 0xB0, 0x06, 0x1C, 0x88, 0x46, 0x00, 0x29
+	.byte 0x78, 0xDD, 0x00, 0x24, 0x33, 0x1D, 0x45, 0x46, 0x69, 0x42, 0x03, 0x20, 0x01, 0x40, 0x00, 0x29
+	.byte 0x32, 0xD0, 0x03, 0x29, 0x1F, 0xDA, 0x02, 0x29, 0x0E, 0xDA, 0x98, 0x68, 0x01, 0x1C, 0x56, 0x39
+	.byte 0x99, 0x60, 0x58, 0x69, 0x00, 0x28, 0x05, 0xDA, 0x00, 0x29, 0x03, 0xDA, 0x74, 0x60, 0x5C, 0x60
+	.byte 0x9C, 0x60, 0x5C, 0x61, 0x28, 0x33, 0x01, 0x3D, 0x98, 0x68, 0x01, 0x1C, 0x56, 0x39, 0x99, 0x60
+	.byte 0x58, 0x69, 0x00, 0x28, 0x05, 0xDA, 0x00, 0x29, 0x03, 0xDA, 0x1C, 0x60, 0x5C, 0x60, 0x9C, 0x60
+	.byte 0x5C, 0x61, 0x28, 0x33, 0x01, 0x3D, 0x98, 0x68, 0x01, 0x1C, 0x56, 0x39, 0x99, 0x60, 0x58, 0x69
+	.byte 0x00, 0x28, 0x05, 0xDA, 0x00, 0x29, 0x03, 0xDA, 0x1C, 0x60, 0x5C, 0x60, 0x9C, 0x60, 0x5C, 0x61
+	.byte 0x28, 0x33, 0x01, 0x3D, 0x00, 0x2D, 0x3D, 0xD0, 0x98, 0x68, 0x01, 0x1C, 0x56, 0x39, 0x99, 0x60
+	.byte 0x58, 0x69, 0x00, 0x28, 0x05, 0xDA, 0x00, 0x29, 0x03, 0xDA, 0x1C, 0x60, 0x5C, 0x60, 0x9C, 0x60
+	.byte 0x5C, 0x61, 0x1A, 0x1C, 0x28, 0x32, 0x90, 0x68, 0x01, 0x1C, 0x56, 0x39, 0x91, 0x60, 0x50, 0x69
+	.byte 0x00, 0x28, 0x05, 0xDA, 0x00, 0x29, 0x03, 0xDA, 0x9C, 0x62, 0x54, 0x60, 0x94, 0x60, 0x54, 0x61
+	.byte 0x1A, 0x1C, 0x50, 0x32, 0x90, 0x68, 0x01, 0x1C, 0x56, 0x39, 0x91, 0x60, 0x50, 0x69, 0x00, 0x28
+	.byte 0x05, 0xDA, 0x00, 0x29, 0x03, 0xDA, 0x1C, 0x65, 0x54, 0x60, 0x94, 0x60, 0x54, 0x61, 0x1A, 0x1C
+	.byte 0x78, 0x32, 0x90, 0x68, 0x01, 0x1C, 0x56, 0x39, 0x91, 0x60, 0x50, 0x69, 0x00, 0x28, 0x05, 0xDA
+	.byte 0x00, 0x29, 0x03, 0xDA, 0x9C, 0x67, 0x54, 0x60, 0x94, 0x60, 0x54, 0x61, 0xA0, 0x33, 0x04, 0x3D
+	.byte 0x00, 0x2D, 0xC1, 0xD1, 0x30, 0x1C, 0x41, 0x46, 0x03, 0xF0, 0xD0, 0xFF, 0x34, 0x48, 0x00, 0x68
+	.byte 0x84, 0x6B, 0x40, 0x46, 0x00, 0x28, 0x59, 0xDD, 0x00, 0x22, 0x91, 0x46, 0x00, 0x27, 0x10, 0x36
+	.byte 0x45, 0x46, 0x30, 0x68, 0x00, 0x28, 0x00, 0xDA, 0xFF, 0x30, 0x00, 0x12, 0x00, 0x90, 0x70, 0x68
+	.byte 0x00, 0x28, 0x00, 0xDA, 0xFF, 0x30, 0x00, 0x12, 0x01, 0x90, 0xB0, 0x68, 0x00, 0x28, 0x00, 0xDA
+	.byte 0xFF, 0x30, 0x00, 0x12, 0x02, 0x90, 0x68, 0x46, 0x01, 0xA9, 0x02, 0xAA, 0x00, 0x23, 0x9F, 0xF7
+	.byte 0x6F, 0xFD, 0x00, 0x98, 0x01, 0x1F, 0x00, 0x91, 0x01, 0x98, 0x04, 0x38, 0x01, 0x90, 0x04, 0x22
+	.byte 0x52, 0x42, 0x91, 0x42, 0x2E, 0xDB, 0x90, 0x42, 0x2C, 0xDB, 0xF4, 0x29, 0x2A, 0xDC, 0xA4, 0x28
+	.byte 0x28, 0xDC, 0xE7, 0x80, 0x02, 0x98, 0x80, 0x03, 0x80, 0x21, 0x09, 0x06, 0x08, 0x43, 0xA0, 0x60
+	.byte 0x27, 0x80, 0x67, 0x80, 0xA7, 0x80, 0x00, 0x99, 0x01, 0x9A, 0x20, 0x1C, 0xA3, 0xF7, 0x48, 0xFB
+	.byte 0xA1, 0x88, 0xFC, 0x22, 0x12, 0x02, 0x10, 0x1C, 0x01, 0x40, 0x04, 0x20, 0x01, 0x43, 0x48, 0x46
+	.byte 0x01, 0x43, 0x10, 0x4A, 0x10, 0x1C, 0x01, 0x40, 0x80, 0x20, 0x40, 0x01, 0x01, 0x43, 0x48, 0x46
+	.byte 0x01, 0x43, 0x0D, 0x4A, 0x10, 0x1C, 0x01, 0x40, 0xA0, 0x68, 0x80, 0x0F, 0x80, 0x02, 0x01, 0x43
+	.byte 0xA1, 0x80, 0x24, 0x69, 0x28, 0x36, 0x01, 0x3D, 0x00, 0x2D, 0xAA, 0xD1, 0x04, 0x48, 0x00, 0x68
+	.byte 0x84, 0x63, 0x03, 0xB0, 0x18, 0xBC, 0x98, 0x46, 0xA1, 0x46, 0xF0, 0xBC, 0x01, 0xBC, 0x00, 0x47
+	.byte 0x74, 0x0D, 0x00, 0x03, 0xFF, 0x0F, 0x00, 0x00, 0xFF, 0xF3, 0x00, 0x00
+	thumb_func_start sub_80E01C4
+sub_80E01C4:
+	push {r4, r5, r6, r7, lr}
+	mov r7, r9
+	mov r6, r8
+	push {r6, r7}
+	lsls r0, r0, #0x10
+	lsrs r0, r0, #0x10
+	mov r9, r0
+	ldr r0, _080E0280 @ =0x03000FD8
+	mov r8, r0
+	ldr r4, [r0, #0x00]
+	movs r1, #0x98
+	lsls r1, r1, #0x02
+	adds r5, r4, r1
+	ldr r6, [r5, #0x00]
+	cmp r6, #0x00
+	bne _080E0272
+	ldr r3, _080E0284 @ =0x02000050
+	ldrh r1, [r3, #0x00]
+	movs r2, #0x9B
+	lsls r2, r2, #0x02
+	adds r0, r4, r2
+	strh r1, [r0, #0x00]
+	ldr r2, _080E0288 @ =0x0200004A
+	ldrh r1, [r2, #0x00]
+	ldr r7, _080E028C @ =0x0000026E
+	adds r0, r4, r7
+	strh r1, [r0, #0x00]
+	ldr r4, _080E0290 @ =0x0300034C
+	ldr r1, _080E0294 @ =0x000008C4
+	adds r0, r4, r1
+	ldr r0, [r0, #0x00]
+	str r0, [r5, #0x00]
+	ldr r7, _080E0298 @ =0x00003744
+	adds r0, r7, #0x0
+	strh r0, [r3, #0x00]
+	ldr r1, _080E029C @ =0x00003F3B
+	adds r0, r1, #0x0
+	strh r0, [r2, #0x00]
+	ldr r0, _080E02A0 @ =0x02000040
+	strh r6, [r0, #0x00]
+	ldr r1, _080E02A4 @ =0x080E163D
+	movs r0, #0x02
+	bl sub_8018B78
+	ldr r2, _080E02A8 @ =0x03001034
+	ldr r0, _080E02AC @ =0x03000FDC
+	ldr r1, [r0, #0x00]
+	ldr r7, _080E02B0 @ =0x00003EF0
+	adds r1, r1, r7
+	ldr r3, [r2, #0x00]
+	movs r0, #0x00
+	movs r2, #0x04
+	bl _call_via_r3
+	ldr r0, _080E02B4 @ =0x06007FFC
+	ldr r1, _080E02B8 @ =0xEEEEEEEE
+	str r1, [r0, #0x00]
+	subs r0, #0x04
+	str r1, [r0, #0x00]
+	subs r0, #0x04
+	str r1, [r0, #0x00]
+	subs r0, #0x04
+	str r1, [r0, #0x00]
+	subs r0, #0x04
+	str r1, [r0, #0x00]
+	subs r0, #0x04
+	str r1, [r0, #0x00]
+	subs r0, #0x04
+	str r1, [r0, #0x00]
+	subs r0, #0x04
+	str r1, [r0, #0x00]
+	ldr r0, _080E02BC @ =0x0200025C
+	mov r1, r9
+	strh r1, [r0, #0x00]
+	ldrh r1, [r4, #0x02]
+	movs r2, #0x80
+	lsls r2, r2, #0x07
+	adds r0, r2, #0x0
+	orrs r0, r1
+	strh r0, [r4, #0x02]
+	mov r7, r8
+	ldr r2, [r7, #0x00]
+	ldrb r1, [r2, #0x0B]
+	movs r0, #0x21
+	negs r0, r0
+	ands r0, r1
+	strb r0, [r2, #0x0B]
+_080E0272:
+	pop {r3, r4}
+	mov r8, r3
+	mov r9, r4
+	pop {r4, r5, r6, r7}
+	pop {r0}
+	bx r0
+	.byte 0x00, 0x00
+_080E0280: .4byte 0x03000FD8
+_080E0284: .4byte 0x02000050
+_080E0288: .4byte 0x0200004A
+_080E028C: .4byte 0x0000026E
+_080E0290: .4byte 0x0300034C
+_080E0294: .4byte 0x000008C4
+_080E0298: .4byte 0x00003744
+_080E029C: .4byte 0x00003F3B
+_080E02A0: .4byte 0x02000040
+_080E02A4: .4byte sub_80E163C
+_080E02A8: .4byte 0x03001034
+_080E02AC: .4byte 0x03000FDC
+_080E02B0: .4byte 0x00003EF0
+_080E02B4: .4byte 0x06007FFC
+_080E02B8: .4byte 0xEEEEEEEE
+_080E02BC: .4byte 0x0200025C
+	thumb_func_start sub_80E02C0
+sub_80E02C0:
+	push {r4, r5, r6, lr}
+	ldr r6, _080E0334 @ =0x03000FD8
+	ldr r2, [r6, #0x00]
+	movs r1, #0x98
+	lsls r1, r1, #0x02
+	adds r0, r2, r1
+	ldr r3, [r0, #0x00]
+	cmp r3, #0x00
+	beq _080E032E
+	ldr r1, _080E0338 @ =0x02000050
+	movs r5, #0x9B
+	lsls r5, r5, #0x02
+	adds r0, r2, r5
+	ldrh r0, [r0, #0x00]
+	strh r0, [r1, #0x00]
+	subs r1, #0x06
+	ldr r4, _080E033C @ =0x0000026E
+	adds r0, r2, r4
+	ldrh r0, [r0, #0x00]
+	strh r0, [r1, #0x00]
+	subs r1, #0x0A
+	movs r0, #0xF0
+	strh r0, [r1, #0x00]
+	movs r0, #0x02
+	adds r1, r3, #0x0
+	bl sub_8018B78
+	ldr r0, [r6, #0x00]
+	adds r5, r0, r5
+	movs r1, #0x00
+	strh r1, [r5, #0x00]
+	adds r4, r0, r4
+	strh r1, [r4, #0x00]
+	movs r2, #0x98
+	lsls r2, r2, #0x02
+	adds r0, r0, r2
+	str r1, [r0, #0x00]
+	ldr r0, _080E0340 @ =0x03001034
+	ldr r1, _080E0344 @ =0x0600F000
+	movs r2, #0xA0
+	lsls r2, r2, #0x03
+	ldr r3, [r0, #0x00]
+	movs r0, #0x00
+	bl _call_via_r3
+	ldr r1, _080E0348 @ =0x040000B0
+	ldrh r2, [r1, #0x0A]
+	ldr r0, _080E034C @ =0x0000C5FF
+	ands r0, r2
+	strh r0, [r1, #0x0A]
+	ldrh r2, [r1, #0x0A]
+	ldr r0, _080E0350 @ =0x00007FFF
+	ands r0, r2
+	strh r0, [r1, #0x0A]
+	ldrh r0, [r1, #0x0A]
+_080E032E:
+	pop {r4, r5, r6}
+	pop {r0}
+	bx r0
+_080E0334: .4byte 0x03000FD8
+_080E0338: .4byte 0x02000050
+_080E033C: .4byte 0x0000026E
+_080E0340: .4byte 0x03001034
+_080E0344: .4byte 0x0600F000
+_080E0348: .4byte 0x040000B0
+_080E034C: .4byte 0x0000C5FF
+_080E0350: .4byte 0x00007FFF
+	thumb_func_start sub_80E0354
+sub_80E0354:
+	push {r4, r5, r6, r7, lr}
+	add sp, #-0x010
+	str r0, [sp, #0x004]
+	str r1, [sp, #0x008]
+	str r2, [sp, #0x00C]
+	adds r5, r3, #0x0
+	ldr r4, _080E03D8 @ =0x03000FD8
+	ldr r1, [r4, #0x00]
+	movs r2, #0x98
+	lsls r2, r2, #0x02
+	adds r0, r1, r2
+	ldr r0, [r0, #0x00]
+	cmp r0, #0x00
+	beq _080E0454
+	subs r2, #0x14
+	adds r0, r1, r2
+	ldr r0, [r0, #0x00]
+	add r2, sp, #0x008
+	add r3, sp, #0x00C
+	movs r1, #0x00
+	str r1, [sp, #0x000]
+	add r1, sp, #0x004
+	bl sub_8082C58
+	ldr r2, _080E03DC @ =0x03000FDC
+	ldr r0, [r4, #0x00]
+	ldrb r1, [r0, #0x0B]
+	lsls r1, r1, #0x1A
+	lsrs r1, r1, #0x1F
+	lsls r0, r1, #0x02
+	adds r0, r0, r1
+	lsls r0, r0, #0x07
+	ldr r1, _080E03E0 @ =0x00003EF0
+	adds r0, r0, r1
+	ldr r1, [r2, #0x00]
+	adds r4, r1, r0
+	adds r7, r5, #0x0
+	muls r7, r5
+	movs r6, #0x00
+	movs r5, #0x00
+_080E03A4:
+	ldr r0, [sp, #0x008]
+	subs r2, r0, r6
+	adds r0, r2, #0x0
+	muls r0, r2
+	adds r2, r0, #0x0
+	subs r2, r7, r2
+	cmp r2, #0x00
+	ble _080E03D4
+	ldr r0, _080E03E4 @ =0x03001038
+	ldr r1, [r0, #0x00]
+	adds r0, r2, #0x0
+	bl _call_via_r1
+	adds r2, r0, #0x0
+	ldr r0, [sp, #0x004]
+	adds r1, r0, r2
+	cmp r1, #0x00
+	blt _080E03D4
+	cmp r1, #0xF0
+	ble _080E03CE
+	movs r1, #0xF0
+_080E03CE:
+	subs r2, r0, r2
+	cmp r2, #0xEF
+	ble _080E03E8
+_080E03D4:
+	stm r4!, {r5}
+	b _080E03FE
+_080E03D8: .4byte 0x03000FD8
+_080E03DC: .4byte 0x03000FDC
+_080E03E0: .4byte 0x00003EF0
+_080E03E4: .4byte 0x03001038
+_080E03E8:
+	cmp r2, #0x00
+	bge _080E03F4
+	lsls r0, r1, #0x10
+	orrs r1, r0
+	stm r4!, {r1}
+	b _080E03FE
+_080E03F4:
+	lsls r0, r2, #0x08
+	orrs r0, r1
+	lsls r1, r0, #0x10
+	orrs r0, r1
+	stm r4!, {r0}
+_080E03FE:
+	adds r1, r6, #0x1
+	ldr r0, [sp, #0x008]
+	subs r2, r0, r1
+	adds r1, r2, #0x0
+	muls r1, r2
+	adds r2, r1, #0x0
+	subs r2, r7, r2
+	cmp r2, #0x00
+	ble _080E0430
+	ldr r0, _080E0434 @ =0x03001038
+	ldr r1, [r0, #0x00]
+	adds r0, r2, #0x0
+	bl _call_via_r1
+	adds r2, r0, #0x0
+	ldr r0, [sp, #0x004]
+	adds r1, r0, r2
+	cmp r1, #0x00
+	blt _080E0430
+	cmp r1, #0xF0
+	ble _080E042A
+	movs r1, #0xF0
+_080E042A:
+	subs r2, r0, r2
+	cmp r2, #0xEF
+	ble _080E0438
+_080E0430:
+	stm r4!, {r5}
+	b _080E044E
+_080E0434: .4byte 0x03001038
+_080E0438:
+	cmp r2, #0x00
+	bge _080E0444
+	lsls r0, r1, #0x10
+	orrs r1, r0
+	stm r4!, {r1}
+	b _080E044E
+_080E0444:
+	lsls r0, r2, #0x08
+	orrs r0, r1
+	lsls r1, r0, #0x10
+	orrs r0, r1
+	stm r4!, {r0}
+_080E044E:
+	adds r6, #0x02
+	cmp r6, #0x9F
+	ble _080E03A4
+_080E0454:
+	add sp, #0x010
+	pop {r4, r5, r6, r7}
+	pop {r0}
+	bx r0
+	thumb_func_start sub_80E045C
+sub_80E045C:
+	push {r4, r5, r6, r7, lr}
+	mov r7, r9
+	mov r6, r8
+	push {r6, r7}
+	add sp, #-0x00C
+	mov r9, r0
+	mov r12, r1
+	adds r6, r2, #0x0
+	ldr r0, _080E05A0 @ =0x03000FD8
+	ldr r3, [r0, #0x00]
+	movs r1, #0x98
+	lsls r1, r1, #0x02
+	adds r0, r3, r1
+	ldr r0, [r0, #0x00]
+	cmp r0, #0x00
+	bne _080E047E
+	b _080E0590
+_080E047E:
+	ldr r0, _080E05A4 @ =0x03000FDC
+	ldr r1, [r0, #0x00]
+	ldr r4, _080E05A8 @ =0x000052F0
+	adds r2, r1, r4
+	movs r7, #0x9C
+	lsls r7, r7, #0x02
+	adds r0, r3, r7
+	ldrb r5, [r0, #0x00]
+	mov r0, r9
+	muls r0, r6
+	mov r8, r0
+	cmp r5, #0x00
+	beq _080E0550
+	adds r3, r2, #0x0
+	adds r4, r5, #0x0
+	movs r0, #0x01
+	ands r0, r5
+	cmp r0, #0x00
+	beq _080E04E0
+	ldr r0, [r2, #0x00]
+	mov r3, r9
+	muls r3, r0
+	adds r0, r3, #0x0
+	cmp r0, #0x00
+	bge _080E04B2
+	adds r0, #0xFF
+_080E04B2:
+	asrs r0, r0, #0x08
+	str r0, [r2, #0x00]
+	ldr r0, [r2, #0x04]
+	mov r4, r12
+	muls r4, r0
+	adds r0, r4, #0x0
+	cmp r0, #0x00
+	bge _080E04C4
+	adds r0, #0xFF
+_080E04C4:
+	asrs r0, r0, #0x08
+	str r0, [r2, #0x04]
+	ldr r0, [r2, #0x08]
+	muls r0, r6
+	cmp r0, #0x00
+	bge _080E04D2
+	adds r0, #0xFF
+_080E04D2:
+	asrs r0, r0, #0x08
+	str r0, [r2, #0x08]
+	ldr r7, _080E05AC @ =0x000052FC
+	adds r3, r1, r7
+	subs r4, r5, #0x1
+	cmp r4, #0x00
+	beq _080E0550
+_080E04E0:
+	ldr r0, [r3, #0x00]
+	mov r1, r9
+	muls r1, r0
+	adds r0, r1, #0x0
+	cmp r0, #0x00
+	bge _080E04EE
+	adds r0, #0xFF
+_080E04EE:
+	asrs r0, r0, #0x08
+	str r0, [r3, #0x00]
+	ldr r0, [r3, #0x04]
+	mov r7, r12
+	muls r7, r0
+	adds r0, r7, #0x0
+	cmp r0, #0x00
+	bge _080E0500
+	adds r0, #0xFF
+_080E0500:
+	asrs r0, r0, #0x08
+	str r0, [r3, #0x04]
+	ldr r0, [r3, #0x08]
+	muls r0, r6
+	cmp r0, #0x00
+	bge _080E050E
+	adds r0, #0xFF
+_080E050E:
+	asrs r0, r0, #0x08
+	str r0, [r3, #0x08]
+	adds r1, r3, #0x0
+	adds r1, #0x0C
+	ldr r0, [r3, #0x0C]
+	mov r7, r9
+	muls r7, r0
+	adds r0, r7, #0x0
+	cmp r0, #0x00
+	bge _080E0524
+	adds r0, #0xFF
+_080E0524:
+	asrs r0, r0, #0x08
+	str r0, [r3, #0x0C]
+	ldr r0, [r1, #0x04]
+	mov r7, r12
+	muls r7, r0
+	adds r0, r7, #0x0
+	cmp r0, #0x00
+	bge _080E0536
+	adds r0, #0xFF
+_080E0536:
+	asrs r0, r0, #0x08
+	str r0, [r1, #0x04]
+	ldr r0, [r1, #0x08]
+	muls r0, r6
+	cmp r0, #0x00
+	bge _080E0544
+	adds r0, #0xFF
+_080E0544:
+	asrs r0, r0, #0x08
+	str r0, [r1, #0x08]
+	adds r3, #0x18
+	subs r4, #0x02
+	cmp r4, #0x00
+	bne _080E04E0
+_080E0550:
+	mov r0, r8
+	cmp r0, #0x00
+	bge _080E0590
+	movs r4, #0x00
+	subs r5, #0x01
+	cmp r4, r5
+	bge _080E0590
+	lsls r0, r5, #0x01
+	adds r0, r0, r5
+	lsls r0, r0, #0x02
+	adds r0, r0, r2
+	mov r8, r0
+_080E0568:
+	mov r1, sp
+	adds r0, r2, #0x0
+	ldm r0!, {r3, r6, r7}
+	stm r1!, {r3, r6, r7}
+	adds r1, r2, #0x0
+	mov r0, r8
+	ldm r0!, {r3, r6, r7}
+	stm r1!, {r3, r6, r7}
+	mov r1, r8
+	mov r0, sp
+	ldm r0!, {r3, r6, r7}
+	stm r1!, {r3, r6, r7}
+	adds r2, #0x0C
+	adds r4, #0x01
+	movs r0, #0x0C
+	negs r0, r0
+	add r8, r0
+	subs r5, #0x01
+	cmp r4, r5
+	blt _080E0568
+_080E0590:
+	add sp, #0x00C
+	pop {r3, r4}
+	mov r8, r3
+	mov r9, r4
+	pop {r4, r5, r6, r7}
+	pop {r0}
+	bx r0
+	.byte 0x00, 0x00
+_080E05A0: .4byte 0x03000FD8
+_080E05A4: .4byte 0x03000FDC
+_080E05A8: .4byte 0x000052F0
+_080E05AC: .4byte 0x000052FC
+	thumb_func_start sub_80E05B0
+sub_80E05B0:
+	push {r4, r5, r6, r7, lr}
+	mov r7, r9
+	mov r6, r8
+	push {r6, r7}
+	add sp, #-0x00C
+	adds r2, r0, #0x0
+	ldr r0, _080E0718 @ =0x03000FD8
+	ldr r1, [r0, #0x00]
+	movs r3, #0x98
+	lsls r3, r3, #0x02
+	adds r0, r1, r3
+	ldr r0, [r0, #0x00]
+	cmp r0, #0x00
+	bne _080E05CE
+	b _080E0708
+_080E05CE:
+	ldr r0, _080E071C @ =0x03000FDC
+	ldr r5, [r0, #0x00]
+	ldr r7, _080E0720 @ =0x000052F0
+	adds r7, r7, r5
+	mov r9, r7
+	adds r3, #0x10
+	adds r0, r1, r3
+	ldrb r6, [r0, #0x00]
+	ldr r1, _080E0724 @ =0x08198584
+	movs r0, #0xFF
+	ands r0, r2
+	lsls r2, r0, #0x01
+	adds r1, r2, r1
+	movs r7, #0x00
+	ldsh r0, [r1, r7]
+	cmp r0, #0x00
+	bge _080E05F2
+	adds r0, #0x3F
+_080E05F2:
+	asrs r0, r0, #0x06
+	mov r8, r0
+	ldr r0, _080E0728 @ =0x08198504
+	adds r0, r2, r0
+	movs r1, #0x00
+	ldsh r0, [r0, r1]
+	cmp r0, #0x00
+	bge _080E0604
+	adds r0, #0x3F
+_080E0604:
+	asrs r7, r0, #0x06
+	cmp r6, #0x00
+	ble _080E06C6
+	ldr r2, _080E072C @ =0x000052F4
+	adds r2, r2, r5
+	mov r12, r2
+	adds r4, r6, #0x0
+	movs r0, #0x01
+	ands r0, r6
+	cmp r0, #0x00
+	beq _080E0658
+	ldr r1, [r2, #0x00]
+	ldr r3, [r2, #0x04]
+	mov r2, r8
+	muls r2, r1
+	adds r0, r3, #0x0
+	muls r0, r7
+	subs r0, r2, r0
+	cmp r0, #0x00
+	bge _080E062E
+	adds r0, #0xFF
+_080E062E:
+	asrs r0, r0, #0x08
+	mov r2, r12
+	str r0, [r2, #0x00]
+	mov r2, r8
+	muls r2, r3
+	adds r0, r1, #0x0
+	muls r0, r7
+	adds r0, r2, r0
+	cmp r0, #0x00
+	bge _080E0644
+	adds r0, #0xFF
+_080E0644:
+	asrs r0, r0, #0x08
+	mov r3, r12
+	str r0, [r3, #0x04]
+	movs r0, #0xA6
+	lsls r0, r0, #0x07
+	adds r0, r0, r5
+	mov r12, r0
+	subs r4, r6, #0x1
+	cmp r4, #0x00
+	beq _080E06C6
+_080E0658:
+	mov r2, r12
+	ldr r1, [r2, #0x00]
+	ldr r3, [r2, #0x04]
+	mov r2, r8
+	muls r2, r1
+	adds r0, r3, #0x0
+	muls r0, r7
+	subs r0, r2, r0
+	cmp r0, #0x00
+	bge _080E066E
+	adds r0, #0xFF
+_080E066E:
+	asrs r0, r0, #0x08
+	mov r5, r12
+	str r0, [r5, #0x00]
+	mov r2, r8
+	muls r2, r3
+	adds r0, r1, #0x0
+	muls r0, r7
+	adds r0, r2, r0
+	cmp r0, #0x00
+	bge _080E0684
+	adds r0, #0xFF
+_080E0684:
+	asrs r0, r0, #0x08
+	mov r1, r12
+	str r0, [r1, #0x04]
+	mov r5, r12
+	adds r5, #0x0C
+	ldr r1, [r1, #0x0C]
+	ldr r3, [r5, #0x04]
+	mov r2, r8
+	muls r2, r1
+	adds r0, r3, #0x0
+	muls r0, r7
+	subs r0, r2, r0
+	cmp r0, #0x00
+	bge _080E06A2
+	adds r0, #0xFF
+_080E06A2:
+	asrs r0, r0, #0x08
+	mov r2, r12
+	str r0, [r2, #0x0C]
+	mov r2, r8
+	muls r2, r3
+	adds r0, r1, #0x0
+	muls r0, r7
+	adds r0, r2, r0
+	cmp r0, #0x00
+	bge _080E06B8
+	adds r0, #0xFF
+_080E06B8:
+	asrs r0, r0, #0x08
+	str r0, [r5, #0x04]
+	movs r3, #0x18
+	add r12, r3
+	subs r4, #0x02
+	cmp r4, #0x00
+	bne _080E0658
+_080E06C6:
+	mov r5, r8
+	cmp r5, #0x00
+	bge _080E0708
+	movs r4, #0x00
+	subs r6, #0x01
+	cmp r4, r6
+	bge _080E0708
+	lsls r0, r6, #0x01
+	adds r0, r0, r6
+	lsls r0, r0, #0x02
+	add r0, r9
+	mov r8, r0
+	mov r2, r9
+_080E06E0:
+	mov r1, sp
+	adds r0, r2, #0x0
+	ldm r0!, {r3, r5, r7}
+	stm r1!, {r3, r5, r7}
+	adds r1, r2, #0x0
+	mov r0, r8
+	ldm r0!, {r3, r5, r7}
+	stm r1!, {r3, r5, r7}
+	mov r1, r8
+	mov r0, sp
+	ldm r0!, {r3, r5, r7}
+	stm r1!, {r3, r5, r7}
+	adds r2, #0x0C
+	adds r4, #0x01
+	movs r7, #0x0C
+	negs r7, r7
+	add r8, r7
+	subs r6, #0x01
+	cmp r4, r6
+	blt _080E06E0
+_080E0708:
+	add sp, #0x00C
+	pop {r3, r4}
+	mov r8, r3
+	mov r9, r4
+	pop {r4, r5, r6, r7}
+	pop {r0}
+	bx r0
+	.byte 0x00, 0x00
+_080E0718: .4byte 0x03000FD8
+_080E071C: .4byte 0x03000FDC
+_080E0720: .4byte 0x000052F0
+_080E0724: .4byte 0x08198584
+_080E0728: .4byte 0x08198504
+_080E072C: .4byte 0x000052F4
+	thumb_func_start sub_80E0730
+sub_80E0730:
+	push {r4, r5, r6, r7, lr}
+	mov r7, r8
+	push {r7}
+	adds r2, r0, #0x0
+	ldr r0, _080E0844 @ =0x03000FD8
+	ldr r1, [r0, #0x00]
+	movs r3, #0x98
+	lsls r3, r3, #0x02
+	adds r0, r1, r3
+	ldr r0, [r0, #0x00]
+	cmp r0, #0x00
+	beq _080E083A
+	ldr r0, _080E0848 @ =0x03000FDC
+	ldr r0, [r0, #0x00]
+	mov r8, r0
+	ldr r4, _080E084C @ =0x000052F0
+	add r4, r8
+	movs r5, #0x9C
+	lsls r5, r5, #0x02
+	adds r0, r1, r5
+	ldrb r3, [r0, #0x00]
+	ldr r1, _080E0850 @ =0x08198584
+	movs r0, #0xFF
+	ands r0, r2
+	lsls r2, r0, #0x01
+	adds r1, r2, r1
+	movs r5, #0x00
+	ldsh r0, [r1, r5]
+	cmp r0, #0x00
+	bge _080E076E
+	adds r0, #0x3F
+_080E076E:
+	asrs r7, r0, #0x06
+	ldr r0, _080E0854 @ =0x08198504
+	adds r0, r2, r0
+	movs r1, #0x00
+	ldsh r0, [r0, r1]
+	cmp r0, #0x00
+	bge _080E077E
+	adds r0, #0x3F
+_080E077E:
+	asrs r6, r0, #0x06
+	cmp r3, #0x00
+	beq _080E083A
+	mov r12, r4
+	adds r5, r3, #0x0
+	movs r0, #0x01
+	ands r0, r5
+	cmp r0, #0x00
+	beq _080E07CC
+	ldr r1, [r4, #0x08]
+	ldr r3, [r4, #0x00]
+	adds r2, r1, #0x0
+	muls r2, r7
+	adds r0, r3, #0x0
+	muls r0, r6
+	subs r0, r2, r0
+	cmp r0, #0x00
+	bge _080E07A4
+	adds r0, #0xFF
+_080E07A4:
+	asrs r0, r0, #0x08
+	mov r2, r12
+	str r0, [r2, #0x08]
+	adds r2, r3, #0x0
+	muls r2, r7
+	adds r0, r1, #0x0
+	muls r0, r6
+	adds r0, r2, r0
+	cmp r0, #0x00
+	bge _080E07BA
+	adds r0, #0xFF
+_080E07BA:
+	asrs r0, r0, #0x08
+	mov r3, r12
+	str r0, [r3, #0x00]
+	ldr r0, _080E0858 @ =0x000052FC
+	add r0, r8
+	mov r12, r0
+	subs r5, #0x01
+	cmp r5, #0x00
+	beq _080E083A
+_080E07CC:
+	mov r2, r12
+	ldr r1, [r2, #0x08]
+	ldr r3, [r2, #0x00]
+	adds r2, r1, #0x0
+	muls r2, r7
+	adds r0, r3, #0x0
+	muls r0, r6
+	subs r0, r2, r0
+	cmp r0, #0x00
+	bge _080E07E2
+	adds r0, #0xFF
+_080E07E2:
+	asrs r0, r0, #0x08
+	mov r2, r12
+	str r0, [r2, #0x08]
+	adds r2, r3, #0x0
+	muls r2, r7
+	adds r0, r1, #0x0
+	muls r0, r6
+	adds r0, r2, r0
+	cmp r0, #0x00
+	bge _080E07F8
+	adds r0, #0xFF
+_080E07F8:
+	asrs r0, r0, #0x08
+	mov r3, r12
+	str r0, [r3, #0x00]
+	mov r4, r12
+	adds r4, #0x0C
+	ldr r1, [r4, #0x08]
+	ldr r3, [r3, #0x0C]
+	adds r2, r1, #0x0
+	muls r2, r7
+	adds r0, r3, #0x0
+	muls r0, r6
+	subs r0, r2, r0
+	cmp r0, #0x00
+	bge _080E0816
+	adds r0, #0xFF
+_080E0816:
+	asrs r0, r0, #0x08
+	str r0, [r4, #0x08]
+	adds r2, r3, #0x0
+	muls r2, r7
+	adds r0, r1, #0x0
+	muls r0, r6
+	adds r0, r2, r0
+	cmp r0, #0x00
+	bge _080E082A
+	adds r0, #0xFF
+_080E082A:
+	asrs r0, r0, #0x08
+	mov r1, r12
+	str r0, [r1, #0x0C]
+	movs r2, #0x18
+	add r12, r2
+	subs r5, #0x02
+	cmp r5, #0x00
+	bne _080E07CC
+_080E083A:
+	pop {r3}
+	mov r8, r3
+	pop {r4, r5, r6, r7}
+	pop {r0}
+	bx r0
+_080E0844: .4byte 0x03000FD8
+_080E0848: .4byte 0x03000FDC
+_080E084C: .4byte 0x000052F0
+_080E0850: .4byte 0x08198584
+_080E0854: .4byte 0x08198504
+_080E0858: .4byte 0x000052FC
+	thumb_func_start sub_80E085C
+sub_80E085C:
+	push {r4, r5, r6, r7, lr}
+	mov r7, r10
+	mov r6, r9
+	mov r5, r8
+	push {r5, r6, r7}
+	add sp, #-0x00C
+	adds r2, r0, #0x0
+	ldr r0, _080E09C4 @ =0x03000FD8
+	ldr r1, [r0, #0x00]
+	movs r3, #0x98
+	lsls r3, r3, #0x02
+	adds r0, r1, r3
+	ldr r0, [r0, #0x00]
+	cmp r0, #0x00
+	bne _080E087C
+	b _080E09B2
+_080E087C:
+	ldr r0, _080E09C8 @ =0x03000FDC
+	ldr r6, [r0, #0x00]
+	ldr r4, _080E09CC @ =0x000052F0
+	adds r4, r4, r6
+	mov r9, r4
+	movs r7, #0x9C
+	lsls r7, r7, #0x02
+	adds r0, r1, r7
+	ldrb r0, [r0, #0x00]
+	mov r10, r0
+	ldr r1, _080E09D0 @ =0x08198584
+	movs r0, #0xFF
+	ands r0, r2
+	lsls r2, r0, #0x01
+	adds r1, r2, r1
+	movs r3, #0x00
+	ldsh r0, [r1, r3]
+	cmp r0, #0x00
+	bge _080E08A4
+	adds r0, #0x3F
+_080E08A4:
+	asrs r0, r0, #0x06
+	mov r8, r0
+	ldr r0, _080E09D4 @ =0x08198504
+	adds r0, r2, r0
+	movs r4, #0x00
+	ldsh r0, [r0, r4]
+	cmp r0, #0x00
+	bge _080E08B6
+	adds r0, #0x3F
+_080E08B6:
+	asrs r0, r0, #0x06
+	mov r12, r0
+	mov r7, r10
+	cmp r7, #0x00
+	ble _080E096C
+	mov r3, r9
+	mov r5, r10
+	movs r0, #0x01
+	ands r0, r7
+	cmp r0, #0x00
+	beq _080E0908
+	ldr r4, [r3, #0x00]
+	ldr r1, [r3, #0x04]
+	mov r2, r8
+	muls r2, r4
+	mov r0, r12
+	muls r0, r1
+	subs r0, r2, r0
+	cmp r0, #0x00
+	bge _080E08E0
+	adds r0, #0xFF
+_080E08E0:
+	asrs r0, r0, #0x08
+	mov r2, r9
+	str r0, [r2, #0x00]
+	mov r2, r8
+	muls r2, r1
+	mov r0, r12
+	muls r0, r4
+	adds r0, r2, r0
+	cmp r0, #0x00
+	bge _080E08F6
+	adds r0, #0xFF
+_080E08F6:
+	asrs r0, r0, #0x08
+	mov r3, r9
+	str r0, [r3, #0x04]
+	ldr r4, _080E09D8 @ =0x000052FC
+	adds r3, r6, r4
+	mov r5, r10
+	subs r5, #0x01
+	cmp r5, #0x00
+	beq _080E096C
+_080E0908:
+	ldr r4, [r3, #0x00]
+	ldr r1, [r3, #0x04]
+	mov r2, r8
+	muls r2, r4
+	mov r0, r12
+	muls r0, r1
+	subs r0, r2, r0
+	cmp r0, #0x00
+	bge _080E091C
+	adds r0, #0xFF
+_080E091C:
+	asrs r0, r0, #0x08
+	str r0, [r3, #0x00]
+	mov r2, r8
+	muls r2, r1
+	mov r0, r12
+	muls r0, r4
+	adds r0, r2, r0
+	cmp r0, #0x00
+	bge _080E0930
+	adds r0, #0xFF
+_080E0930:
+	asrs r0, r0, #0x08
+	str r0, [r3, #0x04]
+	adds r6, r3, #0x0
+	adds r6, #0x0C
+	ldr r4, [r3, #0x0C]
+	ldr r1, [r6, #0x04]
+	mov r2, r8
+	muls r2, r4
+	mov r0, r12
+	muls r0, r1
+	subs r0, r2, r0
+	cmp r0, #0x00
+	bge _080E094C
+	adds r0, #0xFF
+_080E094C:
+	asrs r0, r0, #0x08
+	str r0, [r3, #0x0C]
+	mov r2, r8
+	muls r2, r1
+	mov r0, r12
+	muls r0, r4
+	adds r0, r2, r0
+	cmp r0, #0x00
+	bge _080E0960
+	adds r0, #0xFF
+_080E0960:
+	asrs r0, r0, #0x08
+	str r0, [r6, #0x04]
+	adds r3, #0x18
+	subs r5, #0x02
+	cmp r5, #0x00
+	bne _080E0908
+_080E096C:
+	mov r6, r8
+	cmp r6, #0x00
+	bge _080E09B2
+	movs r5, #0x00
+	movs r7, #0x01
+	negs r7, r7
+	add r10, r7
+	cmp r5, r10
+	bge _080E09B2
+	mov r1, r10
+	lsls r0, r1, #0x01
+	add r0, r10
+	lsls r0, r0, #0x02
+	mov r2, r9
+	adds r3, r0, r2
+_080E098A:
+	mov r1, sp
+	adds r0, r2, #0x0
+	ldm r0!, {r4, r6, r7}
+	stm r1!, {r4, r6, r7}
+	adds r1, r2, #0x0
+	adds r0, r3, #0x0
+	ldm r0!, {r4, r6, r7}
+	stm r1!, {r4, r6, r7}
+	adds r1, r3, #0x0
+	mov r0, sp
+	ldm r0!, {r4, r6, r7}
+	stm r1!, {r4, r6, r7}
+	adds r2, #0x0C
+	adds r5, #0x01
+	subs r3, #0x0C
+	movs r0, #0x01
+	negs r0, r0
+	add r10, r0
+	cmp r5, r10
+	blt _080E098A
+_080E09B2:
+	add sp, #0x00C
+	pop {r3, r4, r5}
+	mov r8, r3
+	mov r9, r4
+	mov r10, r5
+	pop {r4, r5, r6, r7}
+	pop {r0}
+	bx r0
+	.byte 0x00, 0x00
+_080E09C4: .4byte 0x03000FD8
+_080E09C8: .4byte 0x03000FDC
+_080E09CC: .4byte 0x000052F0
+_080E09D0: .4byte 0x08198584
+_080E09D4: .4byte 0x08198504
+_080E09D8: .4byte 0x000052FC
+	thumb_func_start sub_80E09DC
+sub_80E09DC:
+	push {r4, r5, r6, r7, lr}
+	mov r7, r10
+	mov r6, r9
+	mov r5, r8
+	push {r5, r6, r7}
+	add sp, #-0x024
+	str r0, [sp, #0x010]
+	str r1, [sp, #0x014]
+	str r2, [sp, #0x018]
+	ldr r4, _080E0B1C @ =0x03000FD8
+	ldr r3, [r4, #0x00]
+	movs r1, #0x98
+	lsls r1, r1, #0x02
+	adds r0, r3, r1
+	ldr r0, [r0, #0x00]
+	cmp r0, #0x00
+	bne _080E0A00
+	b _080E0BE6
+_080E0A00:
+	ldrb r2, [r3, #0x0B]
+	lsls r0, r2, #0x1A
+	lsrs r0, r0, #0x1F
+	movs r1, #0x01
+	eors r1, r0
+	lsls r1, r1, #0x05
+	movs r0, #0x21
+	negs r0, r0
+	ands r0, r2
+	orrs r0, r1
+	strb r0, [r3, #0x0B]
+	ldr r3, _080E0B20 @ =0x03000FDC
+	ldr r2, [r4, #0x00]
+	ldrb r1, [r2, #0x0B]
+	lsls r1, r1, #0x1A
+	lsrs r1, r1, #0x1F
+	lsls r0, r1, #0x02
+	adds r0, r0, r1
+	lsls r0, r0, #0x07
+	ldr r1, _080E0B24 @ =0x00003EF0
+	adds r0, r0, r1
+	ldr r1, [r3, #0x00]
+	adds r0, r1, r0
+	str r0, [sp, #0x01C]
+	ldr r0, _080E0B28 @ =0x000052F0
+	adds r0, r1, r0
+	str r0, [sp, #0x020]
+	movs r1, #0x9C
+	lsls r1, r1, #0x02
+	adds r2, r2, r1
+	ldrb r7, [r2, #0x00]
+	ldr r0, _080E0B2C @ =0x03001034
+	movs r6, #0x01
+	negs r6, r6
+	movs r2, #0xA0
+	lsls r2, r2, #0x02
+	ldr r3, [r0, #0x00]
+	adds r0, r6, #0x0
+	ldr r1, [sp, #0x01C]
+	bl _call_via_r3
+	lsls r0, r7, #0x01
+	adds r0, r0, r7
+	lsls r0, r0, #0x02
+	ldr r2, [sp, #0x020]
+	adds r0, r2, r0
+	adds r1, r0, #0x0
+	subs r1, #0x0C
+	ldr r0, [r1, #0x00]
+	cmp r0, #0x00
+	bge _080E0A68
+	adds r0, #0xFF
+_080E0A68:
+	asrs r0, r0, #0x08
+	ldr r2, [sp, #0x010]
+	adds r0, r0, r2
+	str r0, [sp, #0x004]
+	ldr r0, [r1, #0x04]
+	cmp r0, #0x00
+	bge _080E0A78
+	adds r0, #0xFF
+_080E0A78:
+	asrs r0, r0, #0x08
+	ldr r2, [sp, #0x014]
+	adds r0, r0, r2
+	str r0, [sp, #0x008]
+	ldr r0, [r1, #0x08]
+	cmp r0, #0x00
+	bge _080E0A88
+	adds r0, #0xFF
+_080E0A88:
+	asrs r0, r0, #0x08
+	ldr r1, [sp, #0x018]
+	adds r0, r0, r1
+	str r0, [sp, #0x00C]
+	ldr r0, [r4, #0x00]
+	movs r2, #0x93
+	lsls r2, r2, #0x02
+	adds r0, r0, r2
+	ldr r0, [r0, #0x00]
+	add r4, sp, #0x008
+	add r5, sp, #0x00C
+	movs r1, #0x00
+	str r1, [sp, #0x000]
+	add r1, sp, #0x004
+	adds r2, r4, #0x0
+	adds r3, r5, #0x0
+	bl sub_8082C58
+	subs r7, #0x01
+	cmp r7, r6
+	bne _080E0AB4
+	b _080E0BE6
+_080E0AB4:
+	ldr r1, [sp, #0x020]
+	adds r0, r1, #0x0
+	adds r0, #0x0C
+	str r0, [sp, #0x020]
+	ldr r6, [sp, #0x004]
+	ldr r4, [sp, #0x008]
+	ldr r0, [r1, #0x00]
+	cmp r0, #0x00
+	bge _080E0AC8
+	adds r0, #0xFF
+_080E0AC8:
+	asrs r0, r0, #0x08
+	ldr r2, [sp, #0x010]
+	adds r0, r0, r2
+	str r0, [sp, #0x004]
+	ldr r0, [r1, #0x04]
+	cmp r0, #0x00
+	bge _080E0AD8
+	adds r0, #0xFF
+_080E0AD8:
+	asrs r0, r0, #0x08
+	ldr r2, [sp, #0x014]
+	adds r0, r0, r2
+	str r0, [sp, #0x008]
+	ldr r0, [r1, #0x08]
+	cmp r0, #0x00
+	bge _080E0AE8
+	adds r0, #0xFF
+_080E0AE8:
+	asrs r0, r0, #0x08
+	ldr r1, [sp, #0x018]
+	adds r0, r0, r1
+	str r0, [sp, #0x00C]
+	ldr r0, _080E0B1C @ =0x03000FD8
+	ldr r0, [r0, #0x00]
+	movs r2, #0x93
+	lsls r2, r2, #0x02
+	adds r0, r0, r2
+	ldr r0, [r0, #0x00]
+	movs r1, #0x00
+	str r1, [sp, #0x000]
+	add r1, sp, #0x004
+	add r2, sp, #0x008
+	add r3, sp, #0x00C
+	bl sub_8082C58
+	ldr r0, [sp, #0x008]
+	cmp r4, r0
+	bge _080E0B30
+	adds r5, r6, #0x0
+	adds r3, r4, #0x0
+	ldr r2, [sp, #0x004]
+	adds r1, r0, #0x0
+	ldr r4, [sp, #0x01C]
+	b _080E0B3C
+_080E0B1C: .4byte 0x03000FD8
+_080E0B20: .4byte 0x03000FDC
+_080E0B24: .4byte 0x00003EF0
+_080E0B28: .4byte 0x000052F0
+_080E0B2C: .4byte 0x03001034
+_080E0B30:
+	ldr r5, [sp, #0x004]
+	adds r3, r0, #0x0
+	adds r2, r6, #0x0
+	adds r1, r4, #0x0
+	ldr r4, [sp, #0x01C]
+	adds r4, #0x01
+_080E0B3C:
+	subs r0, r7, #0x1
+	mov r8, r0
+	cmp r1, #0x00
+	ble _080E0BDA
+	cmp r3, #0x9F
+	bgt _080E0BDA
+	subs r6, r2, r5
+	adds r1, #0x01
+	subs r2, r1, r3
+	mov r12, r2
+	cmp r6, #0x00
+	bge _080E0B5E
+	movs r0, #0x01
+	negs r0, r0
+	mov r10, r0
+	negs r6, r6
+	b _080E0B62
+_080E0B5E:
+	movs r2, #0x01
+	mov r10, r2
+_080E0B62:
+	cmp r3, #0x00
+	bge _080E0B7E
+	adds r2, r6, #0x0
+	muls r2, r3
+	subs r7, #0x01
+	mov r8, r7
+	cmp r2, #0x00
+	bge _080E0B7A
+_080E0B72:
+	add r5, r10
+	add r2, r12
+	cmp r2, #0x00
+	blt _080E0B72
+_080E0B7A:
+	movs r3, #0x00
+	b _080E0B88
+_080E0B7E:
+	movs r2, #0x00
+	lsls r0, r3, #0x02
+	adds r4, r4, r0
+	subs r7, #0x01
+	mov r8, r7
+_080E0B88:
+	cmp r1, #0xA0
+	ble _080E0B8E
+	movs r1, #0xA0
+_080E0B8E:
+	subs r1, r1, r3
+	subs r1, #0x01
+	cmp r1, #0x00
+	beq _080E0BDA
+_080E0B96:
+	subs r2, r2, r6
+	subs r1, #0x01
+	mov r9, r1
+	ldrb r3, [r4, #0x00]
+	adds r7, r4, #0x4
+	cmp r2, #0x00
+	bge _080E0BAC
+_080E0BA4:
+	add r5, r10
+	add r2, r12
+	cmp r2, #0x00
+	blt _080E0BA4
+_080E0BAC:
+	cmp r5, #0x00
+	bge _080E0BB4
+	movs r0, #0x00
+	b _080E0BC0
+_080E0BB4:
+	cmp r5, #0xEF
+	bgt _080E0BBE
+	lsls r0, r5, #0x18
+	lsrs r0, r0, #0x18
+	b _080E0BC0
+_080E0BBE:
+	movs r0, #0xF0
+_080E0BC0:
+	adds r1, r3, #0x0
+	cmp r1, #0xFF
+	beq _080E0BD0
+	cmp r1, r0
+	bcs _080E0BCE
+	strb r0, [r4, #0x02]
+	b _080E0BD2
+_080E0BCE:
+	strb r3, [r4, #0x02]
+_080E0BD0:
+	strb r0, [r4, #0x00]
+_080E0BD2:
+	adds r4, r7, #0x0
+	mov r1, r9
+	cmp r1, #0x00
+	bne _080E0B96
+_080E0BDA:
+	mov r7, r8
+	movs r0, #0x01
+	negs r0, r0
+	cmp r7, r0
+	beq _080E0BE6
+	b _080E0AB4
+_080E0BE6:
+	add sp, #0x024
+	pop {r3, r4, r5}
+	mov r8, r3
+	mov r9, r4
+	mov r10, r5
+	pop {r4, r5, r6, r7}
+	pop {r0}
+	bx r0
+	.byte 0x00, 0x00
+	thumb_func_start sub_80E0BF8
+sub_80E0BF8:
+	push {r4, r5, r6, lr}
+	adds r5, r0, #0x0
+	movs r1, #0x10
+	ldsh r0, [r5, r1]
+	cmp r0, #0x00
+	bne _080E0C40
+_080E0C04:
+	ldr r4, [r5, #0x0C]
+	ldr r0, _080E0C78 @ =0x03000FD8
+	ldr r0, [r0, #0x00]
+	movs r2, #0x93
+	lsls r2, r2, #0x02
+	adds r0, r0, r2
+	ldr r0, [r0, #0x00]
+	movs r3, #0x00
+	ldsh r1, [r4, r3]
+	movs r6, #0x12
+	ldsh r2, [r5, r6]
+	subs r1, r1, r2
+	movs r3, #0x02
+	ldsh r2, [r4, r3]
+	movs r6, #0x14
+	ldsh r3, [r5, r6]
+	subs r2, r2, r3
+	bl sub_8082D00
+	ldrh r0, [r4, #0x00]
+	strh r0, [r5, #0x12]
+	ldrh r0, [r4, #0x02]
+	strh r0, [r5, #0x14]
+	ldrh r0, [r4, #0x04]
+	strh r0, [r5, #0x10]
+	adds r4, #0x06
+	str r4, [r5, #0x0C]
+	lsls r0, r0, #0x10
+	cmp r0, #0x00
+	beq _080E0C04
+_080E0C40:
+	ldrh r1, [r5, #0x10]
+	movs r2, #0x10
+	ldsh r0, [r5, r2]
+	cmp r0, #0x00
+	bge _080E0C7C
+	ldr r4, _080E0C78 @ =0x03000FD8
+	ldr r0, [r4, #0x00]
+	movs r3, #0x93
+	lsls r3, r3, #0x02
+	adds r0, r0, r3
+	ldr r0, [r0, #0x00]
+	movs r6, #0x12
+	ldsh r1, [r5, r6]
+	negs r1, r1
+	movs r3, #0x14
+	ldsh r2, [r5, r3]
+	negs r2, r2
+	bl sub_8082D00
+	ldr r2, [r4, #0x00]
+	ldrb r1, [r2, #0x0D]
+	movs r0, #0x03
+	negs r0, r0
+	ands r0, r1
+	strb r0, [r2, #0x0D]
+	movs r0, #0x00
+	str r0, [r5, #0x04]
+	b _080E0C80
+_080E0C78: .4byte 0x03000FD8
+_080E0C7C:
+	subs r0, r1, #0x1
+	strh r0, [r5, #0x10]
+_080E0C80:
+	pop {r4, r5, r6}
+	pop {r0}
+	bx r0
+	.byte 0x00, 0x00
+	thumb_func_start sub_80E0C88
+sub_80E0C88:
+	push {r4, r5, r6, r7, lr}
+	mov r7, r10
+	mov r6, r9
+	mov r5, r8
+	push {r5, r6, r7}
+	add sp, #-0x008
+	adds r5, r0, #0x0
+	ldr r0, _080E0D6C @ =0x03000FD8
+	ldr r0, [r0, #0x00]
+	movs r1, #0x9B
+	lsls r1, r1, #0x02
+	adds r0, r0, r1
+	movs r4, #0x00
+	strh r5, [r0, #0x00]
+	ldr r2, _080E0D70 @ =0x084FB4FC
+	mov r9, r2
+	lsls r0, r5, #0x01
+	add r0, r9
+	ldrh r0, [r0, #0x00]
+	lsls r0, r0, #0x02
+	ldr r1, _080E0D74 @ =0x089F2CE0
+	mov r8, r1
+	add r0, r8
+	ldr r1, [r0, #0x00]
+	add r1, r8
+	ldr r2, _080E0D78 @ =0x06004000
+	movs r3, #0x01
+	negs r3, r3
+	str r4, [sp, #0x000]
+	str r4, [sp, #0x004]
+	movs r0, #0x02
+	bl sub_80827F0
+	adds r0, r5, #0x3
+	lsls r0, r0, #0x01
+	mov r10, r0
+	add r0, r9
+	ldrh r1, [r0, #0x00]
+	lsls r1, r1, #0x02
+	add r1, r8
+	adds r5, #0x02
+	lsls r5, r5, #0x01
+	mov r2, r9
+	adds r0, r5, r2
+	ldrh r0, [r0, #0x00]
+	lsls r0, r0, #0x02
+	add r0, r8
+	ldr r1, [r1, #0x00]
+	ldr r0, [r0, #0x00]
+	subs r7, r1, r0
+	ldr r6, _080E0D7C @ =0x03001034
+	ldr r4, _080E0D80 @ =0x08198154
+	ldr r0, _080E0D84 @ =0x081980D8
+	subs r4, r4, r0
+	ldr r3, [r6, #0x00]
+	adds r3, r3, r4
+	ldr r0, _080E0D88 @ =0x03000FDC
+	ldr r1, [r0, #0x00]
+	ldr r0, _080E0D8C @ =0x00003DF0
+	adds r1, r1, r0
+	ldr r0, _080E0D90 @ =0x02000180
+	adds r2, r7, #0x0
+	bl _call_via_r3
+	ldr r0, [r6, #0x00]
+	adds r3, r0, r4
+	ldr r4, _080E0D94 @ =0x0300034C
+	ldr r1, _080E0D98 @ =0x00000888
+	adds r0, r4, r1
+	ldrb r1, [r0, #0x00]
+	movs r0, #0x06
+	ands r0, r1
+	cmp r0, #0x00
+	beq _080E0D1E
+	mov r5, r10
+_080E0D1E:
+	mov r2, r9
+	adds r0, r5, r2
+	ldrh r0, [r0, #0x00]
+	lsls r0, r0, #0x02
+	add r0, r8
+	ldr r0, [r0, #0x00]
+	add r0, r8
+	ldr r1, _080E0D90 @ =0x02000180
+	adds r2, r7, #0x0
+	bl _call_via_r3
+	adds r2, r7, #0x0
+	cmp r2, #0x00
+	bge _080E0D3C
+	adds r2, #0x1F
+_080E0D3C:
+	asrs r0, r2, #0x05
+	movs r1, #0x08
+	subs r1, r1, r0
+	movs r0, #0xFF
+	lsls r0, r0, #0x08
+	asrs r0, r1
+	ldr r2, _080E0D9C @ =0xFFFFFF00
+	adds r1, r2, #0x0
+	ands r0, r1
+	ldrh r1, [r4, #0x02]
+	orrs r0, r1
+	strh r0, [r4, #0x02]
+	ldr r0, _080E0DA0 @ =0x080E1349
+	movs r1, #0x00
+	bl sub_807FF20
+	add sp, #0x008
+	pop {r3, r4, r5}
+	mov r8, r3
+	mov r9, r4
+	mov r10, r5
+	pop {r4, r5, r6, r7}
+	pop {r0}
+	bx r0
+_080E0D6C: .4byte 0x03000FD8
+_080E0D70: .4byte 0x084FB4FC
+_080E0D74: .4byte 0x089F2CE0
+_080E0D78: .4byte 0x06004000
+_080E0D7C: .4byte 0x03001034
+_080E0D80: .4byte 0x08198154
+_080E0D84: .4byte 0x081980D8
+_080E0D88: .4byte 0x03000FDC
+_080E0D8C: .4byte 0x00003DF0
+_080E0D90: .4byte 0x02000180
+_080E0D94: .4byte 0x0300034C
+_080E0D98: .4byte 0x00000888
+_080E0D9C: .4byte 0xFFFFFF00
+_080E0DA0: .4byte sub_80E1348
+	thumb_func_start sub_80E0DA4
+sub_80E0DA4:
+	push {r4, r5, lr}
+	add sp, #-0x004
+	ldr r5, _080E0E48 @ =0x03000FD8
+	ldr r0, [r5, #0x00]
+	movs r1, #0x9B
+	lsls r1, r1, #0x02
+	adds r0, r0, r1
+	ldrh r1, [r0, #0x00]
+	ldr r4, _080E0E4C @ =0x084FB4FC
+	adds r0, r1, #0x3
+	lsls r0, r0, #0x01
+	adds r0, r0, r4
+	ldrh r2, [r0, #0x00]
+	lsls r2, r2, #0x02
+	ldr r3, _080E0E50 @ =0x089F2CE0
+	adds r2, r2, r3
+	adds r1, #0x02
+	lsls r1, r1, #0x01
+	adds r1, r1, r4
+	ldrh r0, [r1, #0x00]
+	lsls r0, r0, #0x02
+	adds r0, r0, r3
+	ldr r4, [r2, #0x00]
+	ldr r0, [r0, #0x00]
+	subs r4, r4, r0
+	ldr r1, _080E0E54 @ =0x02000180
+	ldr r3, _080E0E58 @ =0x03001034
+	ldr r0, _080E0E5C @ =0x08198154
+	ldr r2, _080E0E60 @ =0x081980D8
+	subs r0, r0, r2
+	ldr r3, [r3, #0x00]
+	adds r3, r3, r0
+	ldr r0, _080E0E64 @ =0x03000FDC
+	ldr r0, [r0, #0x00]
+	ldr r2, _080E0E68 @ =0x00003DF0
+	adds r0, r0, r2
+	adds r2, r4, #0x0
+	bl _call_via_r3
+	ldr r2, _080E0E6C @ =0x0300034C
+	cmp r4, #0x00
+	bge _080E0DFA
+	adds r4, #0x1F
+_080E0DFA:
+	asrs r0, r4, #0x05
+	movs r1, #0x08
+	subs r1, r1, r0
+	movs r0, #0xFF
+	lsls r0, r0, #0x08
+	asrs r0, r1
+	ldr r3, _080E0E70 @ =0xFFFFFF00
+	adds r1, r3, #0x0
+	ands r0, r1
+	ldrh r1, [r2, #0x02]
+	orrs r0, r1
+	movs r3, #0x00
+	strh r0, [r2, #0x02]
+	ldr r0, [r5, #0x00]
+	movs r1, #0x9D
+	lsls r1, r1, #0x02
+	adds r0, r0, r1
+	ldr r1, [r0, #0x00]
+	cmp r1, #0x00
+	beq _080E0E2E
+	str r3, [r1, #0x04]
+	str r3, [r0, #0x00]
+	ldr r0, _080E0E74 @ =0x02000018
+	strh r3, [r0, #0x00]
+	adds r0, #0x02
+	strh r3, [r0, #0x00]
+_080E0E2E:
+	ldr r1, _080E0E78 @ =0x0600F000
+	movs r2, #0x80
+	lsls r2, r2, #0x04
+	str r3, [sp, #0x000]
+	movs r0, #0x00
+	movs r3, #0x20
+	bl sub_80183A4
+	add sp, #0x004
+	pop {r4, r5}
+	pop {r0}
+	bx r0
+	.byte 0x00, 0x00
+_080E0E48: .4byte 0x03000FD8
+_080E0E4C: .4byte 0x084FB4FC
+_080E0E50: .4byte 0x089F2CE0
+_080E0E54: .4byte 0x02000180
+_080E0E58: .4byte 0x03001034
+_080E0E5C: .4byte 0x08198154
+_080E0E60: .4byte 0x081980D8
+_080E0E64: .4byte 0x03000FDC
+_080E0E68: .4byte 0x00003DF0
+_080E0E6C: .4byte 0x0300034C
+_080E0E70: .4byte 0xFFFFFF00
+_080E0E74: .4byte 0x02000018
+_080E0E78: .4byte 0x0600F000
+	.byte 0xF0, 0xB5, 0x57, 0x46, 0x4E, 0x46, 0x45, 0x46, 0xE0, 0xB4, 0x8E, 0xB0, 0xDD, 0x48, 0x05, 0x90
+	.byte 0x00, 0x21, 0x08, 0x91, 0x00, 0x22, 0x09, 0x92, 0x00, 0x23, 0x0A, 0x93, 0xFF, 0x20, 0x00, 0x9E
+	.byte 0x30, 0x40, 0x41, 0x00, 0xD8, 0x4F, 0xC8, 0x19, 0x00, 0x22, 0x86, 0x5E, 0x30, 0x1C, 0x00, 0x28
+	.byte 0x00, 0xDA, 0x3F, 0x30, 0x84, 0x11, 0x05, 0x9B, 0x22, 0x1C, 0x5A, 0x43, 0xD3, 0x4F, 0xC8, 0x19
+	.byte 0x00, 0x21, 0x43, 0x5E, 0x18, 0x1C, 0x00, 0x28, 0x00, 0xDA, 0x3F, 0x30, 0x85, 0x11, 0x05, 0x99
+	.byte 0x28, 0x1C, 0x48, 0x43, 0x12, 0x1A, 0x05, 0x92, 0x22, 0x1C, 0x4A, 0x43, 0x28, 0x1C, 0x48, 0x43
+	.byte 0x12, 0x18, 0x91, 0x46, 0xE0, 0x02, 0x06, 0x90, 0xEF, 0x02, 0x7A, 0x42, 0x07, 0x92, 0xFF, 0x20
+	.byte 0x00, 0x9B, 0x18, 0x40, 0x42, 0x00, 0xC4, 0x4E, 0x90, 0x19, 0x00, 0x21, 0x40, 0x5E, 0x00, 0x28
+	.byte 0x00, 0xDA, 0x3F, 0x30, 0x80, 0x11, 0xC1, 0x02, 0xC0, 0x4B, 0xD0, 0x18, 0x00, 0x26, 0x80, 0x5F
+	.byte 0x88, 0x46, 0xCA, 0x46, 0xFF, 0x20, 0x61, 0x46, 0x08, 0x40, 0x41, 0x00, 0xBA, 0x4A, 0x88, 0x18
+	.byte 0x00, 0x23, 0xC5, 0x5E, 0x28, 0x1C, 0x00, 0x28, 0x00, 0xDA, 0x3F, 0x30, 0x84, 0x11, 0x4E, 0x46
+	.byte 0x66, 0x43, 0xB6, 0x4A, 0x88, 0x18, 0x00, 0x21, 0x43, 0x5E, 0x18, 0x1C, 0x00, 0x28, 0x00, 0xDA
+	.byte 0x3F, 0x30, 0x82, 0x11, 0x08, 0x99, 0x08, 0x1C, 0x50, 0x43, 0x36, 0x1A, 0xB1, 0x46, 0x08, 0x9E
+	.byte 0x31, 0x1C, 0x61, 0x43, 0x50, 0x46, 0x50, 0x43, 0x09, 0x18, 0x08, 0x91, 0x3E, 0x1C, 0x39, 0x1C
+	.byte 0x61, 0x43, 0x09, 0x9F, 0x38, 0x1C, 0x50, 0x43, 0x0F, 0x1A, 0x09, 0x98, 0x01, 0x1C, 0x61, 0x43
+	.byte 0x30, 0x1C, 0x50, 0x43, 0x09, 0x18, 0x09, 0x91, 0x46, 0x46, 0x41, 0x46, 0x61, 0x43, 0x0A, 0x9B
+	.byte 0x18, 0x1C, 0x50, 0x43, 0x09, 0x1A, 0x88, 0x46, 0xFF, 0x20, 0x61, 0x46, 0x01, 0x40, 0x49, 0x00
+	.byte 0x9D, 0x4A, 0x88, 0x18, 0x00, 0x23, 0xC0, 0x5E, 0x00, 0x28, 0x00, 0xDA, 0x3F, 0x30, 0x80, 0x11
+	.byte 0x0A, 0x9B, 0x1A, 0x1C, 0x42, 0x43, 0x99, 0x4B, 0xC8, 0x18, 0x00, 0x21, 0x40, 0x5E, 0x00, 0x28
+	.byte 0x00, 0xDA, 0x3F, 0x30, 0x80, 0x11, 0x70, 0x43, 0x12, 0x18, 0x0A, 0x92, 0x01, 0x9A, 0x00, 0x9B
+	.byte 0xD2, 0x1A, 0x01, 0x92, 0xFF, 0x20, 0x10, 0x40, 0x41, 0x00, 0x8F, 0x4E, 0x88, 0x19, 0x00, 0x22
+	.byte 0x84, 0x5E, 0x20, 0x1C, 0x00, 0x28, 0x00, 0xDA, 0x3F, 0x30, 0x85, 0x11, 0x05, 0x9B, 0x1E, 0x1C
+	.byte 0x6E, 0x43, 0x8A, 0x4A, 0x88, 0x18, 0x00, 0x23, 0xC2, 0x5E, 0x10, 0x1C, 0x00, 0x28, 0x00, 0xDA
+	.byte 0x3F, 0x30, 0x83, 0x11, 0x48, 0x46, 0x58, 0x43, 0x36, 0x1A, 0x05, 0x96, 0x06, 0x9E, 0x06, 0x98
+	.byte 0x01, 0x1C, 0x69, 0x43, 0x38, 0x1C, 0x58, 0x43, 0x09, 0x1A, 0x06, 0x91, 0x39, 0x1C, 0x69, 0x43
+	.byte 0x30, 0x1C, 0x58, 0x43, 0x0F, 0x18, 0x07, 0x9E, 0x07, 0x98, 0x01, 0x1C, 0x69, 0x43, 0x40, 0x46
+	.byte 0x58, 0x43, 0x09, 0x1A, 0x07, 0x91, 0xFF, 0x20, 0x01, 0x99, 0x01, 0x40, 0x49, 0x00, 0x76, 0x4A
+	.byte 0x88, 0x18, 0x00, 0x23, 0xC0, 0x5E, 0x00, 0x28, 0x00, 0xDA, 0x3F, 0x30, 0x80, 0x11, 0x42, 0x46
+	.byte 0x42, 0x43, 0x72, 0x4B, 0xC8, 0x18, 0x00, 0x21, 0x40, 0x5E, 0x00, 0x28, 0x00, 0xDA, 0x3F, 0x30
+	.byte 0x80, 0x11, 0x70, 0x43, 0x12, 0x18, 0x90, 0x46, 0x08, 0x9E, 0xFF, 0x20, 0x02, 0x9A, 0x10, 0x40
+	.byte 0x41, 0x00, 0x69, 0x4B, 0xC8, 0x18, 0x00, 0x22, 0x83, 0x5E, 0x18, 0x1C, 0x00, 0x28, 0x00, 0xDA
+	.byte 0x3F, 0x30, 0x85, 0x11, 0x65, 0x4A, 0x88, 0x18, 0x00, 0x21, 0x42, 0x5E, 0x10, 0x1C, 0x00, 0x28
+	.byte 0x00, 0xDA, 0x3F, 0x30, 0x84, 0x11, 0x05, 0x98, 0x01, 0x1C, 0x69, 0x43, 0x30, 0x1C, 0x60, 0x43
+	.byte 0x09, 0x18, 0x05, 0x91, 0x09, 0x98, 0x06, 0x9E, 0x31, 0x1C, 0x69, 0x43, 0x60, 0x43, 0x09, 0x18
+	.byte 0x06, 0x91, 0x0A, 0x9C, 0xFF, 0x20, 0x02, 0x99, 0x01, 0x40, 0x49, 0x00, 0x56, 0x4A, 0x88, 0x18
+	.byte 0x00, 0x23, 0xC0, 0x5E, 0x00, 0x28, 0x00, 0xDA, 0x3F, 0x30, 0x80, 0x11, 0x07, 0x9E, 0x32, 0x1C
+	.byte 0x42, 0x43, 0x52, 0x4B, 0xC8, 0x18, 0x00, 0x26, 0x80, 0x5F, 0x00, 0x28, 0x00, 0xDA, 0x3F, 0x30
+	.byte 0x80, 0x11, 0x60, 0x43, 0x12, 0x18, 0x07, 0x92, 0x05, 0x99, 0x06, 0x9A, 0x50, 0x1A, 0x03, 0x9B
+	.byte 0x58, 0x43, 0x00, 0x28, 0x00, 0xDA, 0xFF, 0x30, 0x00, 0x12, 0x0B, 0x90, 0x78, 0x1A, 0x04, 0x9E
+	.byte 0x70, 0x43, 0x00, 0x28, 0x00, 0xDA, 0xFF, 0x30, 0x00, 0x12, 0x0C, 0x90, 0x07, 0x9F, 0x78, 0x1A
+	.byte 0x03, 0x99, 0x48, 0x43, 0x00, 0x28, 0x00, 0xDA, 0xFF, 0x30, 0x06, 0x12, 0x42, 0x46, 0x05, 0x9B
+	.byte 0xD0, 0x1A, 0x04, 0x9F, 0x78, 0x43, 0x00, 0x28, 0x00, 0xDA, 0xFF, 0x30, 0x03, 0x12, 0x0B, 0x98
+	.byte 0x01, 0x1C, 0x59, 0x43, 0x0C, 0x9A, 0x10, 0x1C, 0x70, 0x43, 0x09, 0x1A, 0x00, 0x29, 0x00, 0xDA
+	.byte 0xFF, 0x31, 0x0D, 0x12, 0x36, 0x4F, 0xBA, 0x46, 0x36, 0x49, 0x37, 0x48, 0x0C, 0x1A, 0x50, 0x46
+	.byte 0x02, 0x68, 0x12, 0x19, 0x18, 0x03, 0x29, 0x1C, 0xF9, 0xF0, 0x94, 0xFC, 0x0D, 0x90, 0x33, 0x49
+	.byte 0x89, 0x46, 0x48, 0x45, 0x4D, 0xDC, 0x32, 0x4A, 0x90, 0x46, 0x40, 0x45, 0x49, 0xDB, 0x53, 0x46
+	.byte 0x1A, 0x68, 0x12, 0x19, 0x70, 0x42, 0x00, 0x03, 0x29, 0x1C, 0xF9, 0xF0, 0x83, 0xFC, 0x07, 0x1C
+	.byte 0x4F, 0x45, 0x3E, 0xDC, 0x47, 0x45, 0x3C, 0xDB, 0x56, 0x46, 0x32, 0x68, 0x12, 0x19, 0x0C, 0x99
+	.byte 0x48, 0x42, 0x00, 0x03, 0x29, 0x1C, 0xF9, 0xF0, 0x75, 0xFC, 0x06, 0x1C, 0x4E, 0x45, 0x30, 0xDC
+	.byte 0x46, 0x45, 0x2E, 0xDB, 0x53, 0x46, 0x1A, 0x68, 0x12, 0x19, 0x0B, 0x99, 0x08, 0x03, 0x29, 0x1C
+	.byte 0xF9, 0xF0, 0x68, 0xFC, 0x05, 0x1C, 0x4D, 0x45, 0x23, 0xDC, 0x45, 0x45, 0x21, 0xDB, 0x1D, 0x48
+	.byte 0x04, 0x68, 0xE3, 0x79, 0xDA, 0x06, 0xD1, 0x0E, 0x01, 0x39, 0x1F, 0x20, 0x01, 0x40, 0x20, 0x20
+	.byte 0x40, 0x42, 0x18, 0x40, 0x08, 0x43, 0xE0, 0x71, 0x17, 0x49, 0x18, 0x4B, 0xC8, 0x18, 0x00, 0x78
+	.byte 0x00, 0x07, 0xC0, 0x0F, 0x80, 0x02, 0x92, 0x0D, 0x80, 0x31, 0x52, 0x18, 0x80, 0x18, 0xC1, 0x88
+	.byte 0x69, 0x46, 0x89, 0x8E, 0xC1, 0x80, 0xC1, 0x89, 0xC7, 0x81, 0xC1, 0x8A, 0xC6, 0x82, 0xC1, 0x8B
+	.byte 0xC5, 0x83, 0x0E, 0xB0, 0x38, 0xBC, 0x98, 0x46, 0xA1, 0x46, 0xAA, 0x46, 0xF0, 0xBC, 0x01, 0xBC
+	.byte 0x00, 0x47, 0x15, 0xE0, 0x00, 0xF8, 0xFF, 0xFF, 0x84, 0x85, 0x19, 0x08, 0x04, 0x85, 0x19, 0x08
+	.byte 0x38, 0x10, 0x00, 0x03, 0x2C, 0x83, 0x19, 0x08, 0x20, 0x82, 0x19, 0x08, 0xFF, 0x7F, 0x00, 0x00
+	.byte 0x01, 0x80, 0xFF, 0xFF, 0xD8, 0x0F, 0x00, 0x03, 0x4C, 0x03, 0x00, 0x03, 0x88, 0x08, 0x00, 0x00
+	thumb_func_start sub_80E122C
+sub_80E122C:
+	push {r4, r5, r6, r7, lr}
+	cmp r0, #0x00
+	beq _080E127A
+	ldr r4, [r0, #0x4C]
+	cmp r4, #0x00
+	beq _080E127A
+	movs r2, #0x00
+	ldsh r0, [r1, r2]
+	lsls r7, r0, #0x05
+	movs r2, #0x02
+	ldsh r0, [r1, r2]
+	lsls r5, r0, #0x05
+	movs r2, #0x04
+	ldsh r0, [r1, r2]
+	lsls r6, r0, #0x05
+	cmp r5, #0x00
+	bge _080E1264
+	ldr r0, _080E1260 @ =0x03001034
+	adds r1, r4, r6
+	ldr r3, [r0, #0x00]
+	movs r0, #0x00
+	adds r2, r7, #0x0
+	bl _call_via_r3
+	b _080E127A
+	.byte 0x00, 0x00
+_080E1260: .4byte 0x03001034
+_080E1264:
+	ldr r2, _080E1280 @ =0x03001034
+	ldr r0, _080E1284 @ =0x08198154
+	ldr r1, _080E1288 @ =0x081980D8
+	subs r0, r0, r1
+	ldr r3, [r2, #0x00]
+	adds r3, r3, r0
+	adds r0, r4, r5
+	adds r1, r4, r6
+	adds r2, r7, #0x0
+	bl _call_via_r3
+_080E127A:
+	pop {r4, r5, r6, r7}
+	pop {r0}
+	bx r0
+_080E1280: .4byte 0x03001034
+_080E1284: .4byte 0x08198154
+_080E1288: .4byte 0x081980D8
+	thumb_func_start sub_80E128C
+sub_80E128C:
+	push {r4, r5, r6, r7, lr}
+	adds r7, r0, #0x0
+	ldr r1, [r7, #0x08]
+	movs r2, #0x00
+	ldsh r0, [r1, r2]
+	lsls r6, r0, #0x05
+	movs r2, #0x02
+	ldsh r0, [r1, r2]
+	lsls r4, r0, #0x05
+	movs r2, #0x04
+	ldsh r0, [r1, r2]
+	lsls r5, r0, #0x05
+	cmp r4, #0x00
+	bge _080E12C4
+	ldr r0, _080E12BC @ =0x03001034
+	ldr r2, _080E12C0 @ =0x06004000
+	adds r1, r5, r2
+	ldr r3, [r0, #0x00]
+	movs r0, #0x00
+	adds r2, r6, #0x0
+	bl _call_via_r3
+	b _080E12DC
+	.byte 0x00, 0x00
+_080E12BC: .4byte 0x03001034
+_080E12C0: .4byte 0x06004000
+_080E12C4:
+	ldr r2, _080E12E8 @ =0x03001034
+	ldr r0, _080E12EC @ =0x08198154
+	ldr r1, _080E12F0 @ =0x081980D8
+	subs r0, r0, r1
+	ldr r3, [r2, #0x00]
+	adds r3, r3, r0
+	ldr r1, _080E12F4 @ =0x06004000
+	adds r0, r4, r1
+	adds r1, r5, r1
+	adds r2, r6, #0x0
+	bl _call_via_r3
+_080E12DC:
+	movs r0, #0x00
+	str r0, [r7, #0x04]
+	pop {r4, r5, r6, r7}
+	pop {r0}
+	bx r0
+	.byte 0x00, 0x00
+_080E12E8: .4byte 0x03001034
+_080E12EC: .4byte 0x08198154
+_080E12F0: .4byte 0x081980D8
+_080E12F4: .4byte 0x06004000
+	thumb_func_start sub_80E12F8
+sub_80E12F8:
+	push {r4, r5, r6, r7, lr}
+	adds r4, r0, #0x0
+	adds r5, r1, #0x0
+	ldr r7, _080E1338 @ =0x03000FD8
+	ldr r0, [r7, #0x00]
+	movs r6, #0x9D
+	lsls r6, r6, #0x02
+	adds r0, r0, r6
+	ldr r1, [r0, #0x00]
+	cmp r1, #0x00
+	bne _080E1316
+	ldr r0, _080E133C @ =0x080E19ED
+	bl sub_807FFB8
+	adds r1, r0, #0x0
+_080E1316:
+	strh r4, [r1, #0x12]
+	strh r5, [r1, #0x14]
+	ldr r0, _080E1340 @ =0x02000018
+	ldrh r0, [r0, #0x00]
+	lsls r0, r0, #0x08
+	strh r0, [r1, #0x10]
+	ldr r0, _080E1344 @ =0x0200001A
+	ldrh r0, [r0, #0x00]
+	lsls r0, r0, #0x08
+	strh r0, [r1, #0x18]
+	ldr r0, [r7, #0x00]
+	adds r0, r0, r6
+	str r1, [r0, #0x00]
+	pop {r4, r5, r6, r7}
+	pop {r0}
+	bx r0
+	.byte 0x00, 0x00
+_080E1338: .4byte 0x03000FD8
+_080E133C: .4byte sub_80E19EC
+_080E1340: .4byte 0x02000018
+_080E1344: .4byte 0x0200001A
+	thumb_func_start sub_80E1348
+sub_80E1348:
+	push {r4, r5, lr}
+	adds r5, r0, #0x0
+	ldr r0, _080E13A0 @ =0x03000FD8
+	ldr r0, [r0, #0x00]
+	movs r1, #0x9B
+	lsls r1, r1, #0x02
+	adds r0, r0, r1
+	ldrh r0, [r0, #0x00]
+	ldr r1, _080E13A4 @ =0x084FB4FC
+	adds r0, #0x01
+	lsls r0, r0, #0x01
+	adds r0, r0, r1
+	ldrh r0, [r0, #0x00]
+	lsls r0, r0, #0x02
+	ldr r1, _080E13A8 @ =0x089F2CE0
+	adds r0, r0, r1
+	ldr r0, [r0, #0x00]
+	ldr r3, _080E13AC @ =0x80008000
+	adds r0, r0, r1
+	ldr r2, _080E13B0 @ =0x0600F000
+	movs r4, #0x80
+	lsls r4, r4, #0x02
+_080E1374:
+	ldr r1, [r0, #0x00]
+	adds r1, r1, r3
+	str r1, [r2, #0x00]
+	ldr r1, [r0, #0x04]
+	adds r1, r1, r3
+	str r1, [r2, #0x04]
+	ldr r1, [r0, #0x08]
+	adds r1, r1, r3
+	str r1, [r2, #0x08]
+	ldr r1, [r0, #0x0C]
+	adds r1, r1, r3
+	str r1, [r2, #0x0C]
+	adds r0, #0x10
+	adds r2, #0x10
+	subs r4, #0x04
+	cmp r4, #0x00
+	bne _080E1374
+	str r4, [r5, #0x04]
+	pop {r4, r5}
+	pop {r0}
+	bx r0
+	.byte 0x00, 0x00
+_080E13A0: .4byte 0x03000FD8
+_080E13A4: .4byte 0x084FB4FC
+_080E13A8: .4byte 0x089F2CE0
+_080E13AC: .4byte 0x80008000
+_080E13B0: .4byte 0x0600F000
+	thumb_func_start sub_80E13B4
+sub_80E13B4:
+	push {r4, lr}
+	adds r2, r0, #0x0
+	ldr r0, _080E13D0 @ =0x03000FD8
+	ldr r4, [r0, #0x00]
+	ldrb r1, [r4, #0x0D]
+	movs r0, #0x02
+	ands r0, r1
+	lsls r0, r0, #0x18
+	lsrs r3, r0, #0x18
+	cmp r3, #0x00
+	beq _080E13D4
+	movs r0, #0x00
+	b _080E13EA
+	.byte 0x00, 0x00
+_080E13D0: .4byte 0x03000FD8
+_080E13D4:
+	movs r0, #0x02
+	orrs r0, r1
+	strb r0, [r4, #0x0D]
+	ldr r1, [r2, #0x0C]
+	strh r3, [r2, #0x12]
+	strh r3, [r2, #0x14]
+	ldrh r0, [r1, #0x00]
+	strh r0, [r2, #0x10]
+	adds r1, #0x02
+	str r1, [r2, #0x0C]
+	ldr r0, _080E13F4 @ =0x080E0BF9
+_080E13EA:
+	str r0, [r2, #0x04]
+	pop {r4}
+	pop {r0}
+	bx r0
+	.byte 0x00, 0x00
+_080E13F4: .4byte sub_80E0BF8
+	thumb_func_start sub_80E13F8
+sub_80E13F8:
+	push {r4, r5, r6, lr}
+	adds r4, r0, #0x0
+	ldr r0, _080E14F0 @ =0x03000FD8
+	ldr r3, [r0, #0x00]
+	movs r5, #0x98
+	lsls r5, r5, #0x02
+	adds r0, r3, r5
+	ldr r0, [r0, #0x00]
+	cmp r0, #0x00
+	beq _080E14EA
+	ldr r0, _080E14F4 @ =0x03000FDC
+	ldr r6, [r0, #0x00]
+	ldr r0, _080E14F8 @ =0x000052F0
+	adds r0, r0, r6
+	mov r12, r0
+	adds r5, #0x10
+	adds r0, r3, r5
+	ldrb r0, [r0, #0x00]
+	cmp r0, #0x00
+	beq _080E14EA
+	lsls r5, r4, #0x08
+	lsls r4, r1, #0x08
+	lsls r2, r2, #0x08
+	adds r1, r0, #0x0
+	negs r3, r1
+	movs r0, #0x03
+	ands r3, r0
+	cmp r3, #0x00
+	beq _080E148E
+	cmp r3, #0x03
+	bge _080E1470
+	cmp r3, #0x02
+	bge _080E1456
+	mov r0, r12
+	ldr r3, [r0, #0x00]
+	adds r3, r3, r5
+	str r3, [r0, #0x00]
+	ldr r3, [r0, #0x04]
+	adds r3, r3, r4
+	str r3, [r0, #0x04]
+	ldr r3, [r0, #0x08]
+	adds r3, r3, r2
+	str r3, [r0, #0x08]
+	ldr r0, _080E14FC @ =0x000052FC
+	adds r0, r0, r6
+	mov r12, r0
+	subs r1, #0x01
+_080E1456:
+	mov r6, r12
+	ldr r3, [r6, #0x00]
+	adds r3, r3, r5
+	str r3, [r6, #0x00]
+	ldr r3, [r6, #0x04]
+	adds r3, r3, r4
+	str r3, [r6, #0x04]
+	ldr r3, [r6, #0x08]
+	adds r3, r3, r2
+	str r3, [r6, #0x08]
+	movs r0, #0x0C
+	add r12, r0
+	subs r1, #0x01
+_080E1470:
+	mov r6, r12
+	ldr r3, [r6, #0x00]
+	adds r3, r3, r5
+	str r3, [r6, #0x00]
+	ldr r3, [r6, #0x04]
+	adds r3, r3, r4
+	str r3, [r6, #0x04]
+	ldr r3, [r6, #0x08]
+	adds r3, r3, r2
+	str r3, [r6, #0x08]
+	movs r0, #0x0C
+	add r12, r0
+	subs r1, #0x01
+	cmp r1, #0x00
+	beq _080E14EA
+_080E148E:
+	mov r6, r12
+	ldr r3, [r6, #0x00]
+	adds r3, r3, r5
+	str r3, [r6, #0x00]
+	ldr r3, [r6, #0x04]
+	adds r3, r3, r4
+	str r3, [r6, #0x04]
+	ldr r3, [r6, #0x08]
+	adds r3, r3, r2
+	str r3, [r6, #0x08]
+	mov r0, r12
+	adds r0, #0x0C
+	ldr r3, [r6, #0x0C]
+	adds r3, r3, r5
+	str r3, [r6, #0x0C]
+	ldr r3, [r0, #0x04]
+	adds r3, r3, r4
+	str r3, [r0, #0x04]
+	ldr r3, [r0, #0x08]
+	adds r3, r3, r2
+	str r3, [r0, #0x08]
+	adds r0, #0x0C
+	ldr r3, [r6, #0x18]
+	adds r3, r3, r5
+	str r3, [r6, #0x18]
+	ldr r3, [r0, #0x04]
+	adds r3, r3, r4
+	str r3, [r0, #0x04]
+	ldr r3, [r0, #0x08]
+	adds r3, r3, r2
+	str r3, [r0, #0x08]
+	adds r0, #0x0C
+	ldr r3, [r6, #0x24]
+	adds r3, r3, r5
+	str r3, [r6, #0x24]
+	ldr r3, [r0, #0x04]
+	adds r3, r3, r4
+	str r3, [r0, #0x04]
+	ldr r3, [r0, #0x08]
+	adds r3, r3, r2
+	str r3, [r0, #0x08]
+	movs r0, #0x30
+	add r12, r0
+	subs r1, #0x04
+	cmp r1, #0x00
+	bne _080E148E
+_080E14EA:
+	pop {r4, r5, r6}
+	pop {r0}
+	bx r0
+_080E14F0: .4byte 0x03000FD8
+_080E14F4: .4byte 0x03000FDC
+_080E14F8: .4byte 0x000052F0
+_080E14FC: .4byte 0x000052FC
+	thumb_func_start sub_80E1500
+sub_80E1500:
+	push {r4, r5, r6, lr}
+	adds r2, r0, #0x0
+	ldr r0, _080E162C @ =0x03000FD8
+	ldr r3, [r0, #0x00]
+	movs r1, #0x98
+	lsls r1, r1, #0x02
+	adds r0, r3, r1
+	ldr r0, [r0, #0x00]
+	cmp r0, #0x00
+	bne _080E1516
+	b _080E1624
+_080E1516:
+	ldr r0, _080E1630 @ =0x03000FDC
+	ldr r5, [r0, #0x00]
+	ldr r6, _080E1634 @ =0x000052F0
+	adds r4, r5, r6
+	movs r0, #0x00
+	ldsh r1, [r2, r0]
+	adds r2, #0x02
+	movs r6, #0x9C
+	lsls r6, r6, #0x02
+	adds r0, r3, r6
+	strb r1, [r0, #0x00]
+	cmp r1, #0x00
+	ble _080E1624
+	adds r3, r4, #0x0
+	adds r4, r1, #0x0
+	negs r1, r4
+	movs r0, #0x03
+	ands r1, r0
+	cmp r1, #0x00
+	beq _080E15B2
+	cmp r1, #0x03
+	bge _080E158C
+	cmp r1, #0x02
+	bge _080E156A
+	movs r0, #0x00
+	ldsh r1, [r2, r0]
+	lsls r1, r1, #0x08
+	str r1, [r3, #0x00]
+	adds r2, #0x02
+	movs r6, #0x00
+	ldsh r1, [r2, r6]
+	lsls r1, r1, #0x08
+	str r1, [r3, #0x04]
+	adds r2, #0x02
+	movs r0, #0x00
+	ldsh r1, [r2, r0]
+	lsls r1, r1, #0x08
+	str r1, [r3, #0x08]
+	adds r2, #0x02
+	ldr r1, _080E1638 @ =0x000052FC
+	adds r3, r5, r1
+	subs r4, #0x01
+_080E156A:
+	movs r5, #0x00
+	ldsh r1, [r2, r5]
+	lsls r1, r1, #0x08
+	str r1, [r3, #0x00]
+	adds r2, #0x02
+	movs r6, #0x00
+	ldsh r1, [r2, r6]
+	lsls r1, r1, #0x08
+	str r1, [r3, #0x04]
+	adds r2, #0x02
+	movs r0, #0x00
+	ldsh r1, [r2, r0]
+	lsls r1, r1, #0x08
+	str r1, [r3, #0x08]
+	adds r2, #0x02
+	adds r3, #0x0C
+	subs r4, #0x01
+_080E158C:
+	movs r5, #0x00
+	ldsh r1, [r2, r5]
+	lsls r1, r1, #0x08
+	str r1, [r3, #0x00]
+	adds r2, #0x02
+	movs r6, #0x00
+	ldsh r1, [r2, r6]
+	lsls r1, r1, #0x08
+	str r1, [r3, #0x04]
+	adds r2, #0x02
+	movs r0, #0x00
+	ldsh r1, [r2, r0]
+	lsls r1, r1, #0x08
+	str r1, [r3, #0x08]
+	adds r2, #0x02
+	adds r3, #0x0C
+	subs r4, #0x01
+	cmp r4, #0x00
+	beq _080E1624
+_080E15B2:
+	movs r5, #0x00
+	ldsh r1, [r2, r5]
+	lsls r1, r1, #0x08
+	str r1, [r3, #0x00]
+	movs r6, #0x02
+	ldsh r1, [r2, r6]
+	lsls r1, r1, #0x08
+	str r1, [r3, #0x04]
+	movs r0, #0x04
+	ldsh r1, [r2, r0]
+	lsls r1, r1, #0x08
+	str r1, [r3, #0x08]
+	adds r0, r3, #0x0
+	adds r0, #0x0C
+	movs r5, #0x06
+	ldsh r1, [r2, r5]
+	lsls r1, r1, #0x08
+	str r1, [r3, #0x0C]
+	movs r6, #0x08
+	ldsh r1, [r2, r6]
+	lsls r1, r1, #0x08
+	str r1, [r0, #0x04]
+	movs r5, #0x0A
+	ldsh r1, [r2, r5]
+	lsls r1, r1, #0x08
+	str r1, [r0, #0x08]
+	adds r0, #0x0C
+	movs r6, #0x0C
+	ldsh r1, [r2, r6]
+	lsls r1, r1, #0x08
+	str r1, [r3, #0x18]
+	movs r5, #0x0E
+	ldsh r1, [r2, r5]
+	lsls r1, r1, #0x08
+	str r1, [r0, #0x04]
+	movs r6, #0x10
+	ldsh r1, [r2, r6]
+	lsls r1, r1, #0x08
+	str r1, [r0, #0x08]
+	adds r0, #0x0C
+	movs r5, #0x12
+	ldsh r1, [r2, r5]
+	lsls r1, r1, #0x08
+	str r1, [r3, #0x24]
+	movs r6, #0x14
+	ldsh r1, [r2, r6]
+	lsls r1, r1, #0x08
+	str r1, [r0, #0x04]
+	movs r5, #0x16
+	ldsh r1, [r2, r5]
+	lsls r1, r1, #0x08
+	str r1, [r0, #0x08]
+	adds r2, #0x18
+	adds r3, #0x30
+	subs r4, #0x04
+	cmp r4, #0x00
+	bne _080E15B2
+_080E1624:
+	pop {r4, r5, r6}
+	pop {r0}
+	bx r0
+	.byte 0x00, 0x00
+_080E162C: .4byte 0x03000FD8
+_080E1630: .4byte 0x03000FDC
+_080E1634: .4byte 0x000052F0
+_080E1638: .4byte 0x000052FC
+	thumb_func_start sub_80E163C
+sub_80E163C:
+	push {lr}
+	ldr r0, _080E1674 @ =0x03000FD8
+	ldr r0, [r0, #0x00]
+	movs r1, #0x98
+	lsls r1, r1, #0x02
+	adds r0, r0, r1
+	ldr r0, [r0, #0x00]
+	bl _call_via_r0
+	ldr r0, _080E1678 @ =0x04000040
+	movs r1, #0x00
+	strh r1, [r0, #0x00]
+	adds r0, #0x02
+	strh r1, [r0, #0x00]
+	ldr r3, _080E167C @ =0x03001034
+	ldr r0, _080E1680 @ =0xE1FFE1FF
+	ldr r1, _080E1684 @ =0x0600F000
+	movs r2, #0xA0
+	lsls r2, r2, #0x03
+	ldr r3, [r3, #0x00]
+	bl _call_via_r3
+	ldr r1, _080E1688 @ =0x080E1A2D
+	movs r0, #0x02
+	bl sub_8018B78
+	pop {r0}
+	bx r0
+_080E1674: .4byte 0x03000FD8
+_080E1678: .4byte 0x04000040
+_080E167C: .4byte 0x03001034
+_080E1680: .4byte 0xE1FFE1FF
+_080E1684: .4byte 0x0600F000
+_080E1688: .4byte sub_80E1A2C
+	.byte 0xF0, 0xB5, 0x4F, 0x46, 0x46, 0x46, 0xC0, 0xB4, 0x04, 0x1C, 0x0F, 0x1C, 0x16, 0x1C, 0x1D, 0x1C
+	.byte 0xA1, 0x00, 0x09, 0x19, 0xC9, 0x00, 0x30, 0x4A, 0x01, 0x20, 0x37, 0xF7, 0x21, 0xFB, 0x84, 0x46
+	.byte 0x00, 0x2C, 0x4F, 0xDD, 0x90, 0x20, 0x00, 0x01, 0x81, 0x46, 0x01, 0x21, 0x88, 0x46, 0x62, 0x46
+	.byte 0x21, 0x1C, 0x4B, 0x42, 0x03, 0x20, 0x03, 0x40, 0x00, 0x2B, 0x20, 0xD0, 0x03, 0x2B, 0x13, 0xDA
+	.byte 0x02, 0x2B, 0x08, 0xDA, 0x17, 0x61, 0x56, 0x61, 0x95, 0x61, 0x4B, 0x46, 0x13, 0x80, 0x40, 0x46
+	.byte 0x90, 0x70, 0x28, 0x32, 0x01, 0x39, 0x17, 0x61, 0x56, 0x61, 0x95, 0x61, 0x4B, 0x46, 0x13, 0x80
+	.byte 0x40, 0x46, 0x90, 0x70, 0x28, 0x32, 0x01, 0x39, 0x17, 0x61, 0x56, 0x61, 0x95, 0x61, 0x4B, 0x46
+	.byte 0x13, 0x80, 0x40, 0x46, 0x90, 0x70, 0x28, 0x32, 0x01, 0x39, 0x00, 0x29, 0x22, 0xD0, 0x17, 0x61
+	.byte 0x56, 0x61, 0x95, 0x61, 0x4B, 0x46, 0x13, 0x80, 0x40, 0x46, 0x90, 0x70, 0x10, 0x1C, 0x28, 0x30
+	.byte 0x07, 0x61, 0x46, 0x61, 0x85, 0x61, 0x13, 0x85, 0x43, 0x46, 0x83, 0x70, 0x28, 0x30, 0x07, 0x61
+	.byte 0x46, 0x61, 0x85, 0x61, 0x4B, 0x46, 0x03, 0x80, 0x43, 0x46, 0x83, 0x70, 0x28, 0x30, 0x07, 0x61
+	.byte 0x46, 0x61, 0x85, 0x61, 0x4B, 0x46, 0x03, 0x80, 0x43, 0x46, 0x83, 0x70, 0xA0, 0x32, 0x04, 0x39
+	.byte 0x00, 0x29, 0xDC, 0xD1, 0x00, 0x20, 0x61, 0x46, 0x88, 0x70, 0x60, 0x46, 0x18, 0xBC, 0x98, 0x46
+	.byte 0xA1, 0x46, 0xF0, 0xBC, 0x02, 0xBC, 0x08, 0x47, 0xE8, 0x00, 0x20, 0x08, 0xC8, 0x21, 0x49, 0x00
+	.byte 0x01, 0x82, 0x11, 0x8A, 0x49, 0x42, 0x41, 0x82, 0xFA, 0x21, 0x49, 0x00, 0xC1, 0x82, 0x01, 0x20
+	.byte 0x70, 0x47, 0x00, 0x00
+	thumb_func_start sub_80E1780
+sub_80E1780:
+	push {r4, r5, r6, r7, lr}
+	mov r7, r8
+	push {r7}
+	adds r4, r0, #0x0
+	adds r6, r1, #0x0
+	movs r0, #0x00
+	mov r8, r0
+	str r0, [r4, #0x08]
+	bl sub_8199F30
+	adds r2, r0, #0x0
+	movs r5, #0xFF
+	ands r0, r5
+	movs r3, #0x80
+	lsls r3, r3, #0x01
+	adds r0, r0, r3
+	movs r7, #0x00
+	ldsh r1, [r6, r7]
+	muls r0, r1
+	lsrs r0, r0, #0x08
+	strh r0, [r4, #0x16]
+	lsrs r2, r2, #0x08
+	adds r0, r2, #0x0
+	ands r0, r5
+	adds r0, r0, r3
+	movs r7, #0x02
+	ldsh r1, [r6, r7]
+	muls r0, r1
+	lsrs r0, r0, #0x08
+	strh r0, [r4, #0x12]
+	lsrs r2, r2, #0x08
+	adds r0, r2, #0x0
+	ands r0, r5
+	adds r0, r0, r3
+	movs r3, #0x04
+	ldsh r1, [r6, r3]
+	muls r0, r1
+	lsrs r0, r0, #0x08
+	strh r0, [r4, #0x18]
+	mov r7, r8
+	strh r7, [r4, #0x10]
+	lsrs r2, r2, #0x08
+	strh r2, [r4, #0x14]
+	movs r0, #0x01
+	ands r0, r2
+	adds r0, #0x01
+	pop {r3}
+	mov r8, r3
+	pop {r4, r5, r6, r7}
+	pop {r1}
+	bx r1
+	.byte 0x00, 0x00
+	thumb_func_start sub_80E17E8
+sub_80E17E8:
+	push {r4, r5, r6, lr}
+	adds r3, r0, #0x0
+	adds r4, r1, #0x0
+	movs r0, #0x10
+	ldsh r1, [r3, r0]
+	ldr r0, [r3, #0x04]
+	adds r0, r0, r1
+	str r0, [r3, #0x04]
+	movs r1, #0x12
+	ldsh r0, [r3, r1]
+	ldr r2, [r3, #0x08]
+	adds r2, r2, r0
+	str r2, [r3, #0x08]
+	movs r6, #0x14
+	ldsh r1, [r3, r6]
+	ldr r0, [r3, #0x0C]
+	adds r0, r0, r1
+	str r0, [r3, #0x0C]
+	ldrh r0, [r4, #0x04]
+	ldrh r1, [r3, #0x12]
+	adds r0, r0, r1
+	movs r5, #0x00
+	strh r0, [r3, #0x12]
+	cmp r2, #0x00
+	blt _080E1844
+	lsls r0, r0, #0x10
+	asrs r0, r0, #0x10
+	ldrh r2, [r4, #0x06]
+	movs r6, #0x06
+	ldsh r1, [r4, r6]
+	cmp r0, r1
+	bge _080E182C
+	strh r5, [r3, #0x16]
+	b _080E1844
+_080E182C:
+	movs r1, #0x12
+	ldsh r0, [r3, r1]
+	negs r0, r0
+	lsls r1, r0, #0x01
+	adds r0, r1, r0
+	cmp r0, #0x00
+	bge _080E183C
+	adds r0, #0x03
+_080E183C:
+	asrs r0, r0, #0x02
+	adds r0, r2, r0
+	strh r0, [r3, #0x12]
+	str r5, [r3, #0x08]
+_080E1844:
+	pop {r4, r5, r6}
+	pop {r0}
+	bx r0
+	.byte 0x00, 0x00
+	thumb_func_start sub_80E184C
+sub_80E184C:
+	push {r4, lr}
+	adds r2, r0, #0x0
+	adds r3, r1, #0x0
+	movs r1, #0x14
+	ldsh r0, [r2, r1]
+	ldr r1, [r2, #0x0C]
+	adds r1, r1, r0
+	str r1, [r2, #0x0C]
+	cmp r0, #0x00
+	bge _080E186C
+	ldr r0, _080E1868 @ =0xFFFF8000
+	cmp r1, r0
+	bge _080E187A
+	b _080E1876
+_080E1868: .4byte 0xFFFF8000
+_080E186C:
+	movs r4, #0x06
+	ldsh r0, [r3, r4]
+	lsls r0, r0, #0x08
+	cmp r0, r1
+	bge _080E187A
+_080E1876:
+	movs r0, #0x00
+	strh r0, [r2, #0x16]
+_080E187A:
+	pop {r4}
+	pop {r0}
+	bx r0
+	thumb_func_start sub_80E1880
+sub_80E1880:
+	push {r4, lr}
+	adds r4, r2, #0x0
+	ldr r3, [r0, #0x08]
+	cmp r3, #0x00
+	beq _080E18CE
+	cmp r1, #0x00
+	beq _080E18BC
+	lsls r1, r1, #0x01
+	ldr r0, _080E18A8 @ =0x0838F8B2
+	adds r2, r1, r0
+	ldrb r1, [r3, #0x11]
+	movs r0, #0x40
+	ands r0, r1
+	cmp r0, #0x00
+	beq _080E18AC
+	ldrh r0, [r3, #0x00]
+	ldrh r1, [r2, #0x00]
+	subs r0, r0, r1
+	b _080E18B2
+	.byte 0x00, 0x00
+_080E18A8: .4byte 0x0838F8B2
+_080E18AC:
+	ldrh r0, [r2, #0x00]
+	ldrh r1, [r3, #0x00]
+	adds r0, r0, r1
+_080E18B2:
+	strh r0, [r3, #0x00]
+	ldrh r0, [r2, #0x02]
+	ldrh r1, [r3, #0x02]
+	adds r0, r0, r1
+	strh r0, [r3, #0x02]
+_080E18BC:
+	cmp r4, #0x00
+	beq _080E18CE
+	lsls r0, r4, #0x01
+	ldr r1, _080E18D4 @ =0x0838F8B2
+	adds r0, r0, r1
+	ldrh r1, [r0, #0x00]
+	strh r1, [r3, #0x04]
+	ldrh r0, [r0, #0x02]
+	strh r0, [r3, #0x06]
+_080E18CE:
+	pop {r4}
+	pop {r0}
+	bx r0
+_080E18D4: .4byte 0x0838F8B2
+	thumb_func_start sub_80E18D8
+sub_80E18D8:
+	push {r4, r5, lr}
+	adds r5, r0, #0x0
+	ldr r1, [r5, #0x0C]
+	ldrh r0, [r1, #0x00]
+	movs r2, #0x02
+	ldsh r1, [r1, r2]
+	movs r2, #0x02
+	movs r3, #0x01
+	bl sub_8084338
+	adds r4, r0, #0x0
+	bl sub_807BC90
+	str r4, [r5, #0x08]
+	ldr r1, _080E1904 @ =0x080E1AB1
+	str r1, [r5, #0x04]
+	adds r0, r5, #0x0
+	bl _call_via_r1
+	pop {r4, r5}
+	pop {r0}
+	bx r0
+_080E1904: .4byte sub_80E1AB0
+	thumb_func_start sub_80E1908
+sub_80E1908:
+	push {lr}
+	ldr r1, [r0, #0x0C]
+	ldrh r2, [r1, #0x00]
+	strh r2, [r0, #0x10]
+	adds r1, #0x02
+	str r1, [r0, #0x0C]
+	ldr r1, _080E1920 @ =0x080DF5ED
+	str r1, [r0, #0x04]
+	bl _call_via_r1
+	pop {r0}
+	bx r0
+_080E1920: .4byte sub_80DF5EC
+	thumb_func_start sub_80E1924
+sub_80E1924:
+	push {lr}
+	ldr r1, [r0, #0x0C]
+	ldrh r2, [r1, #0x00]
+	strh r2, [r0, #0x10]
+	adds r1, #0x02
+	str r1, [r0, #0x0C]
+	ldr r1, _080E193C @ =0x080E1AF1
+	str r1, [r0, #0x04]
+	bl _call_via_r1
+	pop {r0}
+	bx r0
+_080E193C: .4byte sub_80E1AF0
+	thumb_func_start sub_80E1940
+sub_80E1940:
+	push {lr}
+	ldr r1, [r0, #0x0C]
+	ldrh r2, [r1, #0x00]
+	strh r2, [r0, #0x10]
+	adds r1, #0x02
+	str r1, [r0, #0x0C]
+	ldr r1, _080E1958 @ =0x080DF2B1
+	str r1, [r0, #0x04]
+	bl _call_via_r1
+	pop {r0}
+	bx r0
+_080E1958: .4byte sub_80DF2B0
+	thumb_func_start sub_80E195C
+sub_80E195C:
+	push {r4, r5, r6, lr}
+	mov r12, r1
+	mov r2, r12
+	adds r2, #0x78
+	ldrh r5, [r2, #0x00]
+	mov r3, r12
+	adds r3, #0x7A
+	ldrh r6, [r3, #0x00]
+	movs r1, #0x00
+	strh r1, [r2, #0x00]
+	strh r1, [r3, #0x00]
+	str r1, [r0, #0x5C]
+	str r1, [r0, #0x60]
+	cmp r5, #0x00
+	beq _080E19A0
+	mov r4, r12
+	adds r4, #0x7E
+	ldrb r1, [r4, #0x00]
+	movs r0, #0x38
+	ands r0, r1
+	cmp r0, #0x00
+	beq _080E19A0
+	mov r0, r12
+	adds r0, #0x08
+	adds r1, r6, #0x0
+	adds r2, r5, #0x0
+	movs r3, #0x00
+	bl sub_8082E1C
+	ldrb r1, [r4, #0x00]
+	movs r0, #0x39
+	negs r0, r0
+	ands r0, r1
+	strb r0, [r4, #0x00]
+_080E19A0:
+	pop {r4, r5, r6}
+	pop {r0}
+	bx r0
+	.byte 0x00, 0x00
+	thumb_func_start sub_80E19A8
+sub_80E19A8:
+	push {r4, lr}
+	adds r4, r0, #0x0
+	ldrh r1, [r4, #0x10]
+	movs r2, #0x10
+	ldsh r0, [r4, r2]
+	cmp r0, #0x00
+	ble _080E19BC
+	subs r0, r1, #0x1
+	strh r0, [r4, #0x10]
+	b _080E19C4
+_080E19BC:
+	bl sub_807F6D0
+	movs r0, #0x00
+	str r0, [r4, #0x04]
+_080E19C4:
+	pop {r4}
+	pop {r0}
+	bx r0
+	.byte 0x00, 0x00

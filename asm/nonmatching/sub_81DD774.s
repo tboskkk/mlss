@@ -1,0 +1,7 @@
+	.syntax unified
+	.text
+
+	thumb_func_start sub_81DD774
+sub_81DD774:
+	bx pc
+	.byte 0xC0, 0x46, 0xE2, 0x8B, 0xF8, 0xEA

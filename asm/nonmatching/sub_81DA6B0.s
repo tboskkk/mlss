@@ -1,0 +1,9 @@
+	.syntax unified
+	.text
+
+	thumb_func_start sub_81DA6B0
+sub_81DA6B0:
+	movs r0, #0x00
+	swi #25
+	bx lr
+	.byte 0x00, 0x00

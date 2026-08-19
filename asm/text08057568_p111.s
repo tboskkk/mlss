@@ -1,0 +1,59 @@
+	.include "asm/macros.inc"
+
+	.syntax unified
+	.text
+
+	thumb_func_start sub_8163280
+sub_8163280:
+	push {lr}
+	adds r2, r0, #0x0
+	movs r0, #0x01
+	ands r0, r1
+	cmp r0, #0x00
+	beq _08163292
+	adds r0, r2, #0x0
+	bl free_heap_8018DA8
+_08163292:
+	pop {r0}
+	bx r0
+	.byte 0x00, 0x00
+	thumb_func_start sub_8163298
+sub_8163298:
+	movs r2, #0x00
+	strh r1, [r0, #0x20]
+	str r2, [r0, #0x24]
+	str r2, [r0, #0x1C]
+	str r2, [r0, #0x18]
+	str r2, [r0, #0x14]
+	str r2, [r0, #0x10]
+	str r2, [r0, #0x0C]
+	str r2, [r0, #0x08]
+	str r2, [r0, #0x04]
+	str r2, [r0, #0x00]
+	str r2, [r0, #0x2C]
+	str r2, [r0, #0x28]
+	bx lr
+	.byte 0x00, 0xB5, 0x00, 0x22, 0x41, 0x88, 0x00, 0x88, 0x81, 0x42, 0x00, 0xD3, 0x01, 0x22, 0x10, 0x1C
+	.byte 0x02, 0xBC, 0x08, 0x47
+	thumb_func_start sub_81632C8
+sub_81632C8:
+	push {lr}
+	adds r1, r0, #0x0
+	ldrh r0, [r1, #0x02]
+	ldrh r2, [r1, #0x00]
+	cmp r0, r2
+	bcs _081632E4
+	adds r0, #0x01
+	strh r0, [r1, #0x02]
+	lsls r0, r0, #0x10
+	lsrs r0, r0, #0x10
+	cmp r0, r2
+	bcs _081632E4
+	movs r0, #0x00
+	b _081632E6
+_081632E4:
+	movs r0, #0x01
+_081632E6:
+	pop {r1}
+	bx r1
+	.byte 0x00, 0x00
