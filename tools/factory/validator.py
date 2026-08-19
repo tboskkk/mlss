@@ -126,20 +126,21 @@ def main():
     while True:
         did_any = False
         while True:
+            # Fresh connection every iteration, closed at the end -- see
+            # tier1.py's main() and its immediately-following commit.
+            # Matters especially here: this is the one process that
+            # touches git, so a wedged/silent validator means real matches
+            # sit unverified indefinitely with no visible sign anything's
+            # wrong.
+            conn = db.connect()
             try:
-                # Fresh connection every iteration -- see tier1.py's main()
-                # for why: a long-lived connection can wedge silently after
-                # an early lock-contention error and never recover. Matters
-                # especially here: this is the one process that touches
-                # git, so a wedged/silent validator means real matches sit
-                # unverified indefinitely with no visible sign anything's
-                # wrong.
-                conn = db.connect()
                 name = validate_one(conn)
             except Exception as e:
                 # See scanner.py's main() for why this matters.
                 print(f"[{time.strftime('%H:%M:%S')}] !! validator validate_one() failed, skipping: {e}")
                 break
+            finally:
+                conn.close()
             if name is None:
                 break
             did_any = True
