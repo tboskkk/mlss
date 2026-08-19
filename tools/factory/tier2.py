@@ -240,7 +240,19 @@ def main():
 
     conn = db.connect()
     while True:
-        n = run_pool(conn, args.jobs, args.stall_min, args.max_functions)
+        try:
+            n = run_pool(conn, args.jobs, args.stall_min, args.max_functions)
+        except Exception as e:
+            # See scanner.py's main() for why this matters. Note this one
+            # matters more than most: run_pool() owns real running
+            # containers via _active, and _cleanup_all() is only wired to
+            # atexit/SIGTERM, not to an in-loop exception -- so on a real
+            # crash here those containers rely on the atexit handler still
+            # firing during process teardown, which it does (exceptions
+            # don't skip atexit), just calling it out since this is the one
+            # process where "crashed" and "orphaned containers" are close.
+            print(f"[{time.strftime('%H:%M:%S')}] !! tier2 run_pool() failed, will retry next cycle: {e}")
+            n = 0
         if args.loop is None:
             break
         if n == 0:
