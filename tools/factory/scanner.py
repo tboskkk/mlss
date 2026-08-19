@@ -157,8 +157,19 @@ def main():
 
     while True:
         t0 = time.time()
-        stats = scan_once()
-        print(f"[{time.strftime('%H:%M:%S')}] scan: {stats} ({time.time()-t0:.1f}s)")
+        try:
+            stats = scan_once()
+            print(f"[{time.strftime('%H:%M:%S')}] scan: {stats} ({time.time()-t0:.1f}s)")
+        except Exception as e:
+            # A transient error (a locked DB during simultaneous writes from
+            # the other four processes, a mid-extraction race on the repo)
+            # should cost this one pass, not kill a process meant to run
+            # unattended for hours. Found live: without this, scanner/tier1/
+            # tier3 crash-looped on "database is locked" every ~30-40s --
+            # the supervisor's restart-on-crash covered for it, but a
+            # process that survives its own transient errors is strictly
+            # better than one that needs restarting every cycle.
+            print(f"[{time.strftime('%H:%M:%S')}] !! scan_once() failed, will retry next cycle: {e}")
         if args.loop is None:
             break
         time.sleep(max(1, args.loop - (time.time() - t0)))
