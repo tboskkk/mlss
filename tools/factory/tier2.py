@@ -97,7 +97,13 @@ def kill_search(name: str, proc: subprocess.Popen):
         proc.wait(timeout=5)
     except subprocess.TimeoutExpired:
         proc.kill()
-    r = gitops.run(["podman", "ps", "--format", "{{.ID}} {{.Command}}"])
+    # --no-trunc is load-bearing, not cosmetic: podman ps's default
+    # {{.Command}} column truncates long commands, and `nonmatchings/<name>`
+    # sits near the END of ours -- past the truncation point every time.
+    # Without it this silently matches nothing, no error, and the
+    # container just keeps running. Found live: both of THIS run's stalled
+    # searches survived their own "stalled, cleaning up" log line intact.
+    r = gitops.run(["podman", "ps", "--no-trunc", "--format", "{{.ID}} {{.Command}}"])
     for line in r.stdout.splitlines():
         if f"nonmatchings/{name}" in line:
             cid = line.split()[0]
