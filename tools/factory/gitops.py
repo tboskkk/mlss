@@ -67,6 +67,42 @@ def find_guard_block(name: str):
     return None, None
 
 
+def splice_into_else(name: str, body: str) -> Path | None:
+    """Write a candidate into the #else branch, KEEPING the guard --
+    different from splice_candidate() below, which removes the guard
+    entirely for a believed-final match. This is for handing a candidate
+    to decomp-permuter: its own find_stub_block() (tools/permute.py)
+    requires the #ifndef/asm_unified/#else/#endif structure to exist so it
+    can pull both the retail assembly (via the asm_unified include) and
+    the candidate (the #else body) at once.
+
+    Found missing live: tier3 was writing every LLM draft to
+    candidate_body in the DB only, and tier2 called permute.py straight
+    from there assuming the file was already up to date -- for every
+    tier3-sourced candidate, the real src/*.c file was untouched (still
+    the split_func.py #error placeholder), so permute.py correctly and
+    consistently refused every single one. 100% of a 21-minute soak
+    test's 189 needs_human landings turned out to be exactly this, not 189
+    different real problems."""
+    c_path, block = find_guard_block(name)
+    if c_path is None:
+        return None
+    text = c_path.read_text()
+    needle = f"asm/nonmatching/{name}.s"
+    new_block = re.sub(
+        r"#else\n.*?\n#endif",
+        lambda _m: f"#else\n{body.strip()}\n#endif",
+        block,
+        count=1,
+        flags=re.DOTALL,
+    )
+    new_text = text.replace(block, new_block, 1)
+    if new_text == text:
+        return None
+    c_path.write_text(new_text)
+    return c_path
+
+
 def splice_candidate(name: str, body: str) -> Path | None:
     """Replace the #ifndef NONMATCHING/#else/#endif guard for `name` with a
     plain function body (no guard -- this is the FINAL form, used once a

@@ -71,10 +71,20 @@ def has_zero(name: str) -> Path | None:
     return hits[0] if hits else None
 
 
-def ensure_isolated(name: str) -> bool:
+def ensure_isolated(name: str, candidate_body: str | None) -> bool:
     out_dir = NONMATCHINGS_DIR / name
     if out_dir.exists():
         return True
+    # The real src/*.c file has to actually contain the candidate BEFORE
+    # permute.py runs -- it reads straight off disk (find_stub_block()),
+    # it doesn't know the DB's candidate_body column exists. Found missing
+    # live: every tier3-sourced candidate landed here with the file still
+    # holding the split_func.py #error placeholder, so permute.py refused
+    # every single one, 100% of a 21-minute run's failures. See
+    # gitops.splice_into_else()'s docstring for the full story.
+    if candidate_body:
+        if gitops.splice_into_else(name, candidate_body) is None:
+            return False
     r = gitops.run(["./container.sh", "tools/permute.py", name])
     return r.returncode == 0
 
@@ -156,6 +166,7 @@ def run_pool(jobs: int, stall_min: float, max_functions: int):
     why. Every DB touch here opens, uses, and closes its own short-lived
     connection instead."""
     claimed = []
+    candidate_bodies = {}
     conn = db.connect()
     try:
         for _ in range(max_functions):
@@ -163,6 +174,7 @@ def run_pool(jobs: int, stall_min: float, max_functions: int):
             if row is None:
                 break
             claimed.append(row["name"])
+            candidate_bodies[row["name"]] = row["candidate_body"]
     finally:
         conn.close()
 
@@ -174,7 +186,7 @@ def run_pool(jobs: int, stall_min: float, max_functions: int):
 
     procs = {}
     for name in claimed:
-        if not ensure_isolated(name):
+        if not ensure_isolated(name, candidate_bodies.get(name)):
             conn = db.connect()
             try:
                 with db.tx(conn):
