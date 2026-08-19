@@ -141,7 +141,15 @@ def main():
     while True:
         did_any = False
         while True:
-            name = process_one(conn)
+            try:
+                name = process_one(conn)
+            except Exception as e:
+                # See scanner.py's main() for why this matters: a transient
+                # error (DB lock contention from the other four processes,
+                # a mid-extraction race) shouldn't crash a process meant to
+                # run unattended for hours.
+                print(f"[{time.strftime('%H:%M:%S')}] !! tier1 process_one() failed, skipping: {e}")
+                break
             if name is None:
                 break
             did_any = True
