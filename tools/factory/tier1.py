@@ -140,21 +140,22 @@ def main():
     while True:
         did_any = False
         while True:
+            # A fresh connection every iteration, not one reused for the
+            # whole process lifetime -- found live, running the full
+            # pipeline together for the first time: a single "database is
+            # locked" error early on (5 processes hitting the DB at once on
+            # startup) can leave a long-lived connection wedged in a way
+            # that silently hangs on every later call instead of raising
+            # again. MUST be closed at the end of every iteration, not just
+            # reassigned -- found THIS the hard way immediately after
+            # deploying the fix above: reassigning conn without closing the
+            # old one leaked a new connection every ~20-30s, and a process
+            # with a dozen simultaneous open connections to the same
+            # SQLite file turned out to be exactly the kind of self-
+            # contention this was supposed to fix, not a improvement over
+            # it.
+            conn = db.connect()
             try:
-                # A fresh connection every iteration, not one reused for the
-                # whole process lifetime -- found live, running the full
-                # pipeline together for the first time: a single "database
-                # is locked" error early on (5 processes hitting the DB at
-                # once on startup) can leave a long-lived connection wedged
-                # in a way that silently hangs on every later call instead
-                # of raising again, so the try/except below never even
-                # fires. A process that looked alive (not crashed, not
-                # restarted by the supervisor) but did zero real work for
-                # 24 minutes straight is a worse failure than a clean
-                # crash-and-restart would have been. A fresh connection
-                # costs nothing meaningful and can't carry that state
-                # forward.
-                conn = db.connect()
                 name = process_one(conn)
             except Exception as e:
                 # See scanner.py's main() for why this matters: a transient
@@ -163,6 +164,8 @@ def main():
                 # run unattended for hours.
                 print(f"[{time.strftime('%H:%M:%S')}] !! tier1 process_one() failed, skipping: {e}")
                 break
+            finally:
+                conn.close()
             if name is None:
                 break
             did_any = True
