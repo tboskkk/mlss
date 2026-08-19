@@ -239,11 +239,15 @@ def main():
     args = ap.parse_args()
 
     while True:
+        # Fresh connection every iteration, closed at the end -- see
+        # tier1.py's main() for why a fresh connection matters (a wedged
+        # long-lived connection after early lock contention) and its
+        # immediately-following commit for why closing it explicitly is
+        # NOT optional (reassigning without closing just leaks one
+        # connection per cycle, which is its own path to the same kind of
+        # self-contention).
+        conn = db.connect()
         try:
-            # Fresh connection every iteration -- see tier1.py's main() for
-            # why: a long-lived connection can wedge silently after an
-            # early lock-contention error and never recover.
-            conn = db.connect()
             n = run_pool(conn, args.jobs, args.stall_min, args.max_functions)
         except Exception as e:
             # See scanner.py's main() for why this matters. Note this one
@@ -256,6 +260,8 @@ def main():
             # process where "crashed" and "orphaned containers" are close.
             print(f"[{time.strftime('%H:%M:%S')}] !! tier2 run_pool() failed, will retry next cycle: {e}")
             n = 0
+        finally:
+            conn.close()
         if args.loop is None:
             break
         if n == 0:
