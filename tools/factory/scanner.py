@@ -74,6 +74,12 @@ def scan_once() -> dict:
                 target_state = "matched"
             elif f.not_c_reason:
                 target_state = "excluded"
+            elif f.status == "in_progress":
+                # Already has a real (non-#error) C attempt sitting in a
+                # src/*.c -- tier 1's idiom matching doesn't apply (there's
+                # already something to search from, not a blank slate), so
+                # this goes straight to tier 2 rather than through queued.
+                target_state = "tier2_ready"
             else:
                 unknowns = triage.unknown_callees(f, funcs)
                 target_state = "queued" if not unknowns else "raw"
