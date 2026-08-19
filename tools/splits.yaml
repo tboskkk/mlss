@@ -45,6 +45,8 @@ groups:
   - {obj: asm/text08019CA4, section: text}
   - {obj: src/game_boy_player_logo, section: text}
   - {obj: asm/text0801A548, section: text}
+  - {obj: src/nullsub_18, section: text}
+  - {obj: asm/text0801A548_p2, section: text}
   - {obj: src/option_screens, section: text}
   - {obj: asm/option_screens, section: text}
   - {obj: src/opening_sequence, section: text}

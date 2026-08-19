@@ -33,6 +33,8 @@ SECTIONS
         build/asm/text08019CA4.o(.text);
         build/src/game_boy_player_logo.o(.text);
         build/asm/text0801A548.o(.text);
+        build/src/nullsub_18.o(.text);
+        build/asm/text0801A548_p2.o(.text);
         build/src/option_screens.o(.text);
         build/asm/option_screens.o(.text);
         build/src/opening_sequence.o(.text);
