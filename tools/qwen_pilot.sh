@@ -119,8 +119,35 @@ pick_target_file() {
 }
 
 SKIP_FILES=""
-ESCALATED_FUNCS=""  # functions that hit MAX_RETRIES_PER_FUNC this run -- don't auto-continue them even if their WIP checkpoint is still at the branch tip
+# ESCALATED_FUNCS/FUNC_RETRY_COUNT used to live only in this process's own
+# memory -- meaning a supervisor that relaunches this script in fresh
+# batches (needed for genuine unattended overnight operation: nothing else
+# restarts qwen_pilot.sh once its own MAX_ITER runs out) would silently
+# reset every function's retry count back to 0 on each relaunch. A function
+# that's genuinely stuck could then eat an entire unattended run hammering
+# the same target forever, never actually hitting MAX_RETRIES_PER_FUNC and
+# escalating to the mailbox the way it's supposed to. Persisted to a small
+# state file so the count survives across relaunches; only reset by
+# deleting the file by hand.
+STATE_FILE="$LOG_DIR/retry_state.txt"
+ESCALATED_FUNCS=""  # functions that hit MAX_RETRIES_PER_FUNC -- don't auto-continue them even if their WIP checkpoint is still at the branch tip
 FUNC_RETRY_COUNT=""  # "func1:count1 func2:count2 ..." poor-man's assoc array, bash 3-compatible
+
+load_state() {
+  [[ -f "$STATE_FILE" ]] || return
+  while IFS= read -r line; do
+    case "$line" in
+      RETRY:*) FUNC_RETRY_COUNT="${line#RETRY:}" ;;
+      ESCALATED:*) ESCALATED_FUNCS="${line#ESCALATED:}" ;;
+    esac
+  done < "$STATE_FILE"
+}
+
+save_state() {
+  { echo "RETRY:$FUNC_RETRY_COUNT"; echo "ESCALATED:$ESCALATED_FUNCS"; } > "$STATE_FILE"
+}
+
+load_state
 
 get_retry_count() {
   for pair in $FUNC_RETRY_COUNT; do
@@ -141,6 +168,7 @@ bump_retry_count() {
   done
   [[ "$found" == "0" ]] && new="$new $name:1"
   FUNC_RETRY_COUNT="$new"
+  save_state
 }
 
 for ((i=1; i<=MAX_ITER; i++)); do
@@ -216,6 +244,7 @@ $( [[ "$IS_CONTINUATION" == "1" ]] && echo "A real, clean-building (but not yet 
 EOF
     fi
     ESCALATED_FUNCS="$ESCALATED_FUNCS $TARGET_FUNC"
+    save_state
     unset TARGET_FUNC
     continue
   fi
