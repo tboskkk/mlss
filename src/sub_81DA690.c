@@ -10,25 +10,40 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81DA690.s\"");
 #else
-#error "TODO: write sub_81DA690 to match asm/nonmatching/sub_81DA690.s, then delete this #error"
+u32 sub_81DA690(void) {
+    return 0xA;
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/BgAffineSet.s\"");
 #else
-#error "TODO: write BgAffineSet to match asm/nonmatching/BgAffineSet.s, then delete this #error"
+u32 BgAffineSet(void) {
+    return 0xE;
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/CpuFastSet.s\"");
 #else
-#error "TODO: write CpuFastSet to match asm/nonmatching/CpuFastSet.s, then delete this #error"
+u32 CpuFastSet(u32 a0) {
+    return a0;
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/CpuSet.s\"");
 #else
-#error "TODO: write CpuSet to match asm/nonmatching/CpuSet.s, then delete this #error"
+u32 CpuSet(u32 a0) {
+    __asm__ volatile (
+        "swi #11\n\t"
+        "bx lr"
+        :
+        : "r" (a0)
+        : "memory"
+    );
+    return a0;
+}
 #endif
 
 #ifndef NONMATCHING
