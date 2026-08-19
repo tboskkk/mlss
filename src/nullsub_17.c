@@ -10,5 +10,7 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/nullsub_17.s\"");
 #else
-#error "TODO: write nullsub_17 to match asm/nonmatching/nullsub_17.s, then delete this #error"
+void nullsub_17(void) {
+    return;
+}
 #endif
