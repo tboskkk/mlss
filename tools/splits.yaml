@@ -63,6 +63,8 @@ groups:
   - {obj: asm/text08057568_p4, section: text}
   - {obj: src/nullsub_7, section: text}
   - {obj: asm/text08057568_p2, section: text}
+  - {obj: src/nullsub_5, section: text}
+  - {obj: asm/text08057568_p7, section: text}
 - name: rodata
   entries:
   - {obj: asm/rodata081DD790, section: rodata}
