@@ -59,6 +59,8 @@ groups:
   - {obj: asm/text08057568_p5, section: text}
   - {obj: src/nullsub_4, section: text}
   - {obj: asm/text08057568_p6, section: text}
+  - {obj: src/nullsub_8, section: text}
+  - {obj: asm/text08057568_p8, section: text}
   - {obj: src/nullsub_21, section: text}
   - {obj: asm/text08057568_p4, section: text}
   - {obj: src/nullsub_7, section: text}

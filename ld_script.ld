@@ -47,6 +47,8 @@ SECTIONS
         build/asm/text08057568_p5.o(.text);
         build/src/nullsub_4.o(.text);
         build/asm/text08057568_p6.o(.text);
+        build/src/nullsub_8.o(.text);
+        build/asm/text08057568_p8.o(.text);
         build/src/nullsub_21.o(.text);
         build/asm/text08057568_p4.o(.text);
         build/src/nullsub_7.o(.text);
