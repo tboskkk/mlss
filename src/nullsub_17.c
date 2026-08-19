@@ -7,10 +7,6 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/nullsub_17.s\"");
-#else
 void nullsub_17(void) {
     return;
 }
-#endif
