@@ -238,9 +238,12 @@ def main():
     ap.add_argument("--loop", type=int, default=None, metavar="SECONDS")
     args = ap.parse_args()
 
-    conn = db.connect()
     while True:
         try:
+            # Fresh connection every iteration -- see tier1.py's main() for
+            # why: a long-lived connection can wedge silently after an
+            # early lock-contention error and never recover.
+            conn = db.connect()
             n = run_pool(conn, args.jobs, args.stall_min, args.max_functions)
         except Exception as e:
             # See scanner.py's main() for why this matters. Note this one
