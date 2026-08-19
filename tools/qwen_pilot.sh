@@ -138,7 +138,10 @@ for r in rows:
 '
 }
 
-SKIP_FILES=""
+# Functions to pass over for the rest of this run. Replaces the old
+# SKIP_FILES: targets are chosen per-function by triage.py now, not by
+# picking a file and taking whatever sits at its front.
+SKIP_FUNCS=""
 # ESCALATED_FUNCS/FUNC_RETRY_COUNT used to live only in this process's own
 # memory -- meaning a supervisor that relaunches this script in fresh
 # batches (needed for genuine unattended overnight operation: nothing else
@@ -232,16 +235,17 @@ for ((i=1; i<=MAX_ITER; i++)); do
   fi
 
   if [[ -z "$TARGET_FUNC" ]]; then
-    TARGET_FILE=$(pick_target_file)
-    if [[ -z "$TARGET_FILE" ]]; then
-      log "no safe target file found (either everything's done or only the excluded/skipped files remain) -- stopping"
+    TARGET_FUNC=$(pick_target_func)
+    if [[ -z "$TARGET_FUNC" ]]; then
+      log "triage.py offered no eligible target (everything tractable is either done, skipped, or escalated) -- stopping"
       break
     fi
-    TARGET_FUNC=$(grep -m1 -oP 'thumb_func_start \K\S+' "asm/$TARGET_FILE" 2>/dev/null || true)
-    if [[ -z "$TARGET_FUNC" ]]; then
-      log "!! couldn't find a thumb_func_start in asm/$TARGET_FILE -- stopping for manual review"
-      exit 1
-    fi
+    # Which blob it lives in, for logging only -- extraction itself resolves
+    # the symbol through mlss.map and no longer cares about file ordering
+    # (split_func.py handles mid-file extraction now).
+    TARGET_FILE=$(grep -l "func_start $TARGET_FUNC\$" asm/*.s 2>/dev/null | head -1)
+    TARGET_FILE="${TARGET_FILE#asm/}"
+    TARGET_FILE="${TARGET_FILE:-unknown}"
   fi
 
   RETRY_COUNT=$(get_retry_count "$TARGET_FUNC")
@@ -252,11 +256,10 @@ for ((i=1; i<=MAX_ITER; i++)); do
     # prior timeout), it stays at the tip of the branch as a genuine
     # handoff for a human or Claude to read and finish, rather than
     # discarding however many attempts' worth of real progress just because
-    # the retry budget ran out. It doesn't block anything else: the
-    # function is already out of its raw asm file, so front-to-back
-    # extraction naturally moves on to whatever's next there. Only the
-    # continuation-detector needs to know not to keep re-selecting it,
-    # which ESCALATED_FUNCS (checked above) handles.
+    # the retry budget ran out. It doesn't block anything else: triage.py
+    # picks targets per-function from anywhere in any blob, and both the
+    # picker and the continuation-detector filter on ESCALATED_FUNCS, so an
+    # escalated function simply stops being offered.
     if [[ ! -f "$MAILBOX/requests/${TARGET_FUNC}.md" ]]; then
       cat > "$MAILBOX/requests/${TARGET_FUNC}.md" <<EOF
 Auto-escalated by qwen_pilot.sh after $RETRY_COUNT unsuccessful attempts (timeouts or genuine non-matches), not written by the model itself. Check .claude/qwen-autopilot-logs/ for this function's transcripts to see what was actually tried.
