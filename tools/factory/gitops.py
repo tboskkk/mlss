@@ -208,22 +208,46 @@ def splice_candidate(name: str, body: str) -> Path | None:
     return c_path
 
 
+ANSI_RE = re.compile(r"\x1b\[[0-9;]*m")
+# asm-differ's own verdict, e.g. "CURRENT (400)" or "CURRENT (0)".
+SCORE_RE = re.compile(r"CURRENT\s*\((\d+)\)")
+
+
 def asm_differ_matches(name: str) -> bool:
-    """True only if every comparable line of `asm-differ -mwo <name>`'s two
-    columns (TARGET / CURRENT) are identical. A cheap sanity check before
-    the expensive from-scratch rebuild -- catches an obviously-wrong
-    candidate without paying for a full rm -rf build/."""
+    """True only if asm-differ scores this function 0 against retail.
+
+    Reads asm-differ's OWN score out of its header rather than trying to
+    compare the two columns by whitespace. The column approach was a real
+    false-positive source: actual diff output carries ANSI color codes and
+    a `|` change marker, so a differing line often doesn't split into
+    exactly two whitespace-separated halves and the old check silently
+    skipped it. Combined with the stale-object bug below, that produced 60
+    false "already matches" verdicts in a single 10-minute run.
+
+    Forces a genuine recompile of this function's object first. Make
+    decides staleness from mtime, and splice_into_else() deliberately
+    doesn't rewrite a file whose content is already correct -- so without
+    this, `make` prints "is up to date" and asm-differ happily diffs an
+    object built from OLDER source. Confirmed live: the same function
+    reported a perfect match against a stale object and score 400 once
+    genuinely rebuilt.
+
+    A false negative here is harmless (falls through to the permuter); a
+    false positive wastes a validator cycle, which is exactly what this
+    fixes.
+    """
+    for stale in ((REPO / "build" / "src" / f"{name}.o"),
+                  (REPO / "build" / "src" / f"{name}.s")):
+        try:
+            stale.unlink()
+        except FileNotFoundError:
+            pass
     r = run(["./container.sh", "asm-differ", "-mwo", name])
-    out = r.stdout + r.stderr
-    lines = [l.strip() for l in out.splitlines() if l.strip()]
-    target_lines = [l for l in lines if l and l[0].isdigit()]
-    if not target_lines:
-        return False
-    for l in target_lines:
-        halves = re.split(r"\s{2,}", l)
-        if len(halves) == 2 and halves[0] != halves[1]:
-            return False
-    return True
+    out = ANSI_RE.sub("", r.stdout + r.stderr)
+    m = SCORE_RE.search(out)
+    if not m:
+        return False  # couldn't read a verdict -> don't claim a match
+    return int(m.group(1)) == 0
 
 
 def finish_match(name: str) -> tuple[bool, str]:
