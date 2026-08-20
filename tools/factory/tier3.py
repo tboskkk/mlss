@@ -237,9 +237,16 @@ def blocking_siblings(name: str) -> list[str]:
 
 
 def process_one(conn, max_escalations: int) -> str | None:
-    row = db.claim_for_worker(conn, "needs_attempt", WORKER_ID)
+    # Oldest-queued-first, not tractability-first -- see tier2.py's
+    # matching fix and commit message for the full story. Same disease
+    # here: confirmed live, 109 of 110 needs_attempt rows and 582 of 658
+    # stalled rows sitting untouched for 4+ hours, because tier3 is now a
+    # genuinely slow, single-slot fallback (m2c handles the easy ~90%
+    # instantly) and tractability-first lets every new arrival tier_m2c
+    # declines cut in line ahead of older ones still waiting.
+    row = db.claim_for_worker(conn, "needs_attempt", WORKER_ID, order_by="updated_at ASC")
     if row is None:
-        row = db.claim_for_worker(conn, "stalled", WORKER_ID)
+        row = db.claim_for_worker(conn, "stalled", WORKER_ID, order_by="updated_at ASC")
     if row is None:
         return None
 

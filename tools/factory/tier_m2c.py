@@ -51,12 +51,19 @@ def _claim(conn, state: str):
     its ORIGINAL state with worker_id cleared (so tier3 can still try it)
     makes it immediately re-claimable by this exact same query, forever,
     with the same deterministic result every time. Hit live: one function
-    cycled thousands of times in under a second before this fix."""
+    cycled thousands of times in under a second before this fix.
+
+    Oldest-queued-first (updated_at ASC), not smallest-first -- this tier
+    itself isn't really bottlenecked (near-instant per function, so size
+    bias rarely matters much in practice), but tier3.py's matching fix
+    found a real starvation problem one hop downstream from here, and
+    there's no reason to leave a smaller version of the same bias sitting
+    here too."""
     with db.tx(conn):
         row = conn.execute(
             "SELECT * FROM functions WHERE state = ? AND worker_id IS NULL "
             "AND (notes IS NULL OR notes NOT LIKE 'm2c:%') "
-            "ORDER BY lines ASC LIMIT 1",
+            "ORDER BY updated_at ASC LIMIT 1",
             (state,),
         ).fetchone()
         if row is None:
