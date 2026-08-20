@@ -78,6 +78,8 @@ groups:
   - {obj: asm/text0801A548_p51, section: text}
   - {obj: src/sub_801DC38, section: text}
   - {obj: asm/text0801A548_p30, section: text}
+  - {obj: src/sub_801E3EC, section: text}
+  - {obj: asm/text0801A548_p52, section: text}
   - {obj: src/sub_80208E0, section: text}
   - {obj: asm/text0801A548_p12, section: text}
   - {obj: src/sprite_heap_free, section: text}
