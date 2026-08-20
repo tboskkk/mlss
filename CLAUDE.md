@@ -527,6 +527,28 @@ doesn't count toward headline progress numbers unless that changes.
   runs immediately before every `split_func.py` call, not just once at
   worktree creation. Doing this by hand: after resetting/cleaning a
   worktree, `./container.sh make` before trusting `split_func.py` again.
+- **A manual `rm -rf build/ && make` (or any ad-hoc repo mutation) run
+  OUTSIDE `gitops.repo_lock()` while the factory is live races against it
+  and produces a scary, misleading `mlss.gba: FAILED`.** The lock exists
+  precisely to serialize every repo-touching operation across the 6
+  factory processes; a manual command that skips it is racing against
+  whatever tier1/tier2/tier3/tier_m2c/validator happen to be mid-build at
+  that exact moment, reading a half-written object or a `ld_script.ld`
+  that changed out from under it. The failure is real (a checksum
+  mismatch, a missing `.o`) but the CAUSE is contention, not corruption —
+  re-running the identical command wrapped in
+  `gitops.repo_lock(what="...")` immediately afterward comes back clean
+  every time this was checked. Hit live, TWICE, in one session, by the
+  same agent that had already diagnosed and called out the first
+  occurrence — writing it down in conversation was not enough to make it
+  stick; this entry is the actual fix. **The habit, not optional:** any
+  manual `make`, `split_func.py`, or `git` command run against this repo
+  while a factory process might be running goes inside
+  `gitops.repo_lock()`, full stop — including "just checking" commands
+  that feel read-only, since `make` itself writes to `build/`. If a
+  from-scratch build fails and a factory supervisor is (or was recently)
+  running, suspect contention before suspecting the code, and confirm by
+  re-running under the lock before treating it as a real regression.
 
 ## Finishing the disassembly (Phase 3)
 
