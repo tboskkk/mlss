@@ -158,7 +158,62 @@ def generate(name: str) -> str | None:
 
     if f"{name}(" not in c:
         return None  # m2c emitted something, but not this function
-    return c.strip()
+    return restore_omitted_leading_params(c, name)
+
+
+FUNC_DEF_RE = re.compile(r"^(.*?\b)(\w+)\s*\(([^)]*)\)(\s*\{)", re.MULTILINE)
+ARG_RE = re.compile(r"\barg(\d+)\b")
+
+
+def restore_omitted_leading_params(c: str, name: str) -> str:
+    """Re-insert argument-register parameters m2c dropped because the
+    function never READS them.
+
+    m2c names parameters by their argument register (arg0=r0, arg1=r1,
+    arg2=r2, arg3=r3, arg4+ = stack), and omits any it can prove unused.
+    That's correct as a description of the assembly, but it does NOT
+    round-trip through the compiler: agbcc assigns argument registers
+    positionally, so a signature starting at `arg1` puts arg1 in r0,
+    arg2 in r1, and so on -- every parameter shifted one register off
+    from retail. The result compiles, looks semantically right, and is
+    consistently wrong in a way the permuter cannot fix by mutation,
+    because the defect is in the signature rather than the body.
+
+    Measured: 59 of 391 translatable functions (15%) hit this. Verified
+    end-to-end on sub_80EA928, which had been STALLED at score 55 through
+    a full permuter search -- restoring the dropped `arg0` took it
+    straight to score 0, an exact match with no search at all.
+
+    Deliberately narrow: only fills the leading gap (arg0..argN-1 before
+    the lowest argument m2c actually emitted), and only for the register
+    arguments r0-r3. Holes in the MIDDLE of a parameter list are left
+    alone -- they'd need the same fix, but they're rarer and this stays
+    a mechanical certainty rather than a guess.
+    """
+    m = None
+    for cand in FUNC_DEF_RE.finditer(c):
+        if cand.group(2) == name:
+            m = cand
+            break
+    if m is None:
+        return c.strip()
+
+    prefix, params, suffix = m.group(1), m.group(3), m.group(4)
+    if params.strip() in ("", "void"):
+        return c.strip()
+
+    indices = [int(x) for x in ARG_RE.findall(params)]
+    if not indices:
+        return c.strip()
+    first = min(indices)
+    # Only r0-r3 are register arguments; a gap at/after arg4 is a stack
+    # layout question, not something to paper over with a dummy.
+    if first <= 0 or first > 3:
+        return c.strip()
+
+    filler = ", ".join(f"s32 arg{i}" for i in range(first))
+    new_def = f"{prefix}{name}({filler}, {params.strip()}){suffix}"
+    return (c[: m.start()] + new_def + c[m.end():]).strip()
 
 
 if __name__ == "__main__":
