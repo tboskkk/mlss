@@ -20,3 +20,9 @@ u32 sub_8028E70(u32 param_1) {
     return temp;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/get_fobj_screen_pos.s\"");
+#else
+#error "TODO: write get_fobj_screen_pos to match asm/nonmatching/get_fobj_screen_pos.s, then delete this #error"
+#endif
