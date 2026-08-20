@@ -25,7 +25,40 @@ quality, it was that every single step (splitting a function out, adding a
 cross-reference symbol, diffing against retail) was 100% manual, and that
 doesn't scale to ~6,000 functions. Everything below exists to fix that.
 
-## Building
+## Where this could lead
+
+Not a commitment, not a roadmap item -- a stated hope worth recording so it
+doesn't get lost between sessions. This is, as far as the maintainer and
+this project have found, the first serious byte-matching decomp attempt at
+this specific game, and one of very few for GBA titles generally outside
+the well-trodden pokeemerald-style Pokémon line. The "Generating C: use
+m2c, not an LLM" finding above matters beyond this repo for the same
+reason: m2c's ARM/Thumb backend is barely a year old and had, before this
+project, no completed real-world GBA project putting real mileage on it.
+If this repo ends up being the thing that proves that backend out at
+scale, it's a genuinely useful reference point for whoever tries a
+byte-matching GBA decomp next -- the same role sotn-decomp plays for PS1
+matching decomps built on Psy-Q/maspsx.
+
+The maintainer's actual hope is bigger than "prove the tooling works":
+seeding a real Harbour Masters-style GBA runtime port, the way LUS/HM64
+does for N64 (Ocarina of Time, Majora's Mask, and others) and how Torch
+handles O2R-style asset extraction for that ecosystem. Worth being honest
+about the shape of that gap rather than glossing it: HM64's core value is
+translating F3DEX display lists (Fast3D) into a modern renderer, and GBA
+has nothing analogous -- no display lists, no microcode, no real 3D. A
+GBA port framework is closer to "a GBA emulator minus the CPU" (natively
+compile the decompiled game code, still reimplement the PPU/tilemap/OAM
+rasterizer, DMA, IRQs, and the m4a/Sappy sound driver underneath it) than
+it is a Fast3D-style translation layer. That's real, separate engineering
+this repo doesn't attempt and isn't scoped to -- what this repo can
+realistically hand to that effort is a completed, byte-exact decompiled
+codebase to build the runtime layer against, plus whatever's learned here
+about matching-decomp tooling for agbcc/Thumb specifically.
+
+Explicitly out of scope, mentioned only so it isn't confused for a next
+step of THIS project: a PS1 decomp is a separate interest of the
+maintainer's, unrelated to MLSS/GBA. If it happens, it's its own repo.
 
     ./container.sh make
 
