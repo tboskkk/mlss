@@ -15,33 +15,11 @@ u32* sub_8059EF0(u32 param_1) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8059F24.s\"");
-#else
-u32 sub_8059F24(u32 param_1) {
-    u16 *puVar1;
-    u16 uVar2;
-    u32 uVar3;
-    
-    puVar1 = (u16 *)0x02000014;
-    uVar2 = *(u16 *)((u32)param_1 + 0x5A);
-    uVar3 = 0x1FF;
-    *puVar1 = uVar2 & uVar3;
-    puVar1 = (u16 *)((u32)puVar1 + 4);
-    uVar2 = *(u16 *)((u32)param_1 + 0x5C);
-    *puVar1 = uVar2 & uVar3;
-    puVar1 = (u16 *)0x0200001C;
-    uVar2 = *(u16 *)((u32)param_1 + 0x5E);
-    *puVar1 = uVar2 & uVar3;
-    puVar1 = (u16 *)0x02000016;
-    uVar2 = *(u8 *)((u32)param_1 + 0x60);
-    *puVar1 = uVar2;
-    puVar1 = (u16 *)((u32)puVar1 + 4);
-    uVar2 = *(u8 *)((u32)param_1 + 0x62);
-    *puVar1 = uVar2;
-    puVar1 = (u16 *)((u32)puVar1 + 4);
-    uVar2 = *(u8 *)((u32)param_1 + 0x64);
-    *puVar1 = uVar2;
-    return param_1;
+void sub_8059F24(void *arg0) {
+    (*(s16 *)((s8 *)((void *)0x02000014) + (0))) = (s16) (0x1FF & (*(u16 *)((s8 *)(arg0) + (0x5A))));
+    (*(s16 *)((s8 *)((void *)0x02000014) + (4))) = (s16) (0x1FF & (*(u16 *)((s8 *)(arg0) + (0x5C))));
+    *(s16 *)0x0200001C = 0x1FF & (*(u16 *)((s8 *)(arg0) + (0x5E)));
+    (*(s16 *)((s8 *)((void *)0x02000016) + (0))) = (s16) (*(u8 *)((s8 *)(arg0) + (0x60)));
+    (*(s16 *)((s8 *)((void *)0x02000016) + (4))) = (s16) (*(u8 *)((s8 *)(arg0) + (0x62)));
+    (*(s16 *)((s8 *)(((void *)0x02000016 + 4)) + (4))) = (s16) (*(u8 *)((s8 *)(arg0) + (0x64)));
 }
-#endif
