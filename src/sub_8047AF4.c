@@ -7,10 +7,6 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8047AF4.s\"");
-#else
-u32 sub_8047AF4(u32 param_1) {
-    return ((param_1 + 0x2B5) & 0xFF) >> 3 & 1;
+s32 sub_8047AF4(void *arg0) {
+    return ((u8) (*(u8 *)((s8 *)(arg0) + (0x2B5))) >> 3) & 1;
 }
-#endif
