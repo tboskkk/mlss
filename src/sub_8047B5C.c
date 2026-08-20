@@ -22,8 +22,17 @@ u16 sub_8047B5C(u16* param_1, u16 param_2) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8047B78.s\"");
-#else
-#error "TODO: write sub_8047B78 to match asm/nonmatching/sub_8047B78.s, then delete this #error"
-#endif
+s32 sub_8047B78(void *arg0)
+{
+  s32 temp_r0_11;
+  unsigned long long var_r1_12;
+  int new_var;
+  temp_r0_11 = 7 & (*((u8 *) (((s8 *) arg0) + 0x2B5)));
+  var_r1_12 = temp_r0_11;
+  new_var = 1;
+  if (temp_r0_11 != 0)
+  {
+    var_r1_12 = new_var;
+  }
+  return var_r1_12;
+}
