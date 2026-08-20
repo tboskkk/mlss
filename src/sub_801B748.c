@@ -7,14 +7,9 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_801B748.s\"");
-#else
-u32* sub_801B748(u32* param_1, u32 param_2, u16 param_3, s16 param_4) {
-    *param_1 = param_2;
-    *(param_1 + 1) = param_3;
-    *(param_1 + 2) = param_4;
-    *(param_1 + 3) = 0xFFFF0000;
-    return param_1;
+void sub_801B748(void *arg0, s32 arg1, s16 arg2, s16 arg3) {
+    (*(s32 *)((s8 *)(arg0) + (0))) = arg1;
+    (*(s16 *)((s8 *)(arg0) + (4))) = arg2;
+    (*(s32 *)((s8 *)(arg0) + (8))) = (s32) arg3;
+    (*(s32 *)((s8 *)(arg0) + (0xC))) = 0xFFFF0000;
 }
-#endif
