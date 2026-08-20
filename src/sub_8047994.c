@@ -33,5 +33,15 @@ u32 sub_80479A8(u32 param_1) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80479BC.s\"");
 #else
-#error "TODO: write sub_80479BC to match asm/nonmatching/sub_80479BC.s, then delete this #error"
+s32 sub_80479BC(void *arg0) {
+    s32 temp_r0_11;
+    s32 var_r1_12;
+
+    temp_r0_11 = 0x30 & (*(u8 *)((s8 *)(arg0) + (0x2B6)));
+    var_r1_12 = temp_r0_11;
+    if (temp_r0_11 != 0) {
+        var_r1_12 = 1;
+    }
+    return var_r1_12;
+}
 #endif
