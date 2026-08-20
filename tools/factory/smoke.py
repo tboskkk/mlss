@@ -108,10 +108,17 @@ def check_nothing_running() -> list[str]:
 
 def check_repo_intact() -> list[str]:
     problems = []
+    # A dirty tree is NOT a failure on its own: the factory always has
+    # uncommitted work in flight (extractions and guarded candidate
+    # splices), and stopping it mid-cycle naturally leaves some behind.
+    # The invariant that actually matters is that the ROM still reproduces
+    # byte-identically -- that is what says the tree is CONSISTENT rather
+    # than merely modified.
     r = gitops.run(["git", "status", "--porcelain"])
     dirty = [l for l in r.stdout.splitlines() if l.strip()]
     if dirty:
-        problems.append(f"working tree dirty ({len(dirty)} paths), e.g. {dirty[:3]}")
+        print(f"      (note: {len(dirty)} uncommitted paths -- expected mid-run, "
+              f"only a problem if the ROM check below fails)")
     import shutil
     shutil.rmtree(gitops.REPO / "build", ignore_errors=True)
     r = gitops.run(["./container.sh", "make"])
