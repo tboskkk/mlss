@@ -534,6 +534,8 @@ groups:
   - {obj: src/sub_80F1C7C, section: text}
   - {obj: src/sub_80F1CF8, section: text}
   - {obj: asm/text08057568_p265, section: text}
+  - {obj: src/btl_script_execute_next_command, section: text}
+  - {obj: asm/text08057568_p370, section: text}
   - {obj: src/sub_80F3808, section: text}
   - {obj: asm/text08057568_p285, section: text}
   - {obj: src/sub_80F39C8, section: text}
