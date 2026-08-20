@@ -301,6 +301,19 @@ def backlog_depth() -> int:
         conn.close()
 
 
+def has_stalled_work() -> bool:
+    """Functions tier2 tried and gave up on, still under the escalation cap.
+    Re-drafting these is the pipeline's only forward path for them."""
+    conn = db.connect()
+    try:
+        return conn.execute(
+            "SELECT COUNT(*) c FROM functions WHERE state = 'stalled' "
+            "AND escalation_count < ?", (MAX_ESCALATIONS_DEFAULT,)
+        ).fetchone()["c"] > 0
+    finally:
+        conn.close()
+
+
 def has_unblocking_work() -> bool:
     """Is there a queued draft that would unblock a whole translation unit?
 
@@ -343,7 +356,13 @@ def main():
         # (its dependencies may have been matched meanwhile, which would
         # change what the right answer looks like). Idling here instead
         # costs nothing and gives the cores back to tier2's searches.
-        if args.max_backlog > 0 and not has_unblocking_work():
+        # Retries of functions tier2 already REJECTED are not speculative
+        # work -- they're the pipeline's only path forward for those, and
+        # blocking them strands every stalled function permanently. The
+        # throttle exists to stop drafting NEW candidates nobody can
+        # consume, so it must not apply when there is stalled work waiting.
+        # (Bounded by --max-escalations, so this cannot spin.)
+        if args.max_backlog > 0 and not has_unblocking_work() and not has_stalled_work():
             depth = backlog_depth()
             if depth >= args.max_backlog:
                 print(f"[{time.strftime('%H:%M:%S')}] backlog {depth} >= {args.max_backlog}, "
