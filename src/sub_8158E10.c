@@ -7,11 +7,6 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8158E10.s\"");
-#else
-u32 sub_8158E10(u32 param_1) {
-    *(u16*)(param_1 + 0x14) = 0;
-    return 0;
+void sub_8158E10(void *arg0) {
+    (*(s16 *)((s8 *)(arg0) + (0x14))) = 0;
 }
-#endif
