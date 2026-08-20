@@ -42,8 +42,16 @@ def validate_one(conn) -> str | None:
     if row is None:
         return None
 
+    # The ENTIRE validate sequence (splice -> asm-differ -> from-scratch
+    # build -> commit, or revert on any failure) has to hold the repo lock
+    # as one unit. Both halves need it for different reasons: the build
+    # fails outright if another process's extraction lands mid-build, and
+    # the revert-on-failure path is repo-wide, so without the lock it
+    # destroys other processes' uncommitted extractions. See
+    # gitops.repo_lock()'s docstring -- both were observed live.
     try:
-        return _validate_claimed(conn, row)
+        with gitops.repo_lock(what=f"validate {row['name']}"):
+            return _validate_claimed(conn, row)
     except Exception as e:
         # A crash mid-processing here is worse than in any other tier: this
         # is the ONE process that touches git, so a half-done failure can
@@ -53,7 +61,11 @@ def validate_one(conn) -> str | None:
         # catch in main() to be enough.
         name = row["name"]
         print(f"  !! {name}: validate_one crashed mid-processing, reverting repo and releasing claim: {e}")
-        gitops.revert_to_clean()
+        try:
+            with gitops.repo_lock(timeout=600, what=f"revert after crash on {name}"):
+                gitops.revert_to_clean()
+        except Exception as e2:
+            print(f"  !! {name}: could not acquire repo lock to revert: {e2}")
         with db.tx(conn):
             db.set_state(conn, name, "needs_human", worker_id=None,
                          notes=f"validator crashed mid-processing: {e}")
