@@ -40,6 +40,7 @@ import requests
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import db  # noqa: E402
 import gitops  # noqa: E402
+import asmfacts  # noqa: E402
 
 WORKER_ID = "tier3"
 LLAMA_URL = "http://127.0.0.1:8080/v1/chat/completions"
@@ -111,6 +112,7 @@ def derive_facts(asm: str) -> list[str]:
             "returns through the saved link register -- that register is NOT a "
             "return value. The signature MUST start with `void` and the body MUST "
             "NOT contain any `return <expr>;`.")
+    facts += asmfacts.describe(asm)
     for sym in dict.fromkeys(POOL_SYMBOL_RE.findall(asm)):
         facts.append(
             f"The literal pool constant is the symbol `{sym}` (usually a function "
