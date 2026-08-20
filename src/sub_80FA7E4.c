@@ -10,5 +10,11 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80FA7E4.s\"");
 #else
-#error "TODO: write sub_80FA7E4 to match asm/nonmatching/sub_80FA7E4.s, then delete this #error"
+s32 sub_80FA7E4(void *arg0, void *arg1) {
+    if ((*(u8 *)0x03000C80 | ((u32) ((*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x24)))) + (0x9A2))) << 0x1F) >> 0x1F)) == 0) {
+        return 1;
+    }
+    (*(s32 *)((s8 *)(arg1) + (0))) = (s32) (*(s32 *)((s8 *)(arg1) + (0x14)));
+    return 0;
+}
 #endif

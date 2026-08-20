@@ -10,5 +10,9 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8082C20.s\"");
 #else
-#error "TODO: write sub_8082C20 to match asm/nonmatching/sub_8082C20.s, then delete this #error"
+void sub_8082C20(s32 arg0, s32 *arg1, s32 *arg2, s32 *arg3) {
+    *arg1 -= M2C_ERROR(/* unknown instruction: ldsh $r5, ($mem_loc_fictive_) */);
+    *arg2 -= M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */);
+    *arg3 += 0x1F0;
+}
 #endif
