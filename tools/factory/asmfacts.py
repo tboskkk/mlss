@@ -140,13 +140,43 @@ def access_map(asm: str) -> list[str]:
 
     out = []
     for target, width, kind in seen:
-        depth = target.count("*")
-        note = ""
-        if depth:
-            note = ("  <- NOTE: this is a SECOND dereference; the pointer itself "
-                    "was loaded out of memory first")
-        out.append(f"{target}: {width} {kind}{note}")
+        out.append(f"{kind:5s} {width:14s} -> use exactly:  {_c_expr(target, width)}")
     return out
+
+
+CTYPE = {"32-bit": "u32", "16-bit": "u16", "8-bit": "u8",
+         "8-bit signed": "s8", "16-bit signed": "s16"}
+
+
+def _c_expr(target: str, width: str) -> str:
+    """Turn a symbolic target like '*(p0+0x204)+0x04' into the exact C
+    lvalue, e.g. `*(u16*)((u8*)(*(u32**)((u8*)p0 + 0x204)) + 0x04)`.
+
+    Describing an access in prose still leaves the model to translate it,
+    and it demonstrably kept collapsing the indirection anyway (writing
+    `p+0x204+4` where retail dereferences first). Handing over the finished
+    expression removes that translation step entirely -- the same reason
+    stating facts beat stating rules.
+    """
+    ctype = CTYPE.get(width, "u32")
+    # Parse right-to-left: innermost is always a parameter.
+    m = re.fullmatch(r"\*\((.+?)\)(?:\+0x([0-9A-Fa-f]+))?", target)
+    if m:
+        inner, off = m.group(1), m.group(2)
+        base = f"(*(u32**)({_c_expr_addr(inner)}))"
+        if off:
+            return f"*({ctype}*)((u8*){base} + 0x{off.upper()})"
+        return f"*({ctype}*){base}"
+    return f"*({ctype}*)({_c_expr_addr(target)})"
+
+
+def _c_expr_addr(target: str) -> str:
+    """Address expression (no final dereference) for a simple pN+0xNN."""
+    m = re.fullmatch(r"(p\d)(?:\+0x([0-9A-Fa-f]+))?", target)
+    if m:
+        p, off = m.group(1), m.group(2)
+        return f"(u8*){p} + 0x{off.upper()}" if off else f"(u8*){p}"
+    return target
 
 
 def describe(asm: str) -> list[str]:
