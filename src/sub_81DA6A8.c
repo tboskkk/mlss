@@ -28,17 +28,23 @@ u32 sub_81DA6AC(u32 param_1) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81DA6B0.s\"");
 #else
-#error "TODO: write sub_81DA6B0 to match asm/nonmatching/sub_81DA6B0.s, then delete this #error"
+u32 sub_81DA6B0(void) {
+    return 0;
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81DA6B8.s\"");
 #else
-#error "TODO: write sub_81DA6B8 to match asm/nonmatching/sub_81DA6B8.s, then delete this #error"
+bool32 sub_81DA6B8(void) {
+    return TRUE;
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81DA6C0.s\"");
 #else
-#error "TODO: write sub_81DA6C0 to match asm/nonmatching/sub_81DA6C0.s, then delete this #error"
+u32 sub_81DA6C0(void) {
+    return 0;
+}
 #endif

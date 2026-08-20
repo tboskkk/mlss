@@ -49,5 +49,7 @@ u32 CpuSet(u32 a0) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81DA6A0.s\"");
 #else
-#error "TODO: write sub_81DA6A0 to match asm/nonmatching/sub_81DA6A0.s, then delete this #error"
+u32 sub_81DA6A0(u32 r0) {
+    return r0;
+}
 #endif

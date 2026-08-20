@@ -10,11 +10,15 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8082D40.s\"");
 #else
-#error "TODO: write sub_8082D40 to match asm/nonmatching/sub_8082D40.s, then delete this #error"
+u16 sub_8082D40(u16 arg0) {
+    return arg0 + 0x0776;
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8082D50.s\"");
 #else
-#error "TODO: write sub_8082D50 to match asm/nonmatching/sub_8082D50.s, then delete this #error"
+s16 sub_8082D50(s16 arg0) {
+    return *(s16*)(arg0 + 0x774);
+}
 #endif

@@ -26,5 +26,7 @@ u32 sub_81DD774(u32 r0) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81DD77C.s\"");
 #else
-#error "TODO: write sub_81DD77C to match asm/nonmatching/sub_81DD77C.s, then delete this #error"
+u32 sub_81DD77C(void) {
+    return 0xC04625EF;
+}
 #endif

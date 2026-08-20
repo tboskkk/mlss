@@ -3,29 +3,6 @@
 	.syntax unified
 	.text
 
-	thumb_func_start sub_80F75D8
-sub_80F75D8:
-	ldr r1, _080F75FC @ =0x03000FD8
-	ldr r1, [r1, #0x00]
-	movs r2, #0x91
-	lsls r2, r2, #0x02
-	adds r1, r1, r2
-	ldr r1, [r1, #0x00]
-	ldr r2, [r1, #0x2C]
-	ldr r1, _080F7600 @ =0x00001788
-	adds r3, r2, r1
-	ldr r1, [r3, #0x00]
-	orrs r1, r0
-	str r1, [r3, #0x00]
-	ldr r1, _080F7604 @ =0x00001798
-	adds r2, r2, r1
-	ldr r1, [r2, #0x00]
-	orrs r1, r0
-	str r1, [r2, #0x00]
-	bx lr
-_080F75FC: .4byte 0x03000FD8
-_080F7600: .4byte 0x00001788
-_080F7604: .4byte 0x00001798
 	thumb_func_start sub_80F7608
 sub_80F7608:
 	push {r4, lr}
@@ -997,26 +974,3 @@ _080F7D28:
 	pop {r1}
 	bx r1
 _080F7D38: .4byte 0x00007FFF
-	thumb_func_start sub_80F7D3C
-sub_80F7D3C:
-	push {lr}
-	adds r2, r1, #0x0
-	ldr r0, [r0, #0x2C]
-	ldr r1, _080F7D54 @ =0x0000179D
-	adds r0, r0, r1
-	ldrb r1, [r0, #0x00]
-	movs r0, #0x7F
-	ands r0, r1
-	cmp r0, #0x00
-	bne _080F7D58
-	movs r0, #0x01
-	b _080F7D5E
-_080F7D54: .4byte 0x0000179D
-_080F7D58:
-	ldr r0, [r2, #0x14]
-	str r0, [r2, #0x00]
-	movs r0, #0x00
-_080F7D5E:
-	pop {r1}
-	bx r1
-	.byte 0x00, 0x00

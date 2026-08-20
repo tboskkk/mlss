@@ -10,11 +10,25 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_808862C.s\"");
 #else
-#error "TODO: write sub_808862C to match asm/nonmatching/sub_808862C.s, then delete this #error"
+u32* sub_808862C(u32* param_1) {
+    u32* puVar1;
+    
+    puVar1 = param_1 + 0x13;
+    *(param_1 + 0x14) = *puVar1;
+    *(param_1 + 0x13) = 0x080886BD;
+    return param_1;
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_808863C.s\"");
 #else
-#error "TODO: write sub_808863C to match asm/nonmatching/sub_808863C.s, then delete this #error"
+u32* sub_808863C(u32* param_1) {
+    u32* puVar1;
+    
+    puVar1 = param_1 + 0x13;
+    *param_1 = *puVar1;
+    param_1[0x13] = (u32)sub_80886E0;
+    return param_1;
+}
 #endif

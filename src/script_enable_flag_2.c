@@ -10,5 +10,10 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/script_enable_flag_2.s\"");
 #else
-#error "TODO: write script_enable_flag_2 to match asm/nonmatching/script_enable_flag_2.s, then delete this #error"
+u16 script_enable_flag_2(u16* flag_addr) {
+    *flag_addr += 0xA0;
+    u16 temp = *flag_addr;
+    *flag_addr = 0x02 | temp;
+    return *flag_addr;
+}
 #endif

@@ -10,13 +10,25 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8150E2C.s\"");
 #else
-#error "TODO: write sub_8150E2C to match asm/nonmatching/sub_8150E2C.s, then delete this #error"
+u32 sub_8150E2C(u32* param_1) {
+    u32 temp;
+    
+    temp = param_1[0x2C / sizeof(u32)];
+    temp &= 0xFFFFFFFD;
+    param_1[0x2C / sizeof(u32)] = temp;
+    
+    return temp;
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8150E38.s\"");
 #else
-#error "TODO: write sub_8150E38 to match asm/nonmatching/sub_8150E38.s, then delete this #error"
+u32 sub_8150E38(u32* param_1) {
+    u32 temp = param_1[0x2C / sizeof(u32)];
+    param_1[0x2C / sizeof(u32)] = temp | 1;
+    return temp;
+}
 #endif
 
 #ifndef NONMATCHING

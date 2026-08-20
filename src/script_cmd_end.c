@@ -10,5 +10,10 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/script_cmd_end.s\"");
 #else
-#error "TODO: write script_cmd_end to match asm/nonmatching/script_cmd_end.s, then delete this #error"
+u32 script_cmd_end(u32* param1) {
+    u32 temp = param1[0];
+    param1[1] = temp;
+    param1[4] = 0;
+    return 1;
+}
 #endif

@@ -10,5 +10,9 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8028EE8.s\"");
 #else
-#error "TODO: write sub_8028EE8 to match asm/nonmatching/sub_8028EE8.s, then delete this #error"
+u8 sub_8028EE8(u8 param_1) {
+    u8 *ptr = &param_1;
+    *ptr = *ptr | 0x40;
+    return param_1;
+}
 #endif

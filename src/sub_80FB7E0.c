@@ -10,11 +10,15 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80FB7E0.s\"");
 #else
-#error "TODO: write sub_80FB7E0 to match asm/nonmatching/sub_80FB7E0.s, then delete this #error"
+u32* sub_80FB7E0(u32 param_1) {
+    return (u32*)((param_1 << 16) >> 14) + 0x083D7458;
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80FB7F0.s\"");
 #else
-#error "TODO: write sub_80FB7F0 to match asm/nonmatching/sub_80FB7F0.s, then delete this #error"
+u32 sub_80FB7F0(u32 param_1) {
+    return ((u32*)0x0851FA00)[(param_1 << 16) >> 14];
+}
 #endif

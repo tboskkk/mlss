@@ -12,3 +12,9 @@ asm_unified(".include \"asm/nonmatching/get_field_object_count.s\"");
 #else
 #error "TODO: write get_field_object_count to match asm/nonmatching/get_field_object_count.s, then delete this #error"
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80FB790.s\"");
+#else
+#error "TODO: write sub_80FB790 to match asm/nonmatching/sub_80FB790.s, then delete this #error"
+#endif
