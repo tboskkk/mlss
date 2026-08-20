@@ -467,6 +467,7 @@ groups:
   - {obj: asm/text08057568_p184, section: text}
   - {obj: src/sub_80FAEEC, section: text}
   - {obj: asm/text08057568_p55, section: text}
+  - {obj: src/get_field_object_type, section: text}
   - {obj: src/get_field_object_count, section: text}
   - {obj: asm/text08057568_p86, section: text}
   - {obj: src/sub_80FB7BC, section: text}

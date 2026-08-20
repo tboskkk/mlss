@@ -3,17 +3,12 @@
 
 // TODO: add other includes (a matching *.h, other subsystem headers) as
 // this file grows. Left minimal since split_func.py doesn't know yet what
-// sub_815F85C needs.
+// get_field_object_type needs.
 
 asm_unified(".include \"asm/macros.inc\"");
 
 #ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_815F85C.s\"");
+asm_unified(".include \"asm/nonmatching/get_field_object_type.s\"");
 #else
-void sub_815F85C(void *arg0, s32 arg1) {
-    (*(s32 *)((s8 *)(arg0) + (4))) = 0x08CDCF50;
-    if (1 & arg1) {
-        free_heap_8018DA8(arg0);
-    }
-}
+#error "TODO: write get_field_object_type to match asm/nonmatching/get_field_object_type.s, then delete this #error"
 #endif
