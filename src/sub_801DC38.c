@@ -7,17 +7,6 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_801DC38.s\"");
-#else
-void sub_801DC38(void* p0)
-{
-    u32 r2 = *(u32*)((u8*)p0);
-    u32 r1 = *(u32*)((u8*)p0 + 0x04);
-    u32 r3 = *(u32*)((u8*)p0 + 0x14);
-    (void)r1;
-    ((void(*)(void))r3)();
-    p0 = *(void**)p0;
-    (void)p0;
+void sub_801DC38(void *arg0) {
+    (*(s32 (**)(s32, s32))((s8 *)(arg0) + (0x14)))((*(s32 *)((s8 *)(arg0) + (0))), (*(s32 *)((s8 *)(arg0) + (4))));
 }
-#endif
