@@ -10,60 +10,42 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8154AAC.s\"");
 #else
-void sub_8154AAC(u8* param_1)
-{
-    u16* puVar1;
-    u16* puVar2;
-    u32* puVar3;
-    u16 local_14;
-    u16 local_16;
-    u16 local_18;
-    u16 local_1a;
-    u32 local_1c;
-    
-    puVar3 = (u32*)0x03001018;
-    puVar1 = (u16*)((u32*)*puVar3 + 0x1C98);
-    puVar2 = (u16*)((u8*)param_1 + 0x38);
-    local_14 = *(u16*)((u8*)param_1 + 0x14);
-    local_16 = *(u16*)((u8*)param_1 + 0x14);
-    local_18 = *(u16*)((u8*)param_1 + 0x14);
-    local_1a = *(u16*)((u8*)param_1 + 0x14);
-    local_1c = *(u32*)((u8*)param_1 + 0x04);
-    if ((*(u16*)((u8*)param_1 + 0x14) == 1)) {
-        if (*(u16*)((u8*)param_1 + 0x14) < 1) {
-            *(u16*)((u8*)param_1 + 0x38) = 0;
-            return;
+void sub_8154AAC(void *arg0) {
+    s16 var_r0_33;
+    s32 temp_r1_14;
+    s32 temp_r1_38;
+    void *temp_r0_12;
+
+    temp_r0_12 = (*(void **)((s8 *)(*(void **)0x03001018) + (0x1C98)));
+    temp_r1_14 = M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */);
+    switch (temp_r1_14) {                           /* irregular */
+    case 0:
+        if ((s32) M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */) > 0) {
+            var_r0_33 = 1;
+block_15:
+            (*(s16 *)((s8 *)(arg0) + (0x38))) = var_r0_33;
         }
-        local_14 = *(u16*)((u8*)param_1 + 0x14);
-        if (local_14 == 0) {
-            *(u16*)((u8*)param_1 + 0x38) = 1;
-            return;
-        }
-        local_16 = *(u16*)((u8*)param_1 + 0x14);
-        if (local_16 == 0) {
-            local_1c = *(u32*)((u8*)param_1 + 0x04);
-            if ((local_1c - *(u32*)((u8*)param_1 + 0x04)) > 0x3BFF) {
-                *(u16*)((u8*)param_1 + 0x38) = 2;
+        return;
+    case 1:
+        temp_r1_38 = M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */);
+        if (temp_r1_38 == 0) {
+            if ((s32) ((*(s32 *)((s8 *)(temp_r0_12) + (4))) - (*(s32 *)((s8 *)(arg0) + (4)))) <= 0x3BFF) {
+                var_r0_33 = 2;
+                goto block_15;
+            }
+        } else {
+            if ((s32) M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */) >= temp_r1_38) {
+                (*(u16 *)((s8 *)(arg0) + (0x14))) = (u16) (*(u16 *)((s8 *)(temp_r0_12) + (0x14)));
                 return;
             }
-            *(u16*)((u8*)param_1 + 0x38) = 2;
+            (*(u16 *)((s8 *)(arg0) + (0x14))) = (u16) ((*(u16 *)((s8 *)(arg0) + (0x14))) + 2);
             return;
         }
-        local_18 = *(u16*)((u8*)param_1 + 0x14);
-        if (local_18 < 0x3BFF) {
-            *(u16*)((u8*)param_1 + 0x14) = local_18 + 2;
-            *(u16*)((u8*)param_1 + 0x38) = 0;
-            return;
-        }
-        *(u16*)((u8*)param_1 + 0x14) = local_18;
-        *(u16*)((u8*)param_1 + 0x38) = 0;
-        return;
+        break;
+    case 2:
+        var_r0_33 = 0;
+        (*(u16 *)((s8 *)(arg0) + (0x14))) = 0U;
+        goto block_15;
     }
-    if (*(u16*)((u8*)param_1 + 0x14) == 2) {
-        *(u16*)((u8*)param_1 + 0x14) = 0;
-        *(u16*)((u8*)param_1 + 0x38) = 0;
-        return;
-    }
-    *(u16*)((u8*)param_1 + 0x38) = 0;
 }
 #endif

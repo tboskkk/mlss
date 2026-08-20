@@ -17,3 +17,9 @@ u32* sub_81DD69C(u32* param_1) {
     param_1[0x08/4] = 0;
     return param_1;
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_81DD6B0.s\"");
+#else
+#error "TODO: write sub_81DD6B0 to match asm/nonmatching/sub_81DD6B0.s, then delete this #error"
+#endif

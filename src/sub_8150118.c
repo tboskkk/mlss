@@ -10,113 +10,57 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8150118.s\"");
 #else
-void sub_8150118(s32 param_1)
-{
-  s32 var_4;
-  
-  var_4 = param_1 << 0x10;
-  var_4 >>= 0x10;
-  if (var_4 > 0xd0) {
-    if (var_4 <= 0x80) {
-      if ((var_4 > 0x98) && (var_4 <= 0xb0)) {
-        param_1 = 0x600;
-      }
-      else {
-        if (var_4 <= 0xe0) {
-          if (var_4 > 0xe0) {
-            if ((var_4 <= 0xc8) && (var_4 > 0xc8)) {
-              param_1 = 0x800;
-            }
-            else {
-              if (var_4 > 0x80) {
-                param_1 = 0x0;
-              }
-              else {
-                param_1 = 0xa00;
-              }
-            }
-          }
-          else {
-            param_1 = 0x800;
-          }
-        }
-        else {
-          param_1 = 0x800;
-        }
-      }
+s32 sub_8150118(s16 arg0) {
+    s16 temp_r1_8;
+
+    temp_r1_8 = arg0;
+    if ((s32) temp_r1_8 <= 0xD0) {
+        return 0x400;
     }
-    else {
-      param_1 = 0x600;
+    if (((s32) temp_r1_8 <= 0x100) || ((s32) temp_r1_8 <= 0x130)) {
+        return 0x600;
     }
-  }
-  else {
-    param_1 = 0x400;
-  }
-  return;
+    if ((s32) temp_r1_8 <= 0x160) {
+        return 0x700;
+    }
+    if (((s32) temp_r1_8 <= 0x190) || ((s32) temp_r1_8 <= 0x1C0)) {
+        return 0x800;
+    }
+    if ((s32) temp_r1_8 > 0x200) {
+        return 0;
+    }
+    return 0xA00;
 }
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8150178.s\"");
 #else
-void sub_8150178(s32 r0)
-{
-    s32 r1 = r0 >> 16;
-    
-    if (r1 > 0xD0)
-    {
-        if (r1 > 0x80)
-        {
-            if (r1 > 0xE0)
-            {
-                if (r1 > 0x98)
-                {
-                    if (r1 > 0xB0)
-                    {
-                        if (r1 > 0xC8)
-                        {
-                            if (r1 > 0xE0)
-                            {
-                                if (r1 <= 0x80)
-                                {
-                                    r0 = 0xF0000;
-                                }
-                                else
-                                {
-                                    r0 = 0x0;
-                                }
-                            }
-                            else
-                            {
-                                r0 = 0xD0000;
-                            }
-                        }
-                        else
-                        {
-                            r0 = 0xC0000;
-                        }
-                    }
-                    else
-                    {
-                        r0 = 0xB0000;
-                    }
-                }
-                else
-                {
-                    r0 = 0x90000;
-                }
-            }
-            else
-            {
-                r0 = 0xE0000;
-            }
-        }
-        else
-        {
-            r0 = 0xA0000;
-        }
+s32 sub_8150178(s16 arg0) {
+    s16 temp_r1_8;
+
+    temp_r1_8 = arg0;
+    if ((s32) temp_r1_8 <= 0xD0) {
+        return 0x500;
     }
-    
-    (void)r0;
+    if ((s32) temp_r1_8 <= 0x100) {
+        return 0x700;
+    }
+    if ((s32) temp_r1_8 <= 0x130) {
+        return 0x900;
+    }
+    if ((s32) temp_r1_8 <= 0x160) {
+        return 0xB00;
+    }
+    if ((s32) temp_r1_8 <= 0x190) {
+        return 0xC00;
+    }
+    if ((s32) temp_r1_8 <= 0x1C0) {
+        return 0xD00;
+    }
+    if ((s32) temp_r1_8 > 0x200) {
+        return 0;
+    }
+    return 0xF00;
 }
 #endif

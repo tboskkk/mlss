@@ -14,5 +14,45 @@ void sub_8158E10(void *arg0) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8158E18.s\"");
 #else
-#error "TODO: write sub_8158E18 to match asm/nonmatching/sub_8158E18.s, then delete this #error"
+void sub_8158E18(u32* p0)
+{
+    u32* r2;
+    u32* r1;
+    u32* r0;
+    u32 r3;
+    u8 r0b;
+
+    r2 = p0;
+    r0 = p0;
+    r0 += 0x25 / sizeof(u32);
+    r0b = *(u8*)r0;
+    if (r0b == 0)
+    {
+        r1 = (u32*)0x083CB0F0;
+        r0 = (u32*)0x03001018;
+        r0 = *(u32**)r0;
+        r3 = 0xF9 << 5;
+        r0 += r3 / sizeof(u32);
+        r0b = *(u8*)r0;
+        r0 = (u32*)(r0b << 5);
+        r0 = (u32*)((u8*)r0 + (u8*)r1);
+        r0 = (u32*)*(u16*)((u8*)r0 + 0x1C);
+    }
+    else
+    {
+        r1 = (u32*)0x083CB0F0;
+        r0 = (u32*)0x03001018;
+        r0 = *(u32**)r0;
+        r3 = 0xF9 << 5;
+        r0 += r3 / sizeof(u32);
+        r0b = *(u8*)r0;
+        r0 = (u32*)(r0b << 5);
+        r0 = (u32*)((u8*)r0 + (u8*)r1);
+        r0 = (u32*)*(u16*)((u8*)r0 + 0x1C);
+        r0 -= 0x64;
+    }
+    *(u16*)((u8*)r2 + 0x14) = (u16)r0;
+    r1 = (u32*)((u8*)r2 + 0x24);
+    *(u8*)r1 = 0x02;
+}
 #endif

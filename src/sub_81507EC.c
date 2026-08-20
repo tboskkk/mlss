@@ -16,11 +16,37 @@ asm_unified(".include \"asm/nonmatching/sub_81507EC.s\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8150810.s\"");
 #else
-#error "TODO: write sub_8150810 to match asm/nonmatching/sub_8150810.s, then delete this #error"
+extern void sub_81507A8();
+
+void sub_8150810(u8* p1, u8* p2)
+{
+    u32* r3 = (u32*)((u8*)p1 + 0x18);
+    if (*(u32*)((u8*)p1 + 0x18) > 0xFF)
+    {
+        *(u32*)((u8*)p1 + 0x248) = *(u32*)((u8*)p1 + 0x2C8);
+        *(u32*)((u8*)p2) = (u32)sub_81507A8;
+    }
+    else
+    {
+        s16 r1 = *(s16*)((u8*)p1 + 0x242);
+        *(u32*)((u8*)p1 + 0x0C) += r1;
+        r1 = *(s16*)((u8*)p1 + 0x244);
+        *(u32*)((u8*)p1 + 0x10) += r1;
+    }
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_815085C.s\"");
 #else
-#error "TODO: write sub_815085C to match asm/nonmatching/sub_815085C.s, then delete this #error"
+void sub_815085C(u32 r0)
+{
+    if (r0 > 4)
+        return;
+    
+    u32* ptr = (u32*)0x08150874;
+    ptr += r0;
+    r0 = *ptr;
+    ((void(*)())r0)();
+}
 #endif
