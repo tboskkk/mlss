@@ -471,19 +471,49 @@ reverse engineering.
 **Still open, and the actual bulk of this phase:**
 
 - `asm/text08000000.s`'s first ~94.5KB (0x08000000-0x08017A00, right after
-  the header) — almost certainly crt0/interrupt vectors plus the m4a
-  ("Sappy") sound driver, given this file is ARM-mode and only 4.2%
-  disassembled. `find_library_code.py` found nothing here — it isn't
-  libgcc/libc, and there's no pinned reference build of m4a in this repo
-  to signature-match against the way libgcc/libc could be. Matching it
+  the header) — **confirmed real missed code, not a guess anymore**, via
+  `tools/probe_code_region.py` (new: disassembles a raw range as both ARM
+  and Thumb, buckets by address, and measures how often each mode
+  produces invalid instructions — real code in the right mode sits near
+  0%, misaligned/wrong-mode code or genuine data reliably doesn't). Two
+  distinct pieces: **`0x08000000`-~`0x08002E00`** (~11.7KB) is clean ARM —
+  textbook GBA crt0 (mode switches to IRQ/System via `msr CPSR_fc`,
+  interrupt-vector install, REG_IE (`0x04000200`) bit-testing dispatch),
+  0.0% bad instructions through most of it. **`~0x08003000`-`0x08017A00`**
+  (~84KB) is genuinely real code too, but disassembles far better as
+  **Thumb** (2.4-2.5% bad) than ARM (6.6%+ and climbing) — almost
+  certainly the m4a ("Sappy") sound driver, which is known to be
+  Thumb-mode; the file's own "ARM-mode, 4.2% disassembled" framing was
+  right about the first ~12KB but not the rest. `find_library_code.py`
+  still finds nothing here (isn't libgcc/libc) and there's no pinned m4a
+  reference build in this repo to signature-match against yet — actually
+  splitting/labeling this ~84KB (function boundaries, real symbol names)
   against a known m4a disassembly (pret projects have fully decompiled
-  copies) is real, unstarted work, not a quick follow-up.
+  copies) is real, unstarted work, just narrower and now evidence-backed
+  instead of a guess.
 - Two enormous, nearly-adjacent runs in `asm/text08057568.s`
-  (0x0818A658-0x081AFAAA and 0x081AFAAC-0x081C91BC, ~257KB combined) —
-  large enough that they're much more likely a big data table (dialogue?
-  event/script data? — this file holds "nearly the whole game" per the
-  original audit) than 257KB of missed code. Not yet inspected byte-by-
-  byte; don't assume either way without looking.
+  (0x0818A658-0x081AFAAA and 0x081AFAAC-0x081C91BC, ~257KB combined,
+  current live boundaries per `map_raw_regions.py` have drifted slightly
+  as extraction has continued: `0x0819B83C`-`0x081DA3A0`, still ~257KB
+  combined) — **inspected byte-by-byte with the same tool, and the
+  original "probably a big data table" guess was mostly right, with one
+  real exception.** The second/larger run
+  (`0x081C0C90`-`0x081DA3A0`, ~104KB) is genuinely data: its bad-instruction
+  rate stays flat (~16%) regardless of which 2-byte alignment phase it's
+  disassembled at, the signature of real data rather than misaligned real
+  code (misaligned code shows a sharp clean/garbage contrast between the
+  right and wrong phase; this doesn't) — byte content confirms it, a
+  clean fixed-stride repeating record structure, most likely animation/
+  sprite frame metadata (not dialogue — that's now confirmed to live
+  elsewhere, see the text-string finding in docs/formats/README.md). The
+  first run (`0x0819B83C`-`0x081C0C8E`, ~152KB) is a genuine **mix**: real
+  code at the front (high byte diversity, clean prologue/epilogue,
+  sensible branches, near-0% bad) transitioning into the same kind of
+  repeating-record data table partway through — so there's a real,
+  bounded chunk of recoverable missed code at its start, just not the
+  whole 152KB. Neither block contains a GBA BIOS decompression call
+  (`swi 0x11`-`0x18`) — checked directly, see docs/formats/README.md's
+  Yoshi Magic cross-reference section for why that mattered.
 - `asm/mariobros.s` has its own huge raw runs (led by one 433,882-byte
   block) — out of scope per the Mario Bros. decision above, noted here
   only so nobody "discovers" it as a surprise.

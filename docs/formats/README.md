@@ -679,9 +679,66 @@ coldef's `b0`/`b1` into an actual Y-position or gravity calculation yet.
 One live caller found so far: `sub_80F0618` (`text08057568.s`, deep in
 still-raw territory, nowhere near being split) calls
 `get_coldef_ptr_by_xz(ctx, x, z)` and feeds the returned 4-byte pointer
-straight into another not-yet-understood function (`sub_80E9C4C`) — a
-real gameplay-code call site, not a dead code path, but tracing what
-`sub_80E9C4C` does with the coldef fields is unstarted work.
+into `sub_80E9C4C`.
+
+### `sub_80E9C4C` traced by hand — result: generic engine flag/counter storage, not physics data
+
+Register-level trace (not decompiled, just read by hand — three functions,
+`sub_80E9C4C`/`sub_80E9958`/`sub_80E9A6C`, none extracted yet). **This
+closes the "what does `sub_80E9C4C` do with the coldef fields" question
+from above, but the honest answer overturns the hypothesis it was framed
+around**: `sub_80E9C4C` barely touches the coldef pointer's *fields* at
+all — it's a 3-way dispatcher keyed on a completely different value,
+`ctx->field_0x00` read as a signed 16-bit ID:
+
+- ID `0`-`60`: calls `sub_80E9BD8(param1)` — the coldef pointer isn't
+  even passed into this branch.
+- ID `61`-`7116`: calls `sub_80E9958(param3, param4, ID-61, coldef_ptr & 0xFF)`.
+- ID `7117`-`7508`: calls `sub_80E9A6C(ID-61, coldef_ptr & 0xFFFF)`.
+- ID `>7508`: no-op.
+
+`sub_80E9958` and `sub_80E9A6C` both turn out to be **write-one-value-
+into-a-shared-global-structure** functions, not physics calculations.
+Both compute an address into `*(0x03000FC0)` (a fixed IWRAM pointer slot,
+referenced from **17 different files** across the disassembly — a real,
+widely-used engine singleton, not a one-off) using an offset and index
+derived purely from the ID, then store the coldef pointer's low bits
+(truncated to 1 bit, 1 byte, or 1 halfword depending on which ID
+sub-range) at that address. The four distinct sub-arrays found, by offset
+within that structure:
+
+| Offset | Element size | Approx. count (from ID sub-ranges) | Access |
+|---|---|---:|---|
+| `+0x20` | 1 bit | ~7,007 | bit set/clear (`sub_80E9958`, low ID range) |
+| `+0x394` | 2 bytes | 64 | halfword store (`sub_80E9A6C`, top ID range) |
+| `+0x414` | 1 byte | ~295 | byte store (`sub_80E9A6C`, low-mid range) |
+| `+0x53C` | 1 byte | ~31 | byte store (`sub_80E9A6C`, mid range) |
+
+This is the classic shape of an RPG's global event-flag/counter table (one
+big bitfield for boolean story/world flags, plus a handful of byte/
+halfword counter arrays) — not anything coldef-specific. **What this
+means for the physics question**: `sub_80F0618`'s particular call
+(`ctx->field_0x00` as the flag ID, the room-tile coldef lookup's low bit
+as the value) reads as "record a one-bit fact about this tile's collision
+entry into the global flag table" — plausibly a one-time-trigger
+bookkeeping bit (switch tile already activated, block already broken,
+that kind of thing), not a raw height/gravity value being extracted from
+the coldef struct. **The original hypothesis — that `b0`/`b1` of a coldef
+entry hold the height/gravity value the physics illusion needs — is
+neither confirmed nor ruled out by this**: this was only ever one call
+site out of what's likely several, and it happens to be a bookkeeping
+path rather than a rendering/physics path. The real height/gravity
+variable is still unlocated; this thread's value is a different, real
+finding instead — a widely-used global structure worth knowing about for
+other decompilation work, discovered as a side effect.
+
+**Not yet renamed** (same reasoning as the sprite pointer cluster above —
+live-build-affecting change, held off during the factory's unattended
+run): `sub_80E9C4C` as something like `set_engine_flag_by_id`,
+`sub_80E9958`/`sub_80E9A6C` as its bit/byte/halfword-array internals, and
+`0x03000FC0` itself as `engine_flags_ptr` or similar once someone finds a
+cleaner name from further context. Worth doing once it's safe to touch
+`tools/symbols/rom.txt` again.
 
 **Symbol renames applied for this finding** (verified byte-identical
 rebuild afterward — `mlss.gba: OK`): `sub_805A00C` ->
