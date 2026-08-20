@@ -13,8 +13,9 @@ u16* sub_805A954(u16* param_1, u16 param_2, u16 param_3) {
     return param_1;
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_805A95C.s\"");
-#else
-#error "TODO: write sub_805A95C to match asm/nonmatching/sub_805A95C.s, then delete this #error"
-#endif
+void sub_805A95C(void *arg0) {
+    (*(s16 *)((s8 *)((void *)0x02000010) + (0))) = (s16) (0x1FF & (*(u16 *)((s8 *)(arg0) + (0x30))));
+    *(s16 *)0x02000014 = 0x1FF & (*(u16 *)((s8 *)(arg0) + (0x32)));
+    (*(s16 *)((s8 *)((void *)0x02000010) + (2))) = (s16) (0xFF & (*(u16 *)((s8 *)(arg0) + (0x34))));
+    *(s16 *)0x02000016 = 0xFF & (*(u16 *)((s8 *)(arg0) + (0x36)));
+}
