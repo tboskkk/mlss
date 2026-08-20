@@ -25,8 +25,7 @@ u8 sub_804776C(u8* a0, u8 a1) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8047784.s\"");
-#else
-#error "TODO: write sub_8047784 to match asm/nonmatching/sub_8047784.s, then delete this #error"
-#endif
+void sub_8047784(void *arg0) {
+    (*(u8 *)((s8 *)(arg0) + (0x20D))) = (u8) ((*(u8 *)((s8 *)(arg0) + (0x20D))) | 0x10);
+    (*(u8 *)((s8 *)(arg0) + (0x217))) = (u8) ((*(u8 *)((s8 *)(arg0) + (0x217))) | 1);
+}
