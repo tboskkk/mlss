@@ -203,65 +203,140 @@ atexit.register(_cleanup_all)
 signal.signal(signal.SIGTERM, lambda *_a: sys.exit(0))  # let atexit run, don't skip it
 
 
-def run_pool(jobs: int, stall_min: float, max_functions: int):
-    """No `conn` parameter on purpose -- see the module-level note below for
-    why. Every DB touch here opens, uses, and closes its own short-lived
-    connection instead."""
-    claimed = []
-    candidate_bodies = {}
+def candidate_body_of(name: str) -> str | None:
     conn = db.connect()
     try:
-        for _ in range(max_functions):
-            row = db.claim_for_worker(conn, "tier2_ready", WORKER_ID)
-            if row is None:
-                break
-            claimed.append(row["name"])
-            candidate_bodies[row["name"]] = row["candidate_body"]
+        row = conn.execute("SELECT candidate_body FROM functions WHERE name = ?", (name,)).fetchone()
+        return row["candidate_body"] if row else None
     finally:
         conn.close()
 
-    if not claimed:
-        return 0
 
-    threads_each = max(1, jobs // len(claimed))
-    print(f"tier2 pool: {claimed} ({threads_each} thread(s) each, cpuset {FARM_CPUSET})")
+def stall_seconds_for(lines_count: int, stall_min: float) -> float:
+    """Scale the give-up timeout to how much search space actually exists.
 
+    A 4-line function's permuter search space is exhausted in seconds --
+    giving it the same 15 minutes as a 150-line function burns six pinned
+    CPU cores for a quarter hour to learn nothing. Measured live: five
+    4-line stubs each held a pool slot for the full 15-minute timeout while
+    279 functions waited, which is most of why the observed match rate was
+    ~6/hr against a theoretical ceiling of ~24/hr.
+    """
+    return min(max(60.0, lines_count * 6.0), stall_min * 60.0)
+
+
+def already_matches(name: str, candidate_body: str | None) -> bool:
+    """Cheap pre-check: is this candidate ALREADY byte-perfect?
+
+    Most correct tier3 drafts are already exact -- confirmed repeatedly
+    (every autonomous match so far has been 'base attempt already
+    matched'). Running the full decomp-permuter apparatus to discover that
+    costs an import (cpp + agbcc + as), a container start, and a pool slot,
+    to reach the same answer one asm-differ invocation gives in seconds.
+    This is the single biggest electricity saving in the pipeline: the
+    common success path no longer spins up a search at all.
+
+    A false positive here is harmless -- the validator still does the full
+    from-scratch build before committing anything, so the real gate is
+    unchanged. A false negative just falls through to the permuter, which
+    is exactly what would have happened anyway.
+    """
+    if not candidate_body:
+        return False
+    with gitops.repo_lock(what=f"tier2 precheck {name}"):
+        if gitops.splice_into_else(name, candidate_body) is None:
+            return False
+        return gitops.asm_differ_matches(name)
+
+
+def run_pool(jobs: int, stall_min: float, max_functions: int):
+    """Continuously-refilled worker pool.
+
+    Previously this claimed a batch of `max_functions`, then waited for
+    EVERY one to finish before claiming any more -- so one slow function
+    idled up to five free slots. Now a slot is refilled the moment it
+    frees, which is what actually turns spare CPU into throughput.
+    """
     procs = {}
-    for name in claimed:
-        if not ensure_isolated(name, candidate_bodies.get(name)):
-            conn = db.connect()
-            try:
-                with db.tx(conn):
-                    db.set_state(conn, name, "needs_human", worker_id=None,
-                                 notes="tier2: couldn't isolate for permuter (permute.py failed)")
-            finally:
-                conn.close()
-            continue
-        proc, log_f = launch(name, threads_each)
-        procs[name] = {"proc": proc, "log": log_f, "last_score": None, "last_improved": time.time()}
-        _active[name] = proc
+    processed = 0
+
+    def claim_one():
         conn = db.connect()
         try:
-            with db.tx(conn):
-                db.set_state(conn, name, "permuting", best_score=None, last_improved_at=time.time())
-            db.log_event(conn, name, "t2_launch", f"threads={threads_each}")
-            conn.commit()
+            return db.claim_for_worker(conn, "tier2_ready", WORKER_ID)
         finally:
             conn.close()
 
-    # This loop can run for the full --stall-min minutes (default 15) --
-    # found live, running the whole pipeline together for the first time:
-    # a SINGLE connection held open across that entire span, doing
-    # periodic small transactions on it every 10s, was leaving every OTHER
-    # process (tier1, tier3, scanner, validator) blocked on writes the
-    # whole time -- confirmed directly, tier1's CPU time was flat to the
-    # second across a 100+-second window while a tier2 cycle was mid-run.
-    # Not just "connection per iteration" (that fixed a DIFFERENT, shorter-
-    # lived version of the same class of bug in every other tier) --
-    # HERE it has to be "connection per individual DB touch", because one
-    # iteration of THIS loop can legitimately span minutes.
-    while procs:
+    def resolve(name, state, notes=None, event=None, detail="", body=None, source="tier2"):
+        conn = db.connect()
+        try:
+            fields = {"worker_id": None}
+            if notes is not None:
+                fields["notes"] = notes
+            if body is not None:
+                fields["candidate_body"] = body
+                fields["candidate_source"] = source
+            with db.tx(conn):
+                db.set_state(conn, name, state, **fields)
+            if event:
+                db.log_event(conn, name, event, detail)
+                conn.commit()
+        finally:
+            conn.close()
+
+    while True:
+        # --- refill every free slot -------------------------------------
+        while len(procs) < max_functions:
+            row = claim_one()
+            if row is None:
+                break
+            name = row["name"]
+            body = row["candidate_body"]
+
+            # Cheap win first: if it already matches, skip the permuter
+            # entirely and hand it straight to the validator.
+            try:
+                if already_matches(name, body):
+                    resolve(name, "validating", event="converged",
+                            detail="score=0 (pre-check: candidate already matched)",
+                            body=body)
+                    print(f"  {name}: already matches -- straight to validator (no search)")
+                    processed += 1
+                    continue
+            except Exception as e:
+                print(f"  {name}: pre-check failed ({e}), falling through to permuter")
+
+            if not ensure_isolated(name, body):
+                resolve(name, "needs_human",
+                        notes="tier2: couldn't isolate for permuter (permute.py failed)")
+                processed += 1
+                continue
+
+            threads_each = max(1, jobs // max(1, max_functions))
+            proc, log_f = launch(name, threads_each)
+            procs[name] = {
+                "proc": proc, "log": log_f, "last_score": None,
+                "last_improved": time.time(),
+                "stall_s": stall_seconds_for(row["lines"] or 0, stall_min),
+            }
+            _active[name] = proc
+            conn = db.connect()
+            try:
+                with db.tx(conn):
+                    db.set_state(conn, name, "permuting", worker_id=None, best_score=None,
+                                 last_improved_at=time.time())
+                db.log_event(conn, name, "t2_launch",
+                             f"threads={threads_each}, stall={procs[name]['stall_s']:.0f}s")
+                conn.commit()
+            finally:
+                conn.close()
+            print(f"  {name}: searching ({threads_each}t, give up after {procs[name]['stall_s']:.0f}s)")
+
+        if not procs:
+            break  # nothing running and nothing left to claim
+
         time.sleep(10)
+
         for name in list(procs):
             info = procs[name]
             score = best_score_seen(name)
@@ -271,81 +346,56 @@ def run_pool(jobs: int, stall_min: float, max_functions: int):
                 conn = db.connect()
                 try:
                     with db.tx(conn):
-                        db.set_state(conn, name, "permuting", best_score=score, last_improved_at=info["last_improved"])
+                        db.set_state(conn, name, "permuting", best_score=score,
+                                     last_improved_at=info["last_improved"])
                     db.log_event(conn, name, "score_update", str(score))
                     conn.commit()
                 finally:
                     conn.close()
 
             exited = info["proc"].poll() is not None
-            stalled = (time.time() - info["last_improved"]) > stall_min * 60
+            stalled = (time.time() - info["last_improved"]) > info["stall_s"]
 
             if exited:
                 info["log"].close()
                 zero = has_zero(name)
-                # Two genuinely different ways to win, and missing the
-                # second one made this pipeline unable to recognize its own
-                # successes at all -- see base_already_zero()'s docstring.
                 base_zero = zero is None and base_already_zero(name)
-                conn = db.connect()
-                try:
-                    if zero or base_zero:
-                        if zero:
-                            body = trim_source(zero.read_text(), name)
-                            detail = "score=0 (permuter found it)"
-                        else:
-                            # The attempt we HANDED the permuter was already
-                            # perfect, so the winning C is the candidate
-                            # body itself -- there's no output dir to read.
-                            body = candidate_bodies.get(name)
-                            detail = "score=0 (base attempt already matched)"
-                            if not body:
-                                # Shouldn't happen (we spliced it in to get
-                                # here) but never guess at a body -- send it
-                                # for a human to look at instead.
-                                with db.tx(conn):
-                                    db.set_state(conn, name, "needs_human", worker_id=None,
-                                                 notes="permuter says base score 0 but no candidate_body on record")
-                                db.log_event(conn, name, "error", "base zero with no candidate_body")
-                                conn.commit()
-                                del procs[name]
-                                _active.pop(name, None)
-                                continue
-                        with db.tx(conn):
-                            db.set_state(conn, name, "validating", worker_id=None,
-                                         candidate_body=body, candidate_source="tier2")
-                        db.log_event(conn, name, "converged", detail)
-                        conn.commit()
+                if zero or base_zero:
+                    if zero:
+                        body = trim_source(zero.read_text(), name)
+                        detail = "score=0 (permuter found it)"
+                    else:
+                        body = candidate_body_of(name)
+                        detail = "score=0 (base attempt already matched)"
+                    if body:
+                        resolve(name, "validating", event="converged", detail=detail, body=body)
                         print(f"  {name}: converged -- {detail}")
                     else:
-                        with db.tx(conn):
-                            db.set_state(conn, name, "stalled", worker_id=None,
-                                         notes="permuter process exited without reaching score 0")
-                        db.log_event(conn, name, "t2_exit_no_zero", "")
-                        conn.commit()
-                        print(f"  {name}: exited, no zero")
-                finally:
-                    conn.close()
+                        resolve(name, "needs_human", event="error",
+                                detail="base zero with no candidate_body",
+                                notes="permuter says base score 0 but no candidate_body on record")
+                else:
+                    resolve(name, "stalled", event="t2_exit_no_zero",
+                            notes="permuter process exited without reaching score 0")
+                    print(f"  {name}: exited, no zero")
                 del procs[name]
                 _active.pop(name, None)
+                processed += 1
             elif stalled:
                 kill_search(name, info["proc"])
                 info["log"].close()
-                conn = db.connect()
-                try:
-                    with db.tx(conn):
-                        db.set_state(conn, name, "stalled", worker_id=None,
-                                     notes=f"no score improvement for {stall_min} min "
-                                            f"(best={info['last_score']}) -- likely wrong C, needs tier3")
-                    db.log_event(conn, name, "stalled", f"best_score={info['last_score']}")
-                    conn.commit()
-                finally:
-                    conn.close()
-                print(f"  {name}: stalled at score {info['last_score']}, handing to tier3")
+                resolve(name, "stalled", event="stalled",
+                        detail=f"best_score={info['last_score']}",
+                        notes=f"no improvement for {info['stall_s']:.0f}s "
+                              f"(best={info['last_score']}) -- likely wrong C, needs tier3")
+                print(f"  {name}: stalled at {info['last_score']} after {info['stall_s']:.0f}s -> tier3")
                 del procs[name]
                 _active.pop(name, None)
+                processed += 1
 
-    return len(claimed)
+    return processed
+
+
 
 
 def main():
