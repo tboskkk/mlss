@@ -96,15 +96,35 @@ def _validate_claimed(conn, row) -> str:
 
     if not gitops.asm_differ_matches(name):
         gitops.revert_to_clean()
+        # LOOP GUARD. Sending a rejected candidate back to tier2 is right
+        # when tier2 might do something new with it -- but if tier2's
+        # pre-check and this validator DISAGREE about the same unchanged
+        # candidate, it ping-pongs forever, burning a full rebuild every
+        # lap. That happened for real (a stale-object bug made the
+        # pre-check say "match" on bytes the validator then correctly
+        # rejected; one function cycled 10+ times in nine minutes and the
+        # run produced 40 converges with 0 matches). The underlying bug is
+        # fixed, but a disagreement must never be able to spin unbounded
+        # again -- so count rejections and give up after a couple.
+        prior = conn.execute(
+            "SELECT COUNT(*) c FROM events WHERE function_name = ? AND kind = 'rejected'",
+            (name,),
+        ).fetchone()["c"]
+        db.log_event(conn, name, "rejected", f"source={source}")
+        conn.commit()
         with db.tx(conn):
             # Not proof the candidate is worthless -- just not byte-perfect.
             # Send it back to the tier that produced it rather than the
             # dead-end needs_human queue, EXCEPT tier1 (idiom matches are
             # deterministic -- if it didn't match, retrying it won't help,
             # that's a real bug in the idiom rule and deserves a look).
-            next_state = "needs_human" if source == "tier1" else "tier2_ready"
-            db.set_state(conn, name, next_state, worker_id=None,
-                         notes=f"candidate from {source} wasn't byte-identical")
+            if source == "tier1" or prior >= 2:
+                db.set_state(conn, name, "needs_human", worker_id=None,
+                             notes=f"candidate from {source} wasn't byte-identical "
+                                    f"({prior + 1} rejections -- not retrying)")
+            else:
+                db.set_state(conn, name, "tier2_ready", worker_id=None,
+                             notes=f"candidate from {source} wasn't byte-identical")
         db.log_event(conn, name, "reverted", f"asm-differ mismatch, source={source}")
         return name
 
