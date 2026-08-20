@@ -10,5 +10,26 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8163EE4.s\"");
 #else
-#error "TODO: write sub_8163EE4 to match asm/nonmatching/sub_8163EE4.s, then delete this #error"
+void sub_8163EE4(u32 r0, u32 r1)
+{
+    u32 *r3;
+    u32 *r4;
+    u32 r2;
+    u32 r5;
+
+    r5 = r0;
+    r3 = (u32 *)0x03001028;
+    r2 = *r3;
+    r0 = 0x41C64E6D * r2 + 0x3039;
+    *r3 = r0;
+    r4 = (u32 *)0x03001038;
+    r2 = 0x08198350 - 0x08198220;
+    r3 = (u32 *)0x03001038;
+    r3 = r3 + r2;
+    r0 = (r0 << 1) >> 0x11;
+    r2 = r5 - 1;
+    r1 = r1 - r2;
+    ((void (*)(u32, u32))r3)(r0, r1);
+    r0 = r0 + r5;
+}
 #endif
