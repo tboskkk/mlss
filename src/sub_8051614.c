@@ -10,9 +10,7 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8051614.s\"");
 #else
-void sub_8051614(u32* p0, u32* p1)
-{
-    u32* r2 = p1 + 0x1A0 / sizeof(u32);
-    (*(u32 (**)(void))r2)();
+void sub_8051614(void *arg1) {
+    (*(s32 (**)())((s8 *)(arg1) + (0x1A0)))();
 }
 #endif

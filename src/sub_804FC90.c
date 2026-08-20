@@ -10,5 +10,25 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_804FC90.s\"");
 #else
-#error "TODO: write sub_804FC90 to match asm/nonmatching/sub_804FC90.s, then delete this #error"
+void sub_804FC90(u32* param_1)
+{
+  u32* puVar1;
+  s8 sVar2;
+  u8 uVar3;
+  u32* puVar4;
+  u32 uVar5;
+  
+  puVar1 = (u32*)((u8*)param_1 + 0x368);
+  puVar4 = *(u32**)puVar1;
+  sVar2 = *(s8*)((u8*)puVar4 + 0x13);
+  if (sVar2 != -1) {
+    uVar3 = *(u8*)((u8*)puVar4 + 0x01);
+    *(u8*)puVar4 = uVar3;
+    uVar5 = (u32)*(u8*)((u8*)param_1 + 0x36C) & 0xff;
+    uVar5 = uVar5 >> 7 ^ 1;
+    *(u8*)((u8*)puVar4 + 0x10 + uVar5) = *(u8*)((u8*)puVar4 + 0x13);
+    *(u8*)((u8*)puVar4 + 0x13) = 0xff;
+  }
+  return;
+}
 #endif

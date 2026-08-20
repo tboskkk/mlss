@@ -10,5 +10,40 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_805F508.s\"");
 #else
-#error "TODO: write sub_805F508 to match asm/nonmatching/sub_805F508.s, then delete this #error"
+void sub_805F508(u32* p0, s16 p1, s16 p2, u16 p3)
+{
+    u32* r4;
+    u32* r5;
+    u32* r6;
+    u16 r0;
+    u16 r1;
+    u16 r2;
+    
+    r4 = (u32*)((u8*)p0 + 0x30);
+    r6 = *(u32**)r4;
+    r5 = *(u32**)((u8*)r6 + 0x30);
+    
+    if (p1 < 0)
+        p1 += 0xFF;
+        
+    r0 = p1 >> 8;
+    *(u16*)((u8*)r5 + 0xAE) = r0;
+    *(u16*)((u8*)r6 + 0xAE) = r0;
+    
+    if (p2 < 0)
+        p2 += 0xFF;
+        
+    r0 = p2 >> 8;
+    *(u16*)((u8*)r5 + 0xB0) = r0;
+    *(u16*)((u8*)r6 + 0xB0) = r0;
+    
+    if (p3 < 0)
+        p3 += 0xFF;
+        
+    r2 = p3 >> 8;
+    r1 = r2 + *(u16*)((u8*)r6 + 0xB2);
+    *(u16*)((u8*)r6 + 0xB2) = r1;
+    r1 = r2 - *(u16*)((u8*)r5 + 0xB2);
+    *(u16*)((u8*)r5 + 0xB2) = r1;
+}
 #endif

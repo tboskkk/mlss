@@ -10,5 +10,84 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8063118.s\"");
 #else
-#error "TODO: write sub_8063118 to match asm/nonmatching/sub_8063118.s, then delete this #error"
+extern void sub_8063248();
+
+void sub_8063118(void* p0) {
+    u32* r4;
+    u32* r5;
+    u16* r8;
+    u16* r9;
+    u16* r12;
+    u32 r0, r1, r2, r3, r6;
+    u16 r7;
+    u32 r10;
+    
+    r5 = (u32*)((u8*)p0 + 0x0);
+    r4 = (u32*)0x03000E18;
+    r2 = 0x08200014;
+    r0 = 0x10;
+    r1 = 0x00;
+    r3 = 0x00;
+    alloc_Zero(r0, r1, r2, r3);
+    sub_801B75C();
+    *(u32*)((u8*)r4 + 0x00) = r0;
+    r1 = (u32*)0x03000E48;
+    r0 = *(u32*)((u8*)r5 + 0x38);
+    if (r0 < 0x00) {
+        r0 += 0xFF;
+    }
+    *(u16*)((u8*)r1 + 0x00) = r0 >> 8;
+    r0 = *(u32*)((u8*)r5 + 0x3C);
+    if (r0 < 0x00) {
+        r0 += 0xFF;
+    }
+    *(u16*)((u8*)r1 + 0x02) = r0 >> 8;
+    r10 = 0x01;
+    r4 = (u32*)((u8*)r5 + 0xA8);
+    r1 = (u32*)0x03000E48;
+    r1 += 0x06;
+    r8 = (u16*)r1;
+    r7 = 0x00;
+    r2 = (u32*)0x03000E48;
+    r2 += 0x04;
+    r12 = (u16*)r2;
+    
+    do {
+        r0 = *(u32*)((u8*)r5 + 0x2C);
+        r0 = *(u32*)((u8*)r0 + 0x28);
+        r0 += 0xD8;
+        r1 = *(u32*)((u8*)r0 + 0x00);
+        if (r1 < 0x00) {
+            r1 += 0xFF;
+        }
+        r6 = 0x083B86E4;
+        r0 = *(u32*)((u8*)r4 + 0x00);
+        r0 <<= 0x04;
+        r0 += r7;
+        r0 += r6;
+        r1 >>= 0x08;
+        r0 = *(u16*)((u8*)r0 + 0x00);
+        r1 += r0;
+        r0 = (u32)r12;
+        *(u16*)((u8*)r0 + 0x00) = r1;
+        r0 = *(u32*)((u8*)r5 + 0x2C);
+        r0 = *(u32*)((u8*)r0 + 0x28);
+        r0 += 0xDC;
+        r2 = *(u32*)((u8*)r0 + 0x00);
+        if (r2 < 0x00) {
+            r2 += 0xFF;
+        }
+        r1 = *(u32*)((u8*)r4 + 0x00);
+        r1 <<= 0x04;
+        r1 += r7;
+        r0 = r6 + 0x2;
+        r1 += r0;
+        r2 >>= 0x08;
+        r1 = *(u16*)((u8*)r1 + 0x00);
+        r2 += r1;
+        r1 = (u32)r8;
+        *(u16*)((u8*)r1 + 0x00) = r2;
+        r2 = r7 + 0x4;
+        r0 = *(u32*)((u8*)r5 + 0x2C);
+        r0 = *(u32*)((u8*)r0 +
 #endif
