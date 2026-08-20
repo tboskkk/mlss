@@ -3,10 +3,12 @@
 
 // TODO: add other includes (a matching *.h, other subsystem headers) as
 // this file grows. Left minimal since split_func.py doesn't know yet what
-// isatty needs.
+// sub_80746EC needs.
 
 asm_unified(".include \"asm/macros.inc\"");
 
-bool32 isatty(void) {
-    return TRUE;
-}
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80746EC.s\"");
+#else
+#error "TODO: write sub_80746EC to match asm/nonmatching/sub_80746EC.s, then delete this #error"
+#endif

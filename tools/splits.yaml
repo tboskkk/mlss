@@ -116,15 +116,29 @@ groups:
   - {obj: asm/text08057568_p57, section: text}
   - {obj: src/sub_806814C, section: text}
   - {obj: asm/text08057568_p109, section: text}
+  - {obj: src/sub_806A22C, section: text}
+  - {obj: asm/text08057568_p131, section: text}
   - {obj: src/sub_806B56C, section: text}
   - {obj: asm/text08057568_p102, section: text}
+  - {obj: src/sub_806C1A8, section: text}
+  - {obj: asm/text08057568_p132, section: text}
   - {obj: src/sub_806E778, section: text}
   - {obj: src/nullsub_15, section: text}
   - {obj: asm/text08057568_p3, section: text}
+  - {obj: src/sub_80708F8, section: text}
+  - {obj: asm/text08057568_p133, section: text}
   - {obj: src/sub_8070C84, section: text}
   - {obj: asm/text08057568_p22, section: text}
+  - {obj: src/sub_8072350, section: text}
+  - {obj: asm/text08057568_p134, section: text}
+  - {obj: src/sub_807411C, section: text}
+  - {obj: asm/text08057568_p135, section: text}
   - {obj: src/sub_807462C, section: text}
   - {obj: asm/text08057568_p122, section: text}
+  - {obj: src/sub_8074688, section: text}
+  - {obj: asm/text08057568_p136, section: text}
+  - {obj: src/sub_80746EC, section: text}
+  - {obj: asm/text08057568_p137, section: text}
   - {obj: src/sub_80793F4, section: text}
   - {obj: asm/text08057568_p91, section: text}
   - {obj: src/sub_807FF98, section: text}
@@ -280,12 +294,16 @@ groups:
   - {obj: asm/text08057568_p110, section: text}
   - {obj: src/sub_8160EC4, section: text}
   - {obj: asm/text08057568_p78, section: text}
+  - {obj: src/sub_816127C, section: text}
+  - {obj: asm/text08057568_p138, section: text}
   - {obj: src/sub_816132C, section: text}
   - {obj: asm/text08057568_p13, section: text}
   - {obj: src/sub_816156C, section: text}
   - {obj: asm/text08057568_p60, section: text}
   - {obj: src/sub_816168C, section: text}
   - {obj: asm/text08057568_p31, section: text}
+  - {obj: src/sub_8161954, section: text}
+  - {obj: asm/text08057568_p139, section: text}
   - {obj: src/sub_81631DC, section: text}
   - {obj: asm/text08057568_p82, section: text}
   - {obj: src/sub_8163264, section: text}
