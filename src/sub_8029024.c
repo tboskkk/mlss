@@ -20,5 +20,7 @@ u32 sub_8029024(u32 param_1, u8 param_2) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8029030.s\"");
 #else
-#error "TODO: write sub_8029030 to match asm/nonmatching/sub_8029030.s, then delete this #error"
+void sub_8029030(void *arg0, s32 arg1, s32 arg2) {
+    (*(u8 *)((s8 *)(arg0) + (0x12D))) = (u8) ((((((*(u8 *)((s8 *)(arg0) + (0x12D))) | 1) & ~2) | ((arg1 & 1) * 2)) & ~0xC) | ((arg2 & 3) * 4));
+}
 #endif
