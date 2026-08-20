@@ -10,16 +10,15 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8150DE8.s\"");
 #else
-u32* sub_8150DE8(u32* param_1, u32 param_2) {
-    *param_1 = param_2;
-    return param_1;
+void sub_8150DE8(void *arg0, s32 arg1) {
+    (*(s32 *)((s8 *)(arg0) + (0x30))) = arg1;
 }
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8150DEC.s\"");
 #else
-u32* sub_8150DEC(u32* param_1) {
-    return &param_1[0x34 >> 2];
+s32 sub_8150DEC(void *arg0) {
+    return (*(s32 *)((s8 *)(arg0) + (0x34)));
 }
 #endif

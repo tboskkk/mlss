@@ -10,7 +10,7 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8158308.s\"");
 #else
-u16 sub_8158308(u32* param_1) {
-    return param_1[0x1C];
+s32 sub_8158308(s32 arg0) {
+    return M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */);
 }
 #endif

@@ -10,9 +10,8 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_804794C.s\"");
 #else
-u16* sub_804794C(u16* param_1, u16 param_2) {
-    *param_1 = param_2;
-    return param_1;
+void sub_804794C(void *arg0, s16 arg1) {
+    (*(s16 *)((s8 *)(arg0) + (0x23E))) = arg1;
 }
 #endif
 
