@@ -7,9 +7,6 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_815EC3C.s\"");
-#else
 u32 sub_815EC3C(u32 param_1) {
     u8* puVar1;
     u8* puVar2;
@@ -20,4 +17,3 @@ u32 sub_815EC3C(u32 param_1) {
     *(u8*)(param_1 + 0x1A) = 0;
     return param_1;
 }
-#endif
