@@ -22,5 +22,31 @@ asm_unified(".include \"asm/nonmatching/sub_8163134.s\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_816316C.s\"");
 #else
-#error "TODO: write sub_816316C to match asm/nonmatching/sub_816316C.s, then delete this #error"
+void sub_816316C(u32* param_1) {
+    u16 temp;
+    
+    temp = *(u16*)((u8*)param_1 + 0x20);
+    if (temp & 1) {
+        *(u16*)0x02000010 = *(u32*)((u8*)param_1 + 0x18);
+        *(u16*)0x02000012 = *(u32*)((u8*)param_1 + 0x1C);
+    }
+    
+    temp = *(u16*)((u8*)param_1 + 0x20);
+    if (temp & 2) {
+        *(u16*)0x02000014 = *(u32*)((u8*)param_1 + 0x18);
+        *(u16*)0x02000016 = *(u32*)((u8*)param_1 + 0x1C);
+    }
+    
+    temp = *(u16*)((u8*)param_1 + 0x20);
+    if (temp & 4) {
+        *(u16*)0x02000018 = *(u32*)((u8*)param_1 + 0x18);
+        *(u16*)0x0200001A = *(u32*)((u8*)param_1 + 0x1C);
+    }
+    
+    temp = *(u16*)((u8*)param_1 + 0x20);
+    if (temp & 8) {
+        *(u16*)0x0200001C = *(u32*)((u8*)param_1 + 0x18);
+        *(u16*)0x0200001E = *(u32*)((u8*)param_1 + 0x1C);
+    }
+}
 #endif

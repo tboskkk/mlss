@@ -18,8 +18,13 @@ void sub_81632EC(void *arg0, u16 arg1) {
     (*(s16 *)((s8 *)(arg0) + (2))) = 0;
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8163308.s\"");
-#else
-#error "TODO: write sub_8163308 to match asm/nonmatching/sub_8163308.s, then delete this #error"
-#endif
+void sub_8163308(u32* param_1, u32 param_2)
+{
+  u32* puVar1;
+  
+  puVar1 = param_1;
+  if ((param_2 & 1) != 0) {
+    free_heap_8018DA8(puVar1);
+  }
+  return;
+}
