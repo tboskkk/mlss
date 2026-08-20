@@ -59,6 +59,8 @@ groups:
   - {obj: asm/text0801A548_p40, section: text}
   - {obj: src/sub_801ADC0, section: text}
   - {obj: asm/text0801A548_p42, section: text}
+  - {obj: src/sub_801AE3C, section: text}
+  - {obj: asm/text0801A548_p43, section: text}
   - {obj: src/sub_801AEDC, section: text}
   - {obj: asm/text0801A548_p38, section: text}
   - {obj: src/sub_801B0AC, section: text}
