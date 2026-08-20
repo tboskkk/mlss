@@ -7,15 +7,12 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8163748.s\"");
-#else
-u32 sub_8163748(u32* param) {
-    u32 r0 = *param;
-    u32 r1 = 0;
-    if (r0 != 0) {
-        r1 = 1;
+s32 sub_8163748(s32 *arg0) {
+    s32 var_r1_7;
+
+    var_r1_7 = 0;
+    if (*arg0 == 0) {
+        var_r1_7 = 1;
     }
-    return r1;
+    return var_r1_7;
 }
-#endif
