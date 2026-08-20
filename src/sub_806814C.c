@@ -26,5 +26,14 @@ u32 sub_806814C(u32* param_1) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8068168.s\"");
 #else
-#error "TODO: write sub_8068168 to match asm/nonmatching/sub_8068168.s, then delete this #error"
+extern s32 sub_8067DC8;
+
+s32 sub_8068168(void *arg0) {
+    if ((*(s32 *)((s8 *)(arg0) + (0x9C))) == 0) {
+        (*(s32 *)((s8 *)(arg0) + (0x9C))) = 2;
+        (*(s32 *)((s8 *)((arg0 + 0x9C)) + (4))) = 1;
+    }
+    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8067DC8;
+    return 1;
+}
 #endif

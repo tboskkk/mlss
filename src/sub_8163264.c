@@ -28,5 +28,19 @@ asm_unified(".include \"asm/nonmatching/sub_8163280.s\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8163298.s\"");
 #else
-#error "TODO: write sub_8163298 to match asm/nonmatching/sub_8163298.s, then delete this #error"
+u32 sub_8163298(u32* param_1, u16 param_2) {
+    *(u16*)((u8*)param_1 + 0x20) = param_2;
+    *(u32*)((u8*)param_1 + 0x24) = 0;
+    *(u32*)((u8*)param_1 + 0x1C) = 0;
+    *(u32*)((u8*)param_1 + 0x18) = 0;
+    *(u32*)((u8*)param_1 + 0x14) = 0;
+    *(u32*)((u8*)param_1 + 0x10) = 0;
+    *(u32*)((u8*)param_1 + 0x0C) = 0;
+    *(u32*)((u8*)param_1 + 0x08) = 0;
+    *(u32*)((u8*)param_1 + 0x04) = 0;
+    *(u32*)((u8*)param_1 + 0x00) = 0;
+    *(u32*)((u8*)param_1 + 0x2C) = 0;
+    *(u32*)((u8*)param_1 + 0x28) = 0;
+    return 0;
+}
 #endif
