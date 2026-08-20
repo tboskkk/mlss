@@ -134,6 +134,7 @@ groups:
   - {obj: asm/text0801A548_p26, section: text}
   - {obj: src/sub_8051434, section: text}
   - {obj: asm/text0801A548_p41, section: text}
+  - {obj: src/nullsub_19, section: text}
   - {obj: src/nullsub_18, section: text}
   - {obj: asm/text0801A548_p2, section: text}
   - {obj: src/sub_8051614, section: text}
