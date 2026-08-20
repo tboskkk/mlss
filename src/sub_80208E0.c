@@ -7,19 +7,12 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80208E0.s\"");
-#else
-u32* sub_80208E0(u32* param_1) {
-    u32* puVar1;
-    u32* puVar2;
-    
-    puVar1 = param_1 + 0x12;
-    *puVar1 = 1;
-    puVar2 = param_1 + 0x14;
-    *(puVar1 + 1) = *puVar2;
-    *(puVar1 + 2) = *(param_1 + 0x13);
-    *(puVar1 + 3) = 0;
-    return puVar1;
+void sub_80208E0(void *arg0) {
+    void *temp_r2_6;
+
+    temp_r2_6 = (*(void **)((s8 *)(arg0) + (0x48)));
+    (*(s32 *)((s8 *)(temp_r2_6) + (0))) = 1;
+    (*(s32 *)((s8 *)(temp_r2_6) + (4))) = (s32) (*(s32 *)((s8 *)(arg0) + (0x50)));
+    (*(s32 *)((s8 *)(temp_r2_6) + (8))) = (s32) (*(s32 *)((s8 *)(arg0) + (0x4C)));
+    (*(s32 *)((s8 *)(temp_r2_6) + (0xC))) = 0;
 }
-#endif
