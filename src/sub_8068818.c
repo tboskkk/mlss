@@ -10,5 +10,15 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8068818.s\"");
 #else
-#error "TODO: write sub_8068818 to match asm/nonmatching/sub_8068818.s, then delete this #error"
+void sub_8068818(void *arg0) {
+    s32 temp_r0_16;
+
+    if (M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */) == 0) {
+        temp_r0_16 = (*(s32 *)((s8 *)(arg0) + (0x10))) + 0xFFFFFE00;
+        (*(s32 *)((s8 *)(arg0) + (0x10))) = temp_r0_16;
+        if ((s32) (*(s32 *)((s8 *)(arg0) + (0x84))) >= temp_r0_16) {
+            (*(s16 *)((s8 *)(arg0) + (0xAC))) = 1;
+        }
+    }
+}
 #endif
