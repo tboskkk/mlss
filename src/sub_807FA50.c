@@ -10,5 +10,15 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_807FA50.s\"");
 #else
-#error "TODO: write sub_807FA50 to match asm/nonmatching/sub_807FA50.s, then delete this #error"
+void sub_807FA50(void) {
+    void *temp_r0_11;
+    void *temp_r3_7;
+
+    temp_r3_7 = *(void **)0x03000FD8;
+    temp_r0_11 = (*(void **)((s8 *)(temp_r3_7) + (0x238)));
+    (*(void **)((s8 *)(temp_r3_7) + (0x238))) = (void *) (*(void **)((s8 *)(temp_r0_11) + (0)));
+    (*(void **)((s8 *)(temp_r0_11) + (0))) = (void *) (*(void **)((s8 *)(temp_r3_7) + (0x23C)));
+    (*(void **)((s8 *)(temp_r3_7) + (0x23C))) = temp_r0_11;
+    (*(u8 *)((s8 *)(temp_r0_11) + (0xC))) = (u8) (-0x20 & (*(u8 *)((s8 *)(temp_r0_11) + (0xC))));
+}
 #endif
