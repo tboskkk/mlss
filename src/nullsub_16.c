@@ -9,3 +9,9 @@ asm_unified(".include \"asm/macros.inc\"");
 
 void nullsub_16(void) {
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8018B78.s\"");
+#else
+#error "TODO: write sub_8018B78 to match asm/nonmatching/sub_8018B78.s, then delete this #error"
+#endif
