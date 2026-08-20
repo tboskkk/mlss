@@ -7,16 +7,7 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_819A718.s\"");
-#else
-u32 sub_819A718(u32* param_1) {
-    u32 temp;
-    
-    temp = *param_1 & 0xF9FF;
-    *param_1 = temp;
-    *(param_1 + 0x1B/4) = *(param_1 + 0x1A/4);
-    
-    return temp;
+void sub_819A718(void *arg0) {
+    (*(u16 *)((s8 *)(arg0) + (0))) = (u16) (0xF9FF & (*(u16 *)((s8 *)(arg0) + (0))));
+    (*(u8 *)((s8 *)(arg0) + (0x1B))) = (u8) (*(u8 *)((s8 *)(arg0) + (0x1A)));
 }
-#endif
