@@ -7,8 +7,18 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_810CAD0.s\"");
-#else
-#error "TODO: write sub_810CAD0 to match asm/nonmatching/sub_810CAD0.s, then delete this #error"
-#endif
+extern s32 sub_810C05C;
+
+void sub_810CAD0(void) {
+    void *temp_r1_12;
+    void *temp_r1_22;
+
+    temp_r1_12 = (*(void **)((s8 *)(*(void **)0x03000FD8) + (0x27C)));
+    if (temp_r1_12 != NULL) {
+        (*(s32 **)((s8 *)(temp_r1_12) + (4))) = &sub_810C05C;
+    }
+    temp_r1_22 = (*(void **)((s8 *)(*(void **)0x03000FD8) + (0x280)));
+    if (temp_r1_22 != NULL) {
+        (*(s32 **)((s8 *)(temp_r1_22) + (4))) = &sub_810C05C;
+    }
+}
