@@ -7,9 +7,6 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8134B24.s\"");
-#else
 bool32 sub_8134B24(u16 *param_1)
 {
   unsigned int new_var;
@@ -21,4 +18,3 @@ bool32 sub_8134B24(u16 *param_1)
  new_var = 0; do { } while (new_var);
   return 1;
 }
-#endif
