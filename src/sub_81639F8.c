@@ -18,8 +18,9 @@ u32* sub_81639F8(u32* param_1, u32 param_2) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8163A08.s\"");
-#else
-#error "TODO: write sub_8163A08 to match asm/nonmatching/sub_8163A08.s, then delete this #error"
-#endif
+s32 sub_8163A08(void *arg0) {
+    if (((*(s32 *)((s8 *)(arg0) + (0x44))) != 0) && ((*(s32 *)((s8 *)(arg0) + (0x40))) != 1)) {
+        return 0;
+    }
+    return 1;
+}
