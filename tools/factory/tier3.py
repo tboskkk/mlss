@@ -53,7 +53,69 @@ Rules:
 - Use real GBA/agbcc types where obvious: u8/u16/u32/s8/s16/s32/bool32, not stdint types.
 - Trace register moves in the prologue carefully to get the true parameter order -- retail code often shuffles registers into a different order than you'd assume from reading top to bottom.
 - A `bx lr`-only body does not always mean the function is void/does nothing -- it can mean a parameter is returned unchanged. Consider what register holds the return value and whether it was ever written to.
-- If a diff is shown (TARGET = retail, CURRENT = your predecessor's attempt), the differences tell you exactly what's wrong -- study them, don't just resubmit similar code."""
+- If a diff is shown (TARGET = retail, CURRENT = your predecessor's attempt), the differences tell you exactly what's wrong -- study them, don't just resubmit similar code.
+- Do NOT invent struct type names. If you don't know a struct, use explicit pointer casts on u8*/u16*/u32* with the exact byte offsets from the assembly. Inventing `struct Foo` guarantees a compile failure.
+- Check branch polarity carefully. `cmp r0,#0` + `beq LABEL` SKIPS the code between the branch and LABEL when the value is zero -- so that code runs when the value is NON-zero. Getting this inverted is a common and costly error.
+
+CRITICAL THUMB IDIOMS -- the most frequent sources of error:
+
+1. RETURN TYPE.
+   - `pop {rN}` immediately followed by `bx rN` (SAME register) means the
+     function pushed LR and is returning through it. That register holds a
+     RETURN ADDRESS, not a value. The function is `void`.
+   - `bx lr` where r0 was only ever scratch is also `void`.
+
+2. LITERAL POOLS NAME SYMBOLS. A trailing `_08068164: .4byte sub_808750C`
+   means the loaded constant IS that symbol -- write the NAME, never the
+   raw address. A set low bit (…0D vs …0C) is just the Thumb flag; it is
+   still that function. These are usually function pointers stored into a
+   struct field.
+
+3. POINTER INDIRECTION -- count the loads.
+       ldr  r0, [r2, #0x08]   ; r0 = a POINTER stored at offset 8
+       ldrb r1, [r0, #0x12]   ; byte at offset 0x12 OF THAT POINTER
+   That is TWO dereferences. Collapsing them into `*(u8*)(p + 8 + 0x12)`
+   is wrong.
+
+4. ACCESS WIDTH must match exactly: `ldr`/`str` 32-bit, `ldrh`/`strh`
+   16-bit, `ldrb`/`strb` 8-bit. `ldrsh`/`ldrsb` sign-extend (s16/s8);
+   `ldrh`/`ldrb` zero-extend.
+
+5. SHIFTED CONSTANTS. `movs r2,#0x81` + `lsls r2,r2,#0x02` builds
+   0x81 << 2 = 0x204, a BYTE offset.
+
+6. Pointer arithmetic scales by pointee size: on a `u32*`, `p + 1` is 4
+   bytes. Choose the pointer type so indices match the assembly's offsets."""
+
+
+ERROR_SIBLING_RE_FACTS = re.compile(r"pop\s*\{r(\d)\}\s*\n\s*bx\s+r\1")
+POOL_SYMBOL_RE = re.compile(r"\.4byte\s+(sub_\w+|[a-zA-Z_]\w*)")
+
+
+def derive_facts(asm: str) -> list[str]:
+    """Compute what is MECHANICALLY determinable from the assembly, so the
+    model is told it as fact rather than asked to infer it.
+
+    Measured directly: phrasing the void-return rule as guidance did not
+    work -- the model kept writing `return x;` anyway. Stating "RETURN TYPE
+    IS void" as a given fixed it immediately, along with the literal-pool
+    symbol rule. This is the reusable technique for this whole pipeline:
+    precompute whatever can be derived, and only ask the LLM for what
+    genuinely needs judgement. The void idiom alone appears in ~50% of
+    queued functions, and pool symbols in ~20%.
+    """
+    facts = []
+    if ERROR_SIBLING_RE_FACTS.search(asm):
+        facts.append(
+            "RETURN TYPE IS `void`. The epilogue is `pop {rN}` + `bx rN`, which "
+            "returns through the saved link register -- that register is NOT a "
+            "return value. The signature MUST start with `void` and the body MUST "
+            "NOT contain any `return <expr>;`.")
+    for sym in dict.fromkeys(POOL_SYMBOL_RE.findall(asm)):
+        facts.append(
+            f"The literal pool constant is the symbol `{sym}` (usually a function "
+            f"pointer). Use the name `{sym}` verbatim, never its numeric address.")
+    return facts
 
 
 def extract_c_body(block_text: str) -> str:
@@ -87,6 +149,13 @@ def ensure_extracted(name: str) -> bool:
 def build_prompt(name: str, row) -> str:
     asm = read_retail_asm(name)
     parts = [f"Function name: {name}", "", "Retail assembly (must match exactly):", "```", asm.strip(), "```"]
+
+    facts = derive_facts(asm)
+    if facts:
+        parts += ["", "ESTABLISHED FACTS about this function -- derived mechanically "
+                      "from the assembly above. These are NOT optional and NOT "
+                      "suggestions; contradicting them guarantees a wrong answer:"]
+        parts += [f"  * {f}" for f in facts]
 
     c_path, block = gitops.find_guard_block(name)
     if block:
