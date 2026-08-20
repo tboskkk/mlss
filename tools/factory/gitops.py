@@ -97,9 +97,14 @@ def splice_into_else(name: str, body: str) -> Path | None:
         flags=re.DOTALL,
     )
     new_text = text.replace(block, new_block, 1)
-    if new_text == text:
-        return None
-    c_path.write_text(new_text)
+    # Deliberately NOT treating "text unchanged" as failure: that just means
+    # this exact candidate is already spliced in (a requeued function, a
+    # retry after a crash), which is a perfectly good state to proceed from.
+    # Treating it as failure sent five already-correctly-spliced functions
+    # straight to needs_human on their first retry -- the file was right,
+    # the pipeline just refused to believe it.
+    if new_text != text:
+        c_path.write_text(new_text)
     return c_path
 
 
