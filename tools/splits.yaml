@@ -33,6 +33,8 @@ groups:
 - name: code
   entries:
   - {obj: asm/text08000000, section: text}
+  - {obj: src/sub_8018218, section: text}
+  - {obj: asm/text08000000_p4, section: text}
   - {obj: src/reset_game_80189C4, section: text}
   - {obj: src/nullsub_17, section: text}
   - {obj: asm/text08000000_p2, section: text}
@@ -278,6 +280,8 @@ groups:
   - {obj: asm/text08057568_p197, section: text}
   - {obj: src/sub_8087C4C, section: text}
   - {obj: asm/text08057568_p287, section: text}
+  - {obj: src/sub_80883F0, section: text}
+  - {obj: asm/text08057568_p302, section: text}
   - {obj: src/sub_808843C, section: text}
   - {obj: asm/text08057568_p259, section: text}
   - {obj: src/sub_808862C, section: text}
@@ -352,6 +356,8 @@ groups:
   - {obj: src/sub_80E99E0, section: text}
   - {obj: src/sub_80E9A6C, section: text}
   - {obj: asm/text08057568_p271, section: text}
+  - {obj: src/sub_80E9BD8, section: text}
+  - {obj: asm/text08057568_p303, section: text}
   - {obj: src/sub_80EA514, section: text}
   - {obj: asm/text08057568_p118, section: text}
   - {obj: src/sub_80EA778, section: text}
@@ -401,6 +407,7 @@ groups:
   - {obj: src/sub_80F10E0, section: text}
   - {obj: src/sub_80F110C, section: text}
   - {obj: asm/text08057568_p156, section: text}
+  - {obj: src/sub_80F1AA4, section: text}
   - {obj: src/sub_80F1AE4, section: text}
   - {obj: asm/text08057568_p25, section: text}
   - {obj: src/sub_80F1BA4, section: text}

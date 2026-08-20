@@ -26,3 +26,9 @@ void sub_8087790(u32 param_1)
     *(u16 *)((int)&local_4 + 0x7C) = (u16)param_1;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80877C0.s\"");
+#else
+#error "TODO: write sub_80877C0 to match asm/nonmatching/sub_80877C0.s, then delete this #error"
+#endif

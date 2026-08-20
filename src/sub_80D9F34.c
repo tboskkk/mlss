@@ -10,5 +10,11 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80D9F34.s\"");
 #else
-#error "TODO: write sub_80D9F34 to match asm/nonmatching/sub_80D9F34.s, then delete this #error"
+extern s32 sub_80DA0E0;
+
+void sub_80D9F34(void *arg0) {
+    if (M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */) != 0) {
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80DA0E0;
+    }
+}
 #endif

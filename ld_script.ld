@@ -21,6 +21,8 @@ SECTIONS
     .text :
     {
         build/asm/text08000000.o(.text);
+        build/src/sub_8018218.o(.text);
+        build/asm/text08000000_p4.o(.text);
         build/src/reset_game_80189C4.o(.text);
         build/src/nullsub_17.o(.text);
         build/asm/text08000000_p2.o(.text);
@@ -266,6 +268,8 @@ SECTIONS
         build/asm/text08057568_p197.o(.text);
         build/src/sub_8087C4C.o(.text);
         build/asm/text08057568_p287.o(.text);
+        build/src/sub_80883F0.o(.text);
+        build/asm/text08057568_p302.o(.text);
         build/src/sub_808843C.o(.text);
         build/asm/text08057568_p259.o(.text);
         build/src/sub_808862C.o(.text);
@@ -340,6 +344,8 @@ SECTIONS
         build/src/sub_80E99E0.o(.text);
         build/src/sub_80E9A6C.o(.text);
         build/asm/text08057568_p271.o(.text);
+        build/src/sub_80E9BD8.o(.text);
+        build/asm/text08057568_p303.o(.text);
         build/src/sub_80EA514.o(.text);
         build/asm/text08057568_p118.o(.text);
         build/src/sub_80EA778.o(.text);
@@ -389,6 +395,7 @@ SECTIONS
         build/src/sub_80F10E0.o(.text);
         build/src/sub_80F110C.o(.text);
         build/asm/text08057568_p156.o(.text);
+        build/src/sub_80F1AA4.o(.text);
         build/src/sub_80F1AE4.o(.text);
         build/asm/text08057568_p25.o(.text);
         build/src/sub_80F1BA4.o(.text);
