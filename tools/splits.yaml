@@ -147,6 +147,7 @@ groups:
   - {obj: src/sub_805A0EC, section: text}
   - {obj: src/get_coldef_ptr_by_idx, section: text}
   - {obj: asm/text08057568_p41, section: text}
+  - {obj: src/sub_805A900, section: text}
   - {obj: src/sub_805A954, section: text}
   - {obj: asm/text08057568_p20, section: text}
   - {obj: src/sub_805CCD8, section: text}
