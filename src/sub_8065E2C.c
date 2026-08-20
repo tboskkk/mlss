@@ -7,8 +7,11 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8065E2C.s\"");
-#else
-#error "TODO: write sub_8065E2C to match asm/nonmatching/sub_8065E2C.s, then delete this #error"
-#endif
+extern s32 sub_8065EA0;
+
+void sub_8065E2C(void *arg0) {
+    if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
+        (*(s16 *)((s8 *)(arg0) + (0xAC))) = 0x14;
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8065EA0;
+    }
+}
