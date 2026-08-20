@@ -10,84 +10,47 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80877FC.s\"");
 #else
-void sub_80877FC(s32 r0, s32 r1, s32 r2, s32 r3)
-{
-    s32 r4;
-    s32 temp;
-    
-    r4 = r0;
-    if (r2 >= 0)
-    {
-        temp = r1 * r4;
-        if (temp < 0)
-        {
-            temp += 0x3FFF;
+s32 sub_80877FC(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    s32 temp_r0_58;
+    s32 temp_r1_21;
+    s32 temp_r4_20;
+    s32 var_r0_13;
+    s32 var_r0_23;
+    s32 var_r0_31;
+    s32 var_r0_39;
+    s32 var_r0_51;
+    s32 var_r0_61;
+
+    if (arg2 < 0) {
+        var_r0_13 = (0x4000 - arg0) * arg1;
+        if (var_r0_13 < 0) {
+            var_r0_13 += 0x3FFF;
         }
-        temp >>= 0xE;
-        r0 = temp - r2;
-        r4 = r0;
-        temp = r2 * r2;
-        if (temp < 0)
-        {
-            temp += 0xFF;
+        temp_r4_20 = (var_r0_13 >> 0xE) - arg2;
+        temp_r1_21 = arg1 - arg2;
+        var_r0_23 = arg2 * arg2;
+        if (var_r0_23 < 0) {
+            var_r0_23 += 0xFF;
         }
-        temp >>= 0x08;
-        r2 = r3 - temp;
-        temp = r1 * r1;
-        if (temp < 0)
-        {
-            temp += 0xFF;
+        var_r0_31 = temp_r1_21 * temp_r1_21;
+        if (var_r0_31 < 0) {
+            var_r0_31 += 0xFF;
         }
-        temp >>= 0x08;
-        r1 = r2 - temp;
-        temp = r4 * r4;
-        if (temp < 0)
-        {
-            temp += 0xFF;
+        var_r0_39 = temp_r4_20 * temp_r4_20;
+        if (var_r0_39 < 0) {
+            var_r0_39 += 0xFF;
         }
-        temp >>= 0x08;
-        r0 = r1 + temp;
+        return ((arg3 - (var_r0_23 >> 8)) - (var_r0_31 >> 8)) + (var_r0_39 >> 8);
     }
-    else
-    {
-        r0 = 0x80 << 7;
-        r0 -= r4;
-        temp = r0 * r1;
-        if (temp < 0)
-        {
-            temp += 0x3FFF;
-        }
-        temp >>= 0xE;
-        if (temp >= 0)
-        {
-            r0 = temp - r2;
-        }
-        else
-        {
-            r0 = temp + r2;
-        }
-        r4 = r0;
-        temp = r2 * r2;
-        if (temp < 0)
-        {
-            temp += 0xFF;
-        }
-        temp >>= 0x08;
-        r2 = r3 - temp;
-        temp = r1 * r1;
-        if (temp < 0)
-        {
-            temp += 0xFF;
-        }
-        temp >>= 0x08;
-        r1 = r2 - temp;
-        temp = r4 * r4;
-        if (temp < 0)
-        {
-            temp += 0xFF;
-        }
-        temp >>= 0x08;
-        r0 = r1 + temp;
+    var_r0_51 = arg1 * arg0;
+    if (var_r0_51 < 0) {
+        var_r0_51 += 0x3FFF;
     }
+    temp_r0_58 = (var_r0_51 >> 0xE) - arg2;
+    var_r0_61 = temp_r0_58 * temp_r0_58;
+    if (var_r0_61 < 0) {
+        var_r0_61 += 0xFF;
+    }
+    return arg3 - (var_r0_61 >> 8);
 }
 #endif

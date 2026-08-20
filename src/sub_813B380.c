@@ -10,11 +10,7 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_813B380.s\"");
 #else
-void sub_813B380(u32* param_1)
-{
-    u32* puVar1;
-    
-    puVar1 = param_1 + 0x1A0 / sizeof(u32);
-    (*(code*)*puVar1)();
+void sub_813B380(void *arg1) {
+    (*(s32 (**)())((s8 *)(arg1) + (0x1A0)))();
 }
 #endif

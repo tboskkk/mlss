@@ -10,5 +10,52 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80D6388.s\"");
 #else
-#error "TODO: write sub_80D6388 to match asm/nonmatching/sub_80D6388.s, then delete this #error"
+extern void sub_80D6400();
+
+void sub_80D6388(u32* p0)
+{
+    u32* r4;
+    u32* r0;
+    u8 r1;
+    u32* r2;
+    u32 r3;
+    
+    r0 = (u32*)0x03000FD8;
+    r0 = (u32*)*(r0);
+    r4 = (u32*)*(r0 + 0x1D);
+    r0 = (u32*)*(r4 + 0x4);
+    r1 = *(u8*)(r0 + 0x12);
+    if ((r1 & 0x08) != 0)
+    {
+        r0 = r4;
+        r0 += 0x1F;
+        r1 = *(u8*)(r0);
+        r1 &= 0x06;
+        if (r1 == 0x02)
+        {
+            r2 = (u32*)0x03001038;
+            r0 = (u32*)0x0819832C;
+            r1 = (u32*)0x08198220;
+            r3 = r0 - r1;
+            r2 = (u32*)*(r2);
+            r2 += r3;
+            r0 = 0x8000;
+            r1 = 0x0E;
+            r0 = ((u32(*)(u32, u32))r2)(r0, r1);
+            r2 = r4;
+            r2 += 0x20;
+            *(u16*)(r2) = (u16)r0;
+            r0 = r4;
+            r0 += 0x21;
+            *(u16*)(r0) = 0;
+            r2 -= 1;
+            r1 = *(u8*)(r2);
+            r0 = 0x21;
+            r0 = -r0;
+            r0 &= r1;
+            *(u8*)(r2) = (u8)r0;
+        }
+    }
+    *(u32*)((u8*)p0 + 0x4C) = (u32)sub_80D6400;
+}
 #endif

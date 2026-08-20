@@ -10,5 +10,50 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8098710.s\"");
 #else
-#error "TODO: write sub_8098710 to match asm/nonmatching/sub_8098710.s, then delete this #error"
+extern void sub_8098790();
+
+void sub_8098710(void* p0)
+{
+    u32 r4 = (u32)p0;
+    u16 r5;
+    u16 r0 = *(u8*)((u8*)p0 + 0x76);
+    u16 r1 = r0 & 6;
+    if (r1 == 2)
+        goto _08098724;
+    if (r1 != 4)
+        goto _08098782;
+_08098724:
+    r0 = *(u32*)((u8*)p0 + 0x28);
+    r1 = 0x84 << 1;
+    r0 += r1;
+    r1 = 0;
+    r0 = *(u16*)((u8*)r0 + r1);
+    r5 = r0 + 0x64;
+    r0 = *(u16*)((u8*)p0 + 0x1E);
+    if (r5 == r0)
+        goto _08098764;
+    u32* r2 = (u32*)0x03001038;
+    u32 r0_1 = 0x0819832C;
+    u32 r1_1 = 0x08198220;
+    r0_1 -= r1_1;
+    r2 = (u32*)((u8*)r2[0] + r0_1);
+    r0 = r5 - r0;
+    r1 = 0x80 << 7;
+    r0 = r1 - r0;
+    ((void (*)(void))r2)(r0);
+    r2 = r0;
+    goto _0809876A;
+_08098764:
+    r1 = 0x80 << 7;
+    r2 = r1;
+_0809876A:
+    *(u16*)((u8*)p0 + 0x7A) = r2;
+    *(u16*)((u8*)p0 + 0x7E) = 0;
+    u8* r2_1 = (u8*)p0 + 0x79;
+    u8 r1_2 = *r2_1;
+    r1_2 &= ~0x21;
+    *r2_1 = r1_2;
+_08098782:
+    *(u32*)((u8*)p0 + 0x4C) = (u32)sub_8098790;
+}
 #endif

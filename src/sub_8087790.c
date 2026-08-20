@@ -30,5 +30,34 @@ void sub_8087790(u32 param_1)
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80877C0.s\"");
 #else
-#error "TODO: write sub_80877C0 to match asm/nonmatching/sub_80877C0.s, then delete this #error"
+void sub_80877C0(u32* p0)
+{
+    u32* r4;
+    u16* r2;
+    u32 r1;
+    u32 r0;
+    u32* r3;
+
+    r3 = p0;
+    r2 = (u16*)((u8*)p0 + 0x92);
+    r4 = (u32*)((u8*)p0 + 0x94);
+    r1 = *(u32*)r4;
+    r0 = *(u16*)r2;
+    r0 += r1;
+    *(u16*)r2 = r0;
+    r0 = 0;
+    r1 = *(s16*)((u8*)r2 + r0);
+    r0 = *(u32*)((u8*)p0 + 0x40);
+    r0 += r1;
+    *(u32*)((u8*)p0 + 0x18) = r0;
+    r1 = *(u32*)((u8*)p0 + 0x98);
+    if (r1 < r0)
+        r0 = 0;
+    else
+    {
+        *(u32*)((u8*)p0 + 0x18) = r1;
+        *(u32*)r4 = 0;
+        r0 = 1;
+    }
+}
 #endif

@@ -161,5 +161,31 @@ void sub_80F8A28(u32* p0, u32* p1, u32* p2, s8 p3)
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80F8A90.s\"");
 #else
-#error "TODO: write sub_80F8A90 to match asm/nonmatching/sub_80F8A90.s, then delete this #error"
+void sub_80F8A90(u32* p0, u32* p2)
+{
+    u32 r1;
+    u32 r0;
+    u32 r2;
+
+    r1 = *(u32*)((u8*)p2 + 0x04);
+    r1 <<= 8;
+    r0 = *(u32*)((u8*)p0 + 0x2C);
+    r0 += r1;
+    r2 = *(u32*)((u8*)p2);
+    if (r2 == 0)
+    {
+        r1 = 0xF4 << 3;
+        r2 = r0 + r1;
+        r1 = *(u16*)(r2);
+        r0 = 4 | r1;
+    }
+    else if (r2 == 1)
+    {
+        r1 = 0xF4 << 3;
+        r2 = r0 + r1;
+        r1 = *(u16*)(r2);
+        r0 = 0xFFFFFFFB & r1;
+    }
+    *(u16*)(r2) = (u16)r0;
+}
 #endif

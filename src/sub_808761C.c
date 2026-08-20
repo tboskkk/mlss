@@ -16,5 +16,24 @@ asm_unified(".include \"asm/nonmatching/sub_808761C.s\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8087650.s\"");
 #else
-#error "TODO: write sub_8087650 to match asm/nonmatching/sub_8087650.s, then delete this #error"
+void sub_8087650(u32 param_1) {
+  u32 *puVar1;
+  u32 *puVar2;
+  u8 uVar3;
+  
+  puVar1 = (u32 *)0x3000FD8;
+  puVar2 = puVar1 + 0x20;
+  if (param_1 == *puVar2) {
+    puVar2 = puVar1 + 0x21;
+  }
+  if (*puVar2 != 0) {
+    puVar1 = puVar2;
+    puVar2 = puVar1 + 0x1F;
+    uVar3 = *(u8 *)puVar2;
+    if ((uVar3 & 6) == 2) {
+      puVar1 = puVar2;
+    }
+  }
+  return;
+}
 #endif

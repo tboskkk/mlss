@@ -10,5 +10,26 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8093E50.s\"");
 #else
-#error "TODO: write sub_8093E50 to match asm/nonmatching/sub_8093E50.s, then delete this #error"
+extern void sub_8093EE0();
+extern void sub_808DD2C();
+
+void sub_8093E50(void* p0) {
+    u8* r3 = (u8*)p0 + 0x77;
+    u8 r2 = *(r3);
+    u8 r1 = -(0x41 & r2);
+    u8 r0 = -(0x21 & r1);
+    *(r3) = r0;
+    u32* r1_ptr = (u32*)((u8*)p0 + 0x28);
+    u32 r4 = *(r1_ptr) + (0x8A << 1);
+    u32* r2_ptr = (u32*)0x03000FF4;
+    u32 r3_val = *(r2_ptr);
+    u32* r1_ptr2 = (u32*)((u8*)p0 + 0x28);
+    u16 r2_val = ~(*(s16*)((u8*)(*(r1_ptr2)) + 0xEC));
+    u32 r1_val = ((r2_val << 4) - r2_val) << 2;
+    u32 r3_new = r3_val + r1_val;
+    u16 r1_val2 = *(u16*)((u8*)r3_new + 0x2C);
+    *(u32*)(r4) = r1_val2;
+    *(u32*)((u8*)p0 + 0x4C) = (u32)sub_8093EE0;
+    *(u32*)((u8*)p0 + 0x68) = (u32)sub_808DD2C;
+}
 #endif

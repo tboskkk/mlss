@@ -10,5 +10,63 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8117C50.s\"");
 #else
-#error "TODO: write sub_8117C50 to match asm/nonmatching/sub_8117C50.s, then delete this #error"
+void sub_8117C50(s32 r0, s32 r1, s32 r2)
+{
+    s32 r3;
+    s32 r0_2;
+    
+    r3 = r0;
+    r0_2 = 0xFFFE;
+    if (r2 != r0_2)
+    {
+        if (r2 > r0_2)
+        {
+            r0_2 = 0xFFFF;
+            if (r2 == r0_2)
+            {
+                r3 = r1;
+            }
+            else
+            {
+                r3 = r3 + r2;
+                if (r1 < r3)
+                {
+                    r3 = r1;
+                }
+            }
+        }
+        else
+        {
+            r0_2--;
+            if (r2 == r0_2)
+            {
+                r3 = r1 >> 2;
+                r0_2 = 3;
+            }
+            else
+            {
+                r3 = r3 + r2;
+                if (r1 < r3)
+                {
+                    r3 = r1;
+                }
+            }
+        }
+    }
+    else
+    {
+        r3 = r1 >> 1;
+        r0_2 = 1;
+    }
+    
+    r0_2 &= r1;
+    if (r0_2 != 0)
+    {
+        r3++;
+    }
+    
+    r0 = r3;
+    r1 = r0;
+    bx r1;
+}
 #endif

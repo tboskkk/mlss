@@ -18,5 +18,25 @@ void sub_81069B4(s8 arg0) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81069D4.s\"");
 #else
-#error "TODO: write sub_81069D4 to match asm/nonmatching/sub_81069D4.s, then delete this #error"
+void sub_81069D4(void* p0)
+{
+    u32* ptr = *(u32**)((u8*)p0 + 0x08);
+    u16 var = *(u16*)((u8*)p0 + 0x10);
+    s16 var2 = *(s16*)((u8*)p0 + 0x14);
+    
+    if (var2 > 0)
+    {
+        *(u16*)((u8*)p0 + 0x10) = var - 1;
+    }
+    else
+    {
+        u8 var3 = *(u8*)((u8*)ptr + 0x12);
+        *(u16*)((u8*)ptr + 0x00) = 0x78;
+        *(u16*)((u8*)ptr + 0x02) = 0x40;
+        var3 &= 0xB8;
+        var3 |= 0x02;
+        *(u8*)((u8*)ptr + 0x12) = var3;
+        *(u32*)((u8*)p0 + 0x04) = 0;
+    }
+}
 #endif

@@ -10,5 +10,57 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80A64C4.s\"");
 #else
-#error "TODO: write sub_80A64C4 to match asm/nonmatching/sub_80A64C4.s, then delete this #error"
+extern void sub_80A653C();
+
+void sub_80A64C4(void* p0) {
+    u32* r0;
+    u32* r4;
+    u8 r1;
+    u32* r2;
+    u32 r0_2;
+    u8 r0_3;
+    u8 r1_2;
+    u8 r1_3;
+    
+    r0 = (u32*)0x03000FD8;
+    r0 = *(u32**)r0;
+    r4 = (u32*)((u8*)r0 + 0x74);
+    r0 = *(u32**)((u8*)r4 + 0x10);
+    r1 = *(u8*)((u8*)r0 + 0x12);
+    if ((r1 & 0x08) == 0) {
+        goto _080A6520;
+    }
+    r0 = (u32*)((u8*)r4 + 0x7E);
+    r0_3 = *(u8*)r0;
+    r1_2 = r0_3 & 0x06;
+    if (r1_2 == 0x02) {
+        goto _080A64EC;
+    }
+    if (r1_2 != 0x04) {
+        goto _080A651C;
+    }
+_080A64EC:
+    r2 = (u32*)0x03001038;
+    r0 = (u32*)0x0819832C;
+    r1 = (u32*)0x08198220;
+    r0_2 = *(u32*)r0 - *(u32*)r1;
+    r2 = *(u32**)r2;
+    r2 = (u32*)((u8*)r2 + r0_2);
+    r0 = 0x80 << 7;
+    r1 = 0x0F;
+    bl _call_via_r2;
+    r2 = (u32*)((u8*)r4 + 0x82);
+    *(u16*)r2 = (u16)r0;
+    r0 = (u32*)((u8*)r4 + 0x86);
+    *(u16*)r0 = 0x00;
+    r2 = (u32*)((u8*)r4 + 0x81);
+    r1_3 = *(u8*)r2;
+    r0_3 = 0x21;
+    r0_3 = -r0_3;
+    r0_3 &= r1_3;
+    *(u8*)r2 = r0_3;
+_080A651C:
+    *(u32*)((u8*)p0 + 0x4C) = (u32)sub_80A653C;
+_080A6520:
+}
 #endif

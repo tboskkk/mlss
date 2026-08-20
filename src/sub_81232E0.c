@@ -22,5 +22,11 @@ asm_unified(".include \"asm/nonmatching/sub_8123308.s\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8123340.s\"");
 #else
-#error "TODO: write sub_8123340 to match asm/nonmatching/sub_8123340.s, then delete this #error"
+void sub_8123340(void)
+{
+    u32 *r4 = (u32 *)0x03000FF4;
+    if (*r4 != 0)
+        free_heap_8018D9C();
+    *r4 = 0;
+}
 #endif

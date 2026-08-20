@@ -23,5 +23,54 @@ s32 sub_810D260(u32 arg0, s32 arg1) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_810D274.s\"");
 #else
-#error "TODO: write sub_810D274 to match asm/nonmatching/sub_810D274.s, then delete this #error"
+void sub_810D274(u32 r0, u32 r1, u32 r2, u32 r3)
+{
+    u32 r5 = r0;
+    u32 r4 = r1;
+    u32 r6 = r2;
+    u32 r7;
+    u32 r12;
+    u32 r3_load;
+    u32 r0_load;
+    u32 r1_load;
+    u32 r0_load2;
+    
+    if (r3 != 0)
+    {
+        r4 = sub_810D260(r0, r1, r2);
+    }
+    
+    r6 &= 0xFF;
+    r0_load = 0x0300034C;
+    r3_load = 0x88 << 4;
+    r1_load = r0_load + r3_load;
+    r1_load = *(u32*)(r1_load);
+    r12 = r0_load;
+    r7 = 0xF;
+    r3_load = 0x1FF;
+    r0_load = 0xFFFF8000;
+    r0_load2 = 0xFFFFC000;
+    
+    r0_load += r0_load2;
+    r6 |= r0_load;
+    
+    do
+    {
+        r0 = r5 & r7;
+        r0 <<= 1;
+        r0 += 0xC0;
+        r4 -= 8;
+        r4 &= r3_load;
+        *(u16*)(r1) = r6;
+        *(u16*)(r1 + 2) = r4;
+        r0 |= r0_load2;
+        *(u16*)(r1 + 4) = r0;
+        r1 += 8;
+        r5 >>= 4;
+    } while (r5 != 0);
+    
+    r3_load = 0x88 << 4;
+    r1 = r12 + r3_load;
+    *(u32*)(r1) = r1;
+}
 #endif

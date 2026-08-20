@@ -28,5 +28,33 @@ void sub_81065D0(void *arg0) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8106608.s\"");
 #else
-#error "TODO: write sub_8106608 to match asm/nonmatching/sub_8106608.s, then delete this #error"
+void sub_8106608(void* p0)
+{
+    u32* r4;
+    u16* r1;
+    u16 r0;
+    s16 r5;
+    u16 r3;
+
+    r4 = *(u32**)(0x03000FD8);
+    r0 = *(u16*)((u8*)p0 + 0x18);
+    r1 = (u16*)((u8*)r4 + 0x40);
+    r5 = 0x18;
+    r0 = *(s16*)((u8*)p0 + r5);
+    if (r0 < 0)
+        r0 += 0xFF;
+    r0 >>= 8;
+    r3 = *(u16*)((u8*)r1 + 0x00) - r0;
+    *(u16*)((u8*)r1 + 0x00) = r3;
+    r0 = *(u16*)((u8*)p0 + 0x18);
+    r0 += 0x19;
+    *(u16*)((u8*)p0 + 0x18) = r0;
+    r1 = (u16*)((u8*)r4 + 0x40);
+    r0 = *(s16*)((u8*)r1 + 0x00);
+    if (r0 > 0)
+    {
+        *(u16*)((u8*)r1 + 0x00) = 0;
+        *(u32*)((u8*)p0 + 0x04) = 0;
+    }
+}
 #endif

@@ -10,5 +10,24 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_813B748.s\"");
 #else
-#error "TODO: write sub_813B748 to match asm/nonmatching/sub_813B748.s, then delete this #error"
+void sub_813B748(void* p0)
+{
+    u16* ptr = (u16*)((u8*)p0 + 0x2DE);
+    if (*ptr == 0)
+    {
+        return;
+    }
+    else
+    {
+        s16 val1 = *(s16*)((u8*)p0 + 0x242);
+        *(u32*)((u8*)p0 + 0x0C) += val1;
+        s16 val2 = *(s16*)((u8*)p0 + 0x244);
+        *(u32*)((u8*)p0 + 0x10) += val2;
+        *ptr -= 1;
+        u16 temp = *ptr;
+        if ((temp ^ (temp >> 15)) & 1)
+            temp = ~temp + 1;
+        return;
+    }
+}
 #endif

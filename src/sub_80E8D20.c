@@ -10,5 +10,40 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80E8D20.s\"");
 #else
-#error "TODO: write sub_80E8D20 to match asm/nonmatching/sub_80E8D20.s, then delete this #error"
+void sub_80E8D20(u8* param_1, u16 param_2)
+{
+    u32 uVar1;
+    u8* puVar2;
+    u8* puVar3;
+    u8* puVar4;
+    
+    puVar2 = (u8*)param_1;
+    puVar3 = (u8*)0x83BBDD0;
+    puVar4 = (u8*)0x300034C;
+    uVar1 = param_2 & 0xFF0000;
+    uVar1 = uVar1 >> 0xC;
+    puVar3 = puVar3 + 0xC;
+    puVar3 = puVar3 + uVar1;
+    puVar4 = puVar4 + (0x8C << 4);
+    uVar1 = *(u8*)puVar4;
+    puVar4 = *(u32**)(puVar3 + 0x0);
+    puVar4 = *(u32**)puVar4;
+    uVar1 = uVar1 << 2;
+    puVar4 = puVar4 + uVar1;
+    uVar1 = *(u32*)puVar4;
+    puVar4 = (u8*)uVar1;
+    puVar2 = puVar2 + 0x0;
+    while( true ) {
+        uVar1 = *(u8*)puVar4;
+        if (uVar1 == 0) break;
+        *(u8*)puVar2 = uVar1;
+        puVar4 = puVar4 + 0x1;
+        puVar2 = puVar2 + 0x1;
+    }
+    *(u8*)puVar2 = 0xFF;
+    puVar2 = puVar2 + 0x1;
+    *(u8*)puVar2 = 0x0A;
+    puVar2 = puVar2 + 0x1;
+    *(u8*)puVar2 = 0x00;
+}
 #endif

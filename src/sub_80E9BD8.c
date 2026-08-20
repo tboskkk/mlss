@@ -10,5 +10,26 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80E9BD8.s\"");
 #else
-#error "TODO: write sub_80E9BD8 to match asm/nonmatching/sub_80E9BD8.s, then delete this #error"
+void sub_80E9BD8(u32* param_1, u32* param_2, s16 param_3, u32 param_4)
+{
+    u32* puVar1;
+    u32 uVar2;
+    
+    uVar2 = (u32)param_3;
+    if (0xf < uVar2) {
+        if (0x34 < uVar2) {
+            puVar1 = *(u32**)(0x3000FC0);
+            puVar1 = puVar1 + (uVar2 - 0x35);
+            *puVar1 = param_4;
+        }
+        else {
+            puVar1 = param_1 + (uVar2 - 0x10);
+            *puVar1 = param_4;
+        }
+    }
+    else {
+        puVar1 = param_2 + uVar2;
+        *puVar1 = param_4;
+    }
+}
 #endif

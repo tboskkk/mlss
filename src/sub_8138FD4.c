@@ -16,11 +16,86 @@ asm_unified(".include \"asm/nonmatching/sub_8138FD4.s\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8138FF0.s\"");
 #else
-#error "TODO: write sub_8138FF0 to match asm/nonmatching/sub_8138FF0.s, then delete this #error"
+u32 sub_8138FF0(u32 p0, s16 p1)
+{
+    u32 r2;
+    u32 r3;
+    u32 r0;
+    u32 r1;
+
+    r2 = 0x100;
+    r3 = p0 + r2;
+    r2 = 0xB0;
+    r0 = p0 + r2;
+    r1 = p1 << 16;
+    r1 >>= 15;
+    r2 = *(u32*)(r0);
+    r2 += r1;
+    r0 = 0;
+    r0 = *(s8*)(r2 + r0);
+    r0 <<= 4;
+    r0 += 8;
+    *(u16*)((u8*)p0 + 0x100 + 0x3C) = r0;
+    r2 += 1;
+    r0 = 0;
+    r0 = *(s8*)(r2 + r0);
+    r0 <<= 4;
+    r0 += 8;
+    *(u16*)((u8*)p0 + 0x100 + 0x38) = r0;
+    r2 += 1;
+    r0 = 0;
+    r0 = *(s8*)(r2 + r0);
+    r0 <<= 4;
+    r0 += 8;
+    *(u16*)((u8*)p0 + 0x100 + 0x3E) = r0;
+    r0 = 1;
+    r0 = *(s8*)(r2 + r0);
+    r0 <<= 4;
+    r0 += 8;
+    *(u16*)((u8*)p0 + 0x100 + 0x3A) = r0;
+    return 0;
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8139030.s\"");
 #else
-#error "TODO: write sub_8139030 to match asm/nonmatching/sub_8139030.s, then delete this #error"
+u32 sub_8139030(u32 p0, s16 p1) {
+    u32 r2;
+    u32 r3;
+    u32 r0;
+    u32 r1;
+    
+    r2 = 0x100;
+    r3 = p0 + r2;
+    r2 = 0xB4;
+    r0 = p0 + r2;
+    r1 = p1 << 0x10;
+    r1 = r1 >> 0xF;
+    r2 = *(u32*)(r0 + 0x0);
+    r2 = r2 + r1;
+    r1 = 0x0;
+    r0 = *(s16*)(r2 + r1);
+    r0 = r0 << 0x4;
+    r0 = r0 + 0x8;
+    *(u16*)(r3 + 0x3C) = r0;
+    r2 = r2 + 0x2;
+    r1 = 0x0;
+    r0 = *(s16*)(r2 + r1);
+    r0 = r0 << 0x4;
+    r0 = r0 + 0x8;
+    *(u16*)(r3 + 0x38) = r0;
+    r2 = r2 + 0x2;
+    r1 = 0x0;
+    r0 = *(s16*)(r2 + r1);
+    r0 = r0 << 0x4;
+    r0 = r0 + 0x8;
+    *(u16*)(r3 + 0x3E) = r0;
+    r1 = 0x2;
+    r0 = *(s16*)(r2 + r1);
+    r0 = r0 << 0x4;
+    r0 = r0 + 0x8;
+    *(u16*)(r3 + 0x3A) = r0;
+    return 0;
+}
 #endif

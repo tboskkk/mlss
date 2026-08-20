@@ -10,78 +10,34 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80FBDE0.s\"");
 #else
-void sub_80FBDE0(s16* p0, u32* p1, s16 p2, s16 p3)
-{
-    s16 r4 = p2;
-    s16 r5 = p3;
-    s16 r6;
-    s16 r7;
-    s16 r0;
-    s16 r1;
-    s16 r2;
-    s16 r3;
-    
-    r6 = *(u32*)((u8*)p1 + 0x0C);
-    if (r6 < 0)
-        r6 += 0xFF;
-    r6 <<= 8;
-    r6 >>= 16;
-    
-    r7 = *(u32*)((u8*)p1 + 0x10);
-    if (r7 < 0)
-        r7 += 0xFF;
-    r7 <<= 8;
-    r7 >>= 16;
-    
-    r0 = *(u32*)((u8*)p1 + 0x14);
-    r1 = *(u32*)((u8*)p1 + 0x18);
-    r0 += r1;
-    if (r0 < 0)
-        r0 += 0xFF;
-    r0 <<= 8;
-    r0 >>= 16;
-    
-    r2 = r6;
-    r2 <<= 16;
-    r2 >>= 16;
-    r3 = *(s16*)((u8*)p0 + 0x00);
-    if (r2 < r3)
-        goto _080FBE54;
-    r3 = *(s16*)((u8*)p0 + 0x02);
-    if (r2 > r3)
-        goto _080FBE54;
-    
-    r2 = r7;
-    r2 <<= 16;
-    r2 >>= 16;
-    r3 = *(s16*)((u8*)p0 + 0x06);
-    if (r2 < r3)
-        goto _080FBE54;
-    r3 = *(s16*)((u8*)p0 + 0x04);
-    if (r2 > r3)
-        goto _080FBE54;
-    
-    r2 = r0;
-    r2 <<= 16;
-    r2 >>= 16;
-    r3 = r0;
-    r3 <<= 16;
-    r1 = r5;
-    r1 <<= 16;
-    r3 >>= 16;
-    if (r3 < r1)
-        goto _080FBE54;
-    r1 = r4;
-    r1 <<= 16;
-    r1 >>= 16;
-    if (r2 > r1)
-        goto _080FBE54;
-    
-    *(u32*)((u8*)p1 + 0x1C) = 1;
-    return;
-    
-_080FBE54:
-    *(u32*)((u8*)p1 + 0x1C) = 0;
-    return;
+s32 sub_80FBDE0(s32 arg0, void *arg1, u16 arg2, u16 arg3) {
+    s16 temp_r4_37;
+    s16 temp_r4_47;
+    s32 var_r0_13;
+    s32 var_r0_20;
+    s32 var_r0_29;
+    u32 temp_r1_35;
+
+    var_r0_13 = (*(s32 *)((s8 *)(arg1) + (0xC)));
+    if (var_r0_13 < 0) {
+        var_r0_13 += 0xFF;
+    }
+    var_r0_20 = (*(s32 *)((s8 *)(arg1) + (0x10)));
+    if (var_r0_20 < 0) {
+        var_r0_20 += 0xFF;
+    }
+    var_r0_29 = (*(s32 *)((s8 *)(arg1) + (0x14))) + (*(s32 *)((s8 *)(arg1) + (0x18)));
+    if (var_r0_29 < 0) {
+        var_r0_29 += 0xFF;
+    }
+    temp_r1_35 = (u32) (var_r0_29 << 8) >> 0x10;
+    temp_r4_37 = (s16) ((u32) (var_r0_13 << 8) >> 0x10);
+    if (((s32) temp_r4_37 >= (s32) M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */)) && ((s32) temp_r4_37 <= (s32) M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */))) {
+        temp_r4_47 = (s16) ((u32) (var_r0_20 << 8) >> 0x10);
+        if (((s32) temp_r4_47 >= (s32) M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */)) && ((s32) temp_r4_47 <= (s32) M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */)) && ((s32) (temp_r1_35 << 0x10) >= (s32) (arg3 << 0x10)) && ((s32) (s16) temp_r1_35 <= (s32) (s16) arg2)) {
+            return 1;
+        }
+    }
+    return 0;
 }
 #endif

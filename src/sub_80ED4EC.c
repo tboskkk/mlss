@@ -10,5 +10,27 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80ED4EC.s\"");
 #else
-#error "TODO: write sub_80ED4EC to match asm/nonmatching/sub_80ED4EC.s, then delete this #error"
+void sub_80ED4EC(u32 r0, u32 r1, u32 r2)
+{
+    u32 *r5;
+    u32 *r3;
+    u32 r0_2;
+    
+    r3 = (u32*)r0;
+    r5 = (u32*)r2;
+    r0_2 = *r5;
+    if (r0_2 <= 4)
+    {
+        u32 *r1_2;
+        r1_2 = (u32*)0x080ED508;
+        r0_2 <<= 2;
+        r0_2 += (u32)r1_2;
+        r0_2 = *(u32*)r0_2;
+        ((void(*)())r0_2)();
+    }
+    else
+    {
+        *(u32*)r3 = 1;
+    }
+}
 #endif

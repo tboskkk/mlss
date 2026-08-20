@@ -29,5 +29,11 @@ void sub_816D898(void *arg0) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_816D96C.s\"");
 #else
-#error "TODO: write sub_816D96C to match asm/nonmatching/sub_816D96C.s, then delete this #error"
+void sub_816D96C(void* p0)
+{
+    *(u32*)((u8*)p0 + 0x18) = 0x08CDD220;
+    process_remove();
+    pop {r0};
+    bx r0;
+}
 #endif

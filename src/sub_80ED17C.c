@@ -10,5 +10,33 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80ED17C.s\"");
 #else
-#error "TODO: write sub_80ED17C to match asm/nonmatching/sub_80ED17C.s, then delete this #error"
+void sub_80ED17C(u32* p0, u32* p1, u32* p2, u32* p3)
+{
+    u32* var1;
+    u32* var2;
+    u32* var3;
+    u32 var4;
+    u32 var5;
+    u32* var6;
+    
+    var1 = p0;
+    var2 = p1;
+    var3 = p2;
+    var6 = p3;
+    var4 = *(u32*)((u8*)var6 + 0x08);
+    var5 = *var6;
+    if (var5 <= 4)
+    {
+        var4 = *(u32*)((u8*)var6 + 0x08);
+        var5 <<= 2;
+        var5 += (u32)(&var4);
+        var5 = *(u32*)var5;
+        ((void(*)())var5)();
+    }
+    else
+    {
+        *(u32*)((u8*)var1 + 0x0) = 0x00000001;
+        return;
+    }
+}
 #endif

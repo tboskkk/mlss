@@ -10,5 +10,24 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80F5924.s\"");
 #else
-#error "TODO: write sub_80F5924 to match asm/nonmatching/sub_80F5924.s, then delete this #error"
+void sub_80F5924(u32 r0, u32 r1, u32 r2)
+{
+    u32* r4;
+    u32 r3;
+    
+    r3 = r1;
+    r4 = (u32*)r2;
+    r0 = *r4;
+    if (r0 <= 5)
+    {
+        r0 <<= 2;
+        r0 += 0x080F5944;
+        r0 = *(u32*)r0;
+        ((void(*)())r0)();
+    }
+    else
+    {
+        r0 = 1;
+    }
+}
 #endif
