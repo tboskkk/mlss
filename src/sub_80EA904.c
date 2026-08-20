@@ -7,17 +7,8 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80EA904.s\"");
-#else
-u32 sub_80EA904(u32 param_1) {
-    u8* puVar1;
-    u32 uVar2;
-    
-    puVar1 = (u8*)(param_1 + 0xA6);
-    *puVar1 = *puVar1 - 1;
-    uVar2 = (u32)*puVar1;
-    *(u32*)(param_1 + (uVar2 << 2)) = 0;
+s32 sub_80EA904(s32 arg0, void *arg1) {
+    (*(u8 *)((s8 *)(arg1) + (0xA6))) = (u8) ((*(u8 *)((s8 *)(arg1) + (0xA6))) - 1);
+    (*(s32 *)((s8 *)((((*(u8 *)((s8 *)(arg1) + (0xA6))) * 4) + arg1)) + (0x58))) = 0;
     return 1;
 }
-#endif
