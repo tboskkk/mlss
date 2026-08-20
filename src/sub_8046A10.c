@@ -1,0 +1,137 @@
+#include "global.h"
+#include "common.h"
+
+// TODO: add other includes (a matching *.h, other subsystem headers) as
+// this file grows. Left minimal since split_func.py doesn't know yet what
+// sub_8046A10 needs.
+
+asm_unified(".include \"asm/macros.inc\"");
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8046A10.s\"");
+#else
+void sub_8046A10(u32* param_1)
+{
+    u32* puVar1;
+    u32* puVar2;
+    u32* puVar3;
+    u32* puVar4;
+    u32* puVar5;
+    u32* puVar6;
+    u16* puVar7;
+    u16* puVar8;
+    u16* puVar9;
+    s16 sVar10;
+    u8 uVar11;
+    u8 uVar12;
+    u8 uVar13;
+    u8 uVar14;
+    u8 uVar15;
+    u8 uVar16;
+    u8 uVar17;
+    u8 uVar18;
+    u8 uVar19;
+    u8 uVar20;
+    u8 uVar21;
+    u8 uVar22;
+    u8 uVar23;
+    u8 uVar24;
+    u8 uVar25;
+    u8 uVar26;
+    u8 uVar27;
+    u8 uVar28;
+    u8 uVar29;
+    u8 uVar30;
+    u8 uVar31;
+    u8 uVar32;
+    u8 uVar33;
+    u8 uVar34;
+    u8 uVar35;
+    u8 uVar36;
+    u8 uVar37;
+    u8 uVar38;
+    u8 uVar39;
+    u8 uVar40;
+    u8 uVar41;
+    u8 uVar42;
+    u8 uVar43;
+    u8 uVar44;
+    u8 uVar45;
+    u8 uVar46;
+    u8 uVar47;
+    u8 uVar48;
+    u8 uVar49;
+    u8 uVar50;
+    u8 uVar51;
+    u8 uVar52;
+    u8 uVar53;
+    u8 uVar54;
+    u8 uVar55;
+    u8 uVar56;
+    u8 uVar57;
+    u8 uVar58;
+    u8 uVar59;
+    u8 uVar60;
+    u8 uVar61;
+    u8 uVar62;
+    u8 uVar63;
+    u8 uVar64;
+    u8 uVar65;
+    u8 uVar66;
+    u8 uVar67;
+    u8 uVar68;
+    u8 uVar69;
+    u8 uVar70;
+    u8 uVar71;
+    u8 uVar72;
+    u8 uVar73;
+    u8 uVar74;
+    u8 uVar75;
+    u8 uVar76;
+    u8 uVar77;
+    u8 uVar78;
+    u8 uVar79;
+    u8 uVar80;
+    u8 uVar81;
+    u8 uVar82;
+    u8 uVar83;
+    u8 uVar84;
+    u8 uVar85;
+    u8 uVar86;
+    u8 uVar87;
+    u8 uVar88;
+    u8 uVar89;
+    u8 uVar90;
+    u8 uVar91;
+    u8 uVar92;
+    u8 uVar93;
+    u8 uVar94;
+    u8 uVar95;
+    u8 uVar96;
+    u8 uVar97;
+    u8 uVar98;
+    u8 uVar99;
+    u8 uVar100;
+    u8 uVar101;
+    u8 uVar102;
+    u8 uVar103;
+    u8 uVar104;
+    u8 uVar105;
+    u8 uVar106;
+    u8 uVar107;
+    u8 uVar108;
+    u8 uVar109;
+    u8 uVar110;
+    u8 uVar111;
+    u8 uVar112;
+    u8 uVar113;
+    u8 uVar114;
+    u8 uVar115;
+    u8 uVar116;
+    u8 uVar117;
+    u8 uVar118;
+    u8 uVar119;
+    u8 uVar120;
+    u8 uVar121;
+    u8 uVar
+#endif

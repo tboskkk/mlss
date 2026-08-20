@@ -35,6 +35,7 @@ groups:
   - {obj: asm/text08000000, section: text}
   - {obj: src/nullsub_17, section: text}
   - {obj: asm/text08000000_p2, section: text}
+  - {obj: src/sub_8018AEC, section: text}
   - {obj: src/nullsub_16, section: text}
   - {obj: asm/text08000000_p3, section: text}
   - {obj: src/heap, section: text}
@@ -49,6 +50,8 @@ groups:
   - {obj: asm/text08019CA4, section: text}
   - {obj: src/game_boy_player_logo, section: text}
   - {obj: asm/text0801A548, section: text}
+  - {obj: src/sub_801A6B0, section: text}
+  - {obj: asm/text0801A548_p37, section: text}
   - {obj: src/sub_801B0AC, section: text}
   - {obj: asm/text0801A548_p23, section: text}
   - {obj: src/sub_801B748, section: text}
@@ -56,6 +59,8 @@ groups:
   - {obj: asm/text0801A548_p5, section: text}
   - {obj: src/sub_801BC98, section: text}
   - {obj: asm/text0801A548_p29, section: text}
+  - {obj: src/sub_801DC38, section: text}
+  - {obj: asm/text0801A548_p30, section: text}
   - {obj: src/sub_80208E0, section: text}
   - {obj: asm/text0801A548_p12, section: text}
   - {obj: src/sprite_heap_search, section: text}
@@ -78,6 +83,8 @@ groups:
   - {obj: asm/text0801A548_p22, section: text}
   - {obj: src/sub_8029888, section: text}
   - {obj: asm/text0801A548_p21, section: text}
+  - {obj: src/sub_80316FC, section: text}
+  - {obj: asm/text0801A548_p32, section: text}
   - {obj: src/sub_803C424, section: text}
   - {obj: asm/text0801A548_p19, section: text}
   - {obj: src/sub_803C4D8, section: text}
@@ -85,6 +92,14 @@ groups:
   - {obj: asm/text0801A548_p25, section: text}
   - {obj: src/sub_803E9F0, section: text}
   - {obj: asm/text0801A548_p7, section: text}
+  - {obj: src/sub_804034C, section: text}
+  - {obj: asm/text0801A548_p36, section: text}
+  - {obj: src/sub_8046A10, section: text}
+  - {obj: asm/text0801A548_p35, section: text}
+  - {obj: src/sub_8047258, section: text}
+  - {obj: asm/text0801A548_p33, section: text}
+  - {obj: src/sub_80475A0, section: text}
+  - {obj: asm/text0801A548_p34, section: text}
   - {obj: src/sub_804776C, section: text}
   - {obj: asm/text0801A548_p15, section: text}
   - {obj: src/sub_804790C, section: text}
@@ -109,15 +124,19 @@ groups:
   - {obj: asm/text0801A548_p26, section: text}
   - {obj: src/nullsub_18, section: text}
   - {obj: asm/text0801A548_p2, section: text}
+  - {obj: src/sub_8051614, section: text}
+  - {obj: asm/text0801A548_p31, section: text}
   - {obj: src/option_screens, section: text}
   - {obj: asm/option_screens, section: text}
   - {obj: src/opening_sequence, section: text}
   - {obj: asm/text080542C4, section: text}
   - {obj: src/title_screen, section: text}
   - {obj: asm/text08057568, section: text}
+  - {obj: src/sub_8059E5C, section: text}
   - {obj: src/sub_8059EC8, section: text}
   - {obj: src/sub_8059EF0, section: text}
   - {obj: asm/text08057568_p76, section: text}
+  - {obj: src/load_col_set_to_dest, section: text}
   - {obj: src/sub_805A0EC, section: text}
   - {obj: src/get_coldef_ptr_by_idx, section: text}
   - {obj: asm/text08057568_p41, section: text}
@@ -137,6 +156,8 @@ groups:
   - {obj: asm/text08057568_p213, section: text}
   - {obj: src/sub_8064540, section: text}
   - {obj: asm/text08057568_p101, section: text}
+  - {obj: src/sub_8064B88, section: text}
+  - {obj: asm/text08057568_p266, section: text}
   - {obj: src/sub_8065B74, section: text}
   - {obj: asm/text08057568_p203, section: text}
   - {obj: src/sub_8065E2C, section: text}
@@ -164,6 +185,8 @@ groups:
   - {obj: asm/text08057568_p132, section: text}
   - {obj: src/sub_806D770, section: text}
   - {obj: asm/text08057568_p235, section: text}
+  - {obj: src/sub_806E690, section: text}
+  - {obj: asm/text08057568_p293, section: text}
   - {obj: src/sub_806E754, section: text}
   - {obj: src/sub_806E778, section: text}
   - {obj: src/nullsub_15, section: text}
@@ -215,6 +238,8 @@ groups:
   - {obj: asm/text08057568_p5, section: text}
   - {obj: src/nullsub_4, section: text}
   - {obj: asm/text08057568_p6, section: text}
+  - {obj: src/sub_8082158, section: text}
+  - {obj: asm/text08057568_p294, section: text}
   - {obj: src/sub_808225C, section: text}
   - {obj: asm/text08057568_p153, section: text}
   - {obj: src/sub_8082B00, section: text}
@@ -232,14 +257,24 @@ groups:
   - {obj: asm/text08057568_p211, section: text}
   - {obj: src/sub_8084E84, section: text}
   - {obj: asm/text08057568_p79, section: text}
+  - {obj: src/sub_8087038, section: text}
+  - {obj: asm/text08057568_p278, section: text}
   - {obj: src/sub_808750C, section: text}
   - {obj: asm/text08057568_p95, section: text}
   - {obj: src/sub_80875B8, section: text}
   - {obj: asm/text08057568_p186, section: text}
   - {obj: src/sub_808761C, section: text}
   - {obj: asm/text08057568_p226, section: text}
+  - {obj: src/sub_8087790, section: text}
+  - {obj: asm/text08057568_p295, section: text}
+  - {obj: src/sub_80877FC, section: text}
+  - {obj: asm/text08057568_p290, section: text}
   - {obj: src/sub_8087BA4, section: text}
   - {obj: asm/text08057568_p197, section: text}
+  - {obj: src/sub_8087C4C, section: text}
+  - {obj: asm/text08057568_p287, section: text}
+  - {obj: src/sub_808843C, section: text}
+  - {obj: asm/text08057568_p259, section: text}
   - {obj: src/sub_808862C, section: text}
   - {obj: asm/text08057568_p54, section: text}
   - {obj: src/sub_8089AB0, section: text}
@@ -270,6 +305,8 @@ groups:
   - {obj: asm/text08057568_p80, section: text}
   - {obj: src/sub_80AC4F8, section: text}
   - {obj: asm/text08057568_p227, section: text}
+  - {obj: src/sub_80BED0C, section: text}
+  - {obj: asm/text08057568_p279, section: text}
   - {obj: src/sub_80D9E9C, section: text}
   - {obj: asm/text08057568_p142, section: text}
   - {obj: src/sub_80D9F34, section: text}
@@ -292,6 +329,8 @@ groups:
   - {obj: asm/text08057568_p155, section: text}
   - {obj: src/sub_80E184C, section: text}
   - {obj: asm/text08057568_p231, section: text}
+  - {obj: src/sub_80E1908, section: text}
+  - {obj: asm/text08057568_p268, section: text}
   - {obj: src/sub_80E19CC, section: text}
   - {obj: asm/text08057568_p126, section: text}
   - {obj: src/sub_80E8E78, section: text}
@@ -302,6 +341,12 @@ groups:
   - {obj: asm/text08057568_p15, section: text}
   - {obj: src/sub_80E9310, section: text}
   - {obj: asm/text08057568_p127, section: text}
+  - {obj: src/sub_80E9414, section: text}
+  - {obj: asm/text08057568_p281, section: text}
+  - {obj: src/sub_80E9958, section: text}
+  - {obj: src/sub_80E99E0, section: text}
+  - {obj: src/sub_80E9A6C, section: text}
+  - {obj: asm/text08057568_p271, section: text}
   - {obj: src/sub_80EA514, section: text}
   - {obj: asm/text08057568_p118, section: text}
   - {obj: src/sub_80EA778, section: text}
@@ -325,6 +370,7 @@ groups:
   - {obj: asm/text08057568_p105, section: text}
   - {obj: src/script_cmd_end, section: text}
   - {obj: asm/text08057568_p46, section: text}
+  - {obj: src/sub_80EF27C, section: text}
   - {obj: src/sub_80EF2EC, section: text}
   - {obj: asm/text08057568_p243, section: text}
   - {obj: src/script_enable_flag_2, section: text}
@@ -339,6 +385,10 @@ groups:
   - {obj: src/sub_80F0B4C, section: text}
   - {obj: src/sub_80F0B80, section: text}
   - {obj: asm/text08057568_p146, section: text}
+  - {obj: src/sub_80F0D38, section: text}
+  - {obj: asm/text08057568_p254, section: text}
+  - {obj: src/sub_80F0EEC, section: text}
+  - {obj: asm/text08057568_p272, section: text}
   - {obj: src/sub_80F0FA0, section: text}
   - {obj: asm/text08057568_p232, section: text}
   - {obj: src/sub_80F10E0, section: text}
@@ -346,10 +396,24 @@ groups:
   - {obj: asm/text08057568_p156, section: text}
   - {obj: src/sub_80F1AE4, section: text}
   - {obj: asm/text08057568_p25, section: text}
+  - {obj: src/sub_80F1BA4, section: text}
   - {obj: src/sub_80F1C0C, section: text}
   - {obj: asm/text08057568_p165, section: text}
+  - {obj: src/sub_80F1C7C, section: text}
+  - {obj: src/sub_80F1CF8, section: text}
+  - {obj: asm/text08057568_p265, section: text}
+  - {obj: src/sub_80F3808, section: text}
+  - {obj: asm/text08057568_p285, section: text}
+  - {obj: src/sub_80F39C8, section: text}
+  - {obj: asm/text08057568_p282, section: text}
+  - {obj: src/sub_80F52B4, section: text}
+  - {obj: asm/text08057568_p255, section: text}
+  - {obj: src/sub_80F6EF8, section: text}
+  - {obj: asm/text08057568_p280, section: text}
   - {obj: src/sub_80F7590, section: text}
   - {obj: asm/text08057568_p147, section: text}
+  - {obj: src/sub_80F76FC, section: text}
+  - {obj: asm/text08057568_p258, section: text}
   - {obj: src/sub_80F7868, section: text}
   - {obj: asm/text08057568_p244, section: text}
   - {obj: src/sub_80F7D3C, section: text}
@@ -360,8 +424,11 @@ groups:
   - {obj: src/sub_80F7EA4, section: text}
   - {obj: src/sub_80F7ED0, section: text}
   - {obj: asm/text08057568_p183, section: text}
+  - {obj: src/sub_80F8008, section: text}
+  - {obj: asm/text08057568_p250, section: text}
   - {obj: src/sub_80F80C4, section: text}
   - {obj: asm/text08057568_p233, section: text}
+  - {obj: src/sub_80F81D4, section: text}
   - {obj: src/sub_80F8254, section: text}
   - {obj: asm/text08057568_p166, section: text}
   - {obj: src/sub_80F82E8, section: text}
@@ -383,6 +450,7 @@ groups:
   - {obj: src/sub_80FB7BC, section: text}
   - {obj: src/sub_80FB7E0, section: text}
   - {obj: asm/text08057568_p56, section: text}
+  - {obj: src/sub_80FBDE0, section: text}
   - {obj: src/sub_80FBE5C, section: text}
   - {obj: asm/text08057568_p167, section: text}
   - {obj: src/sub_81065D0, section: text}
@@ -397,10 +465,14 @@ groups:
   - {obj: asm/text08057568_p194, section: text}
   - {obj: src/sub_8108CBC, section: text}
   - {obj: asm/text08057568_p74, section: text}
+  - {obj: src/sub_810B884, section: text}
+  - {obj: asm/text08057568_p273, section: text}
   - {obj: src/sub_810CAD0, section: text}
   - {obj: asm/text08057568_p219, section: text}
   - {obj: src/sub_810CBDC, section: text}
   - {obj: asm/text08057568_p199, section: text}
+  - {obj: src/sub_810CDFC, section: text}
+  - {obj: asm/text08057568_p286, section: text}
   - {obj: src/sub_810D228, section: text}
   - {obj: src/sub_810D260, section: text}
   - {obj: asm/text08057568_p87, section: text}
@@ -418,6 +490,8 @@ groups:
   - {obj: asm/text08057568_p157, section: text}
   - {obj: src/sub_8112064, section: text}
   - {obj: asm/text08057568_p177, section: text}
+  - {obj: src/sub_8114380, section: text}
+  - {obj: asm/text08057568_p274, section: text}
   - {obj: src/sub_8114558, section: text}
   - {obj: asm/text08057568_p220, section: text}
   - {obj: src/sub_8114790, section: text}
@@ -448,17 +522,28 @@ groups:
   - {obj: asm/text08057568_p245, section: text}
   - {obj: src/sub_8136688, section: text}
   - {obj: asm/text08057568_p66, section: text}
+  - {obj: src/sub_8137E50, section: text}
+  - {obj: asm/text08057568_p275, section: text}
   - {obj: src/sub_8138FA4, section: text}
   - {obj: src/sub_8138FD4, section: text}
   - {obj: asm/text08057568_p120, section: text}
   - {obj: src/sub_8139200, section: text}
   - {obj: asm/text08057568_p246, section: text}
+  - {obj: src/sub_8139970, section: text}
+  - {obj: asm/text08057568_p263, section: text}
+  - {obj: src/sub_813B178, section: text}
+  - {obj: asm/text08057568_p296, section: text}
+  - {obj: src/sub_813B380, section: text}
+  - {obj: asm/text08057568_p260, section: text}
   - {obj: src/sub_813B878, section: text}
   - {obj: asm/text08057568_p206, section: text}
+  - {obj: src/sub_813BB60, section: text}
   - {obj: src/sub_813BC6C, section: text}
   - {obj: asm/text08057568_p121, section: text}
   - {obj: src/sub_813C368, section: text}
   - {obj: asm/text08057568_p207, section: text}
+  - {obj: src/sub_813C484, section: text}
+  - {obj: asm/text08057568_p261, section: text}
   - {obj: src/sub_813DF58, section: text}
   - {obj: asm/text08057568_p212, section: text}
   - {obj: src/sub_81427AC, section: text}
@@ -467,6 +552,17 @@ groups:
   - {obj: asm/text08057568_p8, section: text}
   - {obj: src/sub_8144238, section: text}
   - {obj: asm/text08057568_p222, section: text}
+  - {obj: src/sub_8146DC8, section: text}
+  - {obj: asm/text08057568_p251, section: text}
+  - {obj: src/sub_814B848, section: text}
+  - {obj: asm/text08057568_p283, section: text}
+  - {obj: src/sub_814BEA8, section: text}
+  - {obj: asm/text08057568_p288, section: text}
+  - {obj: src/sub_814BFCC, section: text}
+  - {obj: asm/text08057568_p289, section: text}
+  - {obj: src/sub_8150118, section: text}
+  - {obj: asm/text08057568_p252, section: text}
+  - {obj: src/sub_81501E4, section: text}
   - {obj: src/sub_8150244, section: text}
   - {obj: asm/text08057568_p223, section: text}
   - {obj: src/sub_815071C, section: text}
@@ -480,12 +576,20 @@ groups:
   - {obj: asm/text08057568_p50, section: text}
   - {obj: src/sub_8150EFC, section: text}
   - {obj: asm/text08057568_p67, section: text}
+  - {obj: src/sub_81525C8, section: text}
+  - {obj: src/sub_8152650, section: text}
+  - {obj: asm/text08057568_p262, section: text}
+  - {obj: src/sub_8154AAC, section: text}
+  - {obj: asm/text08057568_p284, section: text}
+  - {obj: src/sub_81580F8, section: text}
   - {obj: src/sub_815817C, section: text}
   - {obj: asm/text08057568_p107, section: text}
   - {obj: src/sub_81582C4, section: text}
   - {obj: asm/text08057568_p26, section: text}
   - {obj: src/sub_8158308, section: text}
   - {obj: asm/text08057568_p27, section: text}
+  - {obj: src/sub_8158790, section: text}
+  - {obj: asm/text08057568_p276, section: text}
   - {obj: src/sub_8158A98, section: text}
   - {obj: asm/text08057568_p248, section: text}
   - {obj: src/sub_8158E10, section: text}
@@ -498,10 +602,14 @@ groups:
   - {obj: asm/text08057568_p236, section: text}
   - {obj: src/sub_8159464, section: text}
   - {obj: asm/text08057568_p237, section: text}
+  - {obj: src/sub_81595FC, section: text}
+  - {obj: asm/text08057568_p264, section: text}
   - {obj: src/sub_8159904, section: text}
   - {obj: asm/text08057568_p29, section: text}
   - {obj: src/sub_8159974, section: text}
   - {obj: asm/text08057568_p58, section: text}
+  - {obj: src/sub_815B058, section: text}
+  - {obj: asm/text08057568_p253, section: text}
   - {obj: src/sub_815E9EC, section: text}
   - {obj: src/sub_815EA08, section: text}
   - {obj: asm/text08057568_p92, section: text}
@@ -509,6 +617,8 @@ groups:
   - {obj: asm/text08057568_p59, section: text}
   - {obj: src/sub_815EC8C, section: text}
   - {obj: asm/text08057568_p30, section: text}
+  - {obj: src/sub_815EFD8, section: text}
+  - {obj: asm/text08057568_p269, section: text}
   - {obj: src/sub_815F2C4, section: text}
   - {obj: asm/text08057568_p238, section: text}
   - {obj: src/sub_815F7FC, section: text}
@@ -522,6 +632,8 @@ groups:
   - {obj: src/sub_815FAA4, section: text}
   - {obj: src/sub_815FACC, section: text}
   - {obj: asm/text08057568_p93, section: text}
+  - {obj: src/sub_81604A8, section: text}
+  - {obj: asm/text08057568_p270, section: text}
   - {obj: src/sub_8160E4C, section: text}
   - {obj: asm/text08057568_p110, section: text}
   - {obj: src/sub_8160EC4, section: text}
@@ -534,8 +646,12 @@ groups:
   - {obj: asm/text08057568_p60, section: text}
   - {obj: src/sub_816168C, section: text}
   - {obj: asm/text08057568_p31, section: text}
+  - {obj: src/sub_8161814, section: text}
+  - {obj: asm/text08057568_p267, section: text}
   - {obj: src/sub_8161954, section: text}
   - {obj: asm/text08057568_p139, section: text}
+  - {obj: src/sub_8161C9C, section: text}
+  - {obj: asm/text08057568_p292, section: text}
   - {obj: src/sub_8163110, section: text}
   - {obj: asm/text08057568_p151, section: text}
   - {obj: src/sub_81631DC, section: text}
@@ -550,6 +666,8 @@ groups:
   - {obj: asm/text08057568_p42, section: text}
   - {obj: src/sub_8163394, section: text}
   - {obj: asm/text08057568_p181, section: text}
+  - {obj: src/sub_816359C, section: text}
+  - {obj: asm/text08057568_p277, section: text}
   - {obj: src/sub_8163650, section: text}
   - {obj: asm/text08057568_p152, section: text}
   - {obj: src/sub_8163748, section: text}
@@ -617,12 +735,20 @@ groups:
   - {obj: asm/text08057568_p77, section: text}
   - {obj: src/sub_819B19C, section: text}
   - {obj: asm/text08057568_p90, section: text}
+  - {obj: src/sub_819B31C, section: text}
   - {obj: src/sub_819B418, section: text}
   - {obj: asm/text08057568_p214, section: text}
   - {obj: src/sub_81DA690, section: text}
   - {obj: asm/text08057568_p10, section: text}
   - {obj: src/sub_81DA6A8, section: text}
   - {obj: asm/text08057568_p11, section: text}
+  - {obj: src/sub_81DA72C, section: text}
+  - {obj: asm/text08057568_p256, section: text}
+  - {obj: src/sub_81DBBA0, section: text}
+  - {obj: asm/text08057568_p291, section: text}
+  - {obj: src/sub_81DC43C, section: text}
+  - {obj: src/sub_81DC49C, section: text}
+  - {obj: asm/text08057568_p257, section: text}
   - {obj: src/_negdi2, section: text}
   - {obj: asm/text08057568_p103, section: text}
   - {obj: src/isatty, section: text}

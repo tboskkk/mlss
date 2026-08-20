@@ -1,0 +1,67 @@
+#include "global.h"
+#include "common.h"
+
+// TODO: add other includes (a matching *.h, other subsystem headers) as
+// this file grows. Left minimal since split_func.py doesn't know yet what
+// sub_80BED0C needs.
+
+asm_unified(".include \"asm/macros.inc\"");
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80BED0C.s\"");
+#else
+extern void sub_80BF3BC();
+extern void sub_80BED8C();
+
+void sub_80BED0C(void* p0)
+{
+    u32* r3 = (u32*)p0;
+    u32** r2 = (u32**)((u8*)p0 + 0x2C);
+    u32* r0 = *(u32**)0x03000FD8;
+    r0 = *(u32**)((u8*)r0 + 0x70);
+    r0 += 0x08;
+    u32* r12 = r0;
+    r0 = *(u32**)0x0300034C;
+    u16 r1 = *(u16*)((u8*)r0 + 0x3E);
+    r0 = 0x03;
+    r0 &= r1;
+    if (r0 == 0)
+        goto _080BED3E;
+    r0 = (u32*)((u8*)p0 + 0x76);
+    r0 = *(u8*)r0;
+    r1 = 0x06;
+    r1 &= r0;
+    if (r1 == 0x02)
+        goto _080BED3A;
+    if (r1 != 0x04)
+        goto _080BED3E;
+_080BED3A:
+    *(u32*)((u8*)p0 + 0x4C) = (u32)sub_80BF3BC;
+_080BED3E:
+    r0 = *(u32*)((u8*)(*r2) + 0x4C);
+    if (r0 == 0)
+        goto _080BED62;
+    r0 = *(u32*)((u8*)(*r2) + 0x40);
+    u32* r1 = *(u32**)((u8*)(*r2) + 0x18);
+    if (r0 < (u32)r1)
+        goto _080BED72;
+    r0 = r12;
+    r0 += 0xB2;
+    u16 r2_ = *(u16*)((u8*)r0 + 0x0);
+    r0 = (u32)r1;
+    if (r0 < 0)
+        r0 += 0xFF;
+    r0 >>= 8;
+    if (r2_ < (s16)r0)
+        goto _080BED72;
+_080BED62:
+    r2 = (u32*)((u8*)r12 + 0xAE);
+    u16 r1_ = *(u16*)((u8*)r2 + 0x00);
+    r0 = 0x00000FFF;
+    r0 &= r1_;
+    *(u16*)((u8*)r2 + 0x00) = (u16)r0;
+    *(u32*)((u8*)p0 + 0x4C) = (u32)sub_80BED8C;
+_080BED72:
+    return;
+}
+#endif

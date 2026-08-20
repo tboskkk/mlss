@@ -7,13 +7,127 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/init_heap.s\"");
 #else
-#error "TODO: write init_heap to match asm/nonmatching/init_heap.s, then delete this #error"
+void init_heap(void)
+{
+    u32 *r4;
+    u32 *r5;
+    u32 *r6;
+    u8 *r0;
+    u32 r1;
+    u32 r2;
+    u32 r3;
+    u8 r8;
+    u8 r9;
+
+    r9 = 0;
+    r4 = (u32 *)0x03001BD8;
+    r5 = (u32 *)0x080000F4;
+    r6 = r4 + 0x80 * 4 / 4;
+    r2 = r5[0] - r6;
+    r2 = (r2 << 9) >> 11;
+    r2 |= 0xA0 << 19;
+    r0 = (u8 *)r4;
+    r1 = (u32)r4;
+    CpuSet(r0, r1, r2);
+    r4[0] = r9;
+    r4[1] = r9;
+    r0 = (u8 *)(r5[0] - r6);
+    r0[0] = 1 | r0[0];
+    r4[2] = (u32)r0;
+    r0 = (u8 *)0x081DD7C8;
+    r1 = r0[0];
+    r8 = r1;
+    r4[3] = (u32)r1;
+    r1 = r0[1];
+    r4[4] = (u32)r1;
+    r1 = r0[2];
+    r4[5] = (u32)r1;
+    r1 = r0[3];
+    r4[6] = (u32)r1;
+    r0 = (u8 *)r9;
+    r4[7] = (u32)r0;
+    r4 = (u32 *)0x02000C80;
+    r2 = 0x0500FCDE;
+    r0 = (u8 *)r4;
+    r1 = (u32)r4;
+    CpuSet(r0, r1, r2);
+    r4[0] = r9;
+    r4[1] = r9;
+    r4[2] = 0x0003F379;
+    r0 = (u8 *)0x02000C8C;
+    r0[0] = r8;
+    r0[1] = r4[7];
+    r0[2] = r4[5];
+    r0[3] = r4[6];
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/free_heap_memory_8018C68.s\"");
 #else
-#error "TODO: write free_heap_memory_8018C68 to match asm/nonmatching/free_heap_memory_8018C68.s, then delete this #error"
+void free_heap_memory_8018C68(u32* a0)
+{
+    u32* r4;
+    u32* r5;
+    u32* r6;
+    u32* r0;
+    u32 r1;
+    u32 r2;
+    u32 r7;
+    
+    if (a0 == 0)
+        return;
+        
+    r4 = a0 - 4;
+    r6 = *(u32**)(r4 + 0);
+    r5 = *(u32**)(r4 + 1);
+    r0 = *(u32**)(r4 + 2);
+    r7 = 1;
+    *r0 |= r7;
+    
+    r1 = a0 - 1;
+    r2 = 0x081DD7C8;
+    *(u8*)(r1) = *(u8*)(r2);
+    r1--;
+    *(u8*)(r1) = *(u8*)(r2 + 1);
+    r1--;
+    *(u8*)(r1) = *(u8*)(r2 + 2);
+    r1--;
+    *(u8*)(r1) = *(u8*)(r2 + 3);
+    
+    if (r5 == 0)
+        return;
+        
+    r1 = *(u32**)(r5 + 2);
+    r0 = r1 & r7;
+    if (r0 == 0)
+        return;
+        
+    r0 = -2;
+    r1 &= r0;
+    *r0 = *r4 + r1;
+    *(u32**)(r4 + 1) = *(u32**)(r5 + 1);
+    r0 = *(u32**)(r5 + 1);
+    if (r0 == 0)
+        return;
+        
+    *(u32**)(r0) = r4;
+    
+    if (r6 == 0)
+        return;
+        
+    r0 = *(u32**)(r6 + 2);
+    r1 = 0x02;
+    r1 = -r1;
+    r0 &= r1;
+    *r0 = r0 + *(u32**)(r4 + 2);
+    *(u32**)(r6 + 1) = *(u32**)(r4 + 1);
+    r0 = *(u32**)(r4 + 1);
+    if (r0 == 0)
+        return;
+        
+    *(u32**)(r0) = r6;
+}
 #endif
 
 #ifndef NONMATCHING
