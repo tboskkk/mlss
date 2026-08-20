@@ -157,6 +157,7 @@ groups:
   - {obj: src/sub_805A900, section: text}
   - {obj: src/sub_805A954, section: text}
   - {obj: asm/text08057568_p20, section: text}
+  - {obj: src/sub_805CCC0, section: text}
   - {obj: src/sub_805CCD8, section: text}
   - {obj: asm/text08057568_p21, section: text}
   - {obj: src/sub_805D914, section: text}
