@@ -7,15 +7,6 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8108CBC.s\"");
-#else
-u16 sub_8108CBC(u16* param)
-{
-    u16 r1 = 0x8F << 1;
-    u16* r2 = param + r1;
-    u16 r0 = *r2 & 0x0FFF;
-    *r2 = r0;
-    return r0;
+void sub_8108CBC(void *arg0) {
+    (*(u16 *)((s8 *)(arg0) + (0x11E))) = (u16) (0xFFF & (*(u16 *)((s8 *)(arg0) + (0x11E))));
 }
-#endif
