@@ -10,43 +10,24 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_804034C.s\"");
 #else
-void sub_804034C(u8* p0)
-{
-    u8 r1;
-    u32 r0;
-    u32 r2;
-    u32 r3;
-    
-    r3 = (u32)p0;
-    r1 = *(u8*)(r3 + 0x20C);
-    r0 = r1 & 1;
-    if (r0 == 0)
-    {
-        r0 = *(u32*)(r3 + 0x25C);
-        r0 = *(u8*)(r3 + r0 + 0x216) & 0x20;
-        if (r0 != 0)
-            goto _080403BE;
-        
-        r0 = *(u32*)(r3 + 0x242);
-        r0 = *(s16*)(r3 + r0);
-        if (r0 == 0)
-        {
-            r0 = *(u32*)(r3 + 0x242);
-            r0 = *(s16*)(r3 + r0);
-            if (r0 == 0)
-                goto _080403BC;
+void sub_804034C(void *arg0) {
+    s16 var_r0_38;
+
+    if ((1 & (*(u8 *)((s8 *)(arg0) + (0x20C)))) && !(0x20 & (*(u8 *)((s8 *)(arg0) + (0x216))))) {
+        if ((s32) (*(s32 *)((s8 *)(arg0) + (0x25C))) >= 0) {
+            if ((s32) ((*(s32 *)((s8 *)(arg0) + (0x14))) + (*(s32 *)((s8 *)(arg0) + (0x18)))) >= (s32) ((*(s32 *)((s8 *)(arg0) + (0x3C))) + (*(s32 *)((s8 *)(arg0) + (0x40))))) {
+                var_r0_38 = 2;
+            } else {
+                var_r0_38 = 3;
+            }
+            goto block_9;
         }
-        
-        *(u16*)(r3 + 0x04) = *(u16*)(r3 + 0x04);
-        goto _080403BE;
+        if ((M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */) != 0) || (var_r0_38 = M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */), (var_r0_38 != 0))) {
+            (*(s16 *)((s8 *)(arg0) + (4))) = 1;
+            return;
+        }
+block_9:
+        (*(s16 *)((s8 *)(arg0) + (4))) = var_r0_38;
     }
-    
-_080403BC:
-    *(u16*)(r3 + 0x04) = (u16)r0;
-    
-_080403BE:
-    r0 = *(u32*)r3;
-    r0 = *(u16*)(r3 + 0x04);
-    return;
 }
 #endif

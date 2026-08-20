@@ -22,5 +22,11 @@ void sub_8029804(void *arg0) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8029830.s\"");
 #else
-#error "TODO: write sub_8029830 to match asm/nonmatching/sub_8029830.s, then delete this #error"
+void sub_8029830(u32* p0)
+{
+    u8* ptr = (u8*)p0;
+    *(u8*)(ptr + 0x208) |= 0x02;
+    *(u16*)(ptr + 0x100) = *(u16*)(ptr + 0x100) + *(u32*)(ptr + 0x200) + 0x23E;
+    *(u8*)(ptr + 0x100) &= 0xBF;
+}
 #endif
