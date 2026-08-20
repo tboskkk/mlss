@@ -300,5 +300,12 @@ void sub_801A2A0(void) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_801A33C.s\"");
 #else
-#error "TODO: write sub_801A33C to match asm/nonmatching/sub_801A33C.s, then delete this #error"
+u32 sub_801A33C(void) {
+    u32 r0 = 0x03000D0C;
+    u32 r1 = *(u32*)r0;
+    u8 r0_2 = *(u8*)r1;
+    if (r0_2 != 0)
+        *(u8*)(r1 + 6) = 1;
+    return r0_2;
+}
 #endif

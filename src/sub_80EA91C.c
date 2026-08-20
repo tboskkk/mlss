@@ -20,5 +20,14 @@ u32 sub_80EA91C(u32* param1) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80EA928.s\"");
 #else
-#error "TODO: write sub_80EA928 to match asm/nonmatching/sub_80EA928.s, then delete this #error"
+u32 sub_80EA928(u32 param_1,u8* param_2,u32* param_3) {
+  u8 *puVar1;
+  u32 uVar2;
+  
+  puVar1 = param_2 + 0xa6;
+  uVar2 = *puVar1;
+  *param_3 = *(param_1 + (uVar2 << 2));
+  *puVar1 = uVar2 + 1;
+  return 1;
+}
 #endif

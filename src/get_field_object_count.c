@@ -10,7 +10,12 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/get_field_object_count.s\"");
 #else
-#error "TODO: write get_field_object_count to match asm/nonmatching/get_field_object_count.s, then delete this #error"
+u8 get_field_object_count(u16 arg0, u8* arg1) {
+    u8** ptr = (u8**)0x083D6C58;
+    u8 val = ptr[arg0 >> 2][1];
+    *arg1 = val >> 3;
+    return *arg1;
+}
 #endif
 
 #ifndef NONMATCHING

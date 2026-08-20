@@ -10,5 +10,22 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/_negdi2.s\"");
 #else
-#error "TODO: write _negdi2 to match asm/nonmatching/_negdi2.s, then delete this #error"
+s64 _negdi2(s64 x) {
+    s32 r1 = (s32)(x >> 32);
+    s32 r0 = (s32)x;
+    s32 r2;
+    s32 r3;
+    s32 r4;
+    
+    r2 = -r0;
+    r3 = r2;
+    r1 = -r1;
+    if (r2 == 0) {
+        r1--;
+    }
+    r4 = r1;
+    r1 = r4;
+    r0 = r3;
+    return ((s64)r1 << 32) | (r0 & 0xFFFFFFFF);
+}
 #endif

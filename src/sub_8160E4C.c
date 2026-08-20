@@ -10,5 +10,13 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8160E4C.s\"");
 #else
-#error "TODO: write sub_8160E4C to match asm/nonmatching/sub_8160E4C.s, then delete this #error"
+u32 sub_8160E4C(u32 param_1) {
+    u32 *reg = (u32 *)0x040000D4;
+    reg[0] = param_1;
+    param_1 += 0x810;
+    param_1 = *(u32 *)param_1;
+    reg[1] = param_1;
+    reg[2] = 0x84000200;
+    return reg[2];
+}
 #endif

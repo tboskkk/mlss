@@ -10,7 +10,13 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/script_cmd_call.s\"");
 #else
-#error "TODO: write script_cmd_call to match asm/nonmatching/script_cmd_call.s, then delete this #error"
+u32 script_cmd_call(u32* a0, u32* a1, u32 a2) {
+    if (a2 == 1) {
+        *a1 = *a0;
+    }
+    *a0 = a2;
+    return 1;
+}
 #endif
 
 #ifndef NONMATCHING

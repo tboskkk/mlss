@@ -22,5 +22,15 @@ u32 sub_8199D48(u32 arg0, u32 arg1) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8199D5C.s\"");
 #else
-#error "TODO: write sub_8199D5C to match asm/nonmatching/sub_8199D5C.s, then delete this #error"
+u32 sub_8199D5C(u32* param_1, u8 param_2, u8 param_3, u32 param_4) {
+    u32 temp;
+    
+    temp = param_1[2];
+    param_1[3] = param_2;
+    param_1[4] = param_3;
+    param_1[2] = param_4;
+    param_1[5] &= 0xFFFFFFDF;
+    
+    return temp;
+}
 #endif

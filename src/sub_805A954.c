@@ -7,12 +7,8 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_805A954.s\"");
-#else
 u16* sub_805A954(u16* param_1, u16 param_2, u16 param_3) {
     param_1[0x10] = param_2;
     param_1[0x11] = param_3;
     return param_1;
 }
-#endif
