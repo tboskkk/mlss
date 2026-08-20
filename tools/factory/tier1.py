@@ -105,19 +105,23 @@ def process_one(conn) -> str | None:
         # already (the common case: still raw).
         frag = gitops.REPO / "asm" / "nonmatching" / f"{name}.s"
         if not frag.exists():
-            r = gitops.run(["./container.sh", "tools/split_func.py", name])
-            if r.returncode != 0:
-                with db.tx(conn):
-                    db.set_state(conn, name, "needs_attempt", worker_id=None,
-                                 notes=f"tier1 idiom matched ({label}) but extraction failed: {r.stderr[-300:]}")
-                return name
-            # Refresh expected/ right after extraction -- CLAUDE.md landmine:
-            # a stale expected/ has the wrong object for a just-moved symbol,
-            # and asm-differ silently diffs against nothing/wrong content.
-            gitops.run(["./container.sh", "make"])
-            import shutil
-            shutil.rmtree(gitops.REPO / "expected", ignore_errors=True)
-            shutil.copytree(gitops.REPO / "build", gitops.REPO / "expected" / "build")
+            # Extraction mutates shared repo state (asm blobs, splits.yaml,
+            # ld_script.ld) and runs a build -- must be serialized against
+            # the validator and the other tiers. See gitops.repo_lock().
+            with gitops.repo_lock(what=f"tier1 extract {name}"):
+                r = gitops.run(["./container.sh", "tools/split_func.py", name])
+                if r.returncode != 0:
+                    with db.tx(conn):
+                        db.set_state(conn, name, "needs_attempt", worker_id=None,
+                                     notes=f"tier1 idiom matched ({label}) but extraction failed: {r.stderr[-300:]}")
+                    return name
+                # Refresh expected/ right after extraction -- CLAUDE.md landmine:
+                # a stale expected/ has the wrong object for a just-moved symbol,
+                # and asm-differ silently diffs against nothing/wrong content.
+                gitops.run(["./container.sh", "make"])
+                import shutil
+                shutil.rmtree(gitops.REPO / "expected", ignore_errors=True)
+                shutil.copytree(gitops.REPO / "build", gitops.REPO / "expected" / "build")
 
         with db.tx(conn):
             db.set_state(conn, name, "validating", worker_id=None,
