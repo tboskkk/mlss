@@ -23,8 +23,10 @@ u32* sub_809EB58(u32* param_1) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_809EB70.s\"");
-#else
-#error "TODO: write sub_809EB70 to match asm/nonmatching/sub_809EB70.s, then delete this #error"
-#endif
+extern s32 sub_808750C;
+
+void sub_809EB70(void *arg0) {
+    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_808750C;
+    }
+}
