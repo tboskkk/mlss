@@ -402,6 +402,8 @@ groups:
   - {obj: asm/text08057568_p105, section: text}
   - {obj: src/script_cmd_end, section: text}
   - {obj: asm/text08057568_p46, section: text}
+  - {obj: src/sub_80EECD0, section: text}
+  - {obj: asm/text08057568_p317, section: text}
   - {obj: src/sub_80EF27C, section: text}
   - {obj: src/sub_80EF2EC, section: text}
   - {obj: asm/text08057568_p243, section: text}
