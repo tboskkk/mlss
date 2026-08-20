@@ -7,18 +7,10 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8065E4C.s\"");
-#else
-u32 sub_8065E4C(u32* param_1) {
-    u32* puVar1;
-    u8 uVar2;
-    
-    puVar1 = param_1;
-    uVar2 = *(u8*)(param_1 + 2) + 0x12;
-    if ((uVar2 & 8) != 0) {
-        *(u32**)(puVar1 + 0x13) = (u32*)0x08065ED5;
+extern s32 sub_8065ED4;
+
+void sub_8065E4C(void *arg0) {
+    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8065ED4;
     }
-    return (u32)puVar1;
 }
-#endif
