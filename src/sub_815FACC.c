@@ -7,22 +7,17 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_815FACC.s\"");
-#else
-u32* sub_815FACC(u32* param_1) {
-    u32 uVar1;
-    u32 uVar2;
-    
-    uVar1 = param_1[1];
-    uVar2 = param_1[2];
-    param_1[5] = uVar1 - param_1[3];
-    param_1[6] = uVar2 - param_1[4];
-    param_1[3] = uVar1;
-    param_1[4] = uVar2;
-    return param_1;
+void sub_815FACC(void *arg0) {
+    s32 temp_r2_10;
+    s32 temp_r3_6;
+
+    temp_r3_6 = (*(s32 *)((s8 *)(arg0) + (4)));
+    (*(s16 *)((s8 *)(arg0) + (0x14))) = (s16) (temp_r3_6 - (*(s32 *)((s8 *)(arg0) + (0xC))));
+    temp_r2_10 = (*(s32 *)((s8 *)(arg0) + (8)));
+    (*(s16 *)((s8 *)(arg0) + (0x18))) = (s16) (temp_r2_10 - (*(s32 *)((s8 *)(arg0) + (0x10))));
+    (*(s32 *)((s8 *)(arg0) + (0xC))) = temp_r3_6;
+    (*(s32 *)((s8 *)(arg0) + (0x10))) = temp_r2_10;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_815FAE4.s\"");
