@@ -117,9 +117,19 @@ def scan_once() -> dict:
                 # from any state -- that's real news, not scanner noise.
                 scanner_owned = {"raw", "queued"}
                 if worker_id is not None or (cur_state not in scanner_owned and target_state != "matched"):
+                    # Deliberately does NOT touch `notes` here. Once a tier
+                    # owns a function, `notes` holds that tier's diagnostic
+                    # reason ("permuter score 0 didn't hold in context",
+                    # "build FAILED ...") -- overwriting it with generic
+                    # triage scoring text destroys the only human-readable
+                    # record of WHY something is stuck. Hit this for real
+                    # while debugging: 189 needs_human rows all showed
+                    # "leaf function (calls nothing); very small" instead of
+                    # their actual failure, and the real reasons had to be
+                    # reconstructed from the append-only events table.
                     conn.execute(
-                        "UPDATE functions SET file=?, tractability=?, notes=?, updated_at=? WHERE name=?",
-                        (f.file, s, "; ".join(reasons), now, name),
+                        "UPDATE functions SET file=?, tractability=?, updated_at=? WHERE name=?",
+                        (f.file, s, now, name),
                     )
                     stats["skipped_active"] += 1
                 elif cur_state != target_state:
