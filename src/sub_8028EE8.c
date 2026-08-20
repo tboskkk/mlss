@@ -7,12 +7,6 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8028EE8.s\"");
-#else
-u8 sub_8028EE8(u8 param_1) {
-    u8 *ptr = &param_1;
-    *ptr = *ptr | 0x40;
-    return param_1;
+void sub_8028EE8(void *arg0) {
+    (*(u8 *)((s8 *)(arg0) + (0xF8))) = (u8) ((*(u8 *)((s8 *)(arg0) + (0xF8))) | 0x40);
 }
-#endif
