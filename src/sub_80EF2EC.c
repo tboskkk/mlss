@@ -10,46 +10,27 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80EF2EC.s\"");
 #else
-void sub_80EF2EC(u32 p0, u32 p1, u32* p2)
-{
-    u32 r4;
-    u32 r5;
-    u32 r6;
-    u16 r0;
-    u16 r1;
-    u8 r2;
-    u8 r3;
-    
-    r6 = p1;
-    r4 = *(u32*)0x03000FD0;
-    r0 = 0x0000054A;
-    r2 = r4 + r0;
-    r1 = *(u32*)p2;
-    r5 = 1;
-    r0 = (r5 << r1) | *(u16*)r2;
-    *(u16*)r2 = r0;
-    r1 = *(u32*)p2;
-    r0 = 0x2C * r1;
-    r1 = 0xC8 << 2;
-    r0 += r1;
-    r4 += r0;
-    r0 = *(u32*)p2;
-    *(u8*)(r4 + 0x09) = r0;
-    r0 = *(u32*)p2;
-    *(u8*)(r4 + 0x0A) = r0;
-    r1 = *(u32*)p2;
-    r1 &= r5;
-    r2 = *(u8*)(r4 + 0x0B);
-    r0 = 0x02;
-    r0 = ~r0;
-    r0 &= r2;
-    r0 |= r1;
-    *(u8*)(r4 + 0x0B) = r0;
-    r0 = *(u32*)p2;
-    *(u8*)(r4 + 0x08) = r0;
-    r0 = *(u32*)p2;
-    *(u32*)(r4 + 0x04) = r0;
-    if (r6 != 0)
-        *(u32*)(r4 + 0x00) = r6;
+s32 sub_80EF2EC(s32 arg1, void *arg3) {
+    void *temp_r3_19;
+    void *temp_r3_26;
+    void *temp_r3_28;
+    void *temp_r4_25;
+    void *temp_r4_9;
+
+    temp_r4_9 = *(void **)0x03000FD0;
+    (*(u16 *)((s8 *)(temp_r4_9) + (0x54A))) = (u16) ((1 << (*(s32 *)((s8 *)(arg3) + (0)))) | (*(u16 *)((s8 *)(temp_r4_9) + (0x54A))));
+    temp_r3_19 = arg3 + 4;
+    temp_r4_25 = temp_r4_9 + ((0x2C * (*(s32 *)((s8 *)(arg3) + (0)))) + 0x320);
+    temp_r3_26 = temp_r3_19 + 4;
+    (*(s8 *)((s8 *)(temp_r4_25) + (9))) = (s8) (*(s32 *)((s8 *)(arg3) + (4)));
+    temp_r3_28 = temp_r3_26 + 4;
+    (*(s8 *)((s8 *)(temp_r4_25) + (0xA))) = (s8) (*(s32 *)((s8 *)(temp_r3_19) + (4)));
+    (*(u8 *)((s8 *)(temp_r4_25) + (0xB))) = (u8) ((-2 & (*(u8 *)((s8 *)(temp_r4_25) + (0xB)))) | ((*(s32 *)((s8 *)(temp_r3_26) + (4))) & 1));
+    (*(s8 *)((s8 *)(temp_r4_25) + (8))) = (s8) (*(s32 *)((s8 *)(temp_r3_28) + (4)));
+    (*(s32 *)((s8 *)(temp_r4_25) + (4))) = (s32) (*(s32 *)((s8 *)((temp_r3_28 + 4)) + (4)));
+    if (arg1 != 0) {
+        (*(s32 *)((s8 *)(temp_r4_25) + (0))) = arg1;
+    }
+    return 1;
 }
 #endif
