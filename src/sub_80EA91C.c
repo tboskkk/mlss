@@ -17,12 +17,8 @@ u32 sub_80EA91C(u32* param1) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80EA928.s\"");
-#else
-s32 sub_80EA928(void *arg1, s32 *arg2) {
+s32 sub_80EA928(s32 arg0, void *arg1, s32 *arg2) {
     (*(s32 *)((s8 *)((((*(u8 *)((s8 *)(arg1) + (0xA6))) * 4) + arg1)) + (0x58))) = (s32) *arg2;
     (*(u8 *)((s8 *)(arg1) + (0xA6))) = (u8) ((*(u8 *)((s8 *)(arg1) + (0xA6))) + 1);
     return 1;
 }
-#endif
