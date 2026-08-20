@@ -118,10 +118,16 @@ def ensure_isolated(name: str, candidate_body: str | None) -> bool:
     # holding the split_func.py #error placeholder, so permute.py refused
     # every single one, 100% of a 21-minute run's failures. See
     # gitops.splice_into_else()'s docstring for the full story.
-    if candidate_body:
-        if gitops.splice_into_else(name, candidate_body) is None:
-            return False
-    r = gitops.run(["./container.sh", "tools/permute.py", name])
+    # Writes into a real src/*.c and runs permute.py (which compiles) --
+    # shared repo state, so serialize it like every other mutation. Only
+    # the SETUP is locked; the long permuter search itself runs outside the
+    # lock, entirely inside nonmatchings/<name>/, so searches stay fully
+    # parallel with everything else. See gitops.repo_lock().
+    with gitops.repo_lock(what=f"tier2 isolate {name}"):
+        if candidate_body:
+            if gitops.splice_into_else(name, candidate_body) is None:
+                return False
+        r = gitops.run(["./container.sh", "tools/permute.py", name])
     return r.returncode == 0
 
 
