@@ -46,22 +46,33 @@ SERVE_SCRIPT = Path.home() / "Desktop" / "ai-training" / "qwen-coder" / "serve.s
 # name -> (script, args, needs_llm). needs_llm processes are only started
 # once llama-server answers healthy; the rest don't touch it at all.
 #
-# tier_m2c runs ahead of tier3 in practice (not by explicit priority, just
-# because it's ~1000x faster per function and polls more often): both
-# claim from the same needs_attempt/stalled pool, so tier_m2c naturally
-# drains the easy majority before tier3 would otherwise see it. tier3 (the
-# LLM) stays in the loop deliberately, as a fallback for what tier_m2c
-# declines -- NOT because it's expected to perform well; a controlled 5-way
-# comparison (CLAUDE.md, "Generating C: use m2c, not an LLM") found it
-# loses to a plain m2c seed on every axis. Something is still better than
-# the #error placeholder for the ~4% tier_m2c can't translate at all.
+# NO LLM TIER HERE, DELIBERATELY. tier3.py still exists (tier_m2c and
+# m2c_sweep import its blocking_siblings/read_retail_asm helpers) but it
+# is no longer RUN. The measured case for removing it, not a preference:
+#
+#   * a controlled 5-way comparison found no LLM configuration beat a
+#     single plain draft, and all of them lost to a plain m2c seed on
+#     compile rate, mean score AND match rate (CLAUDE.md, "Generating C:
+#     use m2c, not an LLM")
+#   * m2c translates 96% of functions and produced 68 exact matches in
+#     ~2 minutes; the LLM produced 1 match in 10 hours
+#   * once the permuter got the cores it needed, llama-server degraded to
+#     ~5 tok/s anyway, so tier3 was contributing ~nothing while holding
+#     6 cores hostage
+#
+# This project is a reverse compiler. A compiler doesn't use an LLM, and
+# neither does this: every stall is a MISSING DETERMINISTIC RULE, not a
+# prompt to hand to a model. See stall_patterns.py, which mines stalls
+# for exactly those rules -- the arg-register fix it inspired
+# (m2c_bridge.restore_omitted_leading_params) took functions that had
+# stalled through full permuter searches straight to score 0, and applied
+# to 15% of the corpus.
 PROCESSES = {
     "scanner":   ("scanner.py",   ["--loop", "300"],  False),
     "validator": ("validator.py", ["--loop", "15"],   False),
     "tier1":     ("tier1.py",     ["--loop", "30"],   False),
     "tier_m2c":  ("tier_m2c.py",  ["--loop", "10"],   False),
     "tier2":     ("tier2.py",     ["--loop", "20", "--stall-min", "15"], False),
-    "tier3":     ("tier3.py",     ["--loop", "20"],   True),
 }
 
 

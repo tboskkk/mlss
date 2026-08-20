@@ -59,7 +59,14 @@ WORKER_ID = "tier2"
 # cores' worth of real compute, so oversubscribing much past that risks
 # thrashing rather than helping.
 FARM_CPUSET = "0-11"
-FARM_CPU_COUNT = 8
+# Was 8 while llama-server still held cores 0-5 for tier3's LLM. tier3 is
+# gone (see supervisor.PROCESSES), llama-server isn't started, so the
+# permuter now has the machine to itself: 12 concurrent searches across
+# 6 physical cores / 12 SMT threads. Still oversubscribed relative to
+# physical cores on purpose -- permuter workers spend real time blocked on
+# compile I/O, so a thread per logical CPU keeps them fed without the
+# decode-collapse problem that made SMT bad for llama-server.
+FARM_CPU_COUNT = 12
 
 OUTPUT_DIR_RE = re.compile(r"^output-(\d+)-\d+$")
 
