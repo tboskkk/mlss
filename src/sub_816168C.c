@@ -7,11 +7,7 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_816168C.s\"");
-#else
 u32* sub_816168C(u32* param_1) {
     *param_1 = 0x08CDD0B8;
     return param_1;
 }
-#endif
