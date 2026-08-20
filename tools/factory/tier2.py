@@ -285,7 +285,18 @@ def run_pool(jobs: int, stall_min: float, max_functions: int):
     def claim_one():
         conn = db.connect()
         try:
-            return db.claim_for_worker(conn, "tier2_ready", WORKER_ID)
+            # Oldest-queued-first, NOT the default tractability ASC.
+            # Tractability-first made sense early (front-load quick wins to
+            # prove the pipeline works), but once generation runs
+            # continuously it means every new easy seed cuts in line ahead
+            # of older, harder ones -- confirmed live via the events log:
+            # 35 functions sitting 3.6-12.5 HOURS in tier2_ready while
+            # newer arrivals kept getting claimed first. updated_at is a
+            # coarse proxy (the scanner's own 5-min reconciliation pass
+            # touches every row, so it's not a precise per-second signal),
+            # but it's far better than none at all for a starvation window
+            # measured in hours, not minutes.
+            return db.claim_for_worker(conn, "tier2_ready", WORKER_ID, order_by="updated_at ASC")
         finally:
             conn.close()
 
