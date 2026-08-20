@@ -44,11 +44,22 @@ HEALTH_URL = "http://127.0.0.1:8080/health"
 SERVE_SCRIPT = Path.home() / "Desktop" / "ai-training" / "qwen-coder" / "serve.sh"
 
 # name -> (script, args, needs_llm). needs_llm processes are only started
-# once llama-server answers healthy; the other four don't touch it at all.
+# once llama-server answers healthy; the rest don't touch it at all.
+#
+# tier_m2c runs ahead of tier3 in practice (not by explicit priority, just
+# because it's ~1000x faster per function and polls more often): both
+# claim from the same needs_attempt/stalled pool, so tier_m2c naturally
+# drains the easy majority before tier3 would otherwise see it. tier3 (the
+# LLM) stays in the loop deliberately, as a fallback for what tier_m2c
+# declines -- NOT because it's expected to perform well; a controlled 5-way
+# comparison (CLAUDE.md, "Generating C: use m2c, not an LLM") found it
+# loses to a plain m2c seed on every axis. Something is still better than
+# the #error placeholder for the ~4% tier_m2c can't translate at all.
 PROCESSES = {
     "scanner":   ("scanner.py",   ["--loop", "300"],  False),
     "validator": ("validator.py", ["--loop", "15"],   False),
     "tier1":     ("tier1.py",     ["--loop", "30"],   False),
+    "tier_m2c":  ("tier_m2c.py",  ["--loop", "10"],   False),
     "tier2":     ("tier2.py",     ["--loop", "20", "--stall-min", "15"], False),
     "tier3":     ("tier3.py",     ["--loop", "20"],   True),
 }

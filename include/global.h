@@ -3,6 +3,11 @@
 
 #include "gba/gba.h"
 #include "buffer_io_reg.h"
+// Typedefs/macros used by m2c-generated seed C (tools/factory/m2c_bridge.py).
+// Pure typedefs and macros -- emits no code, so it cannot affect the built
+// ROM; verified byte-identical after adding. Included globally rather than
+// per-candidate so a generated function needs no preamble of its own.
+#include "m2c_macros.h"
 
 // Figure out if we need these defines later.
 // #define OFFSET_OF(type, element) ((int)&(((type *)0)->element))

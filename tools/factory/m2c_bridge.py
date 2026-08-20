@@ -1,0 +1,169 @@
+#!/usr/bin/env python3
+"""Generate seed C for a function with m2c -- deterministically, no LLM.
+
+This is the successor to tier3's LLM generation step, and it exists because
+of measured results, not preference. A controlled 5-way comparison on a
+fixed benchmark set (see bench.py and bench_results/) found that NOTHING
+tested beat a single plain LLM draft: few-shot, best-of-5, multi-turn
+diff-feedback, a 32B dense model, and a reasoning model all scored equal or
+worse, several at multiples of the compute cost. Mean asm-differ score for
+the best LLM configuration was ~548 with a 69% compile rate.
+
+m2c (tools/m2c, github.com/matt-kempster/m2c) solves the actual problem
+instead: it inverts compiler codegen mechanically. Its ARM/Thumb backend
+was written and is maintained by Simon Lindholm -- the author of asm-differ
+and decomp-permuter, the two tools this project already runs on -- and its
+own test suite contains 80 agbcc-Thumb fixtures using the exact
+`thumb_func_start` / `.code 16` conventions this repo emits. First
+hand-checked function through it (`sub_8047B78`) scored 230 raw, better
+than every LLM variant's mean, in milliseconds rather than tens of seconds.
+
+`--valid-syntax` is what makes this practical: instead of inventing struct
+names (`arg0->unk2B5`, which does not compile against a `void *`), m2c
+emits `M2C_FIELD(arg0, u8 *, 0x2B5)`, which is exactly this project's own
+explicit-byte-cast convention AND carries the access width. Those macros
+are expanded inline here rather than relying on the header, so a generated
+candidate is self-contained C that depends on nothing new.
+
+Output is a SEED, not a finished match -- same as every other candidate
+source in this pipeline. It goes through the identical decomp-permuter
+search and the identical from-scratch-build validator gate as anything
+else. Nothing here bypasses a single check.
+"""
+from __future__ import annotations
+
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import gitops  # noqa: E402
+
+M2C_PY = gitops.REPO / "tools" / "m2c" / "m2c.py"
+COMMON_H = gitops.REPO / "include" / "common.h"
+
+# Declarations m2c emits for symbols it doesn't know. Two shapes:
+#   `extern M2C_UNK sub_8080A40;`
+#   `M2C_UNK free_heap_8018DA8(void *);                  /* extern */`
+EXTERN_LINE_RE = re.compile(r"^\s*(?:extern\s+)?\S.*\b(\w+)\s*(?:\(|;).*$")
+DECL_LINE_RE = re.compile(r"^(?:extern\s|.*/\*\s*extern\s*\*/\s*$)")
+
+# The macro bodies from tools/m2c/m2c_macros.h, expanded inline so a
+# generated candidate needs no new header. Keep in sync if m2c updates them
+# (they have been stable for years; a mismatch shows up immediately as a
+# compile error, not as a silently wrong match).
+UNK_TYPES = {"M2C_UNK": "s32", "M2C_UNK8": "s8", "M2C_UNK16": "s16",
+             "M2C_UNK32": "s32", "M2C_UNK64": "s64"}
+
+
+def _declared_in_common_h() -> set[str]:
+    """Symbols the project's own headers already declare. m2c's guessed
+    prototype for one of these would be a CONFLICTING declaration -- a hard
+    compile error that has nothing to do with whether the body is right."""
+    try:
+        text = COMMON_H.read_text()
+    except OSError:
+        return set()
+    return set(re.findall(r"\b(\w+)\s*\(", text)) | set(re.findall(r"\b(\w+)\s*;", text))
+
+
+def expand_macros(c: str) -> str:
+    """Expand M2C_FIELD/M2C_UNK* inline.
+
+    M2C_FIELD(expr, type_ptr, offset) -> (*(type_ptr)((s8 *)(expr) + (offset)))
+    Done by hand-parsing balanced parens rather than a regex, because the
+    `expr` argument is frequently itself a nested M2C_FIELD call (a
+    double-dereference, the single most common shape in this codebase's
+    remaining functions) and a regex cannot match those reliably.
+    """
+    for unk, real in UNK_TYPES.items():
+        c = re.sub(rf"\b{unk}\b", real, c)
+
+    while True:
+        idx = c.find("M2C_FIELD(")
+        if idx == -1:
+            return c
+        open_paren = idx + len("M2C_FIELD")
+        depth = 0
+        args, cur, i = [], [], open_paren
+        while i < len(c):
+            ch = c[i]
+            if ch == "(":
+                depth += 1
+                if depth == 1:
+                    i += 1
+                    continue
+            elif ch == ")":
+                depth -= 1
+                if depth == 0:
+                    args.append("".join(cur).strip())
+                    break
+            elif ch == "," and depth == 1:
+                args.append("".join(cur).strip())
+                cur = []
+                i += 1
+                continue
+            cur.append(ch)
+            i += 1
+        if len(args) != 3:
+            raise ValueError(f"could not parse M2C_FIELD args: {args!r}")
+        expr, type_ptr, offset = args
+        replacement = f"(*({type_ptr})((s8 *)({expr}) + ({offset})))"
+        c = c[:idx] + replacement + c[i + 1:]
+
+
+def run_m2c(name: str, extra_args: list[str] | None = None) -> str | None:
+    frag = gitops.REPO / "asm" / "nonmatching" / f"{name}.s"
+    if not frag.exists():
+        return None
+    cmd = [sys.executable, str(M2C_PY), "--target", "gba", "--valid-syntax",
+           "--deterministic-vars", *(extra_args or []), str(frag)]
+    try:
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=120,
+                           cwd=str(gitops.REPO / "tools" / "m2c"))
+    except subprocess.TimeoutExpired:
+        return None
+    if r.returncode != 0 or not r.stdout.strip():
+        return None
+    return r.stdout
+
+
+def generate(name: str) -> str | None:
+    """-> compilable seed C for `name`, or None if m2c couldn't produce any."""
+    raw = run_m2c(name)
+    if raw is None:
+        return None
+
+    known = _declared_in_common_h()
+    kept: list[str] = []
+    for line in raw.splitlines():
+        stripped = line.strip()
+        if not stripped:
+            kept.append(line)
+            continue
+        # Drop m2c's guessed declarations for symbols the project already
+        # declares properly -- keeping them is a guaranteed compile error.
+        if DECL_LINE_RE.match(stripped) and "{" not in stripped:
+            m = EXTERN_LINE_RE.match(stripped)
+            if m and m.group(1) in known:
+                continue
+        kept.append(line)
+
+    c = "\n".join(kept)
+    try:
+        c = expand_macros(c)
+    except ValueError:
+        return None
+
+    if f"{name}(" not in c:
+        return None  # m2c emitted something, but not this function
+    return c.strip()
+
+
+if __name__ == "__main__":
+    for n in sys.argv[1:]:
+        print(f"=== {n} ===")
+        out = generate(n)
+        print(out if out else "(m2c produced nothing usable)")
+        print()

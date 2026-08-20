@@ -148,6 +148,78 @@ needing arbitrary hole-punching). Extracting from the middle of a blob is
 future work, not silently broken — you get a clear error naming what to
 extract first.
 
+## Generating C: use m2c, not an LLM
+
+**This is the single highest-leverage thing in this repo — read it before
+writing any decompilation tooling.**
+
+`tools/m2c/` is [m2c](https://github.com/matt-kempster/m2c) (formerly
+`mips_to_c`), a deterministic decompiler that inverts compiler codegen
+mechanically. Its ARM/Thumb backend is written and maintained by Simon
+Lindholm — the author of `asm-differ` and `decomp-permuter`, the two tools
+this project already runs on — and m2c's own test suite carries 80
+agbcc-Thumb fixtures using the exact `thumb_func_start` / `.code 16`
+conventions this repo emits.
+
+    python3 tools/factory/m2c_bridge.py <symbol>      # seed C for one function
+    python3 tools/factory/m2c_sweep.py --generate-only # survey yield, ~26s/337 fns
+    python3 tools/factory/m2c_sweep.py                # measure + seed the pipeline
+
+`tools/factory/m2c_bridge.py` wraps it with the two adaptations this
+project needs: `--valid-syntax` (so unknown fields come out as
+`M2C_FIELD(arg0, u8 *, 0x2B5)` — this project's own explicit-byte-cast
+convention, carrying the access width — instead of an invented
+`arg0->unk2B5` that cannot compile against a `void *`), and dropping m2c's
+guessed declarations for symbols `include/common.h` already declares
+(keeping them is a guaranteed conflicting-declaration error unrelated to
+whether the body is right). The `M2C_*` macros are expanded inline, so a
+generated candidate is self-contained C.
+
+**Why this replaced the LLM tier, measured not assumed.** A controlled
+5-way comparison on a fixed benchmark set (`tools/factory/bench.py`,
+`bench_set.json`, results in `bench_results/`) tested every plausible way
+to make the local LLM better: few-shot examples, best-of-5 sampling,
+multi-turn diff feedback, a 32B dense model (Qwen2.5-Coder-32B), and a
+reasoning model (DeepSeek-R1-Distill-32B). **Nothing beat a single plain
+draft.** Everything that spent more compute scored the same or worse:
+
+| variant | compiled | matches | mean score | cost |
+|---|---|---|---|---|
+| LLM baseline | 9/13 | 1 | 548 | 18 calls, ~500s |
+| LLM few-shot | 7/13 | 0 | 759 | 18 calls |
+| LLM best-of-5 | 8/13 | 0 | 664 | 90 calls |
+| LLM multi-turn | 8/13 | 0 | 744 | 54 calls |
+| LLM dense 32B | 4/13 | 0 | 843 | ~5x slower/call |
+| LLM reasoning 32B | — | — | — | 2.9 tok/s, disqualified |
+| **m2c** | **9/13** | **2** | **439** | **0 calls, 4s** |
+
+The reasoning model was disqualified on throughput alone: 2.9 tok/s
+measured on this CPU-only box (vs ~25 for the MoE), and one fully-resourced
+attempt burned 21 minutes without producing compiling code.
+
+m2c wins on every axis at once and is ~125x faster wall-clock. Do not
+"improve" generation by reaching for a bigger model or a cleverer prompt —
+that path has been measured and it is a dead end. m2c output is a **seed**,
+not a finished match: it still goes through the identical decomp-permuter
+search and the identical from-scratch-build validator gate as any other
+candidate. Nothing bypasses a check.
+
+Known m2c rough edges (real, expect them): literal-pool symbol resolution
+is imperfect, it doesn't infer arrays (emits scalar field accesses instead
+of indexed loops), register-size aliasing (u8/u16 vs word) is weak, and
+complex control flow can fall back to `goto`. It also can't translate BIOS
+SWI veneers or tiny interworking stubs at all.
+
+`include/global.h` includes `include/m2c_macros.h` (pure typedefs and
+macros, emits no code — rebuild verified byte-identical after adding).
+
+`tools/factory/asmfacts.py`'s symbolic register tracking predates this and
+still feeds the LLM tier; `tools/factory/mechanical.py` is a small
+from-scratch deterministic Thumb→C translator written to validate the idea
+before adopting m2c. It works (translates straight-line + single-branch
+shapes, declines everything else) but m2c supersedes it — kept as a
+reference, not a thing to extend.
+
 ## Matching tools
 
 **asm-differ** (`asm-differ` on PATH inside the container,
