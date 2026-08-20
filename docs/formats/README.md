@@ -145,6 +145,291 @@ work and the more promising version of this idea — a table of pointers to
 compressed per-level or per-character assets is a very ordinary GBA data
 layout, and would be a strong found-a-real-structure result if it's here.
 
+## Entry-level pointer/compressed-block cross-check — `tools/cross_check_pointer_targets.py`
+
+Does the "using these together" idea above (diffing table *entry* values,
+not just table start addresses, against the compressed-block address list)
+— run: `./container.sh tools/cross_check_pointer_targets.py`.
+
+**Absolute-pointer hypothesis: 0 hits.** No pointer-table entry (scanned
+across all 357 candidate tables the same range `find_pointer_tables.py`
+covers) points at a confirmed compressed block's exact start address. Same
+negative result as the table-*start* check, now confirmed at entry level
+too — genuinely empty, not just unchecked.
+
+**Relative-offset hypothesis: 2 raw hits, both false positives on
+inspection.** Prompted by a real precedent already in this repo — the
+solidity chain's `SolidityPointerTable @ 0x088E08E0` stores offsets
+*relative to a fixed base*, not absolute pointers (see below) — this tries
+every 4-byte-aligned word in range as `word + its own address`, unfiltered
+(a table of small relative offsets would never pass the absolute-pointer
+`looks_like_pointer` check, so it's invisible to the first hypothesis
+entirely). Both hits it found turned out to be coincidental:
+- `0x082F8B30` sits *inside* the byte stream of another confirmed
+  compressed block (`0x082F2EFF`, 115,928-byte RLE) — high-entropy
+  compressed bytes reading as a plausible-looking offset by chance, the
+  same phenomenon already flagged for the absolute-pointer scan.
+- `0x08467D88` sits inside plain Spanish dialogue text (see the new
+  section below) — not a pointer table at all.
+
+Bottom line: no evidence of a compressed-asset pointer table using either
+addressing scheme, at least not one built from consecutive 4-byte-aligned
+words the way `find_pointer_tables.py` looks for structure. Doesn't rule
+out a pointer table with a different stride/encoding, just closes off the
+two most obvious hypotheses.
+
+## Text/dialogue strings — a new asset class, `tools/find_text_strings.py`
+
+Found by accident while manually inspecting the second false-positive hit
+above: `0x08467D88` decodes (Latin-1) as real Spanish dialogue —
+`"...Recordad, nuestro reino [ctrl]está en..."` ("Remember, our kingdom is
+in..."). Nothing before this pass had looked for *plain, uncompressed*
+text sitting directly in rodata — every prior tool in this doc was built
+around tile graphics, compressed streams, or pointer tables.
+
+Run: `./container.sh tools/find_text_strings.py [--start ADDR] [--end ADDR]`
+
+Scans for runs of "text-like" bytes: printable ASCII, or one of a narrow
+whitelist of the specific accented/punctuation Latin-1 code points Spanish
+(and French/German/Italian) text actually uses — deliberately **not** the
+whole `0xA0`-`0xFE` Latin-1 range. A first version of this tool tried the
+broad range and came back ~99% noise (structured binary data — OAM/
+animation-style tables — drifts into that range constantly, the same way
+it drifts into looking like plausible pointers). The narrow whitelist plus
+requiring a real letter ratio and at least one space character brought
+false positives down to near zero — verified by scanning a known 543KB
+compressed block (13 tiny junk hits, 327 bytes total, obviously not text)
+and the entire pre-rodata code region (2 hits: one junk, one a genuine
+font-glyph-ordering table at `0x0819A294` — interesting in its own right,
+not dialogue).
+
+**~900KB of directly readable, uncompressed text located**, concentrated
+in `0x08200000`-`0x08600000` (binned by 1MB, from a full-range scan):
+
+| Region | Regions found | Bytes | Likely content |
+|---|---:|---:|---|
+| `0x08200000`-`0x08300000` | 1,586 | 45,348 | UI/system messages |
+| `0x08300000`-`0x08400000` | 2,390 | 124,576 | UI/system messages |
+| `0x08400000`-`0x08500000` | 14,987 | 695,121 | bulk dialogue/script pool |
+| `0x08500000`-`0x08600000` | 1,265 | 49,759 | dialogue (tapering off) |
+| `0x08600000`-`0x08D00000` | ~160 combined | ~4,600 | sparse — mostly noise floor from nearby compressed data, not confirmed text |
+
+The `0x08200000`-`0x08400000` region opens with unmistakable, confirmed-
+correct save/load menu text in five languages back to back (English,
+French, German, Italian, Spanish) — e.g. at `0x08201FA0`:
+`"Loading...DO NOT turn the power OFF or remove the Game Pak."` (with
+`0xFF`-prefixed control-code bytes removed; see below). This isn't a
+guess — it's exactly the standard GBA save-warning message, readable
+as-is once the control-code bytes are recognized for what they are.
+
+**Text encoding, characterized but not fully decoded**: plain ASCII plus
+accented letters for the four European languages found so far, and `0xFF`
+as a control-code escape prefix of **variable total length** — the
+sub-opcode byte immediately after `0xFF` appears to determine whether a
+further parameter byte follows (2-byte codes: `FF followed by one byte`;
+3-byte codes: `FF` + two bytes), inferred from cases like `FF 35` (2 bytes,
+no room for a 3rd before the next real text resumes) alongside `FF 0B 01`
+(3 bytes) in the same string. **Not confirmed**: which sub-opcode values
+mean what (line break, name-insertion, wait-for-input, color change are
+the standard GBA-era guesses) — this pass locates and roughly delimits the
+text, it doesn't decode the control-code table. A real decode would need
+tracing the text-rendering function that consumes these bytes, which
+hasn't been found/matched yet.
+
+**Not yet done**: extracting this to real files the way
+`tools/extract_assets.py` does for compressed blocks (this pass only
+prints candidates), and confirming the `0x08400000`-`0x08500000` bulk pool
+is really one contiguous dialogue script table rather than several
+distinct pools with different purposes.
+
+## Full ROM asset map — `tools/map_assets.py`
+
+Merges every scanner above (compressed blocks, pointer tables, text
+regions, the room-properties/solidity/coldef chain, the Game Boy Player
+logo block, every other named symbol in `tools/symbols/rom.txt`) into one
+coverage map, so extraction work can target what's actually still unknown
+instead of guessing. Also folds in Phase 3's `map_raw_regions.py` for the
+CODE realm (`0x08000000`-`0x081DD790`), so the report spans the whole ROM
+(`asm/mariobros.s` excluded per the scope decision, not analyzed).
+
+Run: `./container.sh tools/map_assets.py [--top N]` — writes the full
+interval list to `assets/rom_map.json` (gitignored, regenerate locally
+like every other `assets/` output), prints a human summary.
+
+**RODATA realm (`0x081DD790`-`0x08F50000`, 14,100,592 bytes) coverage, this
+pass**:
+
+| Category | Bytes | % |
+|---|---:|---:|
+| Classified (compressed blocks + pointer tables + text + named structures) | 6,401,664 | 45.40% |
+| Confirmed unused padding (see below) | 2,567,604 | 18.21% |
+| Genuinely unclassified | 5,131,324 | 36.39% |
+
+**A real, checked finding, not an assumption: most of the single biggest
+"gap" turned out to be unused ROM space, not a missed asset.** Before
+trusting gap size as "how much is left to find," this pass checked each
+gap's zero-byte fraction directly against the actual ROM bytes. The
+single largest raw gap (2,567,576 bytes, `0x08CDD268`-`0x08F50000`, right
+before the `asm/mariobros.s` boundary) is **100.000% zero bytes** — real,
+confirmed padding, not a giant unexamined asset. Every *other* large gap
+checked alongside it came back under 1% zero (a handful under 0.6, still
+clearly dense real data, not padding wearing a costume) — so this isn't
+"most padding is invisible," just this one specific stretch. `map_assets.py`
+now separates padding (>=98% zero bytes) from genuine unclassified gaps
+automatically; the 36.39% figure above already has padding excluded.
+
+**Worth a look before more gap-hunting**: the padding region's first ~40
+bytes aren't all zero — a handful of 4-byte little-endian values decode as
+plausible ROM addresses (`0x0816D7B9`, `0x08170719`, `0x08171B61`,
+`0x08171AFD`, `0x08171FC1`, all clustered in a ~0x9000-byte code range
+around `0x08170000`) separated by runs of zero words. `find_pointer_tables.py`
+/ `cross_check_pointer_targets.py`'s table detection requires
+*immediately consecutive* 4-byte-aligned valid words, so a sparse,
+zero-padded-apart pointer list like this is invisible to it — a real gap
+in the existing tooling, not investigated further this pass.
+
+**Top unclassified gaps** (from a live run — re-run the tool for a current
+list as more gets classified; top 5 of 13,432 gaps, `--top 25` for more),
+each checked for a `0x2X`-pattern Huffman header at its start (none found
+— but see caveat below) and GBA-tile-multiple-of-32 sizing:
+
+| Address | Size | Zero-byte fraction | Notes |
+|---|---:|---:|---|
+| `0x08C754C4` | 418,168 B | 0.001 | no Huffman header, not a multiple of 32 |
+| `0x08BB9966` | 332,964 B | 0.002 | same |
+| `0x08923B14` | 309,214 B | 0.166 | same |
+| `0x08C0AE1C` | 281,511 B | 0.001 | same |
+| `0x08527969` | 212,199 B | 0.307 | same |
+
+None of the top 15 gaps had a Huffman-pattern first byte or a clean
+32-byte-multiple size. **Caveat**: a gap's own start is just "wherever the
+previous classified interval happened to end," not necessarily a real
+asset boundary — a compressed block's actual header could sit a few bytes
+into a gap rather than at byte 0, so this check is a first-pass filter,
+not proof there's no Huffman data here. `gba_compress.py` has no real
+Huffman *decoder* yet (`find_compressed_blocks.py`'s Huffman candidates
+are header-pattern-only, off by default, and explicitly noted as noisy) —
+building one and re-scanning these specific gaps with it is the natural
+next step before assuming this 5.1MB is something else entirely.
+
+**Sub-1%-zero-byte density across most of these gaps is itself a small
+data point worth carrying forward**: genuinely random bytes would average
+~0.4% zero by chance alone, so well under that (0.001-0.002 for the
+biggest few) suggests something more structured than either compressed
+data (which usually has *some* literal zero bytes) or plain padding —
+consistent with either an already-decompressed asset using a narrow,
+zero-averse byte-value range, or a GBA compression format this project's
+tooling doesn't decode yet (Huffman, or a variant RLE/LZ77 encoding that
+fails this project's strict clean-termination check and so never made it
+into the 75 confirmed blocks). Not resolved this pass.
+
+**CODE realm (`0x08000000`-`0x081DD790`, 1,955,728 bytes)**: 634,668 bytes
+(32.45%) still raw per `map_raw_regions.py`, matching (and updating —
+extraction shifts these boundaries slightly as functions get pulled out,
+this is a live number) CLAUDE.md's Phase 3 notes: `asm/text08000000.s`'s
+crt0/m4a preamble (96,768 B, `0x08000000`-`0x08017A00`) and the
+combined ~257KB dialogue/data-table candidate spanning
+`0x0819B83C`-`0x081DA3A0` in `asm/text08057568.s` (two adjacent raw runs,
+152,658 B + 104,208 B).
+
+## Cross-referencing the community Yoshi Magic editor
+
+The room-properties/solidity work below was already cross-checked against
+[Yoshi Magic](https://github.com/CaptainSwag101/YoshiMagic) (a VB.NET
+all-in-one editor covering all three GBA M&L games) *after* finding the
+structures independently in our own disassembly. This pass went the other
+direction on purpose — read the tool's own source first, specifically
+looking for anything relevant to the text-string and unclassified-gap
+findings above — since it's a decade-plus-old, independently
+reverse-engineered reference that's never been mined for the asset-mapping
+question directly.
+
+**Text banks, address-confirmed against real ROM bytes (not just trusted
+from the VB source).** `Yoshi Magic/Text Editor/Text Editor.vb` hardcodes
+three pointer-table bases: story text `0x084E8898` (2,433 lines), battle
+text `0x08516E98` (204 lines), additional text `0x08518C88` (12 lines),
+each a 20-byte-stride array of 4-byte pointers. Checked directly: reading
+a `u32` at `0x084E8898 + entry*20` gives a clean, valid, steadily
+incrementing sequence of ROM addresses (`0x083D7C58`, `0x083D7C60`,
+`0x083D7C68`, ... +8 each) — real structure, not a guess. Notably,
+`0x083D7C58` is **exactly** the end address of this project's own
+already-confirmed 1,024-entry pointer table at `0x083D6C58` (see the
+Pointer tables section above, `1024 * 4 = 0x1000`, `0x083D6C58 + 0x1000 =
+0x083D7C58`) — an unplanned cross-confirmation linking two previously
+separate findings. One level further in, these 20-byte records turn out
+to be tiny fixed 8-byte encoded strings themselves (e.g.
+`00 02 FF 0A 00 00 00 00`, decodable with the control-code rule below as
+an empty/placeholder string), not a further indirection.
+`0x084E8898` sits inside this pass's `0x08400000`-`0x08500000` bulk
+dialogue pool (see the text-strings section above) — direct confirmation
+that pool really is the story-text bank, not a guess from address range
+alone anymore.
+
+**Text control-code length rule, now fully resolved.** The previous
+section left "which sub-opcode values need a parameter byte" unconfirmed.
+`Text Editor.vb`'s own byte-to-text loop settles it exactly: after the
+`0xFF` prefix, sub-opcode `0x01` or any value in `0x0B`-`0x11` consumes
+one further parameter byte (3-byte code total); every other sub-opcode is
+a bare 2-byte code. Checked against all four control codes found by hand
+in this tool's original discovery sample: `FF 11 00` (`0x11` is in
+range → 3 bytes ✓), `FF 01 00` (`0x01` → 3 bytes ✓), `FF 0B 01` (`0x0B` in
+range → 3 bytes ✓), `FF 35` (`0x35` not in range → 2 bytes ✓) — all four
+correct. `tools/find_text_strings.py` now uses this exact rule
+(`control_code_len()`) instead of the old length-guessing heuristic, which
+had a real bug: it occasionally swallowed a real leading text letter into
+the control-code bracket whenever that letter happened to also look
+text-like (e.g. `FF 00 44` was misread as a 3-byte code eating the `D` of
+"DO NOT", when the correct read is a 2-byte code `FF 00` followed by
+literal `D`). Re-running the save-message sample now correctly reads
+`"Loading...[00]DO NOT turn [00]the power OFF [00]or remove[00]the Game
+Pak."`.
+
+**Sprite/animation pointer-table cluster, address-confirmed.**
+`Sprite Viewer.vb` hardcodes five more fixed addresses: main data table
+`0x0839EE60`, animation data `0x0839EE8C`, sprite pointers `0x0839EEB8`,
+palette pointers `0x0839EEE4`, tile-dimension lookup `0x0839EE04`. Checked
+directly: the first four each decode as a clean run of valid ROM
+addresses; the fifth doesn't (as expected — it's not a pointer table) but
+its raw bytes decode as `08,08,16,16,32,32,64,64,...` when read as u8
+pairs, exactly the standard GBA sprite size-mode progression (8×8, 16×16,
+32×32, 64×64) — the right content for a "tile dimension lookup table."
+This cluster sits right next to `off_839EC80`, an already-named symbol
+this project found independently (`tools/symbols/rom.txt`, 388 bytes
+before `0x0839EE04`) — the same kind of unplanned cross-confirmation as
+the text banks above. **Not yet added to `tools/symbols/rom.txt`** — these
+five addresses are solid enough for that (following the exact pattern
+already used for the room-properties chain), just not done this pass
+since it's a live-build-affecting change and the factory daemon was
+running an unattended commit loop at the time; a natural next step
+whenever that's convenient.
+
+**Custom sprite compression, ported and empirically tested — result:
+does not explain this project's biggest unclassified gaps.**
+`Sprite Viewer.vb`'s `decomp()` sub implements a genuine custom LZ-style
+scheme (NOT a GBA BIOS format `gba_compress.py` already handles) — a
+control byte's top 3 bits select one of five behaviors (sliding-window
+back-reference copy from up to 1024 bytes back, literal copy, zero/literal
+pairs, byte-repeat run, zero-fill with an extended-run special case),
+terminated by the literal two-byte sequence `0x7F 0xFF`. Ported to
+`tools/try_custom_decomp.py` and tested directly against this project's
+own top unclassified gaps from the ROM map above (`0x08C754C4`, the
+single largest one) — **zero clean decodes found**, the most directly
+relevant negative result available. A broader scan elsewhere did find 25
+"clean" decodes, but cross-referencing every one against `assets/rom_map.json`
+showed most sit *inside* byte ranges this project already confirmed as
+something else entirely (BIOS RLE-compressed blocks, text) — a strong tell
+that the hits are coincidental terminator matches, not real structure,
+since a byte range can't genuinely be both formats at once. Confirmed via
+two negative controls: scanning 400KB of definitely-real Thumb/ARM code
+still produced 2 tiny spurious hits (a nonzero baseline false-positive
+rate for short outputs), while scanning the confirmed 100%-zero padding
+region and the confirmed-real Game Boy Player logo tile data both came
+back with **zero** hits, matching expectations either way. Bottom line:
+this specific format, as ported, isn't the answer for the 5.1MB of
+genuinely unclassified rodata — worth recording so nobody re-tries the
+same dead end, but the actual unclassified-gap mystery (see the ROM map
+section above) is still open.
+
 ## Room properties and the solidity/collision pipeline
 
 Not from either scanner above — found by hand, prompted by cross-

@@ -44,6 +44,7 @@ SECTIONS
         build/asm/text0801A548_p5.o(.text);
         build/src/sub_80208E0.o(.text);
         build/asm/text0801A548_p12.o(.text);
+        build/src/sprite_heap_search.o(.text);
         build/src/sub_8021EA8.o(.text);
         build/asm/text0801A548_p24.o(.text);
         build/src/sub_8028E4C.o(.text);
@@ -84,6 +85,10 @@ SECTIONS
         build/asm/text0801A548_p11.o(.text);
         build/src/sub_8047B5C.o(.text);
         build/asm/text0801A548_p18.o(.text);
+        build/src/sub_8047EFC.o(.text);
+        build/asm/text0801A548_p27.o(.text);
+        build/src/sub_8048040.o(.text);
+        build/asm/text0801A548_p28.o(.text);
         build/src/sub_804FB14.o(.text);
         build/asm/text0801A548_p14.o(.text);
         build/src/sub_8051330.o(.text);
@@ -143,6 +148,8 @@ SECTIONS
         build/asm/text08057568_p102.o(.text);
         build/src/sub_806C1A8.o(.text);
         build/asm/text08057568_p132.o(.text);
+        build/src/sub_806D770.o(.text);
+        build/asm/text08057568_p235.o(.text);
         build/src/sub_806E754.o(.text);
         build/src/sub_806E778.o(.text);
         build/src/nullsub_15.o(.text);
