@@ -573,6 +573,8 @@ SECTIONS
         build/asm/text08057568_p170.o(.text);
         build/src/sub_81251DC.o(.text);
         build/asm/text08057568_p65.o(.text);
+        build/src/tld_init_8127A94.o(.text);
+        build/asm/text08057568_p333.o(.text);
         build/src/sub_8127E38.o(.text);
         build/asm/text08057568_p89.o(.text);
         build/src/sub_8127ECC.o(.text);
