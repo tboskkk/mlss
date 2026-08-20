@@ -16,8 +16,19 @@ u32 sub_8163BB8(void) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8163BC4.s\"");
-#else
-#error "TODO: write sub_8163BC4 to match asm/nonmatching/sub_8163BC4.s, then delete this #error"
-#endif
+s32 sub_8163BC4(void **arg0, s32 arg1) {
+    s32 var_r3_8;
+    void *var_r2_7;
+
+    var_r2_7 = *arg0;
+    var_r3_8 = 0;
+    if (var_r2_7 != NULL) {
+        do {
+            if ((*(s32 *)((s8 *)(var_r2_7) + (0))) == arg1) {
+                var_r3_8 += 1;
+            }
+            var_r2_7 = (*(void **)((s8 *)(var_r2_7) + (8)));
+        } while (var_r2_7 != NULL);
+    }
+    return var_r3_8;
+}
