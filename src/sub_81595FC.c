@@ -31,3 +31,9 @@ void sub_81595FC(void *arg0)
     *((s32 *) (((s8 *) arg0) + 0x50C)) = (s32) ((*((s32 *) (((s8 *) arg0) + 0x50C))) + 0xFFFFFC00);
   }
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8159674.s\"");
+#else
+#error "TODO: write sub_8159674 to match asm/nonmatching/sub_8159674.s, then delete this #error"
+#endif
