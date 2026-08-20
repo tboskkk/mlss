@@ -7,8 +7,14 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_810CBDC.s\"");
-#else
-#error "TODO: write sub_810CBDC to match asm/nonmatching/sub_810CBDC.s, then delete this #error"
-#endif
+void sub_810CBDC(void *arg0) {
+    s32 temp_r0_9;
+
+    temp_r0_9 = (*(s32 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (4)));
+    if (temp_r0_9 == 0) {
+        (*(s32 *)((s8 *)(arg0) + (4))) = temp_r0_9;
+        return;
+    }
+    (*(u16 *)((s8 *)((void *)0x0400001A) + (0))) = (u16) *(u16 *)0x0200001A;
+    (*(u16 *)((s8 *)((void *)0x0400001A) + (4))) = (u16) *(u16 *)0x0200001E;
+}
