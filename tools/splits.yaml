@@ -481,6 +481,8 @@ groups:
   - {obj: asm/text08057568_p217, section: text}
   - {obj: src/sub_80F8A08, section: text}
   - {obj: asm/text08057568_p148, section: text}
+  - {obj: src/sub_80F8B34, section: text}
+  - {obj: asm/text08057568_p320, section: text}
   - {obj: src/sub_80F8C60, section: text}
   - {obj: asm/text08057568_p189, section: text}
   - {obj: src/sub_80F8DA4, section: text}
