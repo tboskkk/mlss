@@ -10,5 +10,16 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_819A770.s\"");
 #else
-#error "TODO: write sub_819A770 to match asm/nonmatching/sub_819A770.s, then delete this #error"
+u8 sub_819A770(void *arg0) {
+    u16 temp_r2_8;
+
+    temp_r2_8 = (*(u16 *)((s8 *)(arg0) + (0)));
+    if (0x200 & temp_r2_8) {
+        if (0x400 & temp_r2_8) {
+            return 0 - (*(u8 *)((s8 *)(arg0) + (0x18)));
+        }
+        return (*(u8 *)((s8 *)(arg0) + (0x18)));
+    }
+    return 0U;
+}
 #endif
