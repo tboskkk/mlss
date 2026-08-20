@@ -10,48 +10,53 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81DBBA0.s\"");
 #else
-u32 sub_81DBBA0(u32* p0, u32* p1) {
-    u32 r0 = *(u32*)((u8*)p0);
-    u32 r1 = (r0 << 9) >> 9;
-    u32 r2 = (r0 << 1) >> 24;
-    u32 r3 = r0 >> 31;
-    *(u32*)((u8*)p1 + 0x04) = r3;
-    if (r1 != 0) {
-        if (r1 == 0xFF) {
-            if (r2 != 0) {
-                u32 r0_1 = 0x80000000 & r2;
-                *(u32*)((u8*)p1) = r0_1 ? 1 : 0;
-            } else {
-                *(u32*)((u8*)p1) = 4;
-            }
-        } else {
-            u32 r0_2 = r1 - 0x7F;
-            *(u32*)((u8*)p1 + 0x08) = r0_2;
-            *(u32*)((u8*)p1) = 3;
-            u32 r0_3 = r2 << 7;
-            u32 r1_1 = 0x80000000;
-            *(u32*)((u8*)p1 + 0x0C) = r0_3 | r1_1;
+void sub_81DBBA0(u32 *arg0, void *arg1) {
+    s32 temp_r4_24;
+    s32 var_r0_32;
+    s32 var_r0_52;
+    u32 temp_r0_8;
+    u32 temp_r1_12;
+    u32 var_r2_10;
+
+    temp_r0_8 = *arg0;
+    var_r2_10 = (u32) (temp_r0_8 << 9) >> 9;
+    temp_r1_12 = (u32) (temp_r0_8 * 2) >> 0x18;
+    (*(u32 *)((s8 *)(arg1) + (4))) = (u32) (temp_r0_8 >> 0x1F);
+    if (temp_r1_12 == 0) {
+        if (var_r2_10 == 0) {
+            (*(s32 *)((s8 *)(arg1) + (0))) = 2;
+            return;
         }
-    } else {
-        if (r2 != 0) {
-            u32 r4 = r2 - 0x7E;
-            *(u32*)((u8*)p1 + 0x08) = r4;
-            *(u32*)((u8*)p1) = 3;
-            u32 r1_2 = 0x3FFFFFFF;
-            if (r4 > r1_2) {
-                goto _081DBC00;
-            }
-            u32 r0_4 = r4;
+        temp_r4_24 = temp_r1_12 - 0x7E;
+        (*(s32 *)((s8 *)(arg1) + (8))) = temp_r4_24;
+        var_r2_10 <<= 7;
+        (*(s32 *)((s8 *)(arg1) + (0))) = 3;
+        if (var_r2_10 <= 0x3FFFFFFFU) {
+            var_r0_32 = temp_r4_24;
             do {
-                r0_4--;
-                r1_2 <<= 1;
-            } while (r1_2 <= r1_2);
-            *(u32*)((u8*)p1 + 0x08) = r0_4;
-        } else {
-            *(u32*)((u8*)p1) = 2;
+                var_r2_10 *= 2;
+                var_r0_32 -= 1;
+            } while (var_r2_10 <= 0x3FFFFFFFU);
+            (*(s32 *)((s8 *)(arg1) + (8))) = var_r0_32;
         }
+        goto block_13;
     }
-_081DBC00:
-    return *(u32*)((u8*)p1);
+    if (temp_r1_12 == 0xFF) {
+        if (var_r2_10 == 0) {
+            (*(s32 *)((s8 *)(arg1) + (0))) = 4;
+            return;
+        }
+        var_r0_52 = 0x100000 & var_r2_10;
+        if (var_r0_52 != 0) {
+            var_r0_52 = 1;
+        }
+        (*(s32 *)((s8 *)(arg1) + (0))) = var_r0_52;
+block_13:
+        (*(u32 *)((s8 *)(arg1) + (0xC))) = var_r2_10;
+        return;
+    }
+    (*(s32 *)((s8 *)(arg1) + (8))) = (s32) (temp_r1_12 - 0x7F);
+    (*(s32 *)((s8 *)(arg1) + (0))) = 3;
+    (*(u32 *)((s8 *)(arg1) + (0xC))) = (u32) ((var_r2_10 << 7) | 0x40000000);
 }
 #endif

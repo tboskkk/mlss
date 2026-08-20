@@ -21,5 +21,11 @@ void sub_8159400(void *arg0, s32 arg1) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8159440.s\"");
 #else
-#error "TODO: write sub_8159440 to match asm/nonmatching/sub_8159440.s, then delete this #error"
+void sub_8159440(u32* p0, u32 p1)
+{
+    u32* var = p0;
+    *(u32*)((u8*)var + 0x04) = 0x08CDCA30;
+    if (p1 & 1)
+        free_heap_8018DA8(var);
+}
 #endif

@@ -10,60 +10,30 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8064B88.s\"");
 #else
-extern void sub_8064C00();
+extern s32 sub_8064C00;
 
-void sub_8064B88(void* p0) {
-    u32* ptr0 = (u32*)p0;
-    u32* ptr1 = (u32*)((u8*)p0 + 0x08);
-    u16* ptr2 = (u16*)((u8*)(*ptr1) + 0x0C);
-    u32 val0 = *(u32*)((u8*)p0 + 0x10);
-    u32 val1 = *(u32*)((u8*)p0 + 0x14);
-    u32 val2 = *(u32*)((u8*)p0 + 0x38);
-    u32 val3 = *(u32*)((u8*)p0 + 0x3C);
-    u32* ptr3 = (u32*)((u8*)p0 + 0x10);
-    u32* ptr4 = (u32*)((u8*)p0 + 0x14);
-    u32* ptr5 = (u32*)((u8*)p0 + 0x4C);
-    
-    u32 temp = *(u32*)((u8*)p0 + 0x08);
-    u16 temp2 = *(u16*)((u8*)(*(u32**)((u8*)p0 + 0x08)) + 0x0C);
-    u32 temp3 = (0x80 << 5) + temp2;
-    *(u16*)((u8*)(*(u32**)((u8*)p0 + 0x08)) + 0x0C) = temp3;
-    
-    u32* ptr6 = (u32*)((u8*)p0 + 0x9C);
-    u32 val4 = *(u32*)((u8*)p0 + 0x10);
-    u32 val5 = *(u32*)((u8*)ptr6 + 0x00);
-    *(u32*)((u8*)p0 + 0x10) = val4 - val5;
-    
-    *(u32*)((u8*)ptr6 + 0x00) = *(u32*)((u8*)ptr6 + 0x00) - 0x11;
-    
-    u32* ptr7 = (u32*)((u8*)p0 + 0xA0);
-    u32 val6 = *(u32*)((u8*)p0 + 0x14);
-    u32 val7 = *(u32*)((u8*)ptr7 + 0x00);
-    *(u32*)((u8*)p0 + 0x14) = val6 + val7;
-    
-    u32 val8 = *(u32*)((u8*)p0 + 0x10);
-    if (val8 <= (0x80 << 7)) {
-        u32* ptr8 = (u32*)((u8*)p0 + 0x84);
-        u32 val9 = *(u32*)((u8*)ptr8 + 0x00);
-        s32 diff1 = val9 - val2;
-        if (diff1 < 0) {
-            diff1 += 0xFF;
+void sub_8064B88(void *arg0) {
+    s32 var_r0_39;
+    s32 var_r0_52;
+    void *temp_r1_8;
+
+    temp_r1_8 = (*(void **)((s8 *)(arg0) + (8)));
+    (*(u16 *)((s8 *)(temp_r1_8) + (0xC))) = (u16) ((*(u16 *)((s8 *)(temp_r1_8) + (0xC))) + 0x1000);
+    (*(s32 *)((s8 *)(arg0) + (0x10))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x10))) - (*(s32 *)((s8 *)(arg0) + (0x9C))));
+    (*(s32 *)((s8 *)(arg0) + (0x9C))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x9C))) - 0x11);
+    (*(s32 *)((s8 *)(arg0) + (0x14))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x14))) + (*(s32 *)((s8 *)(arg0) + (0xA0))));
+    if ((s32) (*(s32 *)((s8 *)(arg0) + (0x10))) > 0x4000) {
+        var_r0_39 = (*(s32 *)((s8 *)(arg0) + (0x84))) - (*(s32 *)((s8 *)(arg0) + (0x38)));
+        if (var_r0_39 < 0) {
+            var_r0_39 += 0xFF;
         }
-        u16 result1 = diff1 >> 8;
-        u32* ptr9 = (u32*)((u8*)p0 + 0xAE);
-        *(u16*)((u8*)ptr9 + 0x00) = result1;
-        
-        u32* ptr10 = (u32*)((u8*)p0 + 0x88);
-        u32 val10 = *(u32*)((u8*)ptr10 + 0x00);
-        s32 diff2 = val10 - val3;
-        if (diff2 < 0) {
-            diff2 += 0xFF;
+        (*(s16 *)((s8 *)(arg0) + (0xAE))) = (s16) (var_r0_39 >> 8);
+        var_r0_52 = (*(s32 *)((s8 *)(arg0) + (0x88))) - (*(s32 *)((s8 *)(arg0) + (0x3C)));
+        if (var_r0_52 < 0) {
+            var_r0_52 += 0xFF;
         }
-        u16 result2 = diff2 >> 8;
-        u32* ptr11 = (u32*)((u8*)p0 + 0xB0);
-        *(u16*)((u8*)ptr11 + 0x00) = result2;
+        (*(s16 *)((s8 *)(arg0) + (0xB0))) = (s16) (var_r0_52 >> 8);
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8064C00;
     }
-    
-    *ptr5 = (u32)sub_8064C00;
 }
 #endif

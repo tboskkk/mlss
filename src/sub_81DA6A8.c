@@ -52,5 +52,22 @@ u32 sub_81DA6C0(void) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81DA6E4.s\"");
 #else
-#error "TODO: write sub_81DA6E4 to match asm/nonmatching/sub_81DA6E4.s, then delete this #error"
+void sub_81DA6E4(s32 r0)
+{
+    u32* r1 = (u32*)0x03001BD0;
+    if (r0 == 4)
+    {
+        *r1 = 0x0821DBAC;
+    }
+    else if (r0 == 0x40)
+    {
+        *r1 = 0x0821DBB8;
+    }
+    else
+    {
+        *r1 = 0x0821DBAC;
+        r0 = 1;
+    }
+    r0;
+}
 #endif

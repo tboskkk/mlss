@@ -10,5 +10,22 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8073E4C.s\"");
 #else
-#error "TODO: write sub_8073E4C to match asm/nonmatching/sub_8073E4C.s, then delete this #error"
+extern s32 sub_807411C;
+
+void sub_8073E4C(void *arg0) {
+    u16 temp_r0_34;
+    void *temp_r1_9;
+
+    temp_r1_9 = *(void **)0x03000FD8;
+    if (((6 & (*(u8 *)((s8 *)((*(void **)((s8 *)(temp_r1_9) + (0x70)))) + (0x7E)))) != 2) && ((6 & (*(u8 *)((s8 *)((*(void **)((s8 *)(temp_r1_9) + (0x74)))) + (0x7E)))) != 2)) {
+        (*(u16 *)((s8 *)(arg0) + (0xAC))) = 0U;
+    }
+    temp_r0_34 = (*(u16 *)((s8 *)(arg0) + (0xAC))) - 1;
+    (*(u16 *)((s8 *)(arg0) + (0xAC))) = temp_r0_34;
+    if ((s32) (temp_r0_34 << 0x10) <= 0) {
+        (*(s32 *)((s8 *)(arg0) + (0xA8))) = 0;
+        (*(u16 *)((s8 *)(arg0) + (0xAC))) = 0x3CU;
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_807411C;
+    }
+}
 #endif

@@ -7,47 +7,27 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_81595FC.s\"");
-#else
-void sub_81595FC(u32* param_1)
+void sub_81595FC(void *arg0)
 {
-    u16* puVar1;
-    u32 uVar2;
-    u32 uVar3;
-    u32 uVar4;
-    u32 uVar5;
-    
-    puVar1 = (u16*)0x0300034C;
-    uVar2 = *puVar1;
-    if ((uVar2 & 0x10) != 0)
-    {
-        uVar3 = (u32)((u8*)param_1 + ((u32)(u8)(0xA1 << 3)));
-        uVar4 = *(u32*)uVar3;
-        uVar5 = uVar4 + (u32)(u8)(0x80 << 3);
-        *(u32*)uVar3 = uVar5;
-    }
-    uVar2 = *puVar1;
-    if ((uVar2 & 0x20) != 0)
-    {
-        uVar3 = (u32)((u8*)param_1 + ((u32)(u8)(0xA1 << 3)));
-        uVar4 = *(u32*)uVar3;
-        uVar5 = uVar4 + 0xFFFFFC00;
-        *(u32*)uVar3 = uVar5;
-    }
-    if ((uVar2 & 0x80) != 0)
-    {
-        uVar3 = (u32)((u8*)param_1 + 0x50C);
-        uVar4 = *(u32*)uVar3;
-        uVar5 = uVar4 + (u32)(u8)(0x80 << 3);
-        *(u32*)uVar3 = uVar5;
-    }
-    if ((uVar2 & 0x40) != 0)
-    {
-        uVar3 = (u32)((u8*)param_1 + 0x50C);
-        uVar4 = *(u32*)uVar3;
-        uVar5 = uVar4 + 0xFFFFFC00;
-        *(u32*)uVar3 = uVar5;
-    }
+  s8 *new_var;
+  u16 temp_r2_23;
+  s8 *new_var2;
+  new_var2 = (new_var = (s8 *) ((void *) 0x0300034C)) + 0x28;
+  if (0x10 & (*((u16 *) new_var2)))
+  {
+    *((s32 *) (((s8 *) arg0) + 0x508)) = (s32) ((*((s32 *) (((s8 *) arg0) + 0x508))) + 0x400);
+  }
+  ;
+  if (0x20 & (*((u16 *) (new_var + 0x28))))
+  {
+    *((s32 *) (((s8 *) arg0) + 0x508)) = (s32) ((*((s32 *) (((s8 *) arg0) + 0x508))) + 0xFFFFFC00);
+  }
+  if (0x80 & (*((u16 *) (new_var + 0x28))))
+  {
+    *((s32 *) (((s8 *) arg0) + 0x50C)) = (s32) ((*((s32 *) (((s8 *) arg0) + 0x50C))) + 0x400);
+  }
+  if (0x40 & (*((u16 *) (new_var + 0x28))))
+  {
+    *((s32 *) (((s8 *) arg0) + 0x50C)) = (s32) ((*((s32 *) (((s8 *) arg0) + 0x50C))) + 0xFFFFFC00);
+  }
 }
-#endif

@@ -21,11 +21,10 @@ u32* sub_81DC49C(void)
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81DC4B0.s\"");
 #else
-extern void sub_81DC4C8();
+s32 sub_81DC4C8();                              /* extern */
 
-void sub_81DC4B0(void)
-{
-    *(u32*)0x08CDB630 = (u32)sub_81DC4C8;
-    (*(void(*)())0x081DC4C9)();
+void sub_81DC4B0(void) {
+    *(s32 (**)())0x08CDB630 = sub_81DC4C8;
+    sub_81DC4C8();
 }
 #endif
