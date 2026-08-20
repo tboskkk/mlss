@@ -31,6 +31,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import db  # noqa: E402
 import gitops  # noqa: E402
+import twins  # noqa: E402
 
 WORKER_ID = "validator"
 
@@ -71,6 +72,55 @@ def validate_one(conn) -> str | None:
                          notes=f"validator crashed mid-processing: {e}")
         db.log_event(conn, name, "error", f"validator crash: {e}")
         return name
+
+
+def propagate_to_twins(conn, name: str, src_asm: str, src_c: str) -> int:
+    """A confirmed match is a solved TEMPLATE, not just one function.
+
+    86 unmatched functions fall into 31 groups whose assembly is identical
+    except for immediates and symbol names (largest group: 8 members), so
+    the factory was running up to 8 separate permuter searches on what is
+    really one problem. Now that one member is proven byte-exact, its
+    twins can be generated mechanically by substituting the differing
+    constants.
+
+    These are still only CANDIDATES -- they go back through tier2 and the
+    same from-scratch validator gate as everything else. The substitution
+    refuses outright unless every mapping is consistent in both
+    directions, so a wrong guess is rare, and when it happens it costs one
+    build and nothing more. Pure DB work, so no repo lock is needed.
+    """
+    try:
+        states = {r["name"]: r["state"] for r in
+                  conn.execute("SELECT name, state FROM functions")}
+        siblings = twins.twins_of(name, states)
+    except Exception as e:
+        print(f"  twin lookup failed for {name}: {e}")
+        return 0
+
+    seeded = 0
+    for sib in siblings:
+        st = states.get(sib)
+        if st in ("matched", "validating", "permuting"):
+            continue
+        frag = gitops.REPO / "asm" / "nonmatching" / f"{sib}.s"
+        if not frag.exists():
+            continue
+        cand = twins.propagate(src_asm, src_c, frag.read_text())
+        if not cand:
+            continue
+        with db.tx(conn):
+            db.set_state(conn, sib, "tier2_ready", worker_id=None,
+                         candidate_body=cand, candidate_source="twin",
+                         tractability=-500,  # a template win: try it before novel work
+                         notes=f"propagated from twin {name} (identical shape, "
+                               f"constants substituted)")
+        db.log_event(conn, sib, "twin_seeded", f"from {name}")
+        seeded += 1
+    if seeded:
+        conn.commit()
+        print(f"  propagated {name}'s solution to {seeded} structural twin(s)")
+    return seeded
 
 
 def _validate_claimed(conn, row) -> str:
@@ -128,6 +178,12 @@ def _validate_claimed(conn, row) -> str:
         db.log_event(conn, name, "reverted", f"asm-differ mismatch, source={source}")
         return name
 
+    # Capture the retail assembly BEFORE finish_match deletes the fragment.
+    # Propagation to structural twins needs it, and once the match lands
+    # the file is gone for good.
+    frag = gitops.REPO / "asm" / "nonmatching" / f"{name}.s"
+    src_asm = frag.read_text() if frag.exists() else None
+
     ok, detail = gitops.finish_match(name)
     if not ok:
         gitops.revert_to_clean()
@@ -147,6 +203,8 @@ def _validate_claimed(conn, row) -> str:
         db.set_state(conn, name, "matched", worker_id=None, candidate_body=None,
                      notes=f"matched via {source}")
     db.log_event(conn, name, "matched", f"source={source}, committed={committed}")
+    if src_asm:
+        propagate_to_twins(conn, name, src_asm, body)
     return name
 
 
