@@ -236,8 +236,19 @@ def asm_differ_matches(name: str) -> bool:
     false positive wastes a validator cycle, which is exactly what this
     fixes.
     """
-    for stale in ((REPO / "build" / "src" / f"{name}.o"),
-                  (REPO / "build" / "src" / f"{name}.s")):
+    # Delete the object of the file that actually CONTAINS this function,
+    # NOT one named after the function. split_func.py appends functions to
+    # an existing src/*.c, so e.g. sub_81DA6A0 lives in src/sub_81DA690.c.
+    # Deleting build/src/sub_81DA6A0.o is then a silent no-op, make says
+    # "is up to date", and the pre-check compares a STALE object -- which
+    # produced a permanent tier2_ready -> validating -> tier2_ready
+    # infinite loop (the pre-check kept saying match on stale bytes, the
+    # validator kept correctly rejecting, forever, burning a rebuild each
+    # lap). Found live: sub_81DA6A0 cycled 10+ times in nine minutes.
+    c_path, _blk = find_guard_block(name)
+    stem = c_path.stem if c_path is not None else name
+    for stale in ((REPO / "build" / "src" / f"{stem}.o"),
+                  (REPO / "build" / "src" / f"{stem}.s")):
         try:
             stale.unlink()
         except FileNotFoundError:
