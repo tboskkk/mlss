@@ -7,18 +7,15 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_810D260.s\"");
-#else
-u32 sub_810D260(u32 r0, u32 r1) {
-    u32 r2 = r1;
-    u32 r1_copy = 0;
-    
-    while (r0 != 0) {
-        r0 >>= 4;
-        r1_copy += 4;
-    }
-    
-    return r2 + r1_copy;
+s32 sub_810D260(u32 arg0, s32 arg1) {
+    s32 var_r1_8;
+    u32 var_r0_0;
+
+    var_r0_0 = arg0;
+    var_r1_8 = 0;
+    do {
+        var_r0_0 = var_r0_0 >> 4;
+        var_r1_8 += 4;
+    } while (var_r0_0 != 0);
+    return arg1 + var_r1_8;
 }
-#endif
