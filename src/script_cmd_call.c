@@ -12,3 +12,9 @@ asm_unified(".include \"asm/nonmatching/script_cmd_call.s\"");
 #else
 #error "TODO: write script_cmd_call to match asm/nonmatching/script_cmd_call.s, then delete this #error"
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/script_cmd_return.s\"");
+#else
+#error "TODO: write script_cmd_return to match asm/nonmatching/script_cmd_return.s, then delete this #error"
+#endif
