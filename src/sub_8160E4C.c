@@ -10,13 +10,10 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8160E4C.s\"");
 #else
-u32 sub_8160E4C(u32 param_1) {
-    u32 *reg = (u32 *)0x040000D4;
-    reg[0] = param_1;
-    param_1 += 0x810;
-    param_1 = *(u32 *)param_1;
-    reg[1] = param_1;
-    reg[2] = 0x84000200;
-    return reg[2];
+s32 sub_8160E4C(void *arg0) {
+    (*(void **)((s8 *)((void *)0x040000D4) + (0))) = arg0;
+    (*(s32 *)((s8 *)((void *)0x040000D4) + (4))) = (s32) (*(s32 *)((s8 *)(arg0) + (0x810)));
+    (*(s32 *)((s8 *)((void *)0x040000D4) + (8))) = 0x84000200;
+    return (*(s32 *)((s8 *)((void *)0x040000D4) + (8)));
 }
 #endif

@@ -20,14 +20,9 @@ u32 sub_80EA91C(u32* param1) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80EA928.s\"");
 #else
-u32 sub_80EA928(u32 param_1,u8* param_2,u32* param_3) {
-  u8 *puVar1;
-  u32 uVar2;
-  
-  puVar1 = param_2 + 0xa6;
-  uVar2 = *puVar1;
-  *param_3 = *(param_1 + (uVar2 << 2));
-  *puVar1 = uVar2 + 1;
-  return 1;
+s32 sub_80EA928(void *arg1, s32 *arg2) {
+    (*(s32 *)((s8 *)((((*(u8 *)((s8 *)(arg1) + (0xA6))) * 4) + arg1)) + (0x58))) = (s32) *arg2;
+    (*(u8 *)((s8 *)(arg1) + (0xA6))) = (u8) ((*(u8 *)((s8 *)(arg1) + (0xA6))) + 1);
+    return 1;
 }
 #endif
