@@ -7,10 +7,9 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/get_coldef_ptr_by_idx.s\"");
-#else
-s32 get_coldef_ptr_by_idx(void *arg0, s32 arg1) {
-    return (*(s32 *)((s8 *)(arg0) + (0xA0))) + ((u32) (arg1 << 0x18) >> 0x16);
+s32 get_coldef_ptr_by_idx(void *arg0, s32 arg1)
+{
+  s32 new_var;
+  new_var = arg1 << 0x18;
+  return (*((s32 *) (((s8 *) arg0) + 0xA0))) + (((u32) new_var) >> 0x16);
 }
-#endif

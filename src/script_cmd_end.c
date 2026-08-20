@@ -10,10 +10,9 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/script_cmd_end.s\"");
 #else
-u32 script_cmd_end(u32* param1) {
-    u32 temp = param1[0];
-    param1[1] = temp;
-    param1[4] = 0;
+s32 script_cmd_end(void *arg1) {
+    (*(s32 *)((s8 *)(arg1) + (4))) = (s32) (*(s32 *)((s8 *)(arg1) + (0)));
+    (*(s32 *)((s8 *)(arg1) + (0x10))) = 0;
     return 1;
 }
 #endif
