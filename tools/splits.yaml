@@ -97,6 +97,8 @@ groups:
   - {obj: asm/text0801A548_p22, section: text}
   - {obj: src/sub_8029888, section: text}
   - {obj: asm/text0801A548_p21, section: text}
+  - {obj: src/sub_8029910, section: text}
+  - {obj: asm/text0801A548_p49, section: text}
   - {obj: src/sub_80316FC, section: text}
   - {obj: asm/text0801A548_p32, section: text}
   - {obj: src/sub_803C424, section: text}
