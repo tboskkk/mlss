@@ -35,6 +35,8 @@ groups:
   - {obj: asm/text08000000, section: text}
   - {obj: src/sub_8018218, section: text}
   - {obj: asm/text08000000_p4, section: text}
+  - {obj: src/sub_801859C, section: text}
+  - {obj: asm/text08000000_p5, section: text}
   - {obj: src/reset_game_80189C4, section: text}
   - {obj: src/nullsub_17, section: text}
   - {obj: asm/text08000000_p2, section: text}
