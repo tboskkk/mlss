@@ -13,10 +13,10 @@ void nullsub_21(void) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8159378.s\"");
 #else
-void sub_8159378(void* p0, s32 p1)
-{
-    *(u32*)((u8*)p0 + 0x04) = 0x08CDCA30;
-    if (p1 & 1)
-        free_heap_8018DA8(p0);
+void sub_8159378(void *arg0, s32 arg1) {
+    (*(s32 *)((s8 *)(arg0) + (4))) = 0x08CDCA30;
+    if (1 & arg1) {
+        free_heap_8018DA8(arg0);
+    }
 }
 #endif

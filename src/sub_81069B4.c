@@ -14,3 +14,9 @@ void sub_81069B4(s8 arg0) {
     temp_r2_11 = *(void **)0x03000FD8;
     (*(u8 *)((s8 *)(temp_r2_11) + (0xB))) = (u8) ((*(u8 *)((s8 *)(temp_r2_11) + (0xB))) | 0x40);
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_81069D4.s\"");
+#else
+#error "TODO: write sub_81069D4 to match asm/nonmatching/sub_81069D4.s, then delete this #error"
+#endif
