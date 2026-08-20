@@ -21,11 +21,10 @@ void sub_815F7FC(void *arg0, s32 arg1) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_815F838.s\"");
 #else
-void sub_815F838(u32* p0, u32 p1)
-{
-    u32* ptr = p0;
-    *(u32*)((u8*)ptr + 0x04) = 0x08CDCF50;
-    if (p1 & 1)
-        free_heap_8018DA8(ptr);
+void sub_815F838(void *arg0, s32 arg1) {
+    (*(s32 *)((s8 *)(arg0) + (4))) = 0x08CDCF50;
+    if (1 & arg1) {
+        free_heap_8018DA8(arg0);
+    }
 }
 #endif
