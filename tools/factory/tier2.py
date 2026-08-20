@@ -367,9 +367,25 @@ def run_pool(jobs: int, stall_min: float, max_functions: int):
                     else:
                         body = candidate_body_of(name)
                         detail = "score=0 (base attempt already matched)"
-                    if body:
+                    # A permuter score-0 is earned in its OWN isolated
+                    # sandbox (nonmatchings/<name>/base.c, with its own
+                    # includes and helper decls). trim_source() splices
+                    # only the function text back into the real src/*.c,
+                    # which can drop context the permuter had -- so
+                    # score-0-in-isolation does not imply score-0-in-place.
+                    # Confirmed live: sub_8163BB8 converged at 0 and the
+                    # validator then correctly rejected it, twice. Verify
+                    # in the real file before claiming convergence, so the
+                    # two stages can't disagree in the first place.
+                    verified = body and already_matches(name, body)
+                    if verified:
                         resolve(name, "validating", event="converged", detail=detail, body=body)
                         print(f"  {name}: converged -- {detail}")
+                    elif body:
+                        resolve(name, "stalled", event="t2_exit_no_zero",
+                                notes="permuter reached score 0 in isolation but the "
+                                      "candidate does not match in its real source file")
+                        print(f"  {name}: permuter score 0 didn't hold in context -> stalled")
                     else:
                         resolve(name, "needs_human", event="error",
                                 detail="base zero with no candidate_body",
