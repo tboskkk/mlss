@@ -7,18 +7,10 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_81367C0.s\"");
-#else
-void sub_81367C0(u32* param_1, s16 param_2)
-{
-    u32* puVar1;
-    
-    puVar1 = param_1;
-    if (param_2 != 0) {
-        process_add(param_1, param_2);
-    }
-    *(u32*)((u8*)puVar1 + 0x18) = 0x08CDC4A0;
-    return;
+s32 process_add(void *, u8);                    /* extern */
+
+void *sub_81367C0(void *arg0, u8 arg1) {
+    process_add(arg0, arg1);
+    (*(s32 *)((s8 *)(arg0) + (0x18))) = 0x08CDC4A0;
+    return arg0;
 }
-#endif
