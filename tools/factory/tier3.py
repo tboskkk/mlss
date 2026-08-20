@@ -116,7 +116,11 @@ def derive_facts(asm: str) -> list[str]:
     for sym in dict.fromkeys(POOL_SYMBOL_RE.findall(asm)):
         facts.append(
             f"The literal pool constant is the symbol `{sym}` (usually a function "
-            f"pointer). Use the name `{sym}` verbatim, never its numeric address.")
+            f"pointer). Use the name `{sym}` verbatim, never its numeric address. "
+            f"`{sym}` is NOT declared in this translation unit, so you MUST emit "
+            f"`extern void {sym}();` on its own line ABOVE your function "
+            f"definition -- without it the file does not compile at all, and the "
+            f"candidate is discarded before it can even be compared.")
     return facts
 
 
