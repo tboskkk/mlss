@@ -232,6 +232,26 @@ def backlog_depth() -> int:
         conn.close()
 
 
+def has_unblocking_work() -> bool:
+    """Is there a queued draft that would unblock a whole translation unit?
+
+    These must NEVER be throttled. Without this exemption the pipeline
+    deadlocks outright: the backlog throttle stops tier3 drafting -> the
+    #error siblings blocking whole files never get drafted -> every
+    candidate in those files keeps failing verification -> the backlog
+    never drains -> tier3 stays throttled forever. Caught by reasoning
+    through the interaction before launching, not by burning an hour on it.
+    """
+    conn = db.connect()
+    try:
+        return conn.execute(
+            "SELECT COUNT(*) c FROM functions WHERE state = 'needs_attempt' "
+            "AND tractability <= -1000"
+        ).fetchone()["c"] > 0
+    finally:
+        conn.close()
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--max-escalations", type=int, default=MAX_ESCALATIONS_DEFAULT)
@@ -254,7 +274,7 @@ def main():
         # (its dependencies may have been matched meanwhile, which would
         # change what the right answer looks like). Idling here instead
         # costs nothing and gives the cores back to tier2's searches.
-        if args.max_backlog > 0:
+        if args.max_backlog > 0 and not has_unblocking_work():
             depth = backlog_depth()
             if depth >= args.max_backlog:
                 print(f"[{time.strftime('%H:%M:%S')}] backlog {depth} >= {args.max_backlog}, "
