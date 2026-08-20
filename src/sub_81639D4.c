@@ -7,11 +7,7 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_81639D4.s\"");
-#else
-u32* sub_81639D4(u32* param_1) {
-    param_1[0x11] = 0;
-    return param_1 + 0x12;
+void sub_81639D4(void *arg0, s32 arg1) {
+    (*(s32 *)((s8 *)(arg0) + (0x44))) = arg1;
+    (*(s16 *)((s8 *)(arg0) + (0x48))) = 0;
 }
-#endif
