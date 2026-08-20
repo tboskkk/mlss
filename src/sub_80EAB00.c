@@ -15,3 +15,9 @@ s32 sub_80EAB00(u8 *arg2) {
     return 1;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80EAB20.s\"");
+#else
+#error "TODO: write sub_80EAB20 to match asm/nonmatching/sub_80EAB20.s, then delete this #error"
+#endif
