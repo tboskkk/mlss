@@ -7,9 +7,6 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8082CCC.s\"");
-#else
 void sub_8082CCC(void *arg0, void *arg1, s32 arg2, s32 arg3, s32 arg4)
 {
   int new_var;
@@ -18,4 +15,3 @@ void sub_8082CCC(void *arg0, void *arg1, s32 arg2, s32 arg3, s32 arg4)
   *((s16 *) (((s8 *) arg1) + 2)) = (s16) (new_var - (*((u16 *) (((s8 *) arg0) + 0x776))));
   *((s16 *) (((s8 *) arg1) + 0xE)) = (s16) (0x1F0 - arg3);
 }
-#endif
