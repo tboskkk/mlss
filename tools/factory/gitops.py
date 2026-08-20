@@ -21,6 +21,13 @@ REPO = Path(__file__).resolve().parent.parent.parent
 SRC_DIR = REPO / "src"
 LOCK_PATH = REPO / ".claude" / "factory" / "repo.lock"
 
+# The complete, confirmed set of paths any factory process (split_func.py, the tier1-3 writers,
+# the Validator) ever writes to -- checked directly against every write_text()/open(...,'w') in
+# split_func.py, splitlib.py, and tools/factory/*.py, not assumed. `revert_to_clean()` and
+# `commit()` below scope their git operations to exactly this list, on purpose -- see both
+# docstrings for why "repo-wide" was a real, live bug.
+FACTORY_PATHS = ["asm/", "src/", "tools/splits.yaml", "ld_script.ld"]
+
 
 @contextmanager
 def repo_lock(timeout: float = 1800, what: str = ""):
@@ -77,13 +84,23 @@ def run(cmd, **kw):
 
 
 def revert_to_clean():
-    """Undo every tracked modification and delete every untracked file.
-    Learned the hard way (see CLAUDE.md / session log): reverting only the
-    specific files one failure path happens to know about is not enough --
-    split_func.py also touches splits.yaml, ld_script.ld, and shrunk/split
-    asm blobs, and a partial revert leaves the tree internally inconsistent
-    enough to corrupt whatever gets attempted next. Only a full revert to
-    git HEAD is actually safe.
+    """Undo every tracked modification and delete every untracked file --
+    but ONLY within FACTORY_PATHS, never repo-wide. Learned the hard way
+    (see CLAUDE.md / session log): reverting only the specific files one
+    failure path happens to know about is not enough -- split_func.py also
+    touches splits.yaml, ld_script.ld, and shrunk/split asm blobs, and a
+    partial revert leaves the tree internally inconsistent enough to
+    corrupt whatever gets attempted next. A full revert of the factory's
+    own domain is what's actually needed -- NOT a full revert of the whole
+    repo, which is a different, worse bug this function used to have
+    (`git checkout -- .`, no path scoping at all): it silently discarded
+    ANY uncommitted work sitting anywhere else in the tree -- caught live
+    when a full session's worth of docs/formats/README.md research got
+    wiped by a wholly unrelated candidate's validation failure, mid-session,
+    with zero warning. Scoping to FACTORY_PATHS keeps the original fix's
+    safety property (every file an extraction/match attempt could touch
+    still gets reverted together, atomically) without touching anything
+    outside it.
 
     Also forces a from-scratch rebuild afterward. mlss.map is gitignored,
     so `git checkout`/`git clean` don't touch it -- it keeps describing
@@ -95,8 +112,8 @@ def revert_to_clean():
     autopilot worktree, once again live while testing THIS module. Baking
     the fix into the shared primitive so nobody has to remember it by hand
     a third time."""
-    run(["git", "checkout", "--", "."])
-    run(["git", "clean", "-fd", "asm/", "src/"])
+    run(["git", "checkout", "--", *FACTORY_PATHS])
+    run(["git", "clean", "-fd", *FACTORY_PATHS])
     shutil.rmtree(REPO / "build", ignore_errors=True)
     run(["./container.sh", "make"])
 
@@ -297,6 +314,11 @@ def finish_match(name: str) -> tuple[bool, str]:
 
 
 def commit(name: str, message: str) -> bool:
-    run(["git", "add", "-A"])
+    # Scoped to FACTORY_PATHS, not `git add -A` -- the unscoped version silently absorbed
+    # whatever else happened to be sitting uncommitted in the shared working tree (found live:
+    # four unrelated tool scripts got swept into an unrelated "Match ..." commit instead of
+    # ever being committed under their own message). See revert_to_clean()'s docstring for the
+    # matching bug on the revert side.
+    run(["git", "add", *FACTORY_PATHS])
     r = run(["git", "commit", "-m", message])
     return r.returncode == 0
