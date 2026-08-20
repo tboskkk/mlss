@@ -10,5 +10,16 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8089BD4.s\"");
 #else
-#error "TODO: write sub_8089BD4 to match asm/nonmatching/sub_8089BD4.s, then delete this #error"
+extern s32 sub_8089F44;
+
+void sub_8089BD4(void *arg0) {
+    u16 temp_r0_17;
+
+    (*(s32 *)((s8 *)(arg0) + (0x10))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x38))) + M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */));
+    temp_r0_17 = (*(u16 *)((s8 *)(arg0) + (0xAC))) - 1;
+    (*(u16 *)((s8 *)(arg0) + (0xAC))) = temp_r0_17;
+    if ((s32) (temp_r0_17 << 0x10) <= 0) {
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8089F44;
+    }
+}
 #endif
