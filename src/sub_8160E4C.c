@@ -17,3 +17,9 @@ s32 sub_8160E4C(void *arg0) {
     return (*(s32 *)((s8 *)((void *)0x040000D4) + (8)));
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8160E6C.s\"");
+#else
+#error "TODO: write sub_8160E6C to match asm/nonmatching/sub_8160E6C.s, then delete this #error"
+#endif

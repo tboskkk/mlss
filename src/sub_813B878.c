@@ -10,5 +10,17 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_813B878.s\"");
 #else
-#error "TODO: write sub_813B878 to match asm/nonmatching/sub_813B878.s, then delete this #error"
+s32 sub_813B878(void *arg0, void *arg1) {
+    s32 temp_r1_14;
+    s32 temp_r2_12;
+    s32 var_r4_8;
+
+    var_r4_8 = 0;
+    temp_r2_12 = (*(s32 *)((s8 *)(arg1) + (0x10)));
+    temp_r1_14 = (*(s32 *)((s8 *)(arg0) + (0x10)));
+    if ((temp_r1_14 >= (s32) (temp_r2_12 - (*(u16 *)((s8 *)(arg1) + (0x276))))) && ((s32) (temp_r1_14 - (*(u16 *)((s8 *)(arg0) + (0x276)))) <= temp_r2_12)) {
+        var_r4_8 = 1;
+    }
+    return var_r4_8;
+}
 #endif
