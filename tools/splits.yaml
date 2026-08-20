@@ -344,6 +344,8 @@ groups:
   - {obj: asm/text08057568_p97, section: text}
   - {obj: src/sub_80DEAC0, section: text}
   - {obj: asm/text08057568_p155, section: text}
+  - {obj: src/sub_80E13B4, section: text}
+  - {obj: asm/text08057568_p310, section: text}
   - {obj: src/sub_80E184C, section: text}
   - {obj: asm/text08057568_p231, section: text}
   - {obj: src/sub_80E1908, section: text}
