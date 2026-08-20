@@ -109,8 +109,18 @@ def base_already_zero(name: str) -> bool:
 
 def ensure_isolated(name: str, candidate_body: str | None) -> bool:
     out_dir = NONMATCHINGS_DIR / name
+    # A leftover isolation dir holds the C from whenever it was created.
+    # Returning early on `out_dir.exists()` meant a function tier3 had
+    # since RE-DRAFTED got searched with its OLD candidate -- the new draft
+    # was never actually tested, and the retry path silently did nothing.
+    # That path only just became reachable (stalled retries are no longer
+    # throttled), so this would have quietly wasted an entire overnight
+    # run's worth of retries. Always re-isolate from the current candidate;
+    # permute.py refuses to overwrite, so clear it first.
     if out_dir.exists():
-        return True
+        if not candidate_body:
+            return True  # nothing newer to install; reuse what's there
+        shutil.rmtree(out_dir, ignore_errors=True)
     # The real src/*.c file has to actually contain the candidate BEFORE
     # permute.py runs -- it reads straight off disk (find_stub_block()),
     # it doesn't know the DB's candidate_body column exists. Found missing
