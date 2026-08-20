@@ -19,3 +19,9 @@ s32 sub_810D260(u32 arg0, s32 arg1) {
     } while (var_r0_0 != 0);
     return arg1 + var_r1_8;
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_810D274.s\"");
+#else
+#error "TODO: write sub_810D274 to match asm/nonmatching/sub_810D274.s, then delete this #error"
+#endif

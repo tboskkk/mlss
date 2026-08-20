@@ -7,12 +7,11 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/script_cmd_end.s\"");
-#else
-s32 script_cmd_end(void *arg1) {
-    (*(s32 *)((s8 *)(arg1) + (4))) = (s32) (*(s32 *)((s8 *)(arg1) + (0)));
-    (*(s32 *)((s8 *)(arg1) + (0x10))) = 0;
-    return 1;
+s32 script_cmd_end(void *arg1)
+{
+  s8 *new_var;
+  *((s32 *) (new_var + 4)) = (s32) (*((s32 *) (new_var + 0)));
+  *((s32 *) (new_var + 0x10)) = 0;
+  new_var = (s8 *) arg1;
+  return 1;
 }
-#endif
