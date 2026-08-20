@@ -10,18 +10,8 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_804776C.s\"");
 #else
-u8 sub_804776C(u8* a0, u8 a1) {
-    u8* var1 = a0;
-    u8 var2 = a1;
-    u8 var3;
-    
-    var1 += 0x83 << 2;
-    var3 = *var1;
-    var3 &= ~2;
-    var3 |= var2 & 1;
-    *var1 = var3;
-    
-    return *var1;
+void sub_804776C(void *arg0, s32 arg1) {
+    (*(u8 *)((s8 *)(arg0) + (0x20C))) = (u8) ((-2 & (*(u8 *)((s8 *)(arg0) + (0x20C)))) | (arg1 & 1));
 }
 #endif
 

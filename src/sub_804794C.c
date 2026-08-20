@@ -14,11 +14,7 @@ void sub_804794C(void *arg0, s16 arg1) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8047958.s\"");
 #else
-u32 sub_8047958(u32 param_1) {
-    u32* puVar1;
-    
-    puVar1 = (u32*)((s32)param_1 + 0x2B6);
-    *puVar1 = *puVar1 & 0xFFFFFFCF;
-    return param_1;
+void sub_8047958(void *arg0) {
+    (*(u8 *)((s8 *)(arg0) + (0x2B6))) = (u8) (-0x31 & (*(u8 *)((s8 *)(arg0) + (0x2B6))));
 }
 #endif
