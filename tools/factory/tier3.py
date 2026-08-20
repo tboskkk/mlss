@@ -188,15 +188,47 @@ def process_one(conn, max_escalations: int) -> str | None:
     return name
 
 
+def backlog_depth() -> int:
+    """How many drafted-but-unverified candidates are already waiting."""
+    conn = db.connect()
+    try:
+        return conn.execute(
+            "SELECT COUNT(*) c FROM functions WHERE state = 'tier2_ready'"
+        ).fetchone()["c"]
+    finally:
+        conn.close()
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--max-escalations", type=int, default=MAX_ESCALATIONS_DEFAULT)
     ap.add_argument("--limit", type=int, default=None, help="stop after this many functions")
     ap.add_argument("--loop", type=int, default=None, metavar="SECONDS")
+    ap.add_argument("--max-backlog", type=int, default=40,
+                     help="pause drafting while this many candidates are already "
+                          "queued unverified (default 40; 0 disables the throttle)")
     args = ap.parse_args()
 
     processed = 0
     while True:
+        # THE BIGGEST ELECTRICITY SAVING IN THE PIPELINE. llama-server runs
+        # ~500%% CPU sustained while generating, and it drafts far faster
+        # than tier2 can verify: measured live at ~290 drafts/hr against a
+        # tier2 ceiling of ~24/hr, with the tier2_ready queue growing
+        # 188 -> 279 in nine minutes. Everything past the queue depth is
+        # inference burned to produce work nobody can consume for hours --
+        # and a draft that sits unverified that long is often stale anyway
+        # (its dependencies may have been matched meanwhile, which would
+        # change what the right answer looks like). Idling here instead
+        # costs nothing and gives the cores back to tier2's searches.
+        if args.max_backlog > 0:
+            depth = backlog_depth()
+            if depth >= args.max_backlog:
+                print(f"[{time.strftime('%H:%M:%S')}] backlog {depth} >= {args.max_backlog}, "
+                      f"pausing drafting (saves LLM inference until tier2 catches up)")
+                time.sleep(args.loop or 60)
+                continue
+
         did_any = False
         while args.limit is None or processed < args.limit:
             # Fresh connection every iteration, closed at the end -- see
