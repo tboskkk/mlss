@@ -27,3 +27,15 @@ asm_unified(".include \"asm/nonmatching/sub_803C440.s\"");
 #else
 #error "TODO: write sub_803C440 to match asm/nonmatching/sub_803C440.s, then delete this #error"
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_803C468.s\"");
+#else
+#error "TODO: write sub_803C468 to match asm/nonmatching/sub_803C468.s, then delete this #error"
+#endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_803C4A0.s\"");
+#else
+#error "TODO: write sub_803C4A0 to match asm/nonmatching/sub_803C4A0.s, then delete this #error"
+#endif
