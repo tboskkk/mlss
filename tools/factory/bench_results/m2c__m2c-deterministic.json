@@ -1,0 +1,156 @@
+{
+  "variant": "m2c",
+  "model": "m2c-deterministic",
+  "n": 18,
+  "compiled": 9,
+  "matches": 2,
+  "mean_score": 438.9,
+  "median_score": 335,
+  "total_wall_seconds": 3.9,
+  "results": {
+    "sub_8047958": {
+      "score": 1205,
+      "compiled": true,
+      "match": false,
+      "elapsed": 0.3,
+      "body": "void sub_8047958(void *arg0) {\n    (*(u8 *)((s8 *)(arg0) + (0x2B6))) = (u8) (-0x31 & (*(u8 *)((s8 *)(arg0) + (0x2B6))));\n}",
+      "calls": 0
+    },
+    "sub_8047B78": {
+      "score": 230,
+      "compiled": true,
+      "match": false,
+      "elapsed": 0.3,
+      "body": "s32 sub_8047B78(void *arg0) {\n    s32 temp_r0_11;\n    s32 var_r1_12;\n\n    temp_r0_11 = 7 & (*(u8 *)((s8 *)(arg0) + (0x2B5)));\n    var_r1_12 = temp_r0_11;\n    if (temp_r0_11 != 0) {\n        var_r1_12 = 1;\n    }\n    return var_r1_12;\n}",
+      "calls": 0
+    },
+    "sub_8087C4C": {
+      "score": 0,
+      "compiled": true,
+      "match": true,
+      "elapsed": 0.3,
+      "body": "void sub_8087C4C(void *arg0) {\n    s32 (*temp_r1_12)(void *);\n    s32 temp_r5_9;\n\n    temp_r5_9 = (*(s32 *)((s8 *)(arg0) + (0x80)));\n    if (temp_r5_9 == 0) {\n        temp_r1_12 = (*(s32 (**)(void *))((s8 *)(arg0) + (0x68)));\n        if (temp_r1_12 != NULL) {\n            temp_r1_12(arg0);\n        }\n        (*(s32 *)((s8 *)(arg0) + (0x6C))) = temp_r5_9;\n    }\n}",
+      "calls": 0
+    },
+    "sub_8159400": {
+      "score": 800,
+      "compiled": true,
+      "match": false,
+      "elapsed": 0.3,
+      "body": "void sub_8159400(void *arg0, s32 arg1) {\n    (*(s32 *)((s8 *)(arg0) + (4))) = 0x08CDCA30;\n    if (1 & arg1) {\n        free_heap_8018DA8(arg0);\n    }\n}",
+      "calls": 0
+    },
+    "sub_815F8BC": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 0.5,
+      "body": "void sub_815F8BC(void *arg0, s32 arg1) {\n    (*(s32 *)((s8 *)(arg0) + (4))) = 0x08CDCF50;\n    if (1 & arg1) {\n        free_heap_8018DA8(arg0);\n    }\n}",
+      "calls": 0
+    },
+    "sub_8161580": {
+      "score": 500,
+      "compiled": true,
+      "match": false,
+      "elapsed": 0.3,
+      "body": "void sub_8161580(void *arg0, s32 arg1) {\n    (*(s32 *)((s8 *)(arg0) + (4))) = 0x08CDD090;\n    if (1 & arg1) {\n        free_heap_8018DA8(arg0);\n    }\n}",
+      "calls": 0
+    },
+    "sub_8029804": {
+      "score": 205,
+      "compiled": true,
+      "match": false,
+      "elapsed": 0.3,
+      "body": "void sub_8029804(void *arg0) {\n    void *temp_r1_18;\n\n    (*(u8 *)((s8 *)(arg0) + (0x208))) = (u8) (-3 & (*(u8 *)((s8 *)(arg0) + (0x208))));\n    temp_r1_18 = (*(void **)((s8 *)(arg0) + (0x200)));\n    (*(u8 *)((s8 *)(temp_r1_18) + (0x351))) = (u8) ((*(u8 *)((s8 *)(temp_r1_18) + (0x351))) | 0x40);\n}",
+      "calls": 0
+    },
+    "sub_807FE7C": {
+      "score": 675,
+      "compiled": true,
+      "match": false,
+      "elapsed": 0.3,
+      "body": "extern s32 sub_807FEB4;\n\nvoid sub_807FE7C(void *arg0) {\n    void *temp_r2_16;\n    void *temp_r3_14;\n\n    (*(u8 *)((s8 *)(arg0) + (0x79))) = (u8) ((*(u8 *)((s8 *)(arg0) + (0x79))) | 0x10);\n    temp_r3_14 = *(void **)0x03000FD8;\n    temp_r2_16 = (*(void **)((s8 *)(temp_r3_14) + (0x3C)));\n    (*(void **)((s8 *)(temp_r3_14) + (0x3C))) = (void *) (*(void **)((s8 *)(temp_r2_16) + (0)));\n    (*(void **)((s8 *)(temp_r2_16) + (0))) = (void *) (*(void **)((s8 *)(temp_r3_14) + (0x4C)));\n    (*(s32 **)((s8 *)(temp_r2_16) + (4))) = &sub_807FEB4;\n    (*(s16 *)((s8 *)(temp_r2_16) + (0x10))) = 0;\n    (*(void **)((s8 *)(temp_r3_14) + (0x4C))) = temp_r2_16;\n    (*(void **)((s8 *)(temp_r2_16) + (8))) = arg0;\n}",
+      "calls": 0
+    },
+    "sub_8082158": {
+      "score": 0,
+      "compiled": true,
+      "match": true,
+      "elapsed": 0.3,
+      "body": "extern s32 sub_8080A40;\n\nvoid sub_8082158(void *arg0) {\n    s32 (*temp_r1_9)(void *);\n    void *temp_r4_8;\n\n    temp_r4_8 = (*(void **)((s8 *)(arg0) + (0xC)));\n    temp_r1_9 = (*(s32 (**)(void *))((s8 *)(temp_r4_8) + (0x4C)));\n    if ((temp_r1_9 == NULL) || (temp_r1_9(temp_r4_8), ((*(s32 (**)(void *))((s8 *)(temp_r4_8) + (0x4C))) == NULL))) {\n        (*(s32 **)((s8 *)(arg0) + (4))) = &sub_8080A40;\n    }\n}",
+      "calls": 0
+    },
+    "sub_809E410": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 0.0,
+      "body": null,
+      "calls": 0
+    },
+    "sub_80F7D3C": {
+      "score": 335,
+      "compiled": true,
+      "match": false,
+      "elapsed": 0.3,
+      "body": "s32 sub_80F7D3C(void *arg0, void *arg1) {\n    if (!(0x7F & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x2C)))) + (0x179D))))) {\n        return 1;\n    }\n    (*(s32 *)((s8 *)(arg1) + (0))) = (s32) (*(s32 *)((s8 *)(arg1) + (0x14)));\n    return 0;\n}",
+      "calls": 0
+    },
+    "sub_816B384": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 0.5,
+      "body": "void sub_816B384(void) {\n    void *temp_r1_9;\n    void *temp_r2_15;\n\n    temp_r1_9 = *(void **)0x03001030;\n    *(u16 *)0x0400001C = (*(u16 *)((s8 *)(temp_r1_9) + (0)));\n    (*(u16 *)((s8 *)((void *)0x0400001E) + (0))) = (u16) (*(u16 *)((s8 *)(temp_r1_9) + (2)));\n    temp_r2_15 = (void *)0x0400001E + 0x92;\n    *(s16 *)0x040000BA = 0;\n    (*(void **)((s8 *)((void *)0x0400001E) + (0x92))) = (void *) (temp_r1_9 + 4);\n    (*(s32 *)((s8 *)(temp_r2_15) + (4))) = 0x0400001C;\n    (*(s32 *)((s8 *)(temp_r2_15) + (8))) = 0xA6600001;\n}",
+      "calls": 0
+    },
+    "sub_80290E0": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 0.0,
+      "body": null,
+      "calls": 0
+    },
+    "sub_8059E5C": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 0.5,
+      "body": "s32 process_remove(void *, s32);                /* extern */\n\nvoid sub_8059E5C(void *arg0, s32 arg1) {\n    (*(s32 *)((s8 *)(arg0) + (0x18))) = 0x08CDC278;\n    if ((*(s32 *)((s8 *)(arg0) + (0x78))) != 0) {\n        free_heap_8018D9C();\n    }\n    if ((*(s32 *)((s8 *)(arg0) + (0x70))) != 0) {\n        free_heap_8018D9C();\n    }\n    if ((*(s32 *)((s8 *)(arg0) + (0x68))) != 0) {\n        free_heap_8018D9C();\n    }\n    process_remove(arg0, arg1);\n}",
+      "calls": 0
+    },
+    "sub_80E122C": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 0.0,
+      "body": null,
+      "calls": 0
+    },
+    "sub_80E3FD8": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 0.0,
+      "body": null,
+      "calls": 0
+    },
+    "sub_8158558": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 0.0,
+      "body": null,
+      "calls": 0
+    },
+    "sub_815EDB0": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 0.0,
+      "body": null,
+      "calls": 0
+    }
+  }
+}

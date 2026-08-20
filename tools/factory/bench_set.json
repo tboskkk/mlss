@@ -1,0 +1,6 @@
+{
+  "_comment": "Fixed benchmark set for tools/factory/bench.py -- generated once (seed 20260820) from needs_human/stalled functions that (a) already have a real #ifndef NONMATCHING guard block to splice into, (b) have no #error-placeholder sibling in the same translation unit (agbcc compiles the WHOLE file, so an undrafted sibling fails EVERY candidate for reasons unrelated to draft quality -- see tier3.blocking_siblings()), (c) aren't in a structural-twin group (twins.py already solves those mechanically, not a fair test of raw model skill), and (d) aren't a known libgcc/libc routine (CLAUDE.md Phase 3 -- reproducing compiler-runtime C is a different task than game-logic decompilation). Stratified into three size buckets, 6 each. MUST stay fixed across every variant run in the 5-way comparison, or the runs aren't comparable.",
+  "small (14-20 lines)": ["sub_8047958", "sub_8047B78", "sub_8087C4C", "sub_8159400", "sub_815F8BC", "sub_8161580"],
+  "medium (21-32 lines)": ["sub_8029804", "sub_807FE7C", "sub_8082158", "sub_809E410", "sub_80F7D3C", "sub_816B384"],
+  "large (33-48 lines)": ["sub_80290E0", "sub_8059E5C", "sub_80E122C", "sub_80E3FD8", "sub_8158558", "sub_815EDB0"]
+}

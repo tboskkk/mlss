@@ -1,0 +1,156 @@
+{
+  "variant": "baseline",
+  "model": "qwen2.5-coder-32b",
+  "n": 18,
+  "compiled": 4,
+  "matches": 0,
+  "mean_score": 842.5,
+  "median_score": 1205,
+  "total_wall_seconds": 1571.7,
+  "results": {
+    "sub_8047958": {
+      "score": 1205,
+      "compiled": true,
+      "match": false,
+      "elapsed": 168.9,
+      "body": "void sub_8047958(u32 param_1) {\n    u8* puVar1;\n    \n    puVar1 = (u8*)(param_1 + 0x2B6);\n    *puVar1 = *puVar1 & 0xCF;\n}",
+      "calls": 1
+    },
+    "sub_8047B78": {
+      "score": 1250,
+      "compiled": true,
+      "match": false,
+      "elapsed": 51.2,
+      "body": "void sub_8047B78(u32* r0) {\n    u32* ptr = r0 + 0x2B5;\n    u8 value = *(u8*)ptr;\n    u8 result = value & 0x07;\n    u8 r1 = (result == 0) ? 0 : 1;\n    *r0 = r1;\n}",
+      "calls": 1
+    },
+    "sub_8087C4C": {
+      "score": 415,
+      "compiled": true,
+      "match": false,
+      "elapsed": 83.3,
+      "body": "void sub_8087C4C(void* p0)\n{\n    u32 r4 = (u32)p0;\n    u32 r0 = r4 + 0x80;\n    u32 r5 = *(u32*)r0;\n    if (r5 != 0x00)\n    {\n        void* r1 = *(void**)(r4 + 0x68);\n        if (r1 != NULL)\n        {\n            ((void(*)(void))r1)();\n        }\n    }\n    *(u32*)(r4 + 0x6C) = r5;\n}",
+      "calls": 1
+    },
+    "sub_8159400": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 136.2,
+      "body": "void sub_8159400(void* p0, s32 p1)\n{\n    *(u32*)((u8*)p0 + 0x04) = 0x08CDCA30;\n    if (p1 & 1) {\n        adds(r0, r2, #0);\n        free_heap_8018DA8(p0);\n    }\n}",
+      "calls": 1
+    },
+    "sub_815F8BC": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 65.0,
+      "body": "void sub_815F8BC(void* p0, s32 p1)\n{\n    *(u32*)((u8*)p0 + 0x04) = 0x08CDCF50;\n    if (p1 & 1)\n        free_heap_8018DA8(p0);\n}",
+      "calls": 1
+    },
+    "sub_8161580": {
+      "score": 500,
+      "compiled": true,
+      "match": false,
+      "elapsed": 121.2,
+      "body": "void sub_8161580(void* p0, u32 p1)\n{\n    *(u32*)((u8*)p0 + 0x04) = 0x08CDD090;\n    if (p1 & 1)\n        free_heap_8018DA8(p0);\n}",
+      "calls": 1
+    },
+    "sub_8029804": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 81.0,
+      "body": "void sub_8029804(u8* p0) {\n    u8* ptr1 = (u8*)((u8*)p0 + 0x208);\n    *ptr1 = (*ptr1 & 0x03) ^ 0x03;\n    u32* ptr2 = (u32*)((u8*)p0 + 0x200);\n    u32 value = *ptr2 + 0x00000351;\n    u8* ptr3 = (u8*)value;\n    *ptr3 = *ptr3 | 0x40;\n}",
+      "calls": 1
+    },
+    "sub_807FE7C": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 140.9,
+      "body": "extern void sub_807FEB4();\n\nvoid sub_807FE7C(u32 r0) {\n    u8 *r3 = (u8 *)(r0 + 0x79);\n    u8 r1 = *r3;\n    r1 |= 0x10;\n    *r3 = r1;\n\n    u32 *r1_ptr = (u32 *)0x03000FD8;\n    u32 r3_value = *r1_ptr;\n    void (*r4)() = sub_807FEB4;\n\n    u32 *r2 = (u32 *)(r3_value + 0x3C);\n    u32 temp = *r2;\n    *r2 = *(u32 *)r3_value;\n    *(u32 *)r3_value = temp;\n\n    temp = *(u32 *)(r3_value + 0x4C);\n    *(u32 *)r3_value = temp;\n    *(void **)(r2 + 1) = r4;\n    *(u16 *)(r2 + 8) = 0;\n    *(u32 *)(r3_value + 0x4C) = r2;\n    *(u32 *)(r2 + 2) = r0;\n\n    __asm__(\"pop {r4}\");\n    __asm__(\"pop {r0}\");\n    __asm__(\"bx r0\");\n}",
+      "calls": 1
+    },
+    "sub_8082158": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 211.9,
+      "body": "extern void sub_8080A40();\n\nvoid sub_8082158(void* p0) {\n    u32* ptr = (u32*)((u8*)p0 + 0x0C);\n    u32* r4 = *(u32**)ptr;\n    u32 r1 = *(u32*)((u8*)r4 + 0x4C);\n    if (r1 == 0) {\n        goto _08082170;\n    }\n    void (*func)(void) = (void (*)(void))r1;\n    func();\n    r1 = *(u32*)((u8*)r4 + 0x4C);\n    if (r1 != 0) {\n        goto _08082174;\n    }\n_08082170:\n    *(u32*)((u8*)p0 + 0x04) = (u32)sub_8080A40;\n_08082174:\n    pop({r4, r5});\n    pop({r0});\n    bx(lr);\n}",
+      "calls": 1
+    },
+    "sub_809E410": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 17.4,
+      "body": "void sub_809E410(u32 r0, u32 r1, u32 r2) {\n    pop {r7};\n    bx lr;\n}",
+      "calls": 1
+    },
+    "sub_80F7D3C": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 81.7,
+      "body": "void sub_80F7D3C(u8* p0, u8* p1) {\n    u32 temp = *(u32*)((u8*)p0 + 0x2C);\n    temp += 0x0000179D;\n    u8 value = *(u8*)(temp);\n    u8 result = value & 0x7F;\n    if (result != 0) {\n        u32 value2 = *(u32*)((u8*)p1 + 0x14);\n        *(u32*)((u8*)p1) = value2;\n    }\n}",
+      "calls": 1
+    },
+    "sub_816B384": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 119.0,
+      "body": "void sub_816B384() {\n    u32 *r4 = (u32 *)0x0400001C;\n    u32 *r0 = (u32 *)0x03001030;\n    u16 *r1 = (u16 *)*r0;\n    u16 value1 = r1[0];\n    r4[0] = value1;\n    u32 *r2 = (u32 *)0x0400001E;\n    u16 value2 = r1[1];\n    r2[0] = value2;\n    r2 += 0x92 / 4;\n    u32 *r3 = (u32 *)0x040000BA;\n    r3[0] = 0;\n    r1 += 2;\n    r2[0] = (u32)r1;\n    r2[1] = (u32)r4;\n    r2[2] = 0xA6600001;\n}",
+      "calls": 1
+    },
+    "sub_80290E0": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 37.6,
+      "body": "void sub_80290E0(u32 r0, u32 r1, u32 r2) {\n    *(u32*)(r0 + 0x1C) = r1;\n    if (*(u8*)(r2 + 0x1A) != 0) {\n        *(u32*)(r0 + 0x18) = 0x808750C;\n    }\n}",
+      "calls": 1
+    },
+    "sub_8059E5C": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 146.6,
+      "body": "void sub_8059E5C(u32* p0, u32* p1)\n{\n    *(u32*)((u8*)p0 + 0x18) = 0x08CDC278;\n    if (*(u32*)((u8*)p0 + 0x78) != 0)\n        free_heap_8018D9C(*(u32*)((u8*)p0 + 0x78));\n    if (*(u32*)((u8*)p0 + 0x70) != 0)\n        free_heap_8018D9C(*(u32*)((u8*)p0 + 0x70));\n    if (*(u32*)((u8*)p0 + 0x68) != 0)\n        free_heap_8018D9C(*(u32*)((u8*)p0 + 0x68));\n    process_remove(p0, p1);\n}",
+      "calls": 1
+    },
+    "sub_80E122C": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 13.6,
+      "body": "void sub_80E122C(u32 r0, u32 r1) {\n    bx lr;\n}",
+      "calls": 1
+    },
+    "sub_80E3FD8": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 27.4,
+      "body": "void sub_80E3FD8(u32 r0, u32 r1) {\n    if (r0 != 0) {\n        r1 = *(u32*)(r0 + 0x1C);\n        *(u32*)(r0 + 0x1C) = r1 + 1;\n    }\n}",
+      "calls": 1
+    },
+    "sub_8158558": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 47.3,
+      "body": "void sub_8158558(u32 r0, u32 r1, u32 r2) {\n    u32 r3;\n    r3 = r2 + 4;\n    r3 = *(u32*)r3;\n    r3 = r3 + 0x1C;\n    r3 = *(u32*)r3;\n    r3 = r3 + 0x24;\n    *(u32*)r3 = r0;\n    r3 = r3 + 4;\n    *(u32*)r3 = r1;\n}",
+      "calls": 1
+    },
+    "sub_815EDB0": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 21.5,
+      "body": "void sub_815EDB0(u32 r0, u32 r1, u32 r2) {\n    // Function body is a single bx lr instruction, indicating no work is done and it returns void.\n    return;\n}",
+      "calls": 1
+    }
+  }
+}

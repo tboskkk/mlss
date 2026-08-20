@@ -1,0 +1,156 @@
+{
+  "variant": "multiturn",
+  "model": "qwen3-coder-30b-a3b",
+  "n": 18,
+  "compiled": 8,
+  "matches": 0,
+  "mean_score": 743.8,
+  "median_score": 800,
+  "total_wall_seconds": 872.5,
+  "results": {
+    "sub_8047958": {
+      "score": 1275,
+      "compiled": true,
+      "match": false,
+      "elapsed": 74.4,
+      "body": "u32 sub_8047958(u32 param_1) {\n    u8* puVar1;\n    \n    puVar1 = (u8*)((s32)param_1 + 0x2B6);\n    *puVar1 = ~(*puVar1 & 0x31);\n    return param_1;\n}",
+      "calls": 3
+    },
+    "sub_8047B78": {
+      "score": 1440,
+      "compiled": true,
+      "match": false,
+      "elapsed": 55.2,
+      "body": "void sub_8047B78(u32* param_1)\n{\n  u32* puVar1;\n  \n  puVar1 = param_1 + 0x6D;\n  *param_1 = *param_1 + 0x2B5;\n  if ((*puVar1 & 7) == 0) {\n    *param_1 = 1;\n  }\n  return;\n}",
+      "calls": 3
+    },
+    "sub_8087C4C": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 30.7,
+      "body": null,
+      "calls": 3
+    },
+    "sub_8159400": {
+      "score": 800,
+      "compiled": true,
+      "match": false,
+      "elapsed": 84.6,
+      "body": "void sub_8159400(void* p0, s32 p1)\n{\n    *(u32*)((u8*)p0 + 0x04) = 0x08CDCA30;\n    if (p1 & 1)\n        free_heap_8018DA8(p0);\n}",
+      "calls": 3
+    },
+    "sub_815F8BC": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 21.6,
+      "body": null,
+      "calls": 3
+    },
+    "sub_8161580": {
+      "score": 500,
+      "compiled": true,
+      "match": false,
+      "elapsed": 44.7,
+      "body": "void sub_8161580(void* p0, u32 p1)\n{\n    *(u32*)((u8*)p0 + 0x04) = 0x08CDD090;\n    if (p1 & 1)\n        free_heap_8018DA8(p0);\n}",
+      "calls": 3
+    },
+    "sub_8029804": {
+      "score": 365,
+      "compiled": true,
+      "match": false,
+      "elapsed": 66.6,
+      "body": "u32 sub_8029804(u32 p0) {\n    u8* ptr = (u8*)p0;\n    *(u8*)(ptr + 0x208) &= 0xFC;\n    *(u8*)(*(u32*)(ptr + 0x200) + 0x351) |= 0x40;\n    return p0;\n}",
+      "calls": 3
+    },
+    "sub_807FE7C": {
+      "score": 300,
+      "compiled": true,
+      "match": false,
+      "elapsed": 124.9,
+      "body": "extern void sub_807FEB4();\n\nvoid sub_807FE7C(void* param_1) {\n    u8* puVar1;\n    u32* puVar2;\n    u32* puVar3;\n    u32* puVar4;\n    \n    puVar1 = (u8*)param_1 + 0x79;\n    *puVar1 = *puVar1 | 0x10;\n    puVar2 = (u32*)0x03000FD8;\n    puVar3 = (u32*)puVar2[0x00 / 4];\n    puVar4 = (u32*)0x0807FEB5;\n    puVar2 = (u32*)puVar3[0x3C / 4];\n    puVar1 = (u8*)puVar2[0x00 / 4];\n    puVar3[0x3C / 4] = (u32)puVar1;\n    puVar1 = (u8*)puVar3[0x4C / 4];\n    puVar2[0x00 / 4] = (u32)puVar1;\n    puVar2[0x04 / 4] = (u32)puVar4;\n    puVar2[0x10 / 4] = 0;\n    puVar3[0x4C / 4] = (u32)puVar2;\n    puVar2[0x08 / 4] = (u32)param_1;\n}",
+      "calls": 3
+    },
+    "sub_8082158": {
+      "score": 415,
+      "compiled": true,
+      "match": false,
+      "elapsed": 102.7,
+      "body": "extern void sub_8080A40();\n\nvoid sub_8082158(void* p0) {\n    u32* r4;\n    u32* r1;\n    u32* r5 = (u32*)((u8*)p0 + 0x0C);\n    r4 = *(u32**)r5;\n    r1 = (u32*)((u8*)r4 + 0x4C);\n    if (*r1 == 0) {\n        void (*func)(void) = (void (*)(void))*r1;\n        func();\n        r1 = (u32*)((u8*)r4 + 0x4C);\n        if (*r1 != 0) {\n            return;\n        }\n    }\n    *(u32*)((u8*)p0 + 0x04) = (u32)&sub_8080A40;\n}",
+      "calls": 3
+    },
+    "sub_809E410": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 7.3,
+      "body": null,
+      "calls": 3
+    },
+    "sub_80F7D3C": {
+      "score": 855,
+      "compiled": true,
+      "match": false,
+      "elapsed": 76.8,
+      "body": "void sub_80F7D3C(u32* p0, u32* p1)\n{\n    u32* r2;\n    u32* r0;\n    u8* r1;\n    u32 r3;\n    \n    r2 = p1;\n    r0 = (u32*)((u8*)p0 + 0x2C);\n    r1 = (u8*)p1 + 0x14;\n    r3 = *(u32*)r0 + 0x179D;\n    \n    if (*(u8*)r3 & 0x7F)\n    {\n        *(u32*)r2 = *(u32*)r1;\n    }\n    else\n    {\n        *(u32*)r2 = 0;\n    }\n}",
+      "calls": 3
+    },
+    "sub_816B384": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 49.0,
+      "body": null,
+      "calls": 3
+    },
+    "sub_80290E0": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 8.8,
+      "body": null,
+      "calls": 3
+    },
+    "sub_8059E5C": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 52.4,
+      "body": null,
+      "calls": 3
+    },
+    "sub_80E122C": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 26.3,
+      "body": null,
+      "calls": 3
+    },
+    "sub_80E3FD8": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 22.3,
+      "body": null,
+      "calls": 3
+    },
+    "sub_8158558": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 6.3,
+      "body": null,
+      "calls": 3
+    },
+    "sub_815EDB0": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 18.1,
+      "body": null,
+      "calls": 3
+    }
+  }
+}

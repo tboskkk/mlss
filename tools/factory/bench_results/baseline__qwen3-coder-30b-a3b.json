@@ -1,0 +1,138 @@
+{
+  "variant": "baseline",
+  "model": "qwen3-coder-30b-a3b",
+  "n": 18,
+  "compiled": 9,
+  "matches": 1,
+  "mean_score": 548.3,
+  "median_score": 500,
+  "total_wall_seconds": 499.2,
+  "results": {
+    "sub_8047958": {
+      "score": 1415,
+      "compiled": true,
+      "match": false,
+      "elapsed": 30.2,
+      "calls": 1
+    },
+    "sub_8047B78": {
+      "score": 630,
+      "compiled": true,
+      "match": false,
+      "elapsed": 7.3,
+      "calls": 1
+    },
+    "sub_8087C4C": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 19.5,
+      "calls": 1
+    },
+    "sub_8159400": {
+      "score": 800,
+      "compiled": true,
+      "match": false,
+      "elapsed": 20.4,
+      "calls": 1
+    },
+    "sub_815F8BC": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 22.4,
+      "calls": 1
+    },
+    "sub_8161580": {
+      "score": 500,
+      "compiled": true,
+      "match": false,
+      "elapsed": 18.6,
+      "calls": 1
+    },
+    "sub_8029804": {
+      "score": 365,
+      "compiled": true,
+      "match": false,
+      "elapsed": 10.1,
+      "calls": 1
+    },
+    "sub_807FE7C": {
+      "score": 675,
+      "compiled": true,
+      "match": false,
+      "elapsed": 21.5,
+      "calls": 1
+    },
+    "sub_8082158": {
+      "score": 245,
+      "compiled": true,
+      "match": false,
+      "elapsed": 29.7,
+      "calls": 1
+    },
+    "sub_809E410": {
+      "score": 0,
+      "compiled": true,
+      "match": true,
+      "elapsed": 15.9,
+      "calls": 1
+    },
+    "sub_80F7D3C": {
+      "score": 305,
+      "compiled": true,
+      "match": false,
+      "elapsed": 14.8,
+      "calls": 1
+    },
+    "sub_816B384": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 18.6,
+      "calls": 1
+    },
+    "sub_80290E0": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 38.7,
+      "calls": 1
+    },
+    "sub_8059E5C": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 40.1,
+      "calls": 1
+    },
+    "sub_80E122C": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 60.5,
+      "calls": 1
+    },
+    "sub_80E3FD8": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 45.1,
+      "calls": 1
+    },
+    "sub_8158558": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 47.7,
+      "calls": 1
+    },
+    "sub_815EDB0": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 38.0,
+      "calls": 1
+    }
+  }
+}

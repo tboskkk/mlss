@@ -1,0 +1,156 @@
+{
+  "variant": "fewshot",
+  "model": "qwen3-coder-30b-a3b",
+  "n": 18,
+  "compiled": 7,
+  "matches": 0,
+  "mean_score": 758.6,
+  "median_score": 685,
+  "total_wall_seconds": 399.9,
+  "results": {
+    "sub_8047958": {
+      "score": 1415,
+      "compiled": true,
+      "match": false,
+      "elapsed": 33.6,
+      "body": "u32 sub_8047958(u32 param_1)\n{\n  u8 *puVar1;\n  puVar1 = (u8 *) ((s32) param_1 + 0x2B6);\n  *puVar1 = ~(*puVar1) & 0x31;\n  return param_1;\n}",
+      "calls": 1
+    },
+    "sub_8047B78": {
+      "score": 645,
+      "compiled": true,
+      "match": false,
+      "elapsed": 10.7,
+      "body": "void sub_8047B78(u32 param_1)\n{\n  u32 *puVar1;\n  u8 uVar2;\n  puVar1 = (u32 *) ((param_1 + 0x2B5) & 0xFFFFFFFF);\n  uVar2 = *(u8 *)puVar1 & 7;\n  if (uVar2 == 0) {\n    uVar2 = 1;\n  }\n  *(u8 *)param_1 = uVar2;\n}",
+      "calls": 1
+    },
+    "sub_8087C4C": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 23.8,
+      "body": "void sub_8087C4C(void* p0)\n{\n    u32* ptr = (u32*)((u8*)p0 + 0x80);\n    u32 val = *ptr;\n    if (val == 0)\n    {\n        void* arg = *(u32*)((u8*)p0 + 0x68);\n        if (arg != NULL)\n        {\n            ((void(*)(void))arg)();\n        }\n    }\n    *(u32*)((u8*)p0 + 0x6C) = val;\n}",
+      "calls": 1
+    },
+    "sub_8159400": {
+      "score": 800,
+      "compiled": true,
+      "match": false,
+      "elapsed": 25.2,
+      "body": "void sub_8159400(void* p0, s32 p1)\n{\n    *(u32*)((u8*)p0 + 0x04) = 0x08CDCA30;\n    if (p1 & 1)\n        free_heap_8018DA8(p0);\n}",
+      "calls": 1
+    },
+    "sub_815F8BC": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 27.2,
+      "body": "void sub_815F8BC(void* p0, s32 p1)\n{\n    *(u32*)((u8*)p0 + 0x04) = 0x08CDCF50;\n    if (p1 & 1)\n        free_heap_8018DA8(p0);\n}",
+      "calls": 1
+    },
+    "sub_8161580": {
+      "score": 500,
+      "compiled": true,
+      "match": false,
+      "elapsed": 22.7,
+      "body": "void sub_8161580(void* p0, u32 p1)\n{\n    *(u32*)((u8*)p0 + 0x04) = 0x08CDD090;\n    if (p1 & 1)\n        free_heap_8018DA8(p0);\n}",
+      "calls": 1
+    },
+    "sub_8029804": {
+      "score": 850,
+      "compiled": true,
+      "match": false,
+      "elapsed": 20.8,
+      "body": "u32 sub_8029804(u32 param_1)\n{\n  u8 *puVar1;\n  u32 *puVar2;\n  u8 uVar3;\n  \n  puVar1 = (u8*)param_1;\n  *(u8*)((u8*)param_1 + 0x208) = (*(u8*)((u8*)param_1 + 0x208) & 0xfffffffc);\n  puVar2 = (u32*)((u8*)param_1 + 0x200);\n  *puVar2 = *(u32*)((u8*)param_1 + 0x200) + 0x351;\n  uVar3 = *(u8*)(((u8*)param_1 + 0x200) + 0x351);\n  *(u8*)(((u8*)param_1 + 0x200) + 0x351) = uVar3 | 0x40;\n  return param_1;\n}",
+      "calls": 1
+    },
+    "sub_807FE7C": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 21.6,
+      "body": "extern void sub_807FEB4();\n\nvoid sub_807FE7C(u32* param_1)\n{\n  u8* puVar1;\n  u32* puVar2;\n  u32* puVar3;\n  u32* puVar4;\n  u32 uVar5;\n  \n  puVar1 = (u8*)param_1;\n  puVar1 += 0x79;\n  *puVar1 |= 0x10;\n  puVar2 = (u32*)0x03000FD8;\n  puVar3 = (u32*)*puVar2;\n  puVar4 = (u32*)puVar3[0x0F];\n  uVar5 = *puVar4;\n  puVar3[0x0F] = uVar5;\n  puVar3[0x13] = *puVar4;\n  *puVar4 = 0x0807FEB5;\n  *puVar4 = param_1;\n}",
+      "calls": 1
+    },
+    "sub_8082158": {
+      "score": 415,
+      "compiled": true,
+      "match": false,
+      "elapsed": 35.1,
+      "body": "extern void sub_8080A40();\n\nvoid sub_8082158(void* p0) {\n    void** r5 = (void**)((u8*)p0 + 0x0C);\n    u32* r4 = *(u32**)r5;\n    u32* r1 = (u32*)((u8*)r4 + 0x4C);\n    if (*r1 == 0) {\n        void (*func)(void) = (void (*)(void))*r1;\n        func();\n        r1 = (u32*)((u8*)r4 + 0x4C);\n        if (*r1 != 0) {\n            return;\n        }\n    }\n    *(u32*)((u8*)p0 + 0x04) = (u32)&sub_8080A40;\n}",
+      "calls": 1
+    },
+    "sub_809E410": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 6.4,
+      "body": "u32* sub_809E410(u32* param_1) {\n    u32 uVar1;\n    u32 uVar2;\n    uVar1 = param_1[0x00];\n    uVar2 = param_1[0x01];\n    param_1[0x00] = uVar2;\n    param_1[0x01] = uVar1;\n    return param_1;\n}",
+      "calls": 1
+    },
+    "sub_80F7D3C": {
+      "score": 685,
+      "compiled": true,
+      "match": false,
+      "elapsed": 17.8,
+      "body": "void sub_80F7D3C(u32* param_0, u32* param_1)\n{\n    u32* puVar1;\n    u8* puVar2;\n    u32 uVar3;\n    \n    puVar1 = (u32*)((u8*)param_0 + 0x2C);\n    puVar2 = (u8*)(*(puVar1) + 0x179D);\n    uVar3 = *(puVar2);\n    if ((uVar3 & 0x7F) != 0)\n    {\n        puVar1 = (u32*)((u8*)param_1 + 0x14);\n        *(u32*)((u8*)param_1) = *puVar1;\n    }\n}",
+      "calls": 1
+    },
+    "sub_816B384": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 70.8,
+      "body": "void sub_816B384(void)\n{\n  u16 *puVar1;\n  u16 *puVar2;\n  u32 *puVar3;\n  u16 *puVar4;\n  u32 *puVar5;\n  u16 *puVar6;\n  u32 *puVar7;\n  u32 *puVar8;\n  u16 *puVar9;\n  u32 *puVar10;\n  u16 *puVar11;\n  u32 *puVar12;\n  u32 *puVar13;\n  u32 *puVar14;\n  u32 *puVar15;\n  u32 *puVar16;\n  u32 *puVar17;\n  u32 *puVar18;\n  u32 *puVar19;\n  u32 *puVar20;\n  u32 *puVar21;\n  u32 *puVar22;\n  u32 *puVar23;\n  u32 *puVar24;\n  u32 *puVar25;\n  u32 *puVar26;\n  u32 *puVar27;\n  u32 *puVar28;\n  u32 *puVar29;\n  u32 *puVar30;\n  u32 *puVar31;\n  u32 *puVar32;\n  u32 *puVar33;\n  u32 *puVar34;\n  u32 *puVar35;\n  u32 *puVar36;\n  u32 *puVar37;\n  u32 *puVar38;\n  u32 *puVar39;\n  u32 *puVar40;\n  u32 *puVar41;\n  u32 *puVar42;\n  u32 *puVar43;\n  u32 *puVar44;\n  u32 *puVar45;\n  u32 *puVar46;\n  u32 *puVar47;\n  u32 *puVar48;\n  u32 *puVar49;\n  u32 *puVar50;\n  u32 *puVar51;\n  u32 *puVar52;\n  u32 *puVar53;\n  u32 *puVar54;\n  u32 *puVar55;\n  u32 *puVar56;\n  u32 *puVar57;\n  u32 *puVar58;\n  u32 *puVar59;\n  u32 *puVar60;\n  u32 *puVar61;\n  u32 *puVar62;\n  u32 *puVar63;\n  u32 *puVar64;\n  u32 *puVar65;\n  u32 *puVar66;\n  u32 *puVar67;\n  u32 *puVar68;\n  u32 *puVar69;\n  u32 *puVar70;\n  u32 *puVar71;\n  u32 *puVar72;\n  u32 *puVar73;\n  u32 *puVar74;\n  u32 *puVar75;\n  u32 *puVar76;\n  u32 *puVar77;\n  u32 *puVar78;\n  u32 *puVar79;\n  u32 *puVar80;\n  u32 *puVar81;\n  u32 *puVar82;\n  u32 *puVar83;\n  u32 *puVar84;\n  u32 *puVar85;\n  u32 *puVar86;\n  u32 *puVar87;\n  u32 *puVar88;\n  u32 *puVar89;\n  u32 *puVar90;\n  u32 *puVar91;\n  u32 *puVar92;\n  u32 *puVar93;\n  u32 *puVar94;\n  u32 *puVar95;\n  u32 *puVar96;\n  u32 *puVar97;\n  u32 *puVar98;\n  u32 *puVar99;\n  u32 *puVar100;\n  u32 *puVar101;\n  u32 *",
+      "calls": 1
+    },
+    "sub_80290E0": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 6.8,
+      "body": "u32* sub_80290E0(u32* param_1) {\n    u32 uVar1;\n    u32 uVar2;\n    uVar1 = param_1[0x00];\n    uVar2 = param_1[0x01];\n    param_1[0x00] = uVar2;\n    param_1[0x01] = uVar1;\n    return param_1;\n}",
+      "calls": 1
+    },
+    "sub_8059E5C": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 49.7,
+      "body": "void sub_8059E5C(u32* p0, u32* p1)\n{\n    u32 *puVar1;\n    \n    puVar1 = p0;\n    *(u32*)((u8*)p0 + 0x18) = 0x08CDC278;\n    if (*(u32*)((u8*)puVar1 + 0x78) != 0)\n        free_heap_8018D9C(*(u32*)((u8*)puVar1 + 0x78));\n    if (*(u32*)((u8*)puVar1 + 0x70) != 0)\n        free_heap_8018D9C(*(u32*)((u8*)puVar1 + 0x70));\n    if (*(u32*)((u8*)puVar1 + 0x68) != 0)\n        free_heap_8018D9C(*(u32*)((u8*)puVar1 + 0x68));\n    process_remove(puVar1, p1);\n}",
+      "calls": 1
+    },
+    "sub_80E122C": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 8.7,
+      "body": "u32* sub_80E122C(u32* param_1) {\n    u32 uVar1;\n    u32 uVar2;\n    uVar1 = param_1[0x00];\n    uVar2 = param_1[0x01];\n    param_1[0x00] = param_1[0x02];\n    param_1[0x01] = param_1[0x03];\n    param_1[0x02] = uVar1;\n    param_1[0x03] = uVar2;\n    return param_1;\n}",
+      "calls": 1
+    },
+    "sub_80E3FD8": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 6.3,
+      "body": "u32* sub_80E3FD8(u32* param_1)\n{\n    u32 uVar1;\n    u32 uVar2;\n    uVar1 = param_1[0x01];\n    uVar2 = param_1[0x00];\n    param_1[0x00] = uVar1;\n    param_1[0x01] = uVar2;\n    return param_1;\n}",
+      "calls": 1
+    },
+    "sub_8158558": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 6.4,
+      "body": "u32* sub_8158558(u32* param_1) {\n    u32 uVar1;\n    u32 uVar2;\n    uVar1 = param_1[0x00];\n    uVar2 = param_1[0x01];\n    param_1[0x00] = uVar2;\n    param_1[0x01] = uVar1;\n    return param_1;\n}",
+      "calls": 1
+    },
+    "sub_815EDB0": {
+      "score": null,
+      "compiled": false,
+      "match": false,
+      "elapsed": 6.3,
+      "body": "u32* sub_815EDB0(u32* param_1) {\n    u32 uVar1;\n    u32 uVar2;\n    uVar1 = param_1[0x04];\n    uVar2 = param_1[0x05];\n    param_1[0x00] = uVar1;\n    param_1[0x01] = uVar2;\n    return param_1;\n}",
+      "calls": 1
+    }
+  }
+}
