@@ -10,45 +10,36 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8161814.s\"");
 #else
-void sub_8161814(u8* param_1)
-{
-    u16* puVar1;
-    u32* puVar2;
-    s16 sVar3;
-    u16 uVar4;
-    s32 sVar5;
-    s32 sVar6;
-    
-    puVar1 = (u16*)param_1;
-    sVar3 = *(s16*)((u8*)param_1 + 0x02);
-    if (sVar3 == 1) {
-        uVar4 = *(u16*)param_1 - 1;
-        *(u16*)param_1 = uVar4;
-        sVar5 = (s32)uVar4 << 0x10;
-        if (sVar5 < 0) {
-            *(u16*)param_1 = 0x50;
-            uVar4 = *(u16*)((u8*)param_1 + 0x02) + 1;
-            *(u16*)((u8*)param_1 + 0x02) = uVar4;
+s32 sub_8161814(void *arg0) {
+    s32 temp_r0_9;
+    s32 temp_r1_33;
+    u16 temp_r0_19;
+    u16 temp_r0_55;
+
+    temp_r0_9 = M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */);
+    switch (temp_r0_9) {                            /* irregular */
+    case 1:
+        temp_r0_19 = (*(u16 *)((s8 *)(arg0) + (0))) - 1;
+        (*(u16 *)((s8 *)(arg0) + (0))) = temp_r0_19;
+        if ((s32) (temp_r0_19 << 0x10) < 0) {
+            (*(u16 *)((s8 *)(arg0) + (0))) = 0x50U;
+            (*(u16 *)((s8 *)(arg0) + (2))) = (u16) ((*(u16 *)((s8 *)(arg0) + (2))) + 1);
         }
-        puVar2 = (u32*)((u8*)param_1 + 0x10);
-        *puVar2 = *(u32*)((u8*)param_1 + 0x10) + ((s32)0xFFFFFC18 << 2);
-        sVar5 = *(s32*)((u8*)param_1 + 0x14) + 0xFFFFFC18;
-        *(u32*)((u8*)param_1 + 0x14) = sVar5;
-        sVar6 = (s32)*(u16*)((u8*)param_1 + 0x04) + ((s32)*(u32*)((u8*)param_1 + 0x10) >> 8);
-        *(u16*)(*(u32**)((u8*)param_1 + 0x08)) = (u16)sVar6;
-        sVar6 = (s32)*(u16*)((u8*)param_1 + 0x06) + ((s32)*(u32*)((u8*)param_1 + 0x14) >> 8);
-        *(u16*)(*(u32**)((u8*)param_1 + 0x0C)) = (u16)sVar6;
-    }
-    else {
-        if (sVar3 == 2) {
-            uVar4 = *(u16*)param_1 - 1;
-            *(u16*)param_1 = uVar4;
-            sVar5 = (s32)uVar4 << 0x10;
-            if (sVar5 >= 0) {
-                *(u16*)param_1 = 1;
-            }
+        temp_r1_33 = (*(s32 *)((s8 *)(arg0) + (0x10))) + 0x3E8;
+        (*(s32 *)((s8 *)(arg0) + (0x10))) = temp_r1_33;
+        (*(s32 *)((s8 *)(arg0) + (0x14))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x14))) + 0xFFFFFC18);
+        *(*(s16 **)((s8 *)(arg0) + (8))) = (temp_r1_33 >> 8) + (*(u16 *)((s8 *)(arg0) + (4)));
+        *(*(s16 **)((s8 *)(arg0) + (0xC))) = ((s32) (*(s32 *)((s8 *)(arg0) + (0x14))) >> 8) + (*(u16 *)((s8 *)(arg0) + (6)));
+block_9:
+    default:
+        return 0;
+    case 2:
+        temp_r0_55 = (*(u16 *)((s8 *)(arg0) + (0))) - 1;
+        (*(u16 *)((s8 *)(arg0) + (0))) = temp_r0_55;
+        if ((s32) (temp_r0_55 << 0x10) <= 0) {
+            return 1;
         }
+        goto block_9;
     }
-    return;
 }
 #endif

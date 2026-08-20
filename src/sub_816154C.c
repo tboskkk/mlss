@@ -7,8 +7,9 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_816154C.s\"");
-#else
-#error "TODO: write sub_816154C to match asm/nonmatching/sub_816154C.s, then delete this #error"
-#endif
+void sub_816154C(void* p0, s32 p1)
+{
+    *(u32*)((u8*)p0 + 0x04) = 0x08CDD090;
+    if (p1 & 1)
+        free_heap_8018DA8(p0);
+}

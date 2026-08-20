@@ -21,5 +21,19 @@ s32 sub_8160E4C(void *arg0) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8160E6C.s\"");
 #else
-#error "TODO: write sub_8160E6C to match asm/nonmatching/sub_8160E6C.s, then delete this #error"
+void sub_8160E6C(u32* param_1)
+{
+  u32* puVar1;
+  
+  puVar1 = param_1 + 0x201;
+  if (*puVar1 != 0) {
+    free_heap_8018D9C(*puVar1);
+    *puVar1 = 0;
+  }
+  puVar1 = param_1 + 0x203;
+  if (*puVar1 != 0) {
+    free_heap_8018D9C(*puVar1);
+    *puVar1 = 0;
+  }
+}
 #endif
