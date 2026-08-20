@@ -10,34 +10,22 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8051434.s\"");
 #else
-void sub_8051434(void* p0)
-{
-    u32* ptr0;
-    u32* ptr1;
-    s32 val0;
-    s32 val1;
-    u16 val2;
-    u16 val3;
-    u16 val4;
-    
-    ptr0 = (u32*)((u8*)p0 + 0x294);
-    val0 = *(u32*)((u8*)p0 + 0x0C);
-    if (val0 >= 0)
-        val0 = val0 >> 8;
-    else
-        val0 = (val0 - 1) >> 8;
-    ptr1 = *(u32**)ptr0;
-    *(u16*)(ptr1 + 0x00) = (u16)val0;
-    val1 = *(u32*)((u8*)p0 + 0x10);
-    if (val1 >= 0)
-        val1 = val1 >> 8;
-    else
-        val1 = (val1 - 1) >> 8;
-    *(u16*)((u8*)ptr1 + 0x02) = (u16)val1;
-    val2 = *(u32*)((u8*)p0 + 0x214);
-    val3 = val2 << 0xF;
-    val4 = val3 >> 0x1C;
-    val4 <<= 0xC;
-    *(u16*)((u8*)ptr1 + 0x0E) = val4;
+void sub_8051434(void *arg0) {
+    s32 var_r0_19;
+    s32 var_r0_27;
+
+    if (2 & (*(u8 *)((s8 *)(arg0) + (0x20F)))) {
+        var_r0_19 = (*(s32 *)((s8 *)(arg0) + (0xC)));
+        if (var_r0_19 < 0) {
+            var_r0_19 += 0xFF;
+        }
+        (*(s16 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x294)))) + (0))) = (s16) (var_r0_19 >> 8);
+        var_r0_27 = (*(s32 *)((s8 *)(arg0) + (0x10)));
+        if (var_r0_27 < 0) {
+            var_r0_27 += 0xFF;
+        }
+        (*(s16 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x294)))) + (2))) = (s16) (var_r0_27 >> 8);
+        (*(s16 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x294)))) + (0xE))) = (s16) (((u32) ((*(s32 *)((s8 *)(arg0) + (0x214))) << 0xF) >> 0x1C) << 0xC);
+    }
 }
 #endif
