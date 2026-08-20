@@ -7,21 +7,16 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8087C4C.s\"");
-#else
-void sub_8087C4C(void* p0)
-{
-    u32* ptr = (u32*)((u8*)p0 + 0x80);
-    u32 val = *ptr;
-    if (val != 0)
-    {
-        void* arg = *(u32*)((u8*)p0 + 0x68);
-        if (arg != NULL)
-        {
-            ((void(*)(void))arg)();
+void sub_8087C4C(void *arg0) {
+    s32 (*temp_r1_12)(void *);
+    s32 temp_r5_9;
+
+    temp_r5_9 = (*(s32 *)((s8 *)(arg0) + (0x80)));
+    if (temp_r5_9 == 0) {
+        temp_r1_12 = (*(s32 (**)(void *))((s8 *)(arg0) + (0x68)));
+        if (temp_r1_12 != NULL) {
+            temp_r1_12(arg0);
         }
+        (*(s32 *)((s8 *)(arg0) + (0x6C))) = temp_r5_9;
     }
-    *(u32*)((u8*)p0 + 0x6C) = val;
 }
-#endif
