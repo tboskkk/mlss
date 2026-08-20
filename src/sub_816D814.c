@@ -20,5 +20,8 @@ u32* sub_816D814(u32* param_1) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_816D898.s\"");
 #else
-#error "TODO: write sub_816D898 to match asm/nonmatching/sub_816D898.s, then delete this #error"
+void sub_816D898(void *arg0) {
+    (*(s32 *)((s8 *)(arg0) + (0x18))) = 0x3C;
+    (*(s32 *)((s8 *)(arg0) + (0x1C))) = 0;
+}
 #endif
