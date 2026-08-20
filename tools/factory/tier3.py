@@ -80,9 +80,7 @@ def ensure_extracted(name: str) -> bool:
         if r.returncode != 0:
             return False
         gitops.run(["./container.sh", "make"])
-        import shutil
-        shutil.rmtree(gitops.REPO / "expected", ignore_errors=True)
-        shutil.copytree(gitops.REPO / "build", gitops.REPO / "expected" / "build")
+        gitops.refresh_expected()
     return True
 
 

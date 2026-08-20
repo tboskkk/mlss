@@ -119,9 +119,7 @@ def process_one(conn) -> str | None:
                 # a stale expected/ has the wrong object for a just-moved symbol,
                 # and asm-differ silently diffs against nothing/wrong content.
                 gitops.run(["./container.sh", "make"])
-                import shutil
-                shutil.rmtree(gitops.REPO / "expected", ignore_errors=True)
-                shutil.copytree(gitops.REPO / "build", gitops.REPO / "expected" / "build")
+                gitops.refresh_expected()
 
         with db.tx(conn):
             db.set_state(conn, name, "validating", worker_id=None,

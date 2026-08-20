@@ -101,6 +101,35 @@ def revert_to_clean():
     run(["./container.sh", "make"])
 
 
+def refresh_expected():
+    """Re-sync expected/ from build/ for asm-differ.
+
+    Must happen after every extraction, not just after a match: extracting
+    moves a symbol from a raw asm/*.s blob into a src/*.c object, so a
+    stale expected/ holds the WRONG object for that symbol and asm-differ
+    silently diffs against nothing (a real CLAUDE.md landmine).
+
+    Uses rsync rather than the obvious rmtree+copytree because this runs on
+    every single extraction -- hundreds of times in a long run -- and the
+    tree is ~340 object files. rmtree+copytree rewrites all of them every
+    time; rsync --delete transfers only what actually changed while still
+    guaranteeing an exact mirror (important: a lingering stale object would
+    be worse than the copy cost). Falls back to the old approach if rsync
+    isn't present.
+    """
+    build = REPO / "build"
+    expected_build = REPO / "expected" / "build"
+    if not build.is_dir():
+        return
+    expected_build.parent.mkdir(parents=True, exist_ok=True)
+    if shutil.which("rsync"):
+        # Trailing slashes matter: sync CONTENTS of build/ into expected/build/.
+        run(["rsync", "-a", "--delete", f"{build}/", f"{expected_build}/"])
+    else:
+        shutil.rmtree(REPO / "expected", ignore_errors=True)
+        shutil.copytree(build, expected_build)
+
+
 def find_guard_block(name: str):
     """Locate the #ifndef NONMATCHING guard block for `name` in whichever
     src/*.c currently references it. Returns (c_path, full_match_text) or
