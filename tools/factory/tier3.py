@@ -133,6 +133,27 @@ def call_llm(prompt: str) -> str | None:
         return None
 
 
+ERROR_SIBLING_RE = re.compile(r'#error "TODO: write (\w+)')
+
+
+def blocking_siblings(name: str) -> list[str]:
+    """Other functions in the SAME src/*.c that are still #error placeholders.
+
+    split_func.py appends a newly extracted function to the preceding
+    src/*.c when one already claims that slot, so several functions share a
+    translation unit. agbcc has to compile the WHOLE unit -- so a single
+    un-drafted `#error` sibling makes asm-differ and decomp-permuter fail
+    for EVERY function in that file, no matter how correct their own C is
+    (the same root cause CLAUDE.md already records for title_screen.c).
+    Found live: 24 files were in this state at once, silently failing
+    everything inside them.
+    """
+    c_path, _block = gitops.find_guard_block(name)
+    if c_path is None:
+        return []
+    return [n for n in ERROR_SIBLING_RE.findall(c_path.read_text()) if n != name]
+
+
 def process_one(conn, max_escalations: int) -> str | None:
     row = db.claim_for_worker(conn, "needs_attempt", WORKER_ID)
     if row is None:
@@ -183,6 +204,20 @@ def process_one(conn, max_escalations: int) -> str | None:
                      escalation_count=new_escalation_count,
                      notes=f"tier3 attempt {new_escalation_count}/{max_escalations} ({elapsed:.0f}s)")
     print(f"  {name}: got a response in {elapsed:.1f}s ({len(candidate)} chars), -> tier2_ready")
+
+    # A candidate can't be verified while a SIBLING in the same translation
+    # unit is still an #error placeholder -- agbcc compiles the whole file.
+    # Pull those to the front of the queue so this file becomes testable;
+    # they need drafting anyway, so this is ordering, not extra work.
+    for sib in blocking_siblings(name):
+        sib_row = conn.execute("SELECT state FROM functions WHERE name = ?", (sib,)).fetchone()
+        if sib_row and sib_row["state"] in ("raw", "queued", "needs_attempt"):
+            with db.tx(conn):
+                db.set_state(conn, sib, "needs_attempt", worker_id=None,
+                             tractability=-1000,  # jump the queue: unblocks a whole file
+                             notes=f"prioritized: its #error blocks {name}'s translation unit")
+            print(f"    ^ prioritized sibling {sib} (blocks this file from compiling)")
+
     return name
 
 
