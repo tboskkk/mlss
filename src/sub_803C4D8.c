@@ -7,8 +7,12 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_803C4D8.s\"");
-#else
-#error "TODO: write sub_803C4D8 to match asm/nonmatching/sub_803C4D8.s, then delete this #error"
-#endif
+s32 sub_803C4D8(void *arg0) {
+    u16 temp_r1_11;
+
+    temp_r1_11 = (*(u16 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x200)))) + (4)));
+    if (((u32) (u16) (temp_r1_11 - 0x10) <= 8U) || ((u32) (u16) (temp_r1_11 - 0x1D) <= 4U)) {
+        return 1;
+    }
+    return 0;
+}
