@@ -321,6 +321,8 @@ groups:
   - {obj: asm/text08057568_p105, section: text}
   - {obj: src/script_cmd_end, section: text}
   - {obj: asm/text08057568_p46, section: text}
+  - {obj: src/sub_80EF2EC, section: text}
+  - {obj: asm/text08057568_p243, section: text}
   - {obj: src/script_enable_flag_2, section: text}
   - {obj: asm/text08057568_p47, section: text}
   - {obj: src/sub_80F0540, section: text}
@@ -344,6 +346,8 @@ groups:
   - {obj: asm/text08057568_p165, section: text}
   - {obj: src/sub_80F7590, section: text}
   - {obj: asm/text08057568_p147, section: text}
+  - {obj: src/sub_80F7868, section: text}
+  - {obj: asm/text08057568_p244, section: text}
   - {obj: src/sub_80F7D3C, section: text}
   - {obj: src/sub_80F7D64, section: text}
   - {obj: asm/text08057568_p106, section: text}
@@ -436,11 +440,15 @@ groups:
   - {obj: asm/text08057568_p100, section: text}
   - {obj: src/sub_8134B64, section: text}
   - {obj: asm/text08057568_p48, section: text}
+  - {obj: src/sub_8135F40, section: text}
+  - {obj: asm/text08057568_p245, section: text}
   - {obj: src/sub_8136688, section: text}
   - {obj: asm/text08057568_p66, section: text}
   - {obj: src/sub_8138FA4, section: text}
   - {obj: src/sub_8138FD4, section: text}
   - {obj: asm/text08057568_p120, section: text}
+  - {obj: src/sub_8139200, section: text}
+  - {obj: asm/text08057568_p246, section: text}
   - {obj: src/sub_813B878, section: text}
   - {obj: asm/text08057568_p206, section: text}
   - {obj: src/sub_813BC6C, section: text}
@@ -474,12 +482,18 @@ groups:
   - {obj: asm/text08057568_p26, section: text}
   - {obj: src/sub_8158308, section: text}
   - {obj: asm/text08057568_p27, section: text}
+  - {obj: src/sub_8158A98, section: text}
+  - {obj: asm/text08057568_p248, section: text}
   - {obj: src/sub_8158E10, section: text}
   - {obj: asm/text08057568_p28, section: text}
   - {obj: src/sub_8158F60, section: text}
   - {obj: asm/text08057568_p178, section: text}
   - {obj: src/nullsub_21, section: text}
   - {obj: asm/text08057568_p4, section: text}
+  - {obj: src/sub_8159400, section: text}
+  - {obj: asm/text08057568_p236, section: text}
+  - {obj: src/sub_8159464, section: text}
+  - {obj: asm/text08057568_p237, section: text}
   - {obj: src/sub_8159904, section: text}
   - {obj: asm/text08057568_p29, section: text}
   - {obj: src/sub_8159974, section: text}
@@ -491,6 +505,14 @@ groups:
   - {obj: asm/text08057568_p59, section: text}
   - {obj: src/sub_815EC8C, section: text}
   - {obj: asm/text08057568_p30, section: text}
+  - {obj: src/sub_815F2C4, section: text}
+  - {obj: asm/text08057568_p238, section: text}
+  - {obj: src/sub_815F7FC, section: text}
+  - {obj: asm/text08057568_p239, section: text}
+  - {obj: src/sub_815F85C, section: text}
+  - {obj: asm/text08057568_p240, section: text}
+  - {obj: src/sub_815F8BC, section: text}
+  - {obj: asm/text08057568_p241, section: text}
   - {obj: src/sub_815FA3C, section: text}
   - {obj: asm/text08057568_p12, section: text}
   - {obj: src/sub_815FAA4, section: text}
@@ -543,6 +565,8 @@ groups:
   - {obj: src/sub_8163BA0, section: text}
   - {obj: src/sub_8163BB8, section: text}
   - {obj: asm/text08057568_p32, section: text}
+  - {obj: src/sub_8163D4C, section: text}
+  - {obj: asm/text08057568_p242, section: text}
   - {obj: src/sub_8163F6C, section: text}
   - {obj: src/sub_8163FA8, section: text}
   - {obj: src/sub_8163FB8, section: text}
@@ -600,6 +624,7 @@ groups:
   - {obj: src/isatty, section: text}
   - {obj: src/alarm, section: text}
   - {obj: asm/text08057568_p9, section: text}
+  - {obj: src/memset, section: text}
   - {obj: src/nullsub_5, section: text}
   - {obj: asm/text08057568_p7, section: text}
   - {obj: src/sub_81DCE7C, section: text}
@@ -608,6 +633,8 @@ groups:
   - {obj: asm/text08057568_p81, section: text}
   - {obj: src/sub_81DD2E0, section: text}
   - {obj: asm/text08057568_p40, section: text}
+  - {obj: src/sub_81DD5B0, section: text}
+  - {obj: asm/text08057568_p247, section: text}
   - {obj: src/sub_81DD69C, section: text}
   - {obj: asm/text08057568_p75, section: text}
   - {obj: src/sub_81DD76C, section: text}
