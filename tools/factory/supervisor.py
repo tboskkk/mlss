@@ -129,6 +129,32 @@ def reap_stale_claims(stale_minutes: float) -> int:
     return n
 
 
+def sweep_orphaned_containers() -> int:
+    """Kill any permuter container no factory process still owns.
+
+    A child's own atexit/SIGTERM handler can NEVER be sufficient, because
+    SIGKILL cannot be caught -- and the supervisor itself sends SIGKILL to
+    anything that outlives its shutdown grace period. Observed exactly
+    that: tier2 was hard-killed mid-cleanup and left three permuter
+    containers running. That is the same failure that once left six
+    abandoned containers running for 12+ hours, driving load average to
+    26.5 and starving llama-server to ~0.1 tok/s. Over a night of
+    restarts these accumulate, so the supervisor sweeps unconditionally
+    rather than trusting its children to have cleaned up after themselves.
+    """
+    r = subprocess.run(["podman", "ps", "--no-trunc", "--format", "{{.ID}} {{.Command}}"],
+                       capture_output=True, text=True)
+    killed = 0
+    for line in r.stdout.splitlines():
+        if "nonmatchings/" in line or "decomp-permuter" in line:
+            cid = line.split()[0]
+            subprocess.run(["podman", "kill", cid], capture_output=True)
+            killed += 1
+    if killed:
+        log(f"swept {killed} orphaned permuter container(s)")
+    return killed
+
+
 def clean_slate():
     log("clean slate: stopping any stray factory processes from a previous session")
     for pyname, _args, _needs_llm in PROCESSES.values():
@@ -144,6 +170,7 @@ def clean_slate():
     # a claim from "permuting" doesn't just get worker_id cleared and left
     # permanently unclaimable -- that bug existed here too before this
     # was unified with reap_stale_claims().
+    sweep_orphaned_containers()
     n = reap_stale_claims(0)
     log(f"reaped {n} orphaned worker claim(s)")
 
@@ -210,6 +237,10 @@ def main():
         # so a legitimate permuting claim can sit that long before tier2
         # itself resolves it; this only catches things well past that.
         if time.time() - last_reap > REAP_INTERVAL_SECONDS:
+            # A tier that crashed (rather than exiting cleanly) can leave
+            # containers behind mid-run, not just at shutdown.
+            if not any(p is not None and p.poll() is None for p in procs.values()):
+                sweep_orphaned_containers()
             n = reap_stale_claims(REAP_STALE_MINUTES)
             if n:
                 log(f"reaper: released {n} stale worker claim(s) (stuck > {REAP_STALE_MINUTES} min)")
@@ -234,10 +265,14 @@ def main():
     for name, proc in procs.items():
         if proc is not None:
             try:
-                proc.wait(timeout=20)
+                # tier2's shutdown has real work to do -- a `podman kill`
+                # per running search -- so give it room. 20s was not
+                # enough and it got SIGKILLed mid-cleanup.
+                proc.wait(timeout=90)
             except subprocess.TimeoutExpired:
                 log(f"!! {name} didn't exit cleanly, killing")
                 proc.kill()
+    sweep_orphaned_containers()
     log("=== supervisor stopped ===")
 
 
