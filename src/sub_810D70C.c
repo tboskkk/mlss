@@ -10,5 +10,9 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_810D70C.s\"");
 #else
-#error "TODO: write sub_810D70C to match asm/nonmatching/sub_810D70C.s, then delete this #error"
+void sub_810D70C(void *arg0) {
+    (*(s16 *)((s8 *)((void *)0x0400001A) + (0))) = (s16) (*(u16 *)0x0200001A + (*(u16 *)((s8 *)(arg0) + (0x14))));
+    (*(s16 *)((s8 *)((void *)0x0400001A) + (4))) = (s16) (*(u16 *)0x0200001E + (*(u16 *)((s8 *)(arg0) + (0x14))));
+    (*(s32 *)((s8 *)(arg0) + (4))) = 0;
+}
 #endif
