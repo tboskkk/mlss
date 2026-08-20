@@ -407,6 +407,8 @@ SECTIONS
         build/asm/text08057568_p105.o(.text);
         build/src/script_cmd_end.o(.text);
         build/asm/text08057568_p46.o(.text);
+        build/src/fld_script_execute_next_command.o(.text);
+        build/asm/text08057568_p331.o(.text);
         build/src/sub_80EEC18.o(.text);
         build/src/sub_80EECD0.o(.text);
         build/asm/text08057568_p317.o(.text);

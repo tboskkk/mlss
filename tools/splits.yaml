@@ -419,6 +419,8 @@ groups:
   - {obj: asm/text08057568_p105, section: text}
   - {obj: src/script_cmd_end, section: text}
   - {obj: asm/text08057568_p46, section: text}
+  - {obj: src/fld_script_execute_next_command, section: text}
+  - {obj: asm/text08057568_p331, section: text}
   - {obj: src/sub_80EEC18, section: text}
   - {obj: src/sub_80EECD0, section: text}
   - {obj: asm/text08057568_p317, section: text}
