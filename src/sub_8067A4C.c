@@ -7,8 +7,14 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8067A4C.s\"");
-#else
-#error "TODO: write sub_8067A4C to match asm/nonmatching/sub_8067A4C.s, then delete this #error"
-#endif
+extern s32 sub_808750C;
+
+void sub_8067A4C(void *arg0) {
+    (*(s32 *)((s8 *)(arg0) + (0x10))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x10))) + 0x200);
+    (*(s32 *)((s8 *)(arg0) + (0x18))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x18))) - (*(s32 *)((s8 *)(arg0) + (0x8C))));
+    (*(s32 *)((s8 *)(arg0) + (0x8C))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x8C))) + 0x66);
+    if ((s32) (*(s32 *)((s8 *)(arg0) + (0x18))) <= 0) {
+        (*(s32 *)((s8 *)(arg0) + (0x18))) = 0;
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_808750C;
+    }
+}
