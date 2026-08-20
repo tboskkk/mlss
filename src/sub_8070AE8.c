@@ -10,27 +10,21 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8070AE8.s\"");
 #else
-extern void sub_8070E4C();
+extern s32 sub_8070E4C;
 
-void sub_8070AE8(void* p0)
-{
-    u32* ptr1;
-    s16 val;
-    
-    ptr1 = *(u32**)((u8*)p0 + 0x2C);
-    ptr1 = *(u32**)((u8*)ptr1 + 0x28);
-    ptr1 = (u32*)((u8*)ptr1 + 0xEC);
-    val = *(s16*)((u8*)ptr1 + 0x00);
-    
-    if (val != -1)
-    {
-        *(u32*)((u8*)p0 + 0xA0) = 0x00000001;
+s32 sub_8070AE8(void *arg0) {
+    s32 *var_r1_18;
+    s32 var_r0_19;
+
+    if (M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */) == -1) {
+        var_r1_18 = arg0 + 0xA0;
+        var_r0_19 = 0;
+    } else {
+        var_r1_18 = arg0 + 0xA0;
+        var_r0_19 = 1;
     }
-    else
-    {
-        *(u32*)((u8*)p0 + 0xA0) = 0x00000000;
-    }
-    
-    *(u32*)((u8*)p0 + 0x4C) = (u32)sub_8070E4C;
+    *var_r1_18 = var_r0_19;
+    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8070E4C;
+    return 1;
 }
 #endif
