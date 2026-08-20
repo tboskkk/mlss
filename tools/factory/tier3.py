@@ -149,6 +149,13 @@ def ensure_extracted(name: str) -> bool:
             return False
         gitops.run(["./container.sh", "make"])
         gitops.refresh_expected()
+        # Commit immediately, still under the lock -- see tier1.py's
+        # matching comment. An uncommitted extraction is vulnerable to
+        # being wiped by revert_to_clean() when a completely unrelated
+        # function's candidate gets rejected later; committing here closes
+        # that window to zero instead of leaving it open until a match.
+        gitops.commit(name, f"Extract {name}\n\nFactory pipeline (tools/factory) -- "
+                             f"mechanical extraction via split_func.py, not yet matched.")
     return True
 
 

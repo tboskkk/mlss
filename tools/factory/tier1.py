@@ -120,6 +120,22 @@ def process_one(conn) -> str | None:
                 # and asm-differ silently diffs against nothing/wrong content.
                 gitops.run(["./container.sh", "make"])
                 gitops.refresh_expected()
+                # Commit the extraction itself, separately from any eventual
+                # match, and while STILL HOLDING the lock so it's atomic
+                # with the extraction. Root-caused live: revert_to_clean()
+                # (correctly) wipes every uncommitted file under
+                # FACTORY_PATHS when some OTHER, unrelated function's
+                # candidate gets rejected -- and an extraction left
+                # uncommitted for the (possibly long) time between "split
+                # out" and "confirmed matching" is exactly the kind of file
+                # that describes. 144 functions lost their extraction this
+                # way in one session before this fix (see
+                # reclaim_extraction.py, which recovers the symptom; this
+                # closes the actual hole). Once committed, `git checkout`/
+                # `git clean` in a later, unrelated revert have nothing
+                # left to touch here.
+                gitops.commit(name, f"Extract {name}\n\nFactory pipeline (tools/factory) -- "
+                                     f"mechanical extraction via split_func.py, not yet matched.")
 
         with db.tx(conn):
             db.set_state(conn, name, "validating", worker_id=None,

@@ -230,8 +230,9 @@ ANSI_RE = re.compile(r"\x1b\[[0-9;]*m")
 SCORE_RE = re.compile(r"CURRENT\s*\((\d+)\)")
 
 
-def asm_differ_matches(name: str) -> bool:
-    """True only if asm-differ scores this function 0 against retail.
+def asm_differ_score(name: str) -> int | None:
+    """asm-differ's own numeric score against retail (0 = byte-identical),
+    or None if no readable verdict could be obtained after a retry.
 
     Reads asm-differ's OWN score out of its header rather than trying to
     compare the two columns by whitespace. The column approach was a real
@@ -249,9 +250,11 @@ def asm_differ_matches(name: str) -> bool:
     reported a perfect match against a stale object and score 400 once
     genuinely rebuilt.
 
-    A false negative here is harmless (falls through to the permuter); a
-    false positive wastes a validator cycle, which is exactly what this
-    fixes.
+    Extracted out of asm_differ_matches() (below) so callers that want the
+    full continuous score -- not just a match/no-match verdict -- have
+    somewhere to get it: pass/fail alone is nearly uninformative when the
+    hit rate is near zero, which is exactly the regime the model-comparison
+    benchmark (tools/factory/bench.py) runs in.
     """
     # Delete the object of the file that actually CONTAINS this function,
     # NOT one named after the function. split_func.py appends functions to
@@ -283,7 +286,7 @@ def asm_differ_matches(name: str) -> bool:
         out = ANSI_RE.sub("", r.stdout + r.stderr)
         m = SCORE_RE.search(out)
         if m:
-            return int(m.group(1)) == 0
+            return int(m.group(1))
         if attempt == 1:
             # Most likely cause is a half-written build tree from a
             # concurrent step; force a clean rebuild of this object.
@@ -293,7 +296,17 @@ def asm_differ_matches(name: str) -> bool:
                     stale.unlink()
                 except FileNotFoundError:
                     pass
-    return False
+    return None
+
+
+def asm_differ_matches(name: str) -> bool:
+    """True only if asm-differ scores this function 0 against retail.
+
+    A false negative here is harmless (falls through to the permuter); a
+    false positive wastes a validator cycle. See asm_differ_score() above
+    for the mechanics -- this is just its match/no-match projection.
+    """
+    return asm_differ_score(name) == 0
 
 
 def finish_match(name: str) -> tuple[bool, str]:
@@ -319,6 +332,18 @@ def commit(name: str, message: str) -> bool:
     # four unrelated tool scripts got swept into an unrelated "Match ..." commit instead of
     # ever being committed under their own message). See revert_to_clean()'s docstring for the
     # matching bug on the revert side.
+    #
+    # The `git commit` itself ALSO needs the pathspec, not just the `git
+    # add` -- `git add FACTORY_PATHS` only adds those paths, but a bare
+    # `git commit -m message` with no pathspec commits the WHOLE INDEX,
+    # including anything already staged from something unrelated (e.g. a
+    # `git submodule add` run interactively mid-session). Confirmed live:
+    # a `Match sub_81582C4` commit silently absorbed an in-progress
+    # `.gitmodules`/submodule addition this way -- harmless that time (no
+    # data lost, just an imprecise commit), but the same gap could just as
+    # easily mix in something that matters. `git commit -- <pathspec>`
+    # commits only changes under those paths and leaves anything else
+    # sitting staged, exactly like `git add` already was scoped to do.
     run(["git", "add", *FACTORY_PATHS])
-    r = run(["git", "commit", "-m", message])
+    r = run(["git", "commit", "-m", message, "--", *FACTORY_PATHS])
     return r.returncode == 0
