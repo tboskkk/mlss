@@ -370,6 +370,8 @@ groups:
   - {obj: asm/text08057568_p343, section: text}
   - {obj: src/sub_80A2C80, section: text}
   - {obj: asm/text08057568_p80, section: text}
+  - {obj: src/sub_80A3324, section: text}
+  - {obj: asm/text08057568_p357, section: text}
   - {obj: src/sub_80AC4F8, section: text}
   - {obj: asm/text08057568_p227, section: text}
   - {obj: src/sub_80B35C8, section: text}
