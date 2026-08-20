@@ -7,13 +7,12 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_804776C.s\"");
-#else
-void sub_804776C(void *arg0, s32 arg1) {
-    (*(u8 *)((s8 *)(arg0) + (0x20C))) = (u8) ((-2 & (*(u8 *)((s8 *)(arg0) + (0x20C)))) | (arg1 & 1));
+void sub_804776C(void *arg0, s32 arg1)
+{
+  unsigned long long new_var;
+  new_var = -2;
+  *((u8 *) (((s8 *) arg0) + 0x20C)) = (u8) ((arg1 & 1) | (new_var & (*((u8 *) (((s8 *) arg0) + 0x20C)))));
 }
-#endif
 
 void sub_8047784(void *arg0) {
     (*(u8 *)((s8 *)(arg0) + (0x20D))) = (u8) ((*(u8 *)((s8 *)(arg0) + (0x20D))) | 0x10);

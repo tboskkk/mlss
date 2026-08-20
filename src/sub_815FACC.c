@@ -22,15 +22,8 @@ void sub_815FACC(void *arg0) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_815FAE4.s\"");
 #else
-u32 sub_815FAE4(u32* param_1, u32 param_2) {
-    s16 local_var;
-    
-    local_var = *(s16*)((u8*)param_1 + 0x14);
-    *(u32*)((u8*)param_1 + 0x04) = *(u32*)((u8*)param_1 + 0x04) + local_var;
-    
-    local_var = *(s16*)((u8*)param_1 + 0x18);
-    *(u32*)((u8*)param_1 + 0x08) = *(u32*)((u8*)param_1 + 0x08) + local_var + param_2;
-    
-    return (u32)param_1;
+void sub_815FAE4(void *arg0, s32 arg1) {
+    (*(s32 *)((s8 *)(arg0) + (4))) = (s32) ((*(s32 *)((s8 *)(arg0) + (4))) + M2C_ERROR(/* unknown instruction: ldsh $r3, ($mem_loc_fictive_) */));
+    (*(s32 *)((s8 *)(arg0) + (8))) = (s32) ((*(s32 *)((s8 *)(arg0) + (8))) + M2C_ERROR(/* unknown instruction: ldsh $r3, ($mem_loc_fictive_) */) + arg1);
 }
 #endif
