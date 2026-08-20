@@ -7,16 +7,10 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80DE948.s\"");
-#else
-u32 sub_80DE948(u32 param_1) {
-    u32 *puVar1;
-    
-    puVar1 = (u32 *)(param_1 + 0x80);
-    if (*puVar1 == 0) {
-        *(u32 *)(param_1 + 0x4C) = 0x0808750D;
+extern s32 sub_808750C;
+
+void sub_80DE948(void *arg0) {
+    if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_808750C;
     }
-    return *puVar1;
 }
-#endif
