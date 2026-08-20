@@ -7,14 +7,12 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_81631DC.s\"");
-#else
-u32 sub_81631DC(u32* param) {
-    u32 r1 = 0;
-    u32 r0 = param[0x24 / sizeof(u32)];
-    if (r0 != 0)
-        r1 = 1;
-    return r1;
+s32 sub_81631DC(void *arg0) {
+    s32 var_r1_7;
+
+    var_r1_7 = 0;
+    if ((*(s32 *)((s8 *)(arg0) + (0x24))) == 0) {
+        var_r1_7 = 1;
+    }
+    return var_r1_7;
 }
-#endif
