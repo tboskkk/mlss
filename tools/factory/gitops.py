@@ -253,12 +253,30 @@ def asm_differ_matches(name: str) -> bool:
             stale.unlink()
         except FileNotFoundError:
             pass
-    r = run(["./container.sh", "asm-differ", "-mwo", name])
-    out = ANSI_RE.sub("", r.stdout + r.stderr)
-    m = SCORE_RE.search(out)
-    if not m:
-        return False  # couldn't read a verdict -> don't claim a match
-    return int(m.group(1)) == 0
+    # Retry once on an unreadable verdict. "asm-differ produced no score"
+    # and "asm-differ says the code differs" are completely different
+    # outcomes, and conflating them THROWS AWAY CORRECT WORK: a permuter
+    # search that genuinely reached score 0 was rejected as "does not match
+    # in its real source file" and demoted to stalled, yet re-checking the
+    # very same candidate by hand afterwards returned a clean match. A
+    # score-0 candidate is confirmed-correct C -- losing one to a transient
+    # build hiccup is the most expensive mistake this pipeline can make.
+    for attempt in (1, 2):
+        r = run(["./container.sh", "asm-differ", "-mwo", name])
+        out = ANSI_RE.sub("", r.stdout + r.stderr)
+        m = SCORE_RE.search(out)
+        if m:
+            return int(m.group(1)) == 0
+        if attempt == 1:
+            # Most likely cause is a half-written build tree from a
+            # concurrent step; force a clean rebuild of this object.
+            for stale in ((REPO / "build" / "src" / f"{stem}.o"),
+                          (REPO / "build" / "src" / f"{stem}.s")):
+                try:
+                    stale.unlink()
+                except FileNotFoundError:
+                    pass
+    return False
 
 
 def finish_match(name: str) -> tuple[bool, str]:
