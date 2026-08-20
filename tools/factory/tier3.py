@@ -73,13 +73,16 @@ def ensure_extracted(name: str) -> bool:
     frag = gitops.REPO / "asm" / "nonmatching" / f"{name}.s"
     if frag.exists():
         return True
-    r = gitops.run(["./container.sh", "tools/split_func.py", name])
-    if r.returncode != 0:
-        return False
-    gitops.run(["./container.sh", "make"])
-    import shutil
-    shutil.rmtree(gitops.REPO / "expected", ignore_errors=True)
-    shutil.copytree(gitops.REPO / "build", gitops.REPO / "expected" / "build")
+    # Extraction mutates shared repo state and runs a build -- serialize it
+    # against the validator and the other tiers. See gitops.repo_lock().
+    with gitops.repo_lock(what=f"tier3 extract {name}"):
+        r = gitops.run(["./container.sh", "tools/split_func.py", name])
+        if r.returncode != 0:
+            return False
+        gitops.run(["./container.sh", "make"])
+        import shutil
+        shutil.rmtree(gitops.REPO / "expected", ignore_errors=True)
+        shutil.copytree(gitops.REPO / "build", gitops.REPO / "expected" / "build")
     return True
 
 
