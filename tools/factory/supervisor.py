@@ -174,6 +174,29 @@ def clean_slate():
     n = reap_stale_claims(0)
     log(f"reaped {n} orphaned worker claim(s)")
 
+    # Integrity gate. A supervisor (or machine) that dies mid-extraction
+    # leaves the working tree inconsistent -- splits.yaml/ld_script.ld
+    # updated but the blob split half-done -- and the ROM then fails to
+    # reproduce. Seen for real: an 80-second run killed mid-flight left
+    # `mlss.gba: FAILED` behind. Nothing downstream can make progress from
+    # that state, so a restart must repair it rather than inherit it.
+    # Safe to revert unconditionally on failure: the factory only ever
+    # COMMITS on a verified match, so anything uncommitted is by
+    # definition in-flight work that was going to be redone anyway.
+    r = subprocess.run(["./container.sh", "make"], cwd=REPO, capture_output=True, text=True)
+    if "mlss.gba: OK" not in r.stdout:
+        log("!! repo does not reproduce the ROM (left broken by a previous crash) -- reverting")
+        subprocess.run(["git", "checkout", "--", "."], cwd=REPO, capture_output=True)
+        subprocess.run(["git", "clean", "-fd", "asm/", "src/"], cwd=REPO, capture_output=True)
+        import shutil
+        shutil.rmtree(REPO / "build", ignore_errors=True)
+        r2 = subprocess.run(["./container.sh", "make"], cwd=REPO, capture_output=True, text=True)
+        if "mlss.gba: OK" in r2.stdout:
+            log("repo repaired: ROM reproduces byte-identically again")
+        else:
+            log("!! STILL BROKEN after revert -- refusing to start, needs a human")
+            sys.exit(1)
+
 
 def start(name: str) -> subprocess.Popen:
     pyname, args, _needs_llm = PROCESSES[name]
