@@ -63,10 +63,14 @@ def check_no_state_cycles(conn, since: int) -> list[str]:
         seen[r["function_name"]].append(r["kind"])
     problems = []
     for name, states in seen.items():
-        # A repeat of any state means the function went round a loop.
-        dupes = {s for s in states if states.count(s) > 1}
+        # Collapse consecutive duplicates first: a tier writing the same
+        # state twice in a row (tier2 logs `permuting` once on claim and
+        # again when recording the initial score) is benign bookkeeping,
+        # not a loop. A genuine loop RETURNS to a state after leaving it.
+        collapsed = [s for i, s in enumerate(states) if i == 0 or s != states[i - 1]]
+        dupes = {s for s in collapsed if collapsed.count(s) > 1}
         if dupes:
-            problems.append(f"{name} revisited {sorted(dupes)} (visited: {' -> '.join(states)})")
+            problems.append(f"{name} revisited {sorted(dupes)} (visited: {' -> '.join(collapsed)})")
     return problems
 
 
