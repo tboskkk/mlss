@@ -7,8 +7,21 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8107118.s\"");
-#else
-#error "TODO: write sub_8107118 to match asm/nonmatching/sub_8107118.s, then delete this #error"
-#endif
+void sub_8107118(void *arg0)
+{
+  int new_var2;
+  void **new_var;
+  u8 temp_r1_10;
+  void *temp_r2_9;
+  new_var = (void **) 0x03000FD8;
+  temp_r2_9 = *new_var;
+  temp_r1_10 = *((u8 *) (((s8 *) temp_r2_9) + 0xB));
+  if (2 & temp_r1_10)
+  {
+    new_var2 = -3;
+    new_var2 = new_var2 & temp_r1_10;
+    *((u8 *) (((s8 *) temp_r2_9) + 0xB)) = (u8) new_var2;
+    return;
+  }
+  *((s32 *) (((s8 *) arg0) + 4)) = (s32) (*((s32 *) (((s8 *) (*((void **) 0x03000FDC))) + 0x8E58)));
+}
