@@ -71,6 +71,42 @@ def has_zero(name: str) -> Path | None:
     return hits[0] if hits else None
 
 
+# decomp-permuter prints this when the attempt it was GIVEN already matches
+# retail perfectly, before it randomizes anything.
+BASE_ZERO_RE = re.compile(r"^\[.*\] base score = 0\s*$", re.MULTILINE)
+
+
+def base_already_zero(name: str) -> bool:
+    """True if the permuter reported the STARTING attempt as a perfect match.
+
+    This is the single most important detection case in the whole pipeline,
+    and missing it made the factory structurally incapable of recognizing
+    its own successes. When the candidate handed to decomp-permuter is
+    already byte-perfect, it prints 'base score = 0' / 'Found zero score!
+    Exiting.' and exits immediately -- WITHOUT ever writing an
+    output-0-N/source.c directory, because write_candidate() only fires for
+    randomized candidates it decides are worth outputting, and a base that's
+    already perfect never goes through that path.
+
+    has_zero() above only looks for that output directory. So every
+    already-correct candidate -- exactly the ones the pipeline most wants --
+    was being reported as 'exited, no zero' and thrown back to tier3 to be
+    redrafted, forever. Confirmed directly: sub_80E92A8's tier3 draft
+    (`return *param_1;` against retail `ldr r0,[r0,#0]; bx lr`) was a
+    perfect match, and the pipeline discarded it. Zero 'converged' events
+    had ever been logged before this was found, despite tier3 producing
+    plenty of correct C.
+    """
+    log = NONMATCHINGS_DIR / name / "farm.log"
+    if not log.exists():
+        return False
+    try:
+        text = log.read_text(errors="replace")
+    except OSError:
+        return False
+    return bool(BASE_ZERO_RE.search(text))
+
+
 def ensure_isolated(name: str, candidate_body: str | None) -> bool:
     out_dir = NONMATCHINGS_DIR / name
     if out_dir.exists():
@@ -241,16 +277,40 @@ def run_pool(jobs: int, stall_min: float, max_functions: int):
             if exited:
                 info["log"].close()
                 zero = has_zero(name)
+                # Two genuinely different ways to win, and missing the
+                # second one made this pipeline unable to recognize its own
+                # successes at all -- see base_already_zero()'s docstring.
+                base_zero = zero is None and base_already_zero(name)
                 conn = db.connect()
                 try:
-                    if zero:
-                        body = trim_source(zero.read_text(), name)
+                    if zero or base_zero:
+                        if zero:
+                            body = trim_source(zero.read_text(), name)
+                            detail = "score=0 (permuter found it)"
+                        else:
+                            # The attempt we HANDED the permuter was already
+                            # perfect, so the winning C is the candidate
+                            # body itself -- there's no output dir to read.
+                            body = candidate_bodies.get(name)
+                            detail = "score=0 (base attempt already matched)"
+                            if not body:
+                                # Shouldn't happen (we spliced it in to get
+                                # here) but never guess at a body -- send it
+                                # for a human to look at instead.
+                                with db.tx(conn):
+                                    db.set_state(conn, name, "needs_human", worker_id=None,
+                                                 notes="permuter says base score 0 but no candidate_body on record")
+                                db.log_event(conn, name, "error", "base zero with no candidate_body")
+                                conn.commit()
+                                del procs[name]
+                                _active.pop(name, None)
+                                continue
                         with db.tx(conn):
                             db.set_state(conn, name, "validating", worker_id=None,
                                          candidate_body=body, candidate_source="tier2")
-                        db.log_event(conn, name, "converged", f"score=0")
+                        db.log_event(conn, name, "converged", detail)
                         conn.commit()
-                        print(f"  {name}: converged")
+                        print(f"  {name}: converged -- {detail}")
                     else:
                         with db.tx(conn):
                             db.set_state(conn, name, "stalled", worker_id=None,
