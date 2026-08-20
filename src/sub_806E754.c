@@ -7,8 +7,17 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_806E754.s\"");
-#else
-#error "TODO: write sub_806E754 to match asm/nonmatching/sub_806E754.s, then delete this #error"
-#endif
+void sub_806E754(void *arg0) {
+    s32 temp_r0_17;
+    void *temp_r2_8;
+
+    temp_r2_8 = (*(void **)((s8 *)(arg0) + (0x30)));
+    (*(s32 *)((s8 *)(temp_r2_8) + (0x10))) = (s32) (*(s32 *)((s8 *)(arg0) + (0x10)));
+    (*(s32 *)((s8 *)(temp_r2_8) + (0x14))) = (s32) (*(s32 *)((s8 *)(arg0) + (0x14)));
+    (*(s32 *)((s8 *)(temp_r2_8) + (0x18))) = (s32) (*(s32 *)((s8 *)(arg0) + (0x18)));
+    temp_r0_17 = (*(s32 *)((s8 *)(arg0) + (0x80)));
+    if (temp_r0_17 == 0) {
+        (*(s32 *)((s8 *)(arg0) + (0x4C))) = temp_r0_17;
+        (*(s32 *)((s8 *)(temp_r2_8) + (0x4C))) = temp_r0_17;
+    }
+}
