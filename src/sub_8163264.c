@@ -7,19 +7,14 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8163264.s\"");
-#else
-u32* sub_8163264(u32* param_1, u32 param_2, u32 param_3) {
-    *param_1 = param_2;
-    *(param_1 + 1) = param_2;
-    *(param_1 + 2) = param_2;
-    *(param_1 + 4) = param_3;
-    *(param_1 + 3) = param_3;
-    *(param_1 + 1) = param_3;
-    *(param_1 + 5) = param_2 >> 8;
-    *(param_1 + 6) = param_3 >> 8;
-    *(param_1 + 9) = 0;
-    return param_1;
+void sub_8163264(void *arg0, s32 arg1, s32 arg2) {
+    (*(s32 *)((s8 *)(arg0) + (0x10))) = arg1;
+    (*(s32 *)((s8 *)(arg0) + (8))) = arg1;
+    (*(s32 *)((s8 *)(arg0) + (0))) = arg1;
+    (*(s32 *)((s8 *)(arg0) + (0x14))) = arg2;
+    (*(s32 *)((s8 *)(arg0) + (0xC))) = arg2;
+    (*(s32 *)((s8 *)(arg0) + (4))) = arg2;
+    (*(s32 *)((s8 *)(arg0) + (0x18))) = (s32) (arg1 >> 8);
+    (*(s32 *)((s8 *)(arg0) + (0x1C))) = (s32) (arg2 >> 8);
+    (*(s32 *)((s8 *)(arg0) + (0x24))) = 0;
 }
-#endif
