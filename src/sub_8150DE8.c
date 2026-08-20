@@ -19,5 +19,7 @@ u32* sub_8150DE8(u32* param_1, u32 param_2) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8150DEC.s\"");
 #else
-#error "TODO: write sub_8150DEC to match asm/nonmatching/sub_8150DEC.s, then delete this #error"
+u32* sub_8150DEC(u32* param_1) {
+    return &param_1[0x34 >> 2];
+}
 #endif
