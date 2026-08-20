@@ -22,5 +22,16 @@ u32 script_cmd_call(u32* a0, u32* a1, u32 a2) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/script_cmd_return.s\"");
 #else
-#error "TODO: write script_cmd_return to match asm/nonmatching/script_cmd_return.s, then delete this #error"
+s32 script_cmd_return(void *arg1) {
+    s32 temp_r2_7;
+
+    temp_r2_7 = (*(s32 *)((s8 *)(arg1) + (0x10)));
+    if (temp_r2_7 == 0) {
+        (*(s32 *)((s8 *)(arg1) + (4))) = (s32) (*(s32 *)((s8 *)(arg1) + (0)));
+    } else {
+        (*(s32 *)((s8 *)(arg1) + (0))) = temp_r2_7;
+        (*(s32 *)((s8 *)(arg1) + (0x10))) = 0;
+    }
+    return 1;
+}
 #endif

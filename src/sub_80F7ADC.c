@@ -3,16 +3,12 @@
 
 // TODO: add other includes (a matching *.h, other subsystem headers) as
 // this file grows. Left minimal since split_func.py doesn't know yet what
-// sub_8167DF8 needs.
+// sub_80F7ADC needs.
 
 asm_unified(".include \"asm/macros.inc\"");
 
 #ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8167DF8.s\"");
+asm_unified(".include \"asm/nonmatching/sub_80F7ADC.s\"");
 #else
-void sub_8167DF8(void *arg0) {
-    if (8 & (*(u16 *)((s8 *)((void *)0x0300034C) + (0x2A)))) {
-        (*(s32 *)((s8 *)(arg0) + (0x54))) = 4;
-    }
-}
+#error "TODO: write sub_80F7ADC to match asm/nonmatching/sub_80F7ADC.s, then delete this #error"
 #endif
