@@ -43,11 +43,23 @@ REPO = gitops.REPO
 NONMATCHINGS_DIR = REPO / "nonmatchings"
 WORKER_ID = "tier2"
 
-# Cores NOT reserved for llama-server (owns 0-5 via -Cr/-Crb in
-# ~/Desktop/ai-training/qwen-coder/serve.sh). Hardcoded to match that
-# config -- if the server's pinning ever changes, this needs to change too.
-FARM_CPUSET = "6-11"
-FARM_CPU_COUNT = 6
+# This box has 6 PHYSICAL cores, not 12 -- serve.sh's own comment documents
+# `lscpu -e=CPU,CORE,ONLINE`: logical CPUs 0-5 are each a distinct physical
+# core's primary thread, 6-11 are the SAME 6 cores' SMT sibling thread. So
+# "6-11" was never a separate bank of cores from llama-server's "0-5" --
+# it was always the other hyperthread on the exact same 6 cores.
+#
+# Widened to the full 0-11 now that tier3's LLM is a rare fallback instead
+# of the primary generation path (m2c is): llama-server's --cpu-strict
+# only confines ITS OWN threads to 0-5, it does not block other processes
+# from being scheduled there, so this lets the permuter opportunistically
+# use the (now mostly idle) primary threads too, without touching
+# llama-server's own pinning or risking its stability. FARM_CPU_COUNT
+# bumped modestly (6 -> 8), not to 12 -- there are still only 6 physical
+# cores' worth of real compute, so oversubscribing much past that risks
+# thrashing rather than helping.
+FARM_CPUSET = "0-11"
+FARM_CPU_COUNT = 8
 
 OUTPUT_DIR_RE = re.compile(r"^output-(\d+)-\d+$")
 
@@ -430,8 +442,8 @@ def main():
                      help=f"total concurrent permuter threads (default {FARM_CPU_COUNT})")
     ap.add_argument("--stall-min", type=float, default=15.0,
                      help="minutes without score improvement before handing off to tier3 (default 15)")
-    ap.add_argument("--max-functions", type=int, default=6,
-                     help="max functions to run concurrently in one pool pass")
+    ap.add_argument("--max-functions", type=int, default=FARM_CPU_COUNT,
+                     help=f"max functions to run concurrently in one pool pass (default {FARM_CPU_COUNT})")
     ap.add_argument("--loop", type=int, default=None, metavar="SECONDS")
     args = ap.parse_args()
 
