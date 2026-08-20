@@ -24,5 +24,30 @@ void sub_8018A4C(s32 arg0)
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8018A68.s\"");
 #else
-#error "TODO: write sub_8018A68 to match asm/nonmatching/sub_8018A68.s, then delete this #error"
+s32 sub_81DA6B0();                              /* extern */
+s32 sub_81DA6B8();                              /* extern */
+s32 sub_81DA6C0();                              /* extern */
+
+void sub_8018A68(void) {
+    u16 temp_r10_14;
+    u16 temp_r4_30;
+
+    temp_r10_14 = *(u16 *)0x02000000;
+    *(u16 *)0x04000000 = 0x80;
+    *(u16 *)0x02000000 = *(u16 *)0x04000000;
+    *(s16 *)0x04000132 = 0x8304;
+    *(s16 *)0x04000208 = 0;
+    temp_r4_30 = *(u16 *)0x04000200;
+    *(u16 *)0x04000200 = 0x3000;
+    *(s16 *)0x04000202 = 0;
+    *(s16 *)0x04000208 = 1;
+    sub_81DA6B0();
+    M2C_ERROR(/* unknown instruction: swi 0x3 */);
+    sub_81DA6B8();
+    *(s16 *)0x04000208 = 0;
+    *(u16 *)0x04000200 = temp_r4_30;
+    *(s16 *)0x04000208 = 1;
+    *(u16 *)0x02000000 = temp_r10_14;
+    sub_81DA6C0();
+}
 #endif
