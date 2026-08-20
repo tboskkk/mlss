@@ -15,10 +15,7 @@ u16 sub_8082D40(u16 arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8082D50.s\"");
-#else
-s16 sub_8082D50(s16 arg0) {
-    return *(s16*)(arg0 + 0x774);
+s16 sub_8082D50(int arg0)
+{
+  return *((s16 *) (arg0 + 0x774));
 }
-#endif
