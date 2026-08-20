@@ -19,5 +19,10 @@ u32 sub_80F1AE4(u32* param1, u32* param2) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80F1AEC.s\"");
 #else
-#error "TODO: write sub_80F1AEC to match asm/nonmatching/sub_80F1AEC.s, then delete this #error"
+s32 sub_80F1AEC(s32 *arg1, void *arg2) {
+    if ((*(u16 *)((s8 *)(*(void **)0x03000FD0) + (0x54C))) == (*(s32 *)((s8 *)(arg2) + (0)))) {
+        *arg1 = (*(s32 *)((s8 *)(arg2) + (4)));
+    }
+    return 1;
+}
 #endif
