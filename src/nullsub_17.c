@@ -20,3 +20,9 @@ void sub_8018A4C(s32 arg0)
   new_var = (s8 *) new_var2;
   *((u8 *) (new_var + 0x889)) = (u8) ((*((u8 *) (((s8 *) new_var2) + 0x889))) | 1);
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8018A68.s\"");
+#else
+#error "TODO: write sub_8018A68 to match asm/nonmatching/sub_8018A68.s, then delete this #error"
+#endif
