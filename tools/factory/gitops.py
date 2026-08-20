@@ -9,13 +9,67 @@ anywhere.
 """
 from __future__ import annotations
 
+import fcntl
 import re
 import shutil
 import subprocess
+import time
+from contextlib import contextmanager
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent.parent
 SRC_DIR = REPO / "src"
+LOCK_PATH = REPO / ".claude" / "factory" / "repo.lock"
+
+
+@contextmanager
+def repo_lock(timeout: float = 1800, what: str = ""):
+    """Serialize every operation that MUTATES the shared repo working tree.
+
+    The factory's processes are deliberately concurrent, but the git working
+    tree is one shared mutable resource and nothing was guarding it. Two
+    real failures from that, both seen live in the same run:
+
+    1. The validator's from-scratch `rm -rf build/ && make` ran while
+       tier1/tier3 were mid-`split_func.py` -- so splits.yaml/ld_script.ld/
+       the asm blobs changed underneath the build, and it failed. The
+       validator correctly refused to commit, but reported a genuinely
+       CORRECT match (sub_81218E0, `return 0;` vs retail `movs r0,#0; bx
+       lr`) as an unexplained anomaly needing a human.
+    2. Much worse: that failure path then calls revert_to_clean(), which is
+       repo-WIDE (`git checkout -- .` + `git clean -fd asm/ src/`).
+       Extractions from tier1/tier3 are uncommitted until a match lands, so
+       one function's validation failure silently destroyed every other
+       process's in-flight extraction work.
+
+    Everything expensive (permuter searches in nonmatchings/, LLM calls)
+    stays fully parallel -- this only serializes the short repo-touching
+    critical sections.
+
+    Uses a non-blocking retry loop rather than a plain blocking flock so a
+    wedged holder can't deadlock the whole factory silently forever.
+    """
+    LOCK_PATH.parent.mkdir(parents=True, exist_ok=True)
+    deadline = time.time() + timeout
+    f = open(LOCK_PATH, "w")
+    try:
+        while True:
+            try:
+                fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                break
+            except BlockingIOError:
+                if time.time() >= deadline:
+                    raise TimeoutError(
+                        f"repo_lock timed out after {timeout}s waiting for another "
+                        f"process to finish mutating the repo (wanted: {what or 'unspecified'})"
+                    )
+                time.sleep(0.5)
+        yield
+    finally:
+        try:
+            fcntl.flock(f, fcntl.LOCK_UN)
+        finally:
+            f.close()
 
 
 def run(cmd, **kw):
