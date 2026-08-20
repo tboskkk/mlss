@@ -7,8 +7,21 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_809E410.s\"");
-#else
-#error "TODO: write sub_809E410 to match asm/nonmatching/sub_809E410.s, then delete this #error"
-#endif
+extern void sub_809E0EC();
+
+void sub_809E410(void* p0)
+{
+    u16* p1 = (u16*)((u8*)p0 + 0xAC);
+    u16* p2 = (u16*)((u8*)p0 + 0xAC);
+    u16* p3 = (u16*)((u8*)p0 + 0xAC);
+    u16 v0 = *p3;
+    s16 v1 = *(s16*)((u8*)p0 + 0xAC);
+    if (v1 > 0)
+    {
+        *p2 = v0 - 1;
+    }
+    else
+    {
+        *(u32*)((u8*)p0 + 0x4C) = (u32)sub_809E0EC;
+    }
+}
