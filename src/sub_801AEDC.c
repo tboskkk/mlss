@@ -10,31 +10,24 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_801AEDC.s\"");
 #else
-void sub_801AEDC(void)
-{
-    u32 r4, r5, r6, r0, r1, r2, r3;
-    r4 = *(u32*)0x03000D18;
-    r4 = *(u32*)(r4 + 8);
-    r5 = r4 & 0xF;
-    r4 >>= 4;
-    r3 = r4 >> 0x18;
-    r0 = 6;
-    r6 = 0xF;
-    do
-    {
-        r0--;
-        r2 = r0 << 2;
-        r1 = r4;
-        r1 >>= r2;
-        r1 &= r6;
-        r3 ^= r1;
-        r0 <<= 0x18;
-        r0 >>= 0x18;
-    } while (r0 != 0);
-    r1 = r3 ^ r5;
-    r0 = -r1;
-    r0 |= r1;
-    r0 >>= 0x1F;
-    return;
+u32 sub_801AEDC(void) {
+    s32 temp_r1_27;
+    u32 temp_r0_8;
+    u32 temp_r4_9;
+    u32 var_r3_12;
+    u8 temp_r0_16;
+    u8 var_r0_13;
+
+    temp_r0_8 = (*(u32 *)((s8 *)((void *)0x03000D18) + (8)));
+    temp_r4_9 = temp_r0_8 >> 4;
+    var_r3_12 = temp_r4_9 >> 0x18;
+    var_r0_13 = 6;
+    do {
+        temp_r0_16 = var_r0_13 - 1;
+        var_r3_12 ^= (temp_r4_9 >> (temp_r0_16 * 4)) & 0xF;
+        var_r0_13 = temp_r0_16;
+    } while (var_r0_13 != 0);
+    temp_r1_27 = var_r3_12 ^ (0xF & temp_r0_8);
+    return (u32) ((0 - temp_r1_27) | temp_r1_27) >> 0x1F;
 }
 #endif
