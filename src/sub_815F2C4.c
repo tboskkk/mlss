@@ -10,16 +10,14 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_815F2C4.s\"");
 #else
-void sub_815F2C4(u32* p0, s32 p1)
+void sub_815F2C4(void *arg0, s32 arg1)
 {
-    u32* r4 = p0;
-    u32* r0 = r4;
-    *(u16*)((u8*)r4 + 0x18) = 0x64;
-    *(u16*)((u8*)r4 + 0x20) = -p1;
-    *(u16*)((u8*)r4 + 0x38) = 0;
-    r0 = sub_815FA3C(r0);
-    *(u16*)((u8*)r0 + 0x0C) = 0;
-    r4 = (u8*)r4 + 0x24;
-    *(u8*)((u8*)r4 + 0x00) = 0x03;
+  int new_var;
+  new_var = 0;
+  *((s16 *) (((s8 *) arg0) + 0x18)) = 0x64;
+  *((s16 *) (((s8 *) arg0) + 0x20)) = (s16) (new_var - arg1);
+  *((s16 *) (((s8 *) arg0) + 0x38)) = 0;
+  *((s16 *) (((s8 *) sub_815FA3C(arg0)) + 0xC)) = 0;
+  *((s8 *) (((s8 *) arg0) + 0x24)) = 3;
 }
 #endif
