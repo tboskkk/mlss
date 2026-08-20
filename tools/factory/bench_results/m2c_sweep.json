@@ -1,4 +1,44 @@
 {
+  "nullsub_19": {
+    "generated": true,
+    "score": 100
+  },
+  "nullsub_1": {
+    "generated": true,
+    "score": 200
+  },
+  "sub_81DA690": {
+    "generated": true,
+    "score": null
+  },
+  "BgAffineSet": {
+    "generated": true,
+    "score": null
+  },
+  "CpuFastSet": {
+    "generated": true,
+    "score": null
+  },
+  "CpuSet": {
+    "generated": true,
+    "score": null
+  },
+  "sub_81DA6A8": {
+    "generated": true,
+    "score": null
+  },
+  "sub_81DA6AC": {
+    "generated": true,
+    "score": null
+  },
+  "sub_81DD76C": {
+    "generated": true,
+    "score": null
+  },
+  "sub_81DD774": {
+    "generated": true,
+    "score": null
+  },
   "sub_81DA6B8": {
     "generated": true,
     "score": null
@@ -7,29 +47,53 @@
     "generated": true,
     "score": 210
   },
+  "sub_81DA6A0": {
+    "generated": true,
+    "score": null
+  },
+  "sub_81DA6B0": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80F1AE4": {
+    "generated": true,
+    "score": 410
+  },
+  "sub_81DD77C": {
+    "generated": true,
+    "score": null
+  },
   "sub_815EC8C": {
     "generated": true,
     "score": 710
   },
+  "sub_8029024": {
+    "generated": true,
+    "score": 985
+  },
   "sub_8163320": {
     "generated": true,
-    "score": 2605
+    "score": 1285
   },
   "sub_815071C": {
     "generated": true,
-    "score": 315
+    "score": 300
+  },
+  "sub_80EA91C": {
+    "generated": true,
+    "score": 55
   },
   "sub_8163FB8": {
     "generated": true,
     "score": 1200
   },
-  "sub_8066540": {
+  "sub_80FB7F0": {
     "generated": true,
-    "score": 410
+    "score": null
   },
   "sub_816156C": {
     "generated": true,
-    "score": 605
+    "score": 1000
   },
   "sub_81639F8": {
     "generated": true,
@@ -39,21 +103,88 @@
     "generated": true,
     "score": 2400
   },
+  "sub_81DA6C0": {
+    "generated": false
+  },
+  "sub_81DC49C": {
+    "generated": true,
+    "score": null
+  },
+  "sub_8051614": {
+    "generated": true,
+    "score": 40
+  },
+  "sub_81DC4B0": {
+    "generated": true,
+    "score": 205
+  },
   "sub_8171F44": {
     "generated": true,
     "score": 1300
+  },
+  "sub_80EB048": {
+    "generated": true,
+    "score": 60
+  },
+  "sub_8199D48": {
+    "generated": true,
+    "score": null
+  },
+  "sub_813C484": {
+    "generated": true,
+    "score": null
+  },
+  "sub_813C498": {
+    "generated": true,
+    "score": null
+  },
+  "sub_813B380": {
+    "generated": true,
+    "score": 40
   },
   "sub_8160EC4": {
     "generated": true,
     "score": 20
   },
+  "sub_8019610": {
+    "generated": true,
+    "score": null
+  },
+  "sub_8059EF0": {
+    "generated": true,
+    "score": null
+  },
+  "sub_819B0F8": {
+    "generated": true,
+    "score": null
+  },
+  "sub_8084E84": {
+    "generated": true,
+    "score": null
+  },
+  "sub_8139970": {
+    "generated": true,
+    "score": 45
+  },
+  "sub_8163BA0": {
+    "generated": true,
+    "score": 905
+  },
   "sub_81169C8": {
     "generated": true,
     "score": 2200
   },
-  "sub_804776C": {
+  "sub_81DC43C": {
     "generated": true,
-    "score": 290
+    "score": null
+  },
+  "get_field_object_count": {
+    "generated": true,
+    "score": null
+  },
+  "sub_816D96C": {
+    "generated": true,
+    "score": 910
   },
   "sub_8047958": {
     "generated": true,
@@ -67,19 +198,1140 @@
     "generated": true,
     "score": 805
   },
+  "sub_80EA904": {
+    "generated": true,
+    "score": 0
+  },
   "sub_80EA928": {
     "generated": true,
-    "score": 55
+    "score": 0
+  },
+  "sub_819B19C": {
+    "generated": true,
+    "score": null
+  },
+  "sub_8163280": {
+    "generated": true,
+    "score": null
+  },
+  "sub_816D814": {
+    "generated": true,
+    "score": 9010
+  },
+  "sub_80E1908": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80E1924": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80E1940": {
+    "generated": true,
+    "score": null
+  },
+  "sub_8047B5C": {
+    "generated": true,
+    "score": 1515
   },
   "sub_8160E4C": {
     "generated": true,
-    "score": 0
+    "score": null
+  },
+  "sub_813BC6C": {
+    "generated": true,
+    "score": 2600
+  },
+  "sub_806814C": {
+    "generated": true,
+    "score": 300
+  },
+  "sub_8199D5C": {
+    "generated": true,
+    "score": null
+  },
+  "sub_8087524": {
+    "generated": true,
+    "score": null
+  },
+  "sub_8089AC8": {
+    "generated": true,
+    "score": null
+  },
+  "sub_8138FD4": {
+    "generated": true,
+    "score": null
   },
   "sub_807462C": {
     "generated": true,
-    "score": 0
+    "score": 200
+  },
+  "sub_8150E44": {
+    "generated": true,
+    "score": 400
+  },
+  "sub_816391C": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80E19CC": {
+    "generated": true,
+    "score": 2000
+  },
+  "sub_80E9310": {
+    "generated": true,
+    "score": null
+  },
+  "sub_814B848": {
+    "generated": true,
+    "score": 360
+  },
+  "sub_80604E0": {
+    "generated": true,
+    "score": 200
+  },
+  "sub_80746EC": {
+    "generated": true,
+    "score": 200
+  },
+  "sub_81593B8": {
+    "generated": true,
+    "score": 205
+  },
+  "sub_81593DC": {
+    "generated": true,
+    "score": 100
+  },
+  "sub_8159440": {
+    "generated": true,
+    "score": 100
+  },
+  "sub_815F838": {
+    "generated": true,
+    "score": 100
+  },
+  "sub_8167DF8": {
+    "generated": true,
+    "score": 710
+  },
+  "sub_80D9E9C": {
+    "generated": true,
+    "score": 200
+  },
+  "script_cmd_return": {
+    "generated": true,
+    "score": 15
+  },
+  "sub_805A0EC": {
+    "generated": true,
+    "score": null
+  },
+  "sub_8163298": {
+    "generated": true,
+    "score": 620
+  },
+  "sub_8159378": {
+    "generated": true,
+    "score": 1005
+  },
+  "sub_8159400": {
+    "generated": true,
+    "score": 905
+  },
+  "sub_8159464": {
+    "generated": true,
+    "score": 600
+  },
+  "sub_815F2C4": {
+    "generated": true,
+    "score": 210
+  },
+  "sub_815F7FC": {
+    "generated": true,
+    "score": 805
+  },
+  "sub_815F85C": {
+    "generated": true,
+    "score": 805
+  },
+  "sub_8161580": {
+    "generated": true,
+    "score": 900
+  },
+  "sub_8163D4C": {
+    "generated": true,
+    "score": 500
+  },
+  "sub_808225C": {
+    "generated": true,
+    "score": 1415
+  },
+  "sub_8158A98": {
+    "generated": true,
+    "score": 210
+  },
+  "sub_815F8BC": {
+    "generated": true,
+    "score": 3050
+  },
+  "sub_81507EC": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80F0724": {
+    "generated": true,
+    "score": 330
+  },
+  "sub_8028E4C": {
+    "generated": true,
+    "score": 205
+  },
+  "sub_806E7CC": {
+    "generated": true,
+    "score": 600
+  },
+  "sub_816D898": {
+    "generated": true,
+    "score": 5910
+  },
+  "sub_80F1C0C": {
+    "generated": true,
+    "score": 445
+  },
+  "sub_81DCE7C": {
+    "generated": true,
+    "score": 1055
+  },
+  "sub_8150DC8": {
+    "generated": true,
+    "score": 530
+  },
+  "sub_801BC98": {
+    "generated": true,
+    "score": null
+  },
+  "sub_8059EC8": {
+    "generated": true,
+    "score": null
+  },
+  "sub_805D914": {
+    "generated": true,
+    "score": null
+  },
+  "sub_8165250": {
+    "generated": true,
+    "score": null
+  },
+  "sub_81346D0": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80F1AEC": {
+    "generated": true,
+    "score": 205
+  },
+  "sub_810D70C": {
+    "generated": true,
+    "score": 50
+  },
+  "sub_8158F60": {
+    "generated": true,
+    "score": 205
+  },
+  "sub_8029888": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80E8E78": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80479BC": {
+    "generated": true,
+    "score": 1830
+  },
+  "sub_81632C8": {
+    "generated": true,
+    "score": 60
+  },
+  "sub_80A1AB8": {
+    "generated": true,
+    "score": 3915
+  },
+  "script_cmd_wait_frames": {
+    "generated": true,
+    "score": 930
+  },
+  "sub_80F7ED0": {
+    "generated": true,
+    "score": 460
+  },
+  "sub_8163394": {
+    "generated": true,
+    "score": null
+  },
+  "sub_8087790": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80FACA4": {
+    "generated": true,
+    "score": null
+  },
+  "sub_8068168": {
+    "generated": true,
+    "score": 300
+  },
+  "sub_815FAA4": {
+    "generated": true,
+    "score": 275
+  },
+  "sub_80875B8": {
+    "generated": true,
+    "score": 1425
+  },
+  "sub_80F7D3C": {
+    "generated": true,
+    "score": 335
+  },
+  "sub_8029804": {
+    "generated": true,
+    "score": 890
+  },
+  "sub_807FA94": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80F0540": {
+    "generated": true,
+    "score": null
+  },
+  "sub_8068818": {
+    "generated": true,
+    "score": 1045
+  },
+  "sub_8089BD4": {
+    "generated": true,
+    "score": 600
+  },
+  "script_cmd_wait_for_user_input": {
+    "generated": true,
+    "score": 330
+  },
+  "sub_819A9B4": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80EAD98": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80F7EA4": {
+    "generated": true,
+    "score": null
+  },
+  "sub_8127ECC": {
+    "generated": true,
+    "score": null
+  },
+  "sub_8029030": {
+    "generated": true,
+    "score": 985
+  },
+  "sub_807FA50": {
+    "generated": true,
+    "score": 895
+  },
+  "sub_8087BA4": {
+    "generated": true,
+    "score": 200
+  },
+  "sub_80F0AE0": {
+    "generated": true,
+    "score": 690
+  },
+  "sub_80F10E0": {
+    "generated": true,
+    "score": 405
+  },
+  "sub_8021EA8": {
+    "generated": true,
+    "score": null
+  },
+  "sub_804FB3C": {
+    "generated": true,
+    "score": null
+  },
+  "sub_810D694": {
+    "generated": true,
+    "score": null
+  },
+  "sub_8065B74": {
+    "generated": true,
+    "score": 1500
+  },
+  "sub_806A97C": {
+    "generated": true,
+    "score": 3100
+  },
+  "sub_819B040": {
+    "generated": true,
+    "score": 850
+  },
+  "sub_8163238": {
+    "generated": true,
+    "score": 265
+  },
+  "sub_8138FA4": {
+    "generated": true,
+    "score": 1445
+  },
+  "sub_813B878": {
+    "generated": true,
+    "score": 475
+  },
+  "sub_81251F0": {
+    "generated": true,
+    "score": null
+  },
+  "sub_819A770": {
+    "generated": true,
+    "score": 245
+  },
+  "sub_80841B8": {
+    "generated": true,
+    "score": 4900
+  },
+  "sub_80F0B4C": {
+    "generated": true,
+    "score": 345
+  },
+  "sub_8079394": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80EAFB4": {
+    "generated": false
+  },
+  "sub_8051330": {
+    "generated": true,
+    "score": 2305
+  },
+  "sub_8063BF0": {
+    "generated": true,
+    "score": 40
+  },
+  "sub_807FE7C": {
+    "generated": true,
+    "score": 675
+  },
+  "sub_8144238": {
+    "generated": true,
+    "score": 410
+  },
+  "sub_8150244": {
+    "generated": true,
+    "score": 270
+  },
+  "sub_819B418": {
+    "generated": true,
+    "score": null
+  },
+  "sub_8160E6C": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80F82E8": {
+    "generated": false
+  },
+  "sub_807F4C4": {
+    "generated": true,
+    "score": 205
+  },
+  "sub_80AC4F8": {
+    "generated": true,
+    "score": 245
+  },
+  "sub_810D228": {
+    "generated": true,
+    "score": 390
+  },
+  "sub_816B384": {
+    "generated": true,
+    "score": null
+  },
+  "sub_808761C": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80F0FA0": {
+    "generated": false
+  },
+  "sub_80F80C4": {
+    "generated": true,
+    "score": null
+  },
+  "sub_8059E5C": {
+    "generated": true,
+    "score": null
+  },
+  "sub_8081FD4": {
+    "generated": true,
+    "score": 225
+  },
+  "sub_80877C0": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80E9BD8": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80F7ADC": {
+    "generated": true,
+    "score": null
+  },
+  "sub_81069D4": {
+    "generated": true,
+    "score": 2485
+  },
+  "sub_8070AE8": {
+    "generated": true,
+    "score": 3760
+  },
+  "sub_8018B78": {
+    "generated": true,
+    "score": null
+  },
+  "sub_81DA6E4": {
+    "generated": true,
+    "score": null
+  },
+  "sub_819A8EC": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80F8824": {
+    "generated": true,
+    "score": null
+  },
+  "get_field_object_type": {
+    "generated": true,
+    "score": null
+  },
+  "sub_819AB78": {
+    "generated": true,
+    "score": 660
+  },
+  "sub_8083EEC": {
+    "generated": true,
+    "score": 820
+  },
+  "sub_80F1A3C": {
+    "generated": true,
+    "score": 685
+  },
+  "sub_801AEDC": {
+    "generated": true,
+    "score": 2315
+  },
+  "sub_8029830": {
+    "generated": true,
+    "score": 685
+  },
+  "sub_804FC90": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80E13B4": {
+    "generated": true,
+    "score": 75
+  },
+  "sub_8163EE4": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80883A0": {
+    "generated": true,
+    "score": null
+  },
+  "sub_8106608": {
+    "generated": true,
+    "score": 2170
+  },
+  "sub_8136470": {
+    "generated": true,
+    "score": 13100
+  },
+  "sub_805A900": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80EECD0": {
+    "generated": false
+  },
+  "sub_80F8148": {
+    "generated": true,
+    "score": null
+  },
+  "sub_816D734": {
+    "generated": true,
+    "score": 1620
+  },
+  "sub_808EC88": {
+    "generated": true,
+    "score": 1500
+  },
+  "sub_808FC84": {
+    "generated": true,
+    "score": 1500
+  },
+  "sub_8091C74": {
+    "generated": true,
+    "score": 1500
+  },
+  "sub_8092E04": {
+    "generated": true,
+    "score": 1500
+  },
+  "sub_8093E50": {
+    "generated": true,
+    "score": 1500
+  },
+  "sub_80F7F54": {
+    "generated": true,
+    "score": 1060
+  },
+  "sub_807F47C": {
+    "generated": true,
+    "score": 890
+  },
+  "sub_80F8B34": {
+    "generated": true,
+    "score": null
+  },
+  "sub_813B4C4": {
+    "generated": true,
+    "score": null
+  },
+  "sub_813B514": {
+    "generated": true,
+    "score": null
+  },
+  "sub_813B564": {
+    "generated": true,
+    "score": null
+  },
+  "sub_813B650": {
+    "generated": true,
+    "score": 2670
+  },
+  "sub_813B748": {
+    "generated": true,
+    "score": 2670
+  },
+  "sub_801AA70": {
+    "generated": false
+  },
+  "sub_805980C": {
+    "generated": false
+  },
+  "sub_80EA6D4": {
+    "generated": false
+  },
+  "sprite_heap_free": {
+    "generated": true,
+    "score": null
+  },
+  "get_fobj_screen_pos": {
+    "generated": true,
+    "score": null
+  },
+  "sub_8087AE0": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80E8D20": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80EEC18": {
+    "generated": false
+  },
+  "sub_80EEF54": {
+    "generated": false
+  },
+  "sub_80F86F0": {
+    "generated": true,
+    "score": null
+  },
+  "sub_8154950": {
+    "generated": false
+  },
+  "sub_8051434": {
+    "generated": true,
+    "score": 1115
+  },
+  "sub_8148CA4": {
+    "generated": true,
+    "score": null
+  },
+  "sub_801ADC0": {
+    "generated": true,
+    "score": 870
+  },
+  "sub_801AE3C": {
+    "generated": true,
+    "score": 985
+  },
+  "sub_80EA9B8": {
+    "generated": true,
+    "score": 215
+  },
+  "sub_80EAB20": {
+    "generated": true,
+    "score": 1710
+  },
+  "sub_8117C50": {
+    "generated": true,
+    "score": 860
+  },
+  "sub_8047C18": {
+    "generated": true,
+    "score": 35
+  },
+  "sub_80ED17C": {
+    "generated": false
+  },
+  "sub_80F5924": {
+    "generated": false
+  },
+  "sub_8158E18": {
+    "generated": true,
+    "score": null
+  },
+  "sub_815928C": {
+    "generated": true,
+    "score": null
+  },
+  "sub_8095800": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80ED4EC": {
+    "generated": false
+  },
+  "sub_80A1154": {
+    "generated": true,
+    "score": 1085
+  },
+  "sub_80A231C": {
+    "generated": true,
+    "score": 1085
+  },
+  "sub_813B9B4": {
+    "generated": true,
+    "score": 2960
+  },
+  "sub_8025D24": {
+    "generated": false
+  },
+  "sub_804FC30": {
+    "generated": true,
+    "score": null
+  },
+  "stage_room_solidity_grid": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80EDAB0": {
+    "generated": false
+  },
+  "sub_81DD6B0": {
+    "generated": true,
+    "score": null
+  },
+  "sub_8047EFC": {
+    "generated": true,
+    "score": 269
+  },
+  "sub_806D770": {
+    "generated": true,
+    "score": 390
+  },
+  "sub_80EF2EC": {
+    "generated": true,
+    "score": 2985
+  },
+  "sub_8135F40": {
+    "generated": true,
+    "score": 15100
+  },
+  "sub_8139200": {
+    "generated": true,
+    "score": 315
+  },
+  "sprite_heap_search": {
+    "generated": true,
+    "score": null
+  },
+  "memset": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80F7868": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80F78C4": {
+    "generated": true,
+    "score": null
+  },
+  "sub_8073E4C": {
+    "generated": true,
+    "score": 610
+  },
+  "sub_809B960": {
+    "generated": true,
+    "score": null
+  },
+  "sub_810D274": {
+    "generated": true,
+    "score": null
+  },
+  "sub_810D34C": {
+    "generated": true,
+    "score": null
+  },
+  "sub_814B7A4": {
+    "generated": true,
+    "score": 815
+  },
+  "sub_8059A8C": {
+    "generated": true,
+    "score": null
+  },
+  "sub_804FA94": {
+    "generated": true,
+    "score": 2010
+  },
+  "sub_80B35C8": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80B992C": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80C8A7C": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80CD18C": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80D3224": {
+    "generated": true,
+    "score": null
+  },
+  "sub_8146DC8": {
+    "generated": true,
+    "score": 1435
+  },
+  "sub_80EF27C": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80F1BA4": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80F8008": {
+    "generated": true,
+    "score": null
+  },
+  "sub_8150118": {
+    "generated": true,
+    "score": 1350
+  },
+  "sub_8159674": {
+    "generated": true,
+    "score": null
+  },
+  "sub_815B058": {
+    "generated": false
+  },
+  "sub_80A3324": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80A3DF0": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80A4210": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80A53B0": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80A5790": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80A64C4": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80A68AC": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80D6388": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80D7410": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80F52B4": {
+    "generated": false
+  },
+  "sub_819B31C": {
+    "generated": false
+  },
+  "sub_81DA72C": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80F76FC": {
+    "generated": true,
+    "score": null
+  },
+  "reset_game_80189C4": {
+    "generated": true,
+    "score": 2245
+  },
+  "sub_8152650": {
+    "generated": false
+  },
+  "sub_808843C": {
+    "generated": true,
+    "score": 3364
+  },
+  "sub_8047258": {
+    "generated": true,
+    "score": 3795
+  },
+  "sub_80316FC": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80475A0": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80F1CF8": {
+    "generated": true,
+    "score": 11455
+  },
+  "sub_8046A10": {
+    "generated": true,
+    "score": 2185
+  },
+  "sub_8150178": {
+    "generated": true,
+    "score": 270
+  },
+  "sub_804034C": {
+    "generated": true,
+    "score": 2625
+  },
+  "sub_815EFD8": {
+    "generated": true,
+    "score": 630
+  },
+  "sub_81604A8": {
+    "generated": false
+  },
+  "sub_8098710": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80E9A6C": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80F0EEC": {
+    "generated": true,
+    "score": null
+  },
+  "sub_8114380": {
+    "generated": true,
+    "score": null
+  },
+  "sub_8137E50": {
+    "generated": false
+  },
+  "sub_816332C": {
+    "generated": true,
+    "score": 1065
+  },
+  "sub_810B884": {
+    "generated": true,
+    "score": 3645
+  },
+  "sub_8158790": {
+    "generated": true,
+    "score": 630
+  },
+  "sub_816359C": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80BED0C": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80E99E0": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80F6EF8": {
+    "generated": true,
+    "score": null
+  },
+  "sub_8087038": {
+    "generated": true,
+    "score": 960
+  },
+  "sub_80E9414": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80F39C8": {
+    "generated": false
+  },
+  "sub_8154AAC": {
+    "generated": true,
+    "score": 5900
+  },
+  "sub_80E9958": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80F3808": {
+    "generated": true,
+    "score": null
+  },
+  "sub_810CDFC": {
+    "generated": true,
+    "score": 4120
+  },
+  "sub_8018AEC": {
+    "generated": true,
+    "score": null
+  },
+  "load_col_set_to_dest": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80F1C7C": {
+    "generated": true,
+    "score": null
+  },
+  "free_heap_memory_8018C68": {
+    "generated": true,
+    "score": null
+  },
+  "sub_815F8F4": {
+    "generated": true,
+    "score": 2450
+  },
+  "sub_80FBDE0": {
+    "generated": true,
+    "score": 2585
+  },
+  "sub_814BEA8": {
+    "generated": true,
+    "score": 1445
+  },
+  "sub_814BFCC": {
+    "generated": true,
+    "score": 1445
+  },
+  "sub_80877FC": {
+    "generated": true,
+    "score": 1280
+  },
+  "sub_81DBBA0": {
+    "generated": true,
+    "score": 210
+  },
+  "sub_80FD1AC": {
+    "generated": true,
+    "score": null
+  },
+  "sub_8161C9C": {
+    "generated": true,
+    "score": 2815
+  },
+  "sub_80F81D4": {
+    "generated": true,
+    "score": null
+  },
+  "sub_81580F8": {
+    "generated": true,
+    "score": null
+  },
+  "init_heap": {
+    "generated": true,
+    "score": null
+  },
+  "sub_8087A44": {
+    "generated": true,
+    "score": null
+  },
+  "sub_8054D70": {
+    "generated": false
+  },
+  "alloc_heap_8018CEC": {
+    "generated": true,
+    "score": null
+  },
+  "sub_80401F0": {
+    "generated": true,
+    "score": 3125
+  },
+  "sub_8018E88": {
+    "generated": true,
+    "score": null
+  },
+  "sub_8063118": {
+    "generated": true,
+    "score": null
   },
   "opdr_update2": {
     "generated": false
+  },
+  "sub_805516C": {
+    "generated": true,
+    "score": null
+  },
+  "sub_801859C": {
+    "generated": true,
+    "score": null
+  },
+  "time_update": {
+    "generated": true,
+    "score": null
+  },
+  "sub_8054378": {
+    "generated": true,
+    "score": null
   }
 }
