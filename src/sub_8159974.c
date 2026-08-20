@@ -17,16 +17,7 @@ u16 sub_8159974(u16 param_1) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8159984.s\"");
-#else
-u16* sub_8159984(u16* param_1, u16 param_2) {
-    u16* puVar1;
-    
-    puVar1 = param_1 + 0xA3 * 0x03;
-    *puVar1 = 1;
-    puVar1 = param_1 + 0x514;
-    *puVar1 = param_2;
-    return param_1;
+void sub_8159984(void *arg0, s16 arg1) {
+    (*(s16 *)((s8 *)(arg0) + (0x518))) = 1;
+    (*(s16 *)((s8 *)(arg0) + (0x514))) = arg1;
 }
-#endif
