@@ -14,3 +14,9 @@ void sub_801B0AC(s16 arg0) {
     *(s16 *)0x03000D3C = arg0;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_801B1C8.s\"");
+#else
+#error "TODO: write sub_801B1C8 to match asm/nonmatching/sub_801B1C8.s, then delete this #error"
+#endif
