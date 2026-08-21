@@ -55,3 +55,9 @@ void sub_80D3224(void* p0)
     *(u32*)((u8*)r6 + 0x4C) = (u32)sub_80D3298;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80D3298.s\"");
+#else
+#error "TODO: write sub_80D3298 to match asm/nonmatching/sub_80D3298.s, then delete this #error"
+#endif
