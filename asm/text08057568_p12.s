@@ -3,17 +3,6 @@
 	.syntax unified
 	.text
 
-	thumb_func_start sub_815FA50
-sub_815FA50:
-	push {lr}
-	ldr r0, [r0, #0x00]
-	cmp r0, #0x00
-	beq _0815FA5C
-	bl sprite_show_8020CBC
-_0815FA5C:
-	pop {r0}
-	bx r0
-	.byte 0x70, 0x47, 0x00, 0x00, 0x01, 0x49, 0x01, 0x63, 0x70, 0x47, 0x00, 0x00, 0x70, 0xCF, 0xCD, 0x08
 	thumb_func_start sub_815FA70
 sub_815FA70:
 	push {lr}
