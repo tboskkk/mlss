@@ -26,17 +26,28 @@ void sub_810CAD0(void) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_810CB04.s\"");
 #else
-#error "TODO: write sub_810CB04 to match asm/nonmatching/sub_810CB04.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_810CB84.s\"");
 #else
-#error "TODO: write sub_810CB84 to match asm/nonmatching/sub_810CB84.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_810CBC8.s\"");
 #else
-#error "TODO: write sub_810CBC8 to match asm/nonmatching/sub_810CBC8.s, then delete this #error"
+s32 sub_810B908(s32);                           /* extern */
+
+void sub_810CBC8(void) {
+    sub_810B908(0);
+    sub_810B908(1);
+}
 #endif
