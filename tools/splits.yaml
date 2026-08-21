@@ -1303,6 +1303,8 @@ groups:
   - {obj: asm/text08057568_p26, section: text}
   - {obj: src/sub_8158308, section: text}
   - {obj: asm/text08057568_p27, section: text}
+  - {obj: src/sub_815859C, section: text}
+  - {obj: asm/text08057568_p605, section: text}
   - {obj: src/sub_8158790, section: text}
   - {obj: asm/text08057568_p276, section: text}
   - {obj: src/sub_8158A98, section: text}
