@@ -258,6 +258,8 @@ groups:
   - {obj: asm/text080542C4, section: text}
   - {obj: src/title_screen, section: text}
   - {obj: asm/text08057568, section: text}
+  - {obj: src/sub_8057D2C, section: text}
+  - {obj: asm/text08057568_p371, section: text}
   - {obj: src/sub_805980C, section: text}
   - {obj: asm/text08057568_p324, section: text}
   - {obj: src/sub_8059A8C, section: text}
