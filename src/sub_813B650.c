@@ -44,5 +44,17 @@ _0813B698:
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_813B6A0.s\"");
 #else
-#error "TODO: write sub_813B6A0 to match asm/nonmatching/sub_813B6A0.s, then delete this #error"
+u32 sub_813B6A0(void *arg0) {
+    u16 temp_r1_22;
+    u16 temp_r1_25;
+
+    if ((*(u16 *)((s8 *)(arg0) + (0x2DE))) != 0) {
+        (*(s32 *)((s8 *)(arg0) + (0x18))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x18))) + M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */));
+        temp_r1_22 = (*(u16 *)((s8 *)(arg0) + (0x2DE))) - 1;
+        (*(u16 *)((s8 *)(arg0) + (0x2DE))) = temp_r1_22;
+        temp_r1_25 = temp_r1_22;
+        return (u32) ((0 - temp_r1_25) | temp_r1_25) >> 0x1F;
+    }
+    return 0U;
+}
 #endif
