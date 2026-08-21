@@ -108,35 +108,48 @@ loop_16:
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8021C24.s\"");
 #else
-s32 sprite_heap_free(u32);                      /* extern */
-void *sub_8021A18(void *, s32);                     /* extern */
-
-void sub_8021C24(void *arg0) {
-    u32 temp_r1_31;
-    void *temp_r0_18;
-    void *temp_r0_44;
-
-    if (((*(u32 *)((s8 *)(arg0) + (0x48))) != 0) && (4 & (*(u8 *)((s8 *)(arg0) + (0x13))))) {
-        temp_r0_18 = sub_8021A18(arg0, 0);
-        if (temp_r0_18 == NULL) {
-            sprite_heap_free((*(u32 *)((s8 *)(arg0) + (0x48))));
-        } else {
-            (*(u8 *)((s8 *)(temp_r0_18) + (0x13))) = (u8) ((*(u8 *)((s8 *)(temp_r0_18) + (0x13))) | 4);
-        }
+void sub_8021C24(void *arg0)
+{
+  s8 *new_var;
+  u32 temp_r1_31;
+  void *temp_r0_18;
+  void *new_var2;
+  void *temp_r0_44;
+  if (((*((u32 *) (((s8 *) arg0) + 0x48))) != 0) && (4 & (*((u8 *) (((s8 *) arg0) + 0x13)))))
+  {
+    temp_r0_18 = sub_8021A18(arg0, 0);
+    if (temp_r0_18 == ((void *) 0))
+    {
+      sprite_heap_free(*((u32 *) (((s8 *) arg0) + 0x48)));
     }
-    temp_r1_31 = (*(u32 *)((s8 *)(arg0) + (0x44)));
-    if (temp_r1_31 != 0) {
-        if ((temp_r1_31 <= 0x07FFFFFFU) && (8 & (*(u8 *)((s8 *)(arg0) + (0x13))))) {
-            temp_r0_44 = sub_8021A18(arg0, 1);
-            if (temp_r0_44 == NULL) {
-                sprite_heap_free((*(u32 *)((s8 *)(arg0) + (0x44))));
-                return;
-            }
-            (*(u8 *)((s8 *)(temp_r0_44) + (0x13))) = (u8) ((*(u8 *)((s8 *)(temp_r0_44) + (0x13))) | 8);
-        }
-    } else if ((((*(u16 *)((s8 *)(arg0) + (0x2E))) + (*(u16 *)((s8 *)(arg0) + (0x30)))) == (*(u16 *)((s8 *)((void *)0x0203FFB8) + (8)))) && (sub_8021A18(arg0, 3) == NULL)) {
-        (*(u16 *)((s8 *)((void *)0x0203FFB8) + (8))) = (u16) ((*(u16 *)((s8 *)((void *)0x0203FFB8) + (8))) - (*(u16 *)((s8 *)(arg0) + (0x30))));
+    else
+    {
+      *((u8 *) (((s8 *) temp_r0_18) + 0x13)) = (u8) ((*((u8 *) (((s8 *) temp_r0_18) + 0x13))) | 4);
     }
+  }
+  new_var = (s8 *) arg0;
+  temp_r1_31 = *((u32 *) (new_var + 0x44));
+  if (temp_r1_31 != 0)
+  {
+    if ((temp_r1_31 <= 0x07FFFFFFU) && (8 & (*((u8 *) (new_var + 0x13)))))
+    {
+      temp_r0_44 = sub_8021A18(arg0, 1);
+      if (temp_r0_44 == ((void *) 0))
+      {
+        sprite_heap_free(*((u32 *) (new_var + 0x44)));
+        return;
+      }
+      *((u8 *) (((s8 *) temp_r0_44) + 0x13)) = (u8) ((*((u8 *) (((s8 *) temp_r0_44) + 0x13))) | 8);
+    }
+  }
+  else
+  {
+    new_var2 = (void *) 0x0203FFB8;
+    if ((((*((u16 *) (new_var + 0x2E))) + (*((u16 *) (new_var + 0x30)))) == (*((u16 *) (((s8 *) new_var2) + 8)))) && (sub_8021A18(arg0, 3) == ((void *) 0)))
+    {
+      *((u16 *) (((s8 *) new_var2) + 8)) = (u16) ((*((u16 *) (((s8 *) new_var2) + 8))) - (*((u16 *) (new_var + 0x30))));
+    }
+  }
 }
 #endif
 

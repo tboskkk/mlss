@@ -19,21 +19,30 @@ asm_unified(".include \"asm/nonmatching/sub_8021EA8.s\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8021ED8.s\"");
 #else
-void sub_8021ED8(void *arg0) {
-    if (0x20 & (*(u8 *)((s8 *)(arg0) + (0x12)))) {
-        if ((*(void **)((s8 *)(arg0) + (0x64))) == (*(void **)((s8 *)(arg0) + (0x68)))) {
-            if ((*(void **)((s8 *)((void *)0x0203FFB8) + (0x30))) == NULL) {
-                (*(void **)((s8 *)((void *)0x0203FFB8) + (0x30))) = arg0;
-            } else {
-                (*(void **)((s8 *)(arg0) + (0x68))) = (void *) (*(void **)((s8 *)((*(void **)((s8 *)((void *)0x0203FFB8) + (0x34)))) + (0x68)));
-                (*(void **)((s8 *)((*(void **)((s8 *)((void *)0x0203FFB8) + (0x34)))) + (0x68))) = arg0;
-            }
-            (*(void **)((s8 *)(arg0) + (0x64))) = (void *) (*(void **)((s8 *)((void *)0x0203FFB8) + (0x34)));
-            (*(void **)((s8 *)((void *)0x0203FFB8) + (0x34))) = arg0;
-            (*(u8 *)((s8 *)((void *)0x0203FFB8) + (1))) = (u8) ((*(u8 *)((s8 *)((void *)0x0203FFB8) + (1))) + 1);
-        }
-        sprite_show_8020CBC(arg0);
+void sub_8021ED8(void *arg0)
+{
+  s8 *new_var;
+  if (0x20 & (*((u8 *) (((s8 *) arg0) + 0x12))))
+  {
+    if ((*((void **) (((s8 *) arg0) + 0x64))) == (*((void **) (((s8 *) arg0) + 0x68))))
+    {
+      new_var = (s8 *) ((void *) 0x0203FFB8);
+      if ((*((void **) (new_var + 0x30))) == ((void *) 0))
+      {
+        *((void **) (new_var + 0x30)) = arg0;
+      }
+      else
+      {
+        *((void **) (((s8 *) arg0) + 0x68)) = (void *) (*((void **) (((s8 *) (*((void **) (new_var + 0x34)))) + 0x68)));
+        *((void **) (((s8 *) (*((void **) (new_var + 0x34)))) + 0x68)) = arg0;
+      }
+      new_var = new_var;
+      *((void **) (((s8 *) arg0) + 0x64)) = (void *) (*((void **) (new_var + 0x34)));
+      *((void **) (new_var + 0x34)) = arg0;
+      *((u8 *) (new_var + 1)) = (u8) ((*((u8 *) (new_var + 1))) + 1);
     }
+    sprite_show_8020CBC(arg0);
+  }
 }
 #endif
 
