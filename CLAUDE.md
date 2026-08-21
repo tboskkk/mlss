@@ -630,12 +630,30 @@ reverse engineering.
      one is inside the embedded Mario Bros. ROM** (`0x08F6xxxx`), never
      in the main game.
 
-  What it actually is: entropy 6.75 bits/byte with all 256 values present
-  and visible repeating structure (long `77 C0` runs, recurring `0B FC`)
-  — data, most likely compressed. Worth cross-checking against Phase 4's
-  `find_compressed_blocks.py` results. **Do not spend time trying to
-  decompile it as m4a.** `find_library_code.py` finding nothing here is
-  consistent with this, not with the old m4a theory.
+  4. *It is referenced exactly like rodata.* Counting 32-bit words
+     anywhere in the ROM that point into an 84KB window: this region gets
+     **1,606**, a same-size known-rodata window gets **1,674**, and
+     arbitrary control windows elsewhere get **116** and **35**. So it is
+     heavily and deliberately referenced — 14-45x above background — at
+     statistically the same rate as real rodata. Target spacings cluster
+     at 1/2/3/4/8 bytes, i.e. it is addressed as a **byte stream**, not
+     as word-aligned records or code entry points.
+
+  What it actually is: entropy 6.75 bits/byte, all 256 values present,
+  byte-to-byte deltas averaging 71 (random is ~85; real 8-bit PCM audio
+  is under 25, so it is **not** raw sample data either), with visible
+  repeating structure (long `77 C0` runs, recurring `0B FC`).
+  `find_compressed_blocks.py` finds **zero** BIOS LZ77/RLE/Huffman blocks
+  in the range, so if it is compressed it uses a custom scheme, not a
+  BIOS one. Best current description: a large, heavily-referenced,
+  byte-addressed data blob in a custom/packed format.
+
+  **Do not spend time trying to decompile it as m4a.**
+  `find_library_code.py` finding nothing here is consistent with this,
+  not with the old m4a theory. (And for the record: GBA audio is not
+  SNES-derived — there is no SPC700, no S-DSP and no BRR. The ARM7 mixes
+  in software into two DMA-fed PCM FIFOs; the four PSG channels are
+  inherited from the Game Boy for GB/GBC compatibility.)
 - Two enormous, nearly-adjacent runs in `asm/text08057568.s`
   (0x0818A658-0x081AFAAA and 0x081AFAAC-0x081C91BC, ~257KB combined,
   current live boundaries per `map_raw_regions.py` have drifted slightly
