@@ -18,29 +18,66 @@ void sub_8051614(void *arg1) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8051628.s\"");
 #else
-#error "TODO: write sub_8051628 to match asm/nonmatching/sub_8051628.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8051740.s\"");
 #else
-#error "TODO: write sub_8051740 to match asm/nonmatching/sub_8051740.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8051A00.s\"");
 #else
-#error "TODO: write sub_8051A00 to match asm/nonmatching/sub_8051A00.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8051A80.s\"");
 #else
-#error "TODO: write sub_8051A80 to match asm/nonmatching/sub_8051A80.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8051ACC.s\"");
 #else
-#error "TODO: write sub_8051ACC to match asm/nonmatching/sub_8051ACC.s, then delete this #error"
+s32 sub_8057C9C(s32, s32, s32);         /* extern */
+
+void sub_8051ACC(void *arg0) {
+    s32 var_r0_12;
+    s32 var_r0_28;
+
+    if ((s32) M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */) < 0) {
+        var_r0_12 = 0;
+        goto block_3;
+    }
+    var_r0_12 = (*(u16 *)((s8 *)(arg0) + (0x20))) - 0xF0;
+    if ((s32) M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */) > var_r0_12) {
+block_3:
+        (*(s16 *)((s8 *)(arg0) + (0x1C))) = (s16) var_r0_12;
+    }
+    if ((s32) M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */) < 0) {
+        var_r0_28 = 0;
+        goto block_7;
+    }
+    var_r0_28 = (*(u16 *)((s8 *)(arg0) + (0x22))) - 0xA0;
+    if ((s32) M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */) > var_r0_28) {
+block_7:
+        (*(s16 *)((s8 *)(arg0) + (0x1E))) = (s16) var_r0_28;
+    }
+    sub_8057C9C((*(s32 *)((s8 *)(arg0) + (0x44))), M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */), M2C_ERROR(/* unknown instruction: ldsh $r2, ($mem_loc_fictive_) */));
+}
 #endif
