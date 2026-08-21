@@ -22,3 +22,9 @@ void sub_810CAD0(void) {
         (*(s32 **)((s8 *)(temp_r1_22) + (4))) = &sub_810C05C;
     }
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_810CB04.s\"");
+#else
+#error "TODO: write sub_810CB04 to match asm/nonmatching/sub_810CB04.s, then delete this #error"
+#endif
