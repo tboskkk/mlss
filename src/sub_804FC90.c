@@ -36,7 +36,24 @@ void sub_804FC90(u32* param_1)
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_804FCD4.s\"");
 #else
-#error "TODO: write sub_804FCD4 to match asm/nonmatching/sub_804FCD4.s, then delete this #error"
+s32 sub_8049000(void *, s32);                   /* extern */
+
+void sub_804FCD4(void *arg0) {
+    s32 var_r1_28;
+
+    (*(u8 *)((s8 *)(arg0) + (0x214))) = (u8) ((-8 & (*(u8 *)((s8 *)(arg0) + (0x214)))) | 3);
+    if ((*(u8 *)((s8 *)(arg0) + (0x54))) == 0) {
+        var_r1_28 = 0x1001;
+        if (8 & (*(u8 *)((s8 *)(arg0) + (0x35B)))) {
+            var_r1_28 = 0x1028;
+        }
+    } else {
+        var_r1_28 = 0x1002;
+    }
+    sub_8049000(arg0, var_r1_28);
+    (*(s16 *)((s8 *)(arg0) + (4))) = 0;
+    (*(u8 *)((s8 *)(arg0) + (0x212))) = (u8) (-0x41 & (*(u8 *)((s8 *)(arg0) + (0x212))));
+}
 #endif
 
 #ifndef NONMATCHING
