@@ -10,13 +10,14 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8158A98.s\"");
 #else
-void sub_8158A98(u32* p0, s32 p1)
+void sub_8158A98(void *arg0, s32 arg1)
 {
-    *(u16*)((u8*)p0 + 0x18) = 0xC8;
-    *(u16*)((u8*)p0 + 0x20) = -p1;
-    *(u16*)((u8*)p0 + 0x38) = 0;
-    sub_815FA3C(p0);
-    *(u16*)((u8*)p0 + 0x0C) = 0;
-    *(u8*)((u8*)p0 + 0x24) = 0x04;
+  int new_var;
+  new_var = 0;
+  *((s16 *) (((s8 *) arg0) + 0x18)) = 0xC8;
+  *((s16 *) (((s8 *) arg0) + 0x20)) = (s16) (0 - arg1);
+  *((s16 *) (((s8 *) arg0) + 0x38)) = new_var;
+  *((s16 *) (((s8 *) sub_815FA3C(arg0)) + 0xC)) = 0;
+  *((s8 *) (((s8 *) arg0) + 0x24)) = 4;
 }
 #endif

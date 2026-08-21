@@ -35,7 +35,11 @@ u32 sub_801AEDC(void) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_801AF50.s\"");
 #else
-#error "TODO: write sub_801AF50 to match asm/nonmatching/sub_801AF50.s, then delete this #error"
+s32 sub_80FC1F8();                              /* extern */
+
+void sub_801AF50(void) {
+    sub_80FC1F8();
+}
 #endif
 
 #ifndef NONMATCHING
