@@ -164,8 +164,50 @@ asm_unified(".include \"asm/nonmatching/sub_8018080.s\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8018170.s\"");
 #else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
+s32 CpuFastSet(s32, s32, s32);                  /* extern */
+
+void sub_8018170(void) {
+    s32 temp_r2_10;
+    s32 var_r5_27;
+    s32 var_r5_59;
+    s32 var_r6_25;
+    s32 var_r6_57;
+    u32 var_r4_17;
+
+    temp_r2_10 = *(s32 *)0x03000BD0;
+    if (temp_r2_10 != 0) {
+        var_r4_17 = (((*(u16 *)((s8 *)((void *)0x0300034C) + (0))) << 0x10) | (*(u16 *)((s8 *)((void *)0x0300034C) + (2)))) & temp_r2_10;
+        if (!(0x40 & (*(u8 *)((s8 *)((void *)0x0300034C) + (0x888))))) {
+            var_r6_25 = 0x02000080;
+            var_r5_27 = 0x05000000;
+            if (var_r4_17 != 0) {
+                do {
+                    if (var_r4_17 & 1) {
+                        (*(s32 *)((s8 *)((void *)0x040000D4) + (0))) = var_r6_25;
+                        (*(s32 *)((s8 *)((void *)0x040000D4) + (4))) = var_r5_27;
+                        (*(s32 *)((s8 *)((void *)0x040000D4) + (8))) = 0x84000008;
+                    }
+                    var_r6_25 += 0x20;
+                    var_r5_27 += 0x20;
+                    var_r4_17 = var_r4_17 >> 1;
+                } while (var_r4_17 != 0);
+            }
+        } else {
+            var_r6_57 = 0x02000080;
+            var_r5_59 = 0x05000000;
+            if (var_r4_17 != 0) {
+                do {
+                    if (1 & var_r4_17) {
+                        CpuFastSet(var_r6_57, var_r5_59, 8);
+                    }
+                    var_r6_57 += 0x20;
+                    var_r5_59 += 0x20;
+                    var_r4_17 = var_r4_17 >> 1;
+                } while (var_r4_17 != 0);
+            }
+        }
+        (*(u16 *)((s8 *)((void *)0x0300034C) + (2))) = 0U;
+        (*(u16 *)((s8 *)((void *)0x0300034C) + (0))) = 0U;
+    }
+}
 #endif
