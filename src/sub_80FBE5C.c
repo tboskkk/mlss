@@ -31,3 +31,9 @@ s32 sub_80FBE7C(s32 arg0, void **arg1) {
     return 0;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80FBEA0.s\"");
+#else
+#error "TODO: write sub_80FBEA0 to match asm/nonmatching/sub_80FBEA0.s, then delete this #error"
+#endif
