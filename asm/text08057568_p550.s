@@ -1,0 +1,119 @@
+	.include "asm/macros.inc"
+
+	.syntax unified
+	.text
+
+	thumb_func_start sub_80FA6DC
+sub_80FA6DC:
+	push {lr}
+	adds r3, r0, #0x0
+	ldr r0, [r2, #0x00]
+	movs r1, #0x01
+	ands r0, r1
+	cmp r0, #0x00
+	beq _080FA6F2
+	ldr r0, [r3, #0x14]
+	bl sub_81219EC
+	b _080FA6F8
+_080FA6F2:
+	ldr r0, [r3, #0x14]
+	bl sub_8121A20
+_080FA6F8:
+	movs r0, #0x01
+	pop {r1}
+	bx r1
+	.byte 0x00, 0x00, 0x30, 0xB5, 0x04, 0x1C, 0x0D, 0x1C, 0x60, 0x69, 0x27, 0xF0, 0xEA, 0xF8, 0x00, 0x06
+	.byte 0x00, 0x0E, 0x01, 0x28, 0x09, 0xD1, 0x60, 0x6A, 0x03, 0x49, 0x40, 0x18, 0x02, 0x21, 0x01, 0x70
+	.byte 0x01, 0x20, 0x05, 0xE0, 0x00, 0x00, 0xA1, 0x09, 0x00, 0x00, 0x68, 0x69, 0x28, 0x60, 0x00, 0x20
+	.byte 0x30, 0xBC, 0x02, 0xBC, 0x08, 0x47
+	thumb_func_start sub_80FA734
+sub_80FA734:
+	push {r4, r5, r6, lr}
+	mov r6, r8
+	push {r6}
+	add sp, #-0x018
+	adds r6, r0, #0x0
+	mov r8, r1
+	adds r5, r2, #0x0
+	ldr r0, [r6, #0x24]
+	movs r1, #0x9A
+	lsls r1, r1, #0x04
+	adds r0, r0, r1
+	ldrb r4, [r0, #0x00]
+	subs r4, #0x01
+	lsls r4, r4, #0x18
+	lsrs r4, r4, #0x18
+	adds r0, r6, #0x0
+	adds r0, #0x1C
+	add r3, sp, #0x010
+	add r1, sp, #0x014
+	str r1, [sp, #0x000]
+	adds r1, r5, #0x0
+	add r2, sp, #0x00C
+	bl sub_80EA6D4
+	adds r5, #0x0C
+	ldr r0, [r6, #0x14]
+	ldr r2, [r5, #0x00]
+	movs r1, #0x03
+	ands r2, r1
+	ldr r1, [sp, #0x00C]
+	str r1, [sp, #0x000]
+	ldr r1, [sp, #0x010]
+	str r1, [sp, #0x004]
+	movs r3, #0x04
+	ldsh r1, [r5, r3]
+	str r1, [sp, #0x008]
+	adds r1, r4, #0x0
+	movs r3, #0x01
+	bl sub_8120C54
+	movs r0, #0xA0
+	add r8, r0
+	mov r3, r8
+	ldrh r1, [r3, #0x00]
+	movs r0, #0x02
+	orrs r0, r1
+	strh r0, [r3, #0x00]
+	movs r0, #0x00
+	add sp, #0x018
+	pop {r3}
+	mov r8, r3
+	pop {r4, r5, r6}
+	pop {r1}
+	bx r1
+	thumb_func_start sub_80FA7A0
+sub_80FA7A0:
+	push {lr}
+	ldr r2, [r2, #0x00]
+	cmp r2, #0x00
+	beq _080FA7AE
+	cmp r2, #0x01
+	beq _080FA7B6
+	b _080FA7BC
+_080FA7AE:
+	ldr r0, [r0, #0x14]
+	bl sub_81218C8
+	b _080FA7BC
+_080FA7B6:
+	ldr r0, [r0, #0x14]
+	bl sub_81218D4
+_080FA7BC:
+	movs r0, #0x01
+	pop {r1}
+	bx r1
+	.byte 0x00, 0x00
+	thumb_func_start sub_80FA7C4
+sub_80FA7C4:
+	push {lr}
+	ldr r2, [r0, #0x24]
+	ldr r3, _080FA7E0 @ =0x000009A1
+	adds r2, r2, r3
+	movs r3, #0x01
+	strb r3, [r2, #0x00]
+	adds r0, #0x1C
+	bl script_cmd_return
+	lsls r0, r0, #0x18
+	lsrs r0, r0, #0x18
+	pop {r1}
+	bx r1
+	.byte 0x00, 0x00
+_080FA7E0: .4byte 0x000009A1
