@@ -15,5 +15,22 @@ void sub_819A718(void *arg0) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_819A72C.s\"");
 #else
-#error "TODO: write sub_819A72C to match asm/nonmatching/sub_819A72C.s, then delete this #error"
+void sub_819A72C(void *arg0, void *arg1) {
+    u16 temp_r3_18;
+    u8 temp_r0_9;
+
+    temp_r0_9 = (*(u8 *)((s8 *)(arg0) + (0x1B)));
+    if (temp_r0_9 != 0) {
+        (*(u8 *)((s8 *)(arg0) + (0x1B))) = (u8) (temp_r0_9 - 1);
+        return;
+    }
+    (*(u8 *)((s8 *)(arg0) + (0x1B))) = (u8) (*(u8 *)((s8 *)(arg0) + (0x19)));
+    temp_r3_18 = (*(u16 *)((s8 *)(arg0) + (0)));
+    if (0x200 & temp_r3_18) {
+        (*(u16 *)((s8 *)(arg0) + (0))) = (u16) (0x400 ^ temp_r3_18);
+        (*(s32 (**)(void *))((s8 *)(arg1) + (0x10)))(arg0);
+        return;
+    }
+    (*(u16 *)((s8 *)(arg0) + (0))) = (u16) (0x200 | temp_r3_18);
+}
 #endif
