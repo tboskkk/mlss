@@ -986,6 +986,8 @@ groups:
   - {obj: asm/text08057568_p167, section: text}
   - {obj: src/init_btl_process_80FC25C, section: text}
   - {obj: asm/text08057568_p471, section: text}
+  - {obj: src/btl_80FC438, section: text}
+  - {obj: asm/text08057568_p619, section: text}
   - {obj: src/btl_update_80FC8F4, section: text}
   - {obj: asm/text08057568_p551, section: text}
   - {obj: src/sub_80FD1AC, section: text}
