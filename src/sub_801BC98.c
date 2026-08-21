@@ -12,3 +12,9 @@ asm_unified(".include \"asm/nonmatching/sub_801BC98.s\"");
 #else
 #error "TODO: write sub_801BC98 to match asm/nonmatching/sub_801BC98.s, then delete this #error"
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/time_init.s\"");
+#else
+#error "TODO: write time_init to match asm/nonmatching/time_init.s, then delete this #error"
+#endif
