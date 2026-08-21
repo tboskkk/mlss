@@ -1171,6 +1171,34 @@ Two process lessons from this, both cheap and both nearly missed:
     through it — the supervisor restarts children on SIGTERM, so it costs
     one signal.
 
+**A sixth, which was quietly halving the machine.** `tier2.main()` catches
+an exception from `run_pool()` and calls it again — but `procs` is LOCAL to
+`run_pool()`, so the retry starts with an empty pool and refills to
+`max_functions` while the previous pool's containers are still running,
+owned only by module-level `_active`. Every exception there therefore
+*added* up to 12 concurrent searches instead of replacing them. Measured
+live: **20 permuter containers against a 12-slot pool**, stable across three
+samples 20s apart, no duplicate names, none of them orphans — 20
+genuinely-owned searches, **load average 31 on 6 physical cores**, with
+individual permuters starved down to 31-52% CPU. That is not extra
+throughput; it is the same work done slower. `_cleanup_all()` now runs on
+that path too (killing containers and requeuing their rows); after the fix,
+12 containers and load 11.
+
+Worth knowing how nearly-invisible this was. `podman ps`'s `{{.Command}}`
+column truncates, and `nonmatchings/<name>` sits past the cut — so a
+first pass at the orphan check reported "20 orphans, 0 legitimate" and the
+correct reading (`--no-trunc`) reported the exact opposite. `kill_search()`
+already carries a comment about this same truncation biting it. **Use
+`--no-trunc` for anything that identifies a permuter container.**
+
+**And the reason it took an hour: the logs were lying by omission.** The
+supervisor pointed each child's stdout at a file, so Python block-buffered
+it — `tier2.log` had stopped updating at 13:57 while tier2 was very much
+alive, and the one exception that explains the whole incident sat unflushed
+in a buffer for the entire investigation of it. Children now launch with
+`-u`. A log you cannot read *during* the incident is not a log.
+
 **A measured claim ordering rule: high-score seeds are not worth a slot.**
 Over 1,020 seeds with a recorded asm-differ score, against whether they
 ever reached matched/validating:
