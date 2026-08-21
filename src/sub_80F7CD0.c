@@ -28,9 +28,7 @@ s32 sub_80F7CD0(s32 arg0, s32 arg1, void *arg2) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80F7D0C.s\"");
-#else
+s32 sub_807F754(s32, s32, s32);                 /* extern */
 s32 sub_80F7D0C(s32 arg0, s32 arg1, void *arg2)
 {
   s32 temp_r1_10;
@@ -48,4 +46,3 @@ s32 sub_80F7D0C(s32 arg0, s32 arg1, void *arg2)
   sub_807F754(new_var, var_r1_16, *((s32 *) (((s8 *) arg2) + 4)));
   return 1;
 }
-#endif
