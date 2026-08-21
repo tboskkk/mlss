@@ -464,18 +464,16 @@ asm_unified(".include \"asm/nonmatching/sub_806A19C.s\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_806A1CC.s\"");
 #else
-s32 sub_80871A8();                                  /* extern */
-extern s32 sub_808750C;
-
-s32 sub_806A1CC(void *arg0) {
-    s32 var_r0_8;
-
-    var_r0_8 = sub_80871A8();
-    if (var_r0_8 == 0) {
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_808750C;
-        var_r0_8 = 0;
-    }
-    return var_r0_8;
+s32 sub_806A1CC(void *arg0)
+{
+  s32 var_r0_8;
+  ;
+  if (sub_80871A8() == 0)
+  {
+    *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_808750C;
+    var_r0_8 = 0;
+  }
+  return var_r0_8;
 }
 #endif
 

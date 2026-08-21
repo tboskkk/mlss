@@ -33,3 +33,9 @@ void sub_80E9BD8(u32* param_1, u32* param_2, s16 param_3, u32 param_4)
     }
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80E9C14.s\"");
+#else
+#error "TODO: write sub_80E9C14 to match asm/nonmatching/sub_80E9C14.s, then delete this #error"
+#endif
