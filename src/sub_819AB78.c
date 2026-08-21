@@ -29,3 +29,9 @@ void sub_819AB78(void *arg0)
   }
   *((u8 *) 0x04000081) = var_r1_21;
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_819ABB8.s\"");
+#else
+#error "TODO: write sub_819ABB8 to match asm/nonmatching/sub_819ABB8.s, then delete this #error"
+#endif
