@@ -17,3 +17,9 @@ void sub_8029910(void)
     if (r4[1] != 0)
         ((void (*)(void))r4[1])();
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8029934.s\"");
+#else
+#error "TODO: write sub_8029934 to match asm/nonmatching/sub_8029934.s, then delete this #error"
+#endif
