@@ -14,5 +14,9 @@ void sub_816AFF0(void *arg0) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_816B000.s\"");
 #else
-#error "TODO: write sub_816B000 to match asm/nonmatching/sub_816B000.s, then delete this #error"
+void sub_816B000(void *arg0) {
+    if (8 & (*(u16 *)((s8 *)((void *)0x0300034C) + (0x2A)))) {
+        (*(s32 *)((s8 *)(arg0) + (0x474))) = 4;
+    }
+}
 #endif
