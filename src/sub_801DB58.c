@@ -19,12 +19,10 @@ asm_unified(".include \"asm/nonmatching/sub_801DB58.s\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_801DC00.s\"");
 #else
-s32 CpuFastSet(s32 *, s32, s32);                /* extern */
-
-void sub_801DC00(s32 *arg0, s32 arg1) {
+void sub_801DC00(void **arg0, s32 arg1) {
     s32 sp0;
 
     sp0 = (arg1 * 0x10) | arg1 | (arg1 << 8) | (arg1 << 0xC) | (arg1 << 0x10) | (arg1 << 0x14) | (arg1 << 0x18) | (arg1 << 0x1C);
-    CpuFastSet(&sp0, *arg0, 0x01001400);
+    CpuFastSet(&sp0, *arg0, 0x01001400U);
 }
 #endif

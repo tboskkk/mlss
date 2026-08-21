@@ -7,19 +7,12 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_806E778.s\"");
-#else
-u32 sub_806E778(u32 param_1) {
-    u32 *puVar1;
-    u32 uVar2;
+void sub_806E778(void *arg0) {
+    s32 temp_r1_9;
 
-    puVar1 = (u32 *)((u32)param_1 + 0x80);
-    uVar2 = *puVar1;
-    if (uVar2 != 0) {
-        *(u32 *)(param_1 + 0x4C) = uVar2;
-        *(u32 *)(*(u32 *)(param_1 + 0x30) + 0x4C) = uVar2;
+    temp_r1_9 = (*(s32 *)((s8 *)(arg0) + (0x80)));
+    if (temp_r1_9 == 0) {
+        (*(s32 *)((s8 *)(arg0) + (0x4C))) = temp_r1_9;
+        (*(s32 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x30)))) + (0x4C))) = temp_r1_9;
     }
-    return uVar2;
 }
-#endif
