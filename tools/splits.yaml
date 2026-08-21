@@ -310,6 +310,8 @@ groups:
   - {obj: src/sub_805D8DC, section: text}
   - {obj: src/sub_805D914, section: text}
   - {obj: asm/text08057568_p159, section: text}
+  - {obj: src/sub_805D9CC, section: text}
+  - {obj: asm/text08057568_p385, section: text}
   - {obj: src/sub_805F508, section: text}
   - {obj: asm/text08057568_p325, section: text}
   - {obj: src/sub_805F5E4, section: text}
