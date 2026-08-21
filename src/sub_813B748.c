@@ -31,3 +31,9 @@ void sub_813B748(void* p0)
     }
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_813B798.s\"");
+#else
+#error "TODO: write sub_813B798 to match asm/nonmatching/sub_813B798.s, then delete this #error"
+#endif
