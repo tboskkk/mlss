@@ -10,58 +10,23 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80A231C.s\"");
 #else
-extern void sub_80A2374();
+extern s32 sub_80A2374;
 
-void sub_80A231C(void* p0) {
-    void* r4;
-    void* r0;
-    void* r3;
-    u8 r1;
-    u8 r0_2;
-    u16 r0_3;
-    u16 r1_2;
-    u8 r1_3;
-    u8 r0_4;
-    
-    r4 = p0;
-    r0 = p0;
-    r0 = *(void**)(0x03000FD8);
-    r0 = *(void**)((u8*)r0 + 0x74);
-    r3 = r0;
-    r0 = *(void**)((u8*)r0 + 0x10);
-    r1 = *(u8*)((u8*)r0 + 0x12);
-    r0 = r1 & 0x08;
-    if (r0 == 0) {
-        goto _080A2366;
+void sub_80A231C(void *arg0) {
+    s32 temp_r1_21;
+    u8 *temp_r2_36;
+    void *temp_r3_10;
+
+    temp_r3_10 = (*(void **)((s8 *)(*(void **)0x03000FD8) + (0x74)));
+    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(temp_r3_10) + (0x10)))) + (0x12)))) {
+        temp_r1_21 = 6 & (*(u8 *)((s8 *)(temp_r3_10) + (0x7E)));
+        if ((temp_r1_21 == 2) || (temp_r1_21 == 4)) {
+            (*(s16 *)((s8 *)(temp_r3_10) + (0x82))) = 0x4000;
+            (*(s16 *)((s8 *)(temp_r3_10) + (0x86))) = 0;
+            temp_r2_36 = (temp_r3_10 + 0x82) - 1;
+            *temp_r2_36 &= -0x21;
+        }
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80A2374;
     }
-    r0 = r3;
-    r0 = (u8*)r0 + 0x7E;
-    r0_2 = *(u8*)r0;
-    r1_2 = r0_2 & 0x06;
-    if (r1_2 == 0x02) {
-        goto _080A2344;
-    }
-    if (r1_2 != 0x04) {
-        goto _080A2362;
-    }
-_080A2344:
-    r0 = r3;
-    r0 = (u8*)r0 + 0x82;
-    r0_3 = 0x8000;
-    *(u16*)((u8*)r0) = r0_3;
-    r0 = r3;
-    r0 = (u8*)r0 + 0x86;
-    *(u16*)((u8*)r0) = 0;
-    r2 = (u8*)r3 + 0x81;
-    r1_3 = *(u8*)r2;
-    r0_4 = 0x21;
-    r0_4 = -r0_4;
-    r1_3 = r0_4 & r1_3;
-    *(u8*)r2 = r1_3;
-_080A2362:
-    *(u32*)((u8*)r4 + 0x4C) = (u32)sub_80A2374;
-_080A2366:
-    r0 = *(void**)((u8*)r4 + 0x0);
-    bx r0;
 }
 #endif
