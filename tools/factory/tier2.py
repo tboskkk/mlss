@@ -583,6 +583,10 @@ def run_pool(jobs: int, stall_min: float, max_functions: int):
                 "proc": proc, "log": log_f, "last_score": None,
                 "last_improved": time.time(),
                 "stall_s": stall_seconds_for(row["lines"] or 0, stall_min),
+                # Was this seed's score known at claim time? If not, the
+                # ceiling could not be applied to it -- see the abort in
+                # the poll loop.
+                "seed_scored": row["best_score"] is not None,
             }
             _active[name] = proc
             conn = db.connect()
@@ -613,6 +617,7 @@ def run_pool(jobs: int, stall_min: float, max_functions: int):
             info = procs[name]
             score = best_score_seen(name)
             if score is not None and score != info["last_score"]:
+                first_score = info["last_score"] is None
                 info["last_score"] = score
                 info["last_improved"] = time.time()
                 conn = db.connect()
@@ -624,6 +629,46 @@ def run_pool(jobs: int, stall_min: float, max_functions: int):
                     conn.commit()
                 finally:
                     conn.close()
+
+                # LATE CEILING. claim_one()'s ceiling can only filter on a
+                # score the row already has, and an unscored seed has none
+                # -- so every unscored row passes it regardless of quality
+                # and then holds a slot for up to stall_seconds_for()
+                # (15 min). Measured right after the ceiling went in: all
+                # 12 slots were filled by unscored seeds whose base scores
+                # turned out to be 2,140-6,650, i.e. exactly the bands that
+                # convert at 0.7% and 0.0%.
+                #
+                # The permuter's FIRST reported score is the base score --
+                # the same number asm-differ would have given the seed --
+                # so this is not a new judgement, it is the ceiling applied
+                # a few seconds late, as soon as the information exists.
+                # Only the first score qualifies: a search that started
+                # under the ceiling and drifted up is still searching from
+                # a good seed and is left alone.
+                #
+                # Requeued WITH the discovered score, so the ordinary
+                # ceiling handles it from then on and it is never probed
+                # twice.
+                if (first_score and not info["seed_scored"]
+                        and score >= SEED_SCORE_CEILING):
+                    kill_search(name, info["proc"])
+                    info["log"].close()
+                    # best_score was just written by the set_state above,
+                    # so the row carries its discovered score already --
+                    # resolve() only moves the state and must not race a
+                    # separate write against a slot re-claiming it.
+                    resolve(name, "tier2_ready", event="t2_ceiling_abort",
+                            detail=str(score),
+                            notes=f"seed scored {score} on first report, at or above "
+                                  f"the {SEED_SCORE_CEILING} ceiling -- slot released "
+                                  f"without a full search; needs a better seed, not "
+                                  f"more search")
+                    print(f"  {name}: base score {score} >= ceiling -> slot released")
+                    del procs[name]
+                    _active.pop(name, None)
+                    processed += 1
+                    continue
 
             exited = info["proc"].poll() is not None
             stalled = (time.time() - info["last_improved"]) > info["stall_s"]
