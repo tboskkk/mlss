@@ -96,3 +96,9 @@ s32 sub_801B1C8(void *arg0, s32 *arg1, s32 *arg2, s32 arg3) {
     return 1;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_801B390.s\"");
+#else
+#error "TODO: write sub_801B390 to match asm/nonmatching/sub_801B390.s, then delete this #error"
+#endif
