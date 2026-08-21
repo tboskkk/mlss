@@ -332,9 +332,6 @@ block_18:
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_804FA30.s\"");
-#else
 void *get_coldef_ptr_by_xz(s32, s16, s16);          /* extern */
 
 void *sub_804FA30(void *arg0, s16 arg1, s16 arg2, s32 *arg3, s32 *arg4, s32 *arg5) {
@@ -361,4 +358,3 @@ void *sub_804FA30(void *arg0, s16 arg1, s16 arg2, s32 *arg3, s32 *arg4, s32 *arg
     }
     return temp_r0_15;
 }
-#endif
