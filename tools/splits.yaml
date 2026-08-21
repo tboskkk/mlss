@@ -837,6 +837,8 @@ groups:
   - {obj: asm/text08057568_p218, section: text}
   - {obj: src/sub_80FACA4, section: text}
   - {obj: asm/text08057568_p184, section: text}
+  - {obj: src/sub_80FAD6C, section: text}
+  - {obj: asm/text08057568_p470, section: text}
   - {obj: src/sub_80FAEEC, section: text}
   - {obj: asm/text08057568_p55, section: text}
   - {obj: src/get_field_object_type, section: text}
