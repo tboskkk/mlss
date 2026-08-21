@@ -58,3 +58,9 @@ asm_unified(".include \"asm/nonmatching/script_cmd_use_ability.s\"");
 #else
 #error "TODO: write script_cmd_use_ability to match asm/nonmatching/script_cmd_use_ability.s, then delete this #error"
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80F571C.s\"");
+#else
+#error "TODO: write sub_80F571C to match asm/nonmatching/sub_80F571C.s, then delete this #error"
+#endif
