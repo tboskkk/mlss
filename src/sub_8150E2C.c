@@ -34,5 +34,10 @@ u32 sub_8150E38(u32* param_1) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8150E44.s\"");
 #else
-#error "TODO: write sub_8150E44 to match asm/nonmatching/sub_8150E44.s, then delete this #error"
+void sub_8150E44(void *arg0, s16 arg1) {
+    if (!(0x20 & (*(u16 *)((s8 *)(arg0) + (0x2C))))) {
+        (*(s16 *)((s8 *)(arg0) + (0x1C))) = 1;
+        (*(s16 *)((s8 *)(arg0) + (0x18))) = arg1;
+    }
+}
 #endif
