@@ -30,3 +30,9 @@ u32* sub_8158198(u32* param_1) {
     return param_1;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_81581FC.s\"");
+#else
+#error "TODO: write sub_81581FC to match asm/nonmatching/sub_81581FC.s, then delete this #error"
+#endif
