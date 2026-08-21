@@ -29,3 +29,9 @@ void sub_810CDFC(s32 arg0) {
     *(s32 *)0x04000044 = (*(u16 *)0x0200001A + 0x99) | ((*(u16 *)0x0200001A + 0x8E) << 8) | (((*(u16 *)0x0200001A + 0x99) | ((*(u16 *)0x0200001A + 0x8E) << 8)) << 0x10);
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_810CE88.s\"");
+#else
+#error "TODO: write sub_810CE88 to match asm/nonmatching/sub_810CE88.s, then delete this #error"
+#endif
