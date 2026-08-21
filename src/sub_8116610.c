@@ -20,3 +20,9 @@ u16 sub_8116610(u16* param_1) {
     return temp;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8116620.s\"");
+#else
+#error "TODO: write sub_8116620 to match asm/nonmatching/sub_8116620.s, then delete this #error"
+#endif
