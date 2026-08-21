@@ -30,3 +30,9 @@ asm_unified(".include \"asm/nonmatching/sub_805B7F0.s\"");
 #else
 #error "TODO: write sub_805B7F0 to match asm/nonmatching/sub_805B7F0.s, then delete this #error"
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_805B8BC.s\"");
+#else
+#error "TODO: write sub_805B8BC to match asm/nonmatching/sub_805B8BC.s, then delete this #error"
+#endif
