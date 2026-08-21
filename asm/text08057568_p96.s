@@ -3,42 +3,6 @@
 	.syntax unified
 	.text
 
-	thumb_func_start sub_80DD430
-sub_80DD430:
-	push {r4, r5, lr}
-	adds r4, r0, #0x0
-	bl sub_8086D80
-	adds r5, r0, #0x0
-	cmp r5, #0x00
-	bne _080DD46A
-	adds r2, r4, #0x0
-	adds r2, #0xAE
-	movs r1, #0x00
-	ldsh r0, [r2, r1]
-	negs r0, r0
-	lsrs r1, r0, #0x1F
-	adds r0, r0, r1
-	asrs r0, r0, #0x01
-	strh r0, [r2, #0x00]
-	adds r0, r4, #0x0
-	adds r0, #0xB0
-	strh r5, [r0, #0x00]
-	adds r0, #0x02
-	strh r5, [r0, #0x00]
-	ldr r0, _080DD474 @ =0x080DCF7D
-	str r0, [r4, #0x4C]
-	adds r0, r4, #0x0
-	movs r1, #0x00
-	movs r2, #0x00
-	movs r3, #0x00
-	bl sub_8082E1C
-_080DD46A:
-	adds r0, r5, #0x0
-	pop {r4, r5}
-	pop {r1}
-	bx r1
-	.byte 0x00, 0x00
-_080DD474: .4byte sub_80DCF7C
 	thumb_func_start sub_80DD478
 sub_80DD478:
 	push {r4, r5, r6, r7, lr}
