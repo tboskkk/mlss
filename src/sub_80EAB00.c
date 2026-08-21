@@ -44,3 +44,9 @@ block_9:
     return 1;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/script_cmd_conditional_jump.s\"");
+#else
+#error "TODO: write script_cmd_conditional_jump to match asm/nonmatching/script_cmd_conditional_jump.s, then delete this #error"
+#endif
