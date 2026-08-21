@@ -19,3 +19,9 @@ u8 sub_819B19C(u8 param_1) {
     return param_1;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_819B1B8.s\"");
+#else
+#error "TODO: write sub_819B1B8 to match asm/nonmatching/sub_819B1B8.s, then delete this #error"
+#endif
