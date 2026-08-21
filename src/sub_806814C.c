@@ -49,7 +49,8 @@ void sub_806819C(void *arg0)
   s32 var_r0_10;
   s32 var_r0_26;
   temp_r1_8 = *((s32 *) (((s8 *) arg0) + 0x10));
-  var_r0_10 = (*((s32 *) (((s8 *) arg0) + 0x10)) = temp_r1_8 + 0xFFFFFECD);
+  var_r0_10 = temp_r1_8 + 0xFFFFFECD;
+  *((s32 *) (((s8 *) arg0) + 0x10)) = var_r0_10;
   temp_r4_12 = *((s32 *) (((s8 *) arg0) + 0x18));
   temp_r3_14 = temp_r4_12 + 0xFFFFFE00;
   *((s32 *) (((s8 *) arg0) + 0x18)) = temp_r3_14;
@@ -57,7 +58,8 @@ void sub_806819C(void *arg0)
   {
     var_r0_10 = temp_r1_8 - 0x34;
   }
-  if (((s32) (var_r0_10 >> 8)) > (-0x20))
+  temp_r1_8 = var_r0_10 >> 8;
+  if (((s32) temp_r1_8) > (-0x20))
   {
     var_r0_26 = temp_r3_14;
     if (var_r0_26 < 0)

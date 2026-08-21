@@ -131,16 +131,21 @@ void sub_810D170(void) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_810D1A4.s\"");
 #else
-s32 sub_8085A6C(void *);                            /* extern */
-
-void sub_810D1A4(void *arg0) {
-    void *temp_r2_8;
-
-    temp_r2_8 = (*(void **)((s8 *)(arg0) + (8)));
-    (*(u8 *)((s8 *)(temp_r2_8) + (0x79))) = (u8) (-0x11 & (*(u8 *)((s8 *)(temp_r2_8) + (0x79))));
-    if (((*(s32 *)((s8 *)(temp_r2_8) + (0x80))) == 0) || ((sub_8085A6C(temp_r2_8) << 0x18) != 0)) {
-        (*(s32 *)((s8 *)(arg0) + (4))) = 0;
-    }
+void sub_810D1A4(void *arg0)
+{
+  s32 *new_var;
+  void *temp_r2_8;
+  long new_var2;
+  void *new_var3;
+  new_var3 = arg0;
+  temp_r2_8 = *((void **) (((s8 *) new_var3) + 8));
+  *((u8 *) (((s8 *) temp_r2_8) + 0x79)) = (u8) ((-0x11) & (*(((s8 *) temp_r2_8) + 0x79)));
+  new_var = &(*((s32 *) (((s8 *) temp_r2_8) + 0x80)));
+  new_var2 = *new_var;
+  if ((new_var2 == 0) || ((sub_8085A6C(temp_r2_8) << 0x18) != 0))
+  {
+    *((s32 *) (((s8 *) arg0) + 4)) = 0;
+  }
 }
 #endif
 

@@ -12,7 +12,7 @@ asm_unified(".include \"asm/nonmatching/sub_806A2FC.s\"");
 #else
 void sub_806A2FC(void *arg0)
 {
-  unsigned long temp_r0_11;
+  long temp_r0_11;
   temp_r0_11 = (*((u16 *) (((s8 *) arg0) + 0xAC))) - 1;
   *((u16 *) (((s8 *) arg0) + 0xAC)) = temp_r0_11;
   if (((s32) (temp_r0_11 << 0x10)) <= 0)

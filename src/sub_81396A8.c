@@ -68,8 +68,15 @@ asm_unified(".include \"asm/nonmatching/sub_813980C.s\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8139880.s\"");
 #else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
+s32 sub_81370C4(s32, s32);                      /* extern */
+s32 sub_81378CC(s32, s32, s32, s32);            /* extern */
+s32 sub_81381D4(s32);                           /* extern */
+extern s32 sub_813980C;
+
+void sub_8139880(s32 arg0, s32 arg1, s32 **arg2) {
+    sub_81370C4(arg1, 0xFF);
+    sub_81378CC(arg1, 1, M2C_ERROR(/* unknown instruction: ldsh $r2, ($mem_loc_fictive_) */) << 8, M2C_ERROR(/* unknown instruction: ldsh $r3, ($mem_loc_fictive_) */) << 8);
+    sub_81381D4(arg1);
+    *arg2 = &sub_813980C;
+}
 #endif

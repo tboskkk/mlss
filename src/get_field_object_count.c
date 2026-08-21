@@ -7,16 +7,10 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/get_field_object_count.s\"");
-#else
-u8 get_field_object_count(u16 arg0, u8* arg1) {
-    u8** ptr = (u8**)0x083D6C58;
-    u8 val = ptr[arg0 >> 2][1];
-    *arg1 = val >> 3;
+u8 get_field_object_count(s32 arg0, u8 *arg1) {
+    *arg1 = (u8) ((u8) (*(u8 *)((s8 *)(*(s32 *)(0x083D6C58 + ((u32) (arg0 << 0x10) >> 0xE))) + (1))) >> 3);
     return *arg1;
 }
-#endif
 
 u32 sub_80FB790(u32 param_1, u32 param_2)
 {

@@ -168,8 +168,18 @@ void sub_8148A38(s32 arg0, void *arg1) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8148AB0.s\"");
 #else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
+s32 sub_80FBC14(s32 *, s32, s32, s32, s32); /* extern */
+s32 sub_80FBD44(s32, u8 *);                         /* extern */
+s32 sub_8139D44(s32 *, s32, s32, s32);      /* extern */
+
+s32 sub_8148AB0(s32 arg0, s32 arg1) {
+    s32 sp4;
+    u8 sp14;
+    s32 temp_r4_19;
+
+    if (((sub_80FBD44(arg0, &sp14) << 0x18) == 0) || (temp_r4_19 = (*(s32 *)((s8 *)(((sp14 * 4) + arg0)) + (0x28))), sub_8139D44(&sp4, arg1, 0x11, 0x1C), ((sub_80FBC14(&sp4, arg1, temp_r4_19, M2C_ERROR(/* unknown instruction: ldsh $r3, ($mem_loc_fictive_) */), M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */)) << 0x18) == 0))) {
+        return 0;
+    }
+    return 1;
+}
 #endif

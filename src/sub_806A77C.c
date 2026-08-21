@@ -130,8 +130,25 @@ void sub_806A8E0(void *arg0) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_806A908.s\"");
 #else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
+s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
+s32 sub_8085B38(void *);                        /* extern */
+extern s32 sub_806A97C;
+
+void sub_806A908(void *arg0) {
+    void *temp_r1_20;
+
+    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+        sub_8082E1C(arg0, 3, 0, 0);
+        temp_r1_20 = arg0 + 0x84;
+        (*(s32 *)((s8 *)(arg0) + (0x84))) = (s32) (*(s32 *)((s8 *)(arg0) + (0x38)));
+        (*(s32 *)((s8 *)(temp_r1_20) + (4))) = (s32) (*(s32 *)((s8 *)(arg0) + (0x3C)));
+        (*(s32 *)((s8 *)((temp_r1_20 + 4)) + (4))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x40))) + 0x8000);
+        (*(u8 *)((s8 *)(arg0) + (0x79))) = (u8) ((*(u8 *)((s8 *)(arg0) + (0x79))) | 0x20);
+        (*(s16 *)((s8 *)(arg0) + (0x7C))) = 0x180;
+        (*(s16 *)((s8 *)(arg0) + (0x7A))) = 0;
+        sub_8085B38(arg0);
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_806A97C;
+        play_sfx_80195B4(0x112, -1);
+    }
+}
 #endif

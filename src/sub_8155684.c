@@ -158,13 +158,17 @@ asm_unified(".include \"asm/nonmatching/sub_8158044.s\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81580A4.s\"");
 #else
-s32 sub_81649AC(s32, s32, s32, s32, s32);   /* extern */
-
-void sub_81580A4(void *arg0, s32 arg1) {
-    void *temp_r3_10;
-
-    temp_r3_10 = *(void **)0x03001018;
-    sub_81649AC((*(s32 *)((s8 *)(temp_r3_10) + (0x1CA8))), arg1, (s32) ((*(s32 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x4C)))) + (4))) - (*(s32 *)((s8 *)(temp_r3_10) + (0x1CB8)))) >> 8, 0x50, 1);
+void sub_81580A4(void *arg0, s32 arg1)
+{
+  s32 new_var3;
+  s8 *new_var2;
+  void *temp_r3_10;
+  s8 *new_var;
+  new_var2 = (s8 *) (*((void **) (((s8 *) arg0) + 0x4C)));
+  temp_r3_10 = *((void **) 0x03001018);
+  new_var = new_var2 + 4;
+  new_var3 = ((s32) ((*((s32 *) new_var)) - (*((s32 *) (((s8 *) temp_r3_10) + 0x1CB8))))) >> 8;
+  sub_81649AC(*((s32 *) (((s8 *) temp_r3_10) + 0x1CA8)), arg1, new_var3, 0x50, 1);
 }
 #endif
 
