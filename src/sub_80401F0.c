@@ -40,3 +40,9 @@ void sub_80401F0(void *arg0, s32 arg1, s32 arg2, u16 arg3) {
     (*(u8 *)((s8 *)(arg0) + (0x213))) = (u8) ((-0x21 & (*(u8 *)((s8 *)(arg0) + (0x213)))) | (var_r3_92 << 5));
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80402C4.s\"");
+#else
+#error "TODO: write sub_80402C4 to match asm/nonmatching/sub_80402C4.s, then delete this #error"
+#endif
