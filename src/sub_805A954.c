@@ -19,3 +19,9 @@ void sub_805A95C(void *arg0) {
     (*(s16 *)((s8 *)((void *)0x02000010) + (2))) = (s16) (0xFF & (*(u16 *)((s8 *)(arg0) + (0x34))));
     *(s16 *)0x02000016 = 0xFF & (*(u16 *)((s8 *)(arg0) + (0x36)));
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_805A99C.s\"");
+#else
+#error "TODO: write sub_805A99C to match asm/nonmatching/sub_805A99C.s, then delete this #error"
+#endif
