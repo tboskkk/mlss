@@ -67,3 +67,9 @@ void sub_81DA72C(u32 r0, u32 r1, s16 r2)
     *(u16*)r0 = r6;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_81DA7AC.s\"");
+#else
+#error "TODO: write sub_81DA7AC to match asm/nonmatching/sub_81DA7AC.s, then delete this #error"
+#endif
