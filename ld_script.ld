@@ -278,6 +278,8 @@ SECTIONS
         build/src/sub_805A900.o(.text);
         build/src/sub_805A954.o(.text);
         build/asm/text08057568_p20.o(.text);
+        build/src/sub_805B074.o(.text);
+        build/asm/text08057568_p378.o(.text);
         build/src/sub_805CCC0.o(.text);
         build/src/sub_805CCD8.o(.text);
         build/asm/text08057568_p21.o(.text);
