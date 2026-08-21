@@ -18,9 +18,6 @@ void sub_80DB0FC(void *arg0) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80DB12C.s\"");
-#else
 s32 sub_807F4FC(void *);                        /* extern */
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 extern s32 sub_80DAD00;
@@ -40,4 +37,3 @@ void sub_80DB12C(void *arg0) {
         (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80DAD00;
     }
 }
-#endif

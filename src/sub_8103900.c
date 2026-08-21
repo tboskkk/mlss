@@ -34,14 +34,45 @@ asm_unified(".include \"asm/nonmatching/sub_8103D74.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_81040DC.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+s32 sub_8082C58(s32, s32 *, s32 *, s32 *, s32); /* extern */
+s32 sub_8082D50(s32);                               /* extern */
+s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
+extern s32 sub_8106AC8;
+
+void sub_81040DC(void *arg0) {
+    s32 sp4;
+    s32 sp8;
+    s32 spC;
+    s32 temp_r0_23;
+    s32 temp_r0_58;
+    s32 var_r0_26;
+    void *temp_r1_12;
+    void *temp_r4_16;
+    void *temp_r5_20;
+
+    temp_r1_12 = *(void **)0x03000FD8;
+    temp_r4_16 = (*(void **)((s8 *)(temp_r1_12) + (0x37C)));
+    temp_r5_20 = (*(void **)((s8 *)(temp_r1_12) + (0x278)));
+    temp_r0_23 = (*(s32 *)((s8 *)(temp_r4_16) + (0x10))) + 0xFFFFFF00;
+    (*(s32 *)((s8 *)(temp_r4_16) + (0x10))) = temp_r0_23;
+    (*(s32 *)((s8 *)(temp_r5_20) + (0x10))) = temp_r0_23;
+    var_r0_26 = (*(s32 *)((s8 *)(temp_r4_16) + (0x10)));
+    if (var_r0_26 < 0) {
+        var_r0_26 += 0xFF;
+    }
+    sp4 = var_r0_26 >> 8;
+    sp8 = 0;
+    spC = 0;
+    sub_8082C58((*(s32 *)((s8 *)(temp_r1_12) + (0x24C))), &sp4, &sp8, &spC, 0);
+    if (sp4 <= 0xD0) {
+        temp_r0_58 = ((s32) (sub_8082D50((*(s32 *)((s8 *)(*(void **)0x03000FD8) + (0x24C)))) << 0x10) >> 8) + 0xD000;
+        (*(s32 *)((s8 *)(temp_r4_16) + (0x10))) = temp_r0_58;
+        (*(s32 *)((s8 *)(temp_r5_20) + (0x10))) = temp_r0_58;
+        sub_8082E1C(temp_r5_20, 4, 0, 0);
+        (*(s8 *)((s8 *)(*(void **)0x03000FD8) + (0x342))) = 0;
+        (*(s32 **)((s8 *)(arg0) + (4))) = &sub_8106AC8;
+    }
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8104184.s\"");

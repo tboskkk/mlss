@@ -138,9 +138,6 @@ void sub_8163C94(void *arg0, void *arg1) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8163CD4.s\"");
-#else
 void sub_8163CD4(void *arg0, void *arg1) {
     void *temp_r0_18;
     void *var_r0_8;
@@ -172,4 +169,3 @@ block_3:
         (*(s32 *)((s8 *)(arg0) + (8))) = (s32) ((*(s32 *)((s8 *)(arg0) + (8))) + 1);
     }
 }
-#endif

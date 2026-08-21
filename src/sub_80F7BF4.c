@@ -37,9 +37,6 @@ loop_1:
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80F7C3C.s\"");
-#else
 s32 sub_807F6D0();                              /* extern */
 s32 sub_807F6EC(s32, s32);                      /* extern */
 
@@ -60,11 +57,7 @@ s32 sub_80F7C3C(s32 arg0, s32 arg1, s32 *arg2) {
     }
     return 1;
 }
-#endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80F7C78.s\"");
-#else
 s32 sub_80E3CF4();                                  /* extern */
 s32 sub_8116620(s32);                               /* extern */
 
@@ -77,4 +70,3 @@ s32 sub_80F7C78(s32 arg0, void *arg1) {
     }
     return 1;
 }
-#endif

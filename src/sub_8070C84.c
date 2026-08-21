@@ -38,9 +38,6 @@ void sub_8070D60(void *arg0) {
     (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8071080;
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8070D88.s\"");
-#else
 extern s32 sub_806F47C;
 
 void sub_8070D88(void *arg0) {
@@ -59,4 +56,3 @@ void sub_8070D88(void *arg0) {
         (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_806F47C;
     }
 }
-#endif
