@@ -31,5 +31,18 @@ s32 sub_80F1A3C(void *arg0, void *arg1, void *arg3) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80F1A7C.s\"");
 #else
-#error "TODO: write sub_80F1A7C to match asm/nonmatching/sub_80F1A7C.s, then delete this #error"
+s32 sub_80475A0(s32, s32);                      /* extern */
+
+s32 sub_80F1A7C(void *arg0, s32 arg1, void *arg3) {
+    s32 temp_r0_9;
+    s32 var_r4_8;
+
+    var_r4_8 = arg1;
+    temp_r0_9 = (*(s32 *)((s8 *)(arg3) + (0)));
+    if (temp_r0_9 != 0x3F) {
+        var_r4_8 = (*(s32 *)((s8 *)(((temp_r0_9 * 4) + (*(s32 *)((s8 *)(arg0) + (0x14))))) + (0x28)));
+    }
+    sub_80475A0(var_r4_8, (*(s32 *)((s8 *)(arg3) + (4))));
+    return 1;
+}
 #endif
