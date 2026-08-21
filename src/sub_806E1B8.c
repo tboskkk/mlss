@@ -64,20 +64,18 @@ asm_unified(".include \"asm/nonmatching/sub_806E624.s\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_806E664.s\"");
 #else
-s32 stop_sfx_80195A8(s32);                      /* extern */
-s32 sub_8086D80();                                  /* extern */
-extern s32 sub_806E1B8;
-
-s32 sub_806E664(void *arg0) {
-    s32 var_r0_8;
-
-    var_r0_8 = sub_8086D80();
-    if (var_r0_8 == 0) {
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_806E1B8;
-        stop_sfx_80195A8(0x6C);
-        play_sfx_80195B4(0x40, -1);
-        var_r0_8 = 0;
-    }
-    return var_r0_8;
+s32 sub_806E664(void *arg0)
+{
+  s32 var_r0_8;
+  var_r0_8 = sub_8086D80();
+  if (var_r0_8 == 0)
+  {
+    var_r0_8 = 0x4C;
+    *((s32 **) (((s8 *) arg0) + var_r0_8)) = &sub_806E1B8;
+    stop_sfx_80195A8(0x6C);
+    play_sfx_80195B4(0x40, -1);
+    var_r0_8 = 0;
+  }
+  return var_r0_8;
 }
 #endif
