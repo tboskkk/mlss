@@ -169,5 +169,61 @@ asm_unified(".include \"asm/nonmatching/sub_81DAD4C.s\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81DAE94.s\"");
 #else
-#error "TODO: write sub_81DAE94 to match asm/nonmatching/sub_81DAE94.s, then delete this #error"
+void sub_81DAE94(void *arg0, void *arg1) {
+    u32 sp0;
+    s32 sp4;
+    s32 temp_r0_12;
+    s32 temp_r1_81;
+    u32 temp_r1_10;
+    u32 temp_r3_20;
+    u32 var_r4_15;
+    u32 var_r5_17;
+
+    temp_r1_10 = (*(u32 *)((s8 *)(arg0) + (4)));
+    sp0 = temp_r1_10;
+    temp_r0_12 = (*(s32 *)((s8 *)(arg0) + (0)));
+    sp4 = temp_r0_12;
+    var_r4_15 = temp_r1_10;
+    var_r5_17 = (u32) (temp_r0_12 << 0xC) >> 0xC;
+    temp_r3_20 = (u32) ((*(u16 *)((s8 *)(&sp0) + (6))) << 0x11) >> 0x15;
+    (*(u32 *)((s8 *)(arg1) + (4))) = (u32) ((u8) (*(u8 *)((s8 *)(&sp0) + (7))) >> 7);
+    if (temp_r3_20 == 0) {
+        if ((temp_r1_10 | var_r5_17) == 0) {
+            (*(s32 *)((s8 *)(arg1) + (0))) = 2;
+            return;
+        }
+        (*(s32 *)((s8 *)(arg1) + (8))) = 0xFFFFFC02;
+        var_r5_17 = (var_r4_15 >> 0x18) | (var_r5_17 << 8);
+        var_r4_15 <<= 8;
+        (*(s32 *)((s8 *)(arg1) + (0))) = 3;
+        if (var_r5_17 <= 0x0FFFFFFFU) {
+            do {
+                var_r5_17 = (var_r4_15 >> 0x1F) | (var_r5_17 * 2);
+                var_r4_15 *= 2;
+                (*(s32 *)((s8 *)(arg1) + (8))) = (s32) ((*(s32 *)((s8 *)(arg1) + (8))) - 1);
+            } while (var_r5_17 <= 0x0FFFFFFFU);
+        }
+        goto block_13;
+    }
+    if (temp_r3_20 == 0x7FF) {
+        if ((temp_r1_10 | var_r5_17) == 0) {
+            (*(s32 *)((s8 *)(arg1) + (0))) = 4;
+            return;
+        }
+        temp_r1_81 = var_r5_17 & 0x80000;
+        if (temp_r1_81 != 0) {
+            (*(s32 *)((s8 *)(arg1) + (0))) = 1;
+        } else {
+            (*(s32 *)((s8 *)(arg1) + (0))) = temp_r1_81;
+        }
+block_13:
+        (*(u32 *)((s8 *)(arg1) + (0xC))) = var_r4_15;
+        (*(u32 *)((s8 *)(arg1) + (0x10))) = var_r5_17;
+        return;
+    }
+    (*(s32 *)((s8 *)(arg1) + (8))) = (s32) (temp_r3_20 + 0xFFFFFC01);
+    (*(s32 *)((s8 *)(arg1) + (0))) = 3;
+    (*(u32 *)((s8 *)(arg1) + (0xC))) = (u32) (var_r4_15 << 8);
+    (*(u32 *)((s8 *)(arg1) + (0x10))) = (u32) ((var_r4_15 >> 0x18) | (var_r5_17 << 8) | 0x10000000);
+}
 #endif
