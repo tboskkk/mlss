@@ -52,3 +52,9 @@ void sub_814B7A4(u32* p1, u32* p2)
     }
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_814B804.s\"");
+#else
+#error "TODO: write sub_814B804 to match asm/nonmatching/sub_814B804.s, then delete this #error"
+#endif
