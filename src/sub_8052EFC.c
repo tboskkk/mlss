@@ -36,3 +36,9 @@ asm_unified(".include \"asm/nonmatching/bclr_update_8053778.s\"");
 #else
 #error "TODO: write bclr_update_8053778 to match asm/nonmatching/bclr_update_8053778.s, then delete this #error"
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8053CB4.s\"");
+#else
+#error "TODO: write sub_8053CB4 to match asm/nonmatching/sub_8053CB4.s, then delete this #error"
+#endif
