@@ -16,3 +16,9 @@ void sub_8114790(void *arg0) {
         (*(s8 *)((s8 *)((*(void **)((s8 *)((*(void **)((s8 *)(arg0) + (0x2C)))) + (0x28)))) + (0x113))) = (s8) temp_r2_11;
     }
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_81147B4.s\"");
+#else
+#error "TODO: write sub_81147B4 to match asm/nonmatching/sub_81147B4.s, then delete this #error"
+#endif
