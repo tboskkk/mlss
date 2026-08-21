@@ -50,3 +50,9 @@ void sub_815085C(u32 r0)
     ((void(*)())r0)();
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8150A00.s\"");
+#else
+#error "TODO: write sub_8150A00 to match asm/nonmatching/sub_8150A00.s, then delete this #error"
+#endif
