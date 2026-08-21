@@ -18,7 +18,21 @@ void sub_8065E4C(void *arg0) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8065E68.s\"");
 #else
-#error "TODO: write sub_8065E68 to match asm/nonmatching/sub_8065E68.s, then delete this #error"
+s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
+extern s32 sub_8065D10;
+
+void sub_8065E68(void *arg0) {
+    s32 temp_r0_17;
+
+    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+        temp_r0_17 = (*(s32 *)((s8 *)(arg0) + (0x9C))) - 1;
+        (*(s32 *)((s8 *)(arg0) + (0x9C))) = temp_r0_17;
+        if (temp_r0_17 <= 0) {
+            sub_8082E1C(arg0, 8, 0, 0);
+            (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8065D10;
+        }
+    }
+}
 #endif
 
 #ifndef NONMATCHING
