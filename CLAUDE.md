@@ -1132,6 +1132,45 @@ the dashboard:
     declarations from the actual translation unit rather than from m2c's
     guesses; not attempted yet.
 
+**And a fifth, found by not trusting the rescue's own numbers.** Of the 25
+candidates `rescue_isolated_zeros.py` recovered, only 12 became matches —
+13 were rejected by the validator as "asm-differ said match but
+from-scratch build FAILED". Checking *why* rather than filing them under
+the known backlog found the check itself was broken:
+
+`asm_differ_score()` derived its object stem from `find_guard_block()`,
+which returns `None` once `splice_candidate()` has REMOVED the guard —
+which is precisely the state the validator calls it in. The stem fell back
+to the FUNCTION's own name, so for any function living in someone else's
+file (`sub_8028E14` in `start_battle_8027AC4.c` — the normal case, since
+`split_func.py` appends) it deleted a file that does not exist, while
+asm-differ's `-m` rebuilt the real object with `NONMATCHING=1` and nothing
+removed it. `object_size_matches()` then ran `make <obj>`, Make saw an
+object newer than its source and declined to rebuild, and the size check
+measured the NONMATCHING object — where every `#else` branch was compiled
+instead of the retail `.include`, so the object is a fraction of its real
+size. Reported mismatches like **-4652 bytes** on candidates that were
+fine.
+
+Diagnosed by a test worth reusing: with the tree CLEAN, rebuild the object
+and compare it to `expected/`. All four files checked reproduced
+`expected/` exactly — which ruled out the obvious suspect (a stale
+`expected/`) in one step and pointed at `build/` instead. With the stem
+fixed, the same three functions report `0xC8` / `0x1388` / `0x4D8`,
+unchanged. **17 rows requeued, 14 matched** (`sub_801B034`'s -276 is a
+real length mismatch and stays for a human).
+
+Two process lessons from this, both cheap and both nearly missed:
+  * **A tool's own success number is not the result.** "26 recovered" was
+    26 *promotions*, and 13 of them died at the next gate. Count matches at
+    the terminal state, never at the hand-off.
+  * **A long-running worker holds the code it imported at startup.** The
+    first requeue of those 17 rows failed identically, because the
+    validator process had loaded `gitops.py` at 12:07 and the fix landed at
+    14:15. Restart the worker that owns a fix before re-running work
+    through it — the supervisor restarts children on SIGTERM, so it costs
+    one signal.
+
 **A measured claim ordering rule: high-score seeds are not worth a slot.**
 Over 1,020 seeds with a recorded asm-differ score, against whether they
 ever reached matched/validating:
