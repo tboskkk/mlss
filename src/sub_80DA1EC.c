@@ -30,3 +30,9 @@ void sub_80DA208(void *arg0) {
     }
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80DA224.s\"");
+#else
+#error "TODO: write sub_80DA224 to match asm/nonmatching/sub_80DA224.s, then delete this #error"
+#endif
