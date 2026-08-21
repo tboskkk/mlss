@@ -14,3 +14,9 @@ s32 sub_80F0B80(void)
   *((u8 *) (((s8 *) temp_r2_7) + 0x55F)) = (u8) (((-0x61) & (*(((s8 *) temp_r2_7) + 0x55F))) | 0x20);
   return 1;
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80F0BA4.s\"");
+#else
+#error "TODO: write sub_80F0BA4 to match asm/nonmatching/sub_80F0BA4.s, then delete this #error"
+#endif
