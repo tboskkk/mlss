@@ -40,6 +40,10 @@ import db  # noqa: E402
 import gitops  # noqa: E402
 
 REPO = gitops.REPO
+
+# Seeds at or above this asm-differ score are searched only when nothing
+# below it is claimable. See claim_one() for the measurement behind it.
+SEED_SCORE_CEILING = 5000
 NONMATCHINGS_DIR = REPO / "nonmatchings"
 WORKER_ID = "tier2"
 
@@ -214,6 +218,91 @@ def trim_source(source: str, fn_name: str) -> str:
     return source
 
 
+def decl_prefix(source: str, fn_name: str) -> str:
+    """Everything ABOVE the function definition -- trim_source's complement.
+
+    This exists because trim_source alone silently threw away real matches.
+    The permuter searches an ISOLATED file (nonmatchings/<name>/base.c)
+    which carries m2c's guessed callee prototypes above the function;
+    trim_source cuts at the function, so those prototypes never come back
+    with the winning source. In the real src/*.c the callee is then
+    undeclared, and agbcc runs with `-Wimplicit -Werror` -- so the spliced
+    result does not merely score differently, it does not COMPILE, and
+    already_matches() reports False for a function the permuter had
+    genuinely solved.
+
+    Measured before the fix: 178 distinct functions reached score 0 in
+    isolation and were rejected here, and tier2 then spent 1,599 of 2,897
+    launches (55% of the pool, over 24h) re-searching them -- re-deriving
+    the same rejected zero. Convergence read 0.6%/12h against a 15.6%
+    historical baseline; the searches were succeeding and the result was
+    being discarded.
+
+    The prefix is taken from candidate_body rather than from the
+    permuter's base.c on purpose: base.c also carries m2c's typedef
+    preamble (`typedef int int32_t;` ...), which global.h already
+    provides, so re-splicing it is a redefinition error. candidate_body is
+    what m2c_bridge produced FOR the real file -- it already drops
+    anything the project headers declare -- and it is known to compile
+    there, since scoring it is how the row reached tier2_ready.
+    """
+    trimmed = trim_source(source, fn_name)
+    return source[: len(source) - len(trimmed)]
+
+
+def _prefix_variants(name: str) -> list[str]:
+    """Declaration prefixes to try in front of a permuter-won function,
+    best-supported first.
+
+    There is no single always-right prefix, which is why this returns
+    several and the caller lets an actual asm-differ score decide:
+
+      1. The seeding candidate's own prefix. Correct by construction at
+         the moment of convergence -- it is what m2c_bridge produced FOR
+         the real file, so it already omits anything the project headers
+         declare. Can go stale if the row was re-seeded mid-search.
+      2. The search's own base.c prefix minus typedefs. base.c is what the
+         permuter actually compiled, so its declarations are contemporaneous
+         with the win; its typedefs (`typedef int int32_t;` ...) come from
+         m2c's --context and collide with global.h.
+      3. base.c's prefix verbatim -- last resort for a file whose real
+         source somehow lacks the headers.
+    """
+    out = []
+    cand = candidate_body_of(name)
+    if cand:
+        out.append(decl_prefix(cand, name))
+    base = REPO / "nonmatchings" / name / "base.c"
+    if base.is_file():
+        src = base.read_text()
+        pre = decl_prefix(src, name)
+        no_typedefs = "\n".join(l for l in pre.splitlines()
+                                 if not l.lstrip().startswith("typedef"))
+        out += [no_typedefs, pre]
+    seen, uniq = set(), []
+    for pre in out:
+        key = pre.strip()
+        if key and key not in seen:
+            seen.add(key)
+            uniq.append(pre)
+    return uniq or [""]
+
+
+def reattach_decls(permuted: str, name: str) -> list[str]:
+    """The permuter's winning function text, with its callee prototypes
+    restored -- one body per plausible prefix. See decl_prefix() for why
+    dropping the prefix loses real matches, and _prefix_variants() for why
+    there is more than one candidate prefix."""
+    fn_only = trim_source(permuted, name)
+    bodies = []
+    for prefix in _prefix_variants(name):
+        prefix = prefix.rstrip()
+        bodies.append(prefix + "\n" + fn_only.lstrip("\n") if prefix else fn_only)
+    if fn_only not in bodies:
+        bodies.append(fn_only)  # the pre-fix behaviour, still worth a shot
+    return bodies
+
+
 # Every actively-launched search this process owns right now, so a kill
 # signal (or an unhandled exception) can still clean up real containers
 # instead of orphaning them -- see kill_search()'s docstring for why that
@@ -223,9 +312,35 @@ _active: dict[str, subprocess.Popen] = {}
 
 
 def _cleanup_all():
+    """Stop every search this process owns AND hand its rows back.
+
+    Killing the containers was only half of it. tier2 marks a row
+    `permuting` with worker_id=None (it tracks ownership in its own
+    in-process `procs` dict), so a row abandoned mid-search is in a state
+    NOTHING claims from -- it waits on the supervisor's reaper, whose
+    staleness window is 45 minutes. Every tier2 restart therefore parked
+    up to 12 functions for up to 45 minutes; two restarts in ten minutes
+    left 24 rows sitting in `permuting` behind a single live container,
+    which also makes the dashboard's `permuting` count a fiction.
+
+    Releasing them here costs nothing and is safe: the row goes back to
+    tier2_ready with its candidate intact, so the next pool slot re-claims
+    it normally. The reaper stays as the backstop for the cases this
+    cannot cover -- a SIGKILL, a crash, a power cut.
+    """
     for name, proc in list(_active.items()):
         print(f"  cleanup: stopping {name}'s search (process exiting)")
         kill_search(name, proc)
+        try:
+            conn = db.connect()
+            try:
+                with db.tx(conn):
+                    db.set_state(conn, name, "tier2_ready", worker_id=None,
+                                 notes="search interrupted (tier2 exiting) -- requeued")
+            finally:
+                conn.close()
+        except Exception as e:
+            print(f"  cleanup: could not requeue {name}: {e}")
 
 
 atexit.register(_cleanup_all)
@@ -269,13 +384,36 @@ def already_matches(name: str, candidate_body: str | None) -> bool:
     from-scratch build before committing anything, so the real gate is
     unchanged. A false negative just falls through to the permuter, which
     is exactly what would have happened anyway.
+
+    It REVERTS the splice on every path, which it did not used to.
+    Scoring requires writing the candidate into the real src/*.c, and
+    leaving it there turns a pure predicate into a working-tree mutation
+    that outlives the question it answered. gitops.commit() stages
+    FACTORY_PATHS -- which includes src/ -- so every one of those
+    abandoned splices got swept into whatever match committed next.
+    Measured live: 9 stale splices sitting in the tree at once, and
+    `Match sub_8163A24` (1f84d124) carrying edits to SIX unrelated source
+    files, 271 insertions and 284 deletions that have nothing to do with
+    sub_8163A24. Harmless to the ROM -- a #else branch never builds the
+    shipped ROM -- but it makes every commit message a lie, and it commits
+    unverified drafts that can re-create the translation-unit deadlock
+    (CLAUDE.md section D) in a file nobody touched on purpose.
+
+    Reverting is safe for every caller: the promotion path stores the body
+    in the DB (resolve(..., body=...)) and the validator re-splices from
+    there, and the permuter path re-splices for itself in
+    ensure_isolated().
     """
     if not candidate_body:
         return False
     with gitops.repo_lock(what=f"tier2 precheck {name}"):
-        if gitops.splice_into_else(name, candidate_body) is None:
+        c_path = gitops.splice_into_else(name, candidate_body)
+        if c_path is None:
             return False
-        return gitops.asm_differ_matches(name)
+        try:
+            return gitops.asm_differ_matches(name)
+        finally:
+            gitops.run(["git", "checkout", "--", str(c_path.relative_to(gitops.REPO))])
 
 
 def run_pool(jobs: int, stall_min: float, max_functions: int):
@@ -336,9 +474,41 @@ def run_pool(jobs: int, stall_min: float, max_functions: int):
             # gets a first search before anything gets a second, while
             # closest-first still decides the order within each round --
             # which was the point of the change and is worth keeping.
-            return db.claim_for_worker(
-                conn, "tier2_ready", WORKER_ID,
-                order_by="escalation_count ASC, best_score IS NULL ASC, best_score ASC")
+            #
+            # SEED CEILING. Attempts-first fairness is right among seeds
+            # that could plausibly converge, and wrong when most of the
+            # queue cannot. Measured over 1,020 seeds with a recorded
+            # asm-differ score, against whether they ever reached
+            # matched/validating:
+            #
+            #     seed score      seeds   converted
+            #        1 -  99         43      25.6%
+            #      100 - 499        147      12.9%
+            #      500 -1499        213       3.3%
+            #     1500 -4999        255       2.4%
+            #     5000-19999        135       0.7%
+            #    20000+             227       0.0%   <- 227 tried, zero
+            #
+            # 1,975 of 2,923 queued seeds sit at 5000+, so attempts-first
+            # spends most of the pool on the two bands that convert at
+            # 0.7% and 0.0%. A 15-minute stochastic search does not close a
+            # 20,000-point gap; that function needs a better SEED, which is
+            # this project's whole thesis (CLAUDE.md section E).
+            #
+            # A ceiling, not an exclusion: high-score rows stay in
+            # tier2_ready, and the moment nothing under the ceiling is
+            # claimable the pool takes them anyway rather than idling. So
+            # this can only reorder work, never drop it, and a new m2c rule
+            # that re-seeds a function to a lower score puts it straight
+            # back in contention.
+            order = "escalation_count ASC, best_score IS NULL ASC, best_score ASC"
+            row = db.claim_for_worker(
+                conn, "tier2_ready", WORKER_ID, order_by=order,
+                extra_where="(best_score IS NULL OR best_score < ?)",
+                params=(SEED_SCORE_CEILING,))
+            if row is not None:
+                return row
+            return db.claim_for_worker(conn, "tier2_ready", WORKER_ID, order_by=order)
         finally:
             conn.close()
 
@@ -464,8 +634,35 @@ def run_pool(jobs: int, stall_min: float, max_functions: int):
                 base_zero = zero is None and base_already_zero(name)
                 if zero or base_zero:
                     if zero:
-                        body = trim_source(zero.read_text(), name)
+                        # Try each prefix variant; the first that actually
+                        # scores 0 in the REAL file wins. Dropping the
+                        # prefix entirely -- what this used to do -- left
+                        # callees undeclared, and agbcc's -Wimplicit
+                        # -Werror turned that into a compile failure, so a
+                        # genuinely solved function read as "didn't hold".
+                        body = None
+                        for cand_body in reattach_decls(zero.read_text(), name):
+                            if already_matches(name, cand_body):
+                                body = cand_body
+                                break
                         detail = "score=0 (permuter found it)"
+                        if body is not None:
+                            resolve(name, "validating", event="converged",
+                                    detail=detail, body=body)
+                            print(f"  {name}: converged -- {detail}")
+                            del procs[name]
+                            _active.pop(name, None)
+                            processed += 1
+                            continue
+                        resolve(name, "stalled", event="t2_exit_no_zero",
+                                notes="permuter reached score 0 in isolation but no "
+                                      "declaration prefix made it match in its real "
+                                      "source file")
+                        print(f"  {name}: permuter score 0 didn't hold in context -> stalled")
+                        del procs[name]
+                        _active.pop(name, None)
+                        processed += 1
+                        continue
                     else:
                         body = candidate_body_of(name)
                         detail = "score=0 (base attempt already matched)"

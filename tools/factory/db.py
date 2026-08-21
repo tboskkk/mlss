@@ -150,17 +150,25 @@ def set_state(conn: sqlite3.Connection, name: str, new_state: str, **fields) -> 
     log_event(conn, name, f"state:{new_state}", ", ".join(f"{k}={v}" for k, v in fields.items()))
 
 
-def claim_for_worker(conn: sqlite3.Connection, state: str, worker_id: str, order_by: str = "tractability ASC"):
+def claim_for_worker(conn: sqlite3.Connection, state: str, worker_id: str,
+                     order_by: str = "tractability ASC",
+                     extra_where: str | None = None, params: tuple = ()):
     """Atomically claim the single best-ranked row in `state` for this
     worker, by moving it to a transitional 'claimed by me' marker in
     worker_id under one transaction -- the mutual-exclusion mechanism that
     makes 'two workers grab the same function' structurally impossible
-    rather than a race to be careful about. Returns the row, or None."""
+    rather than a race to be careful about. Returns the row, or None.
+
+    `extra_where` is an additional SQL predicate ANDed onto the claim (with
+    its own `params`), for a caller that wants to restrict WHICH rows it
+    will take rather than just how they are ordered -- see tier2's seed
+    ceiling."""
     with tx(conn):
         row = conn.execute(
             f"SELECT * FROM functions WHERE state = ? AND worker_id IS NULL "
+            f"{('AND ' + extra_where) if extra_where else ''} "
             f"ORDER BY {order_by} LIMIT 1",
-            (state,),
+            (state, *params),
         ).fetchone()
         if row is None:
             return None
