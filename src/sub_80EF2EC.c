@@ -52,3 +52,9 @@ asm_unified(".include \"asm/nonmatching/evts_update.s\"");
 #else
 #error "TODO: write evts_update to match asm/nonmatching/evts_update.s, then delete this #error"
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80EF618.s\"");
+#else
+#error "TODO: write sub_80EF618 to match asm/nonmatching/sub_80EF618.s, then delete this #error"
+#endif
