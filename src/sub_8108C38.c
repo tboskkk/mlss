@@ -10,17 +10,41 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8108C38.s\"");
 #else
-#error "TODO: write sub_8108C38 to match asm/nonmatching/sub_8108C38.s, then delete this #error"
+void sub_8108C38(void *arg0) {
+    u16 temp_r1_11;
+
+    temp_r1_11 = (*(u16 *)((s8 *)(arg0) + (0x11E)));
+    if (0x80 & temp_r1_11) {
+        (*(u16 *)((s8 *)(arg0) + (0x11E))) = (u16) (0xFF7F & temp_r1_11);
+        (*(s16 *)((s8 *)(arg0) + (0x11C))) = 0x100;
+    }
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8108C64.s\"");
 #else
-#error "TODO: write sub_8108C64 to match asm/nonmatching/sub_8108C64.s, then delete this #error"
+void sub_8108C64(void *arg0) {
+    u16 temp_r1_11;
+
+    temp_r1_11 = (*(u16 *)((s8 *)(arg0) + (0x11E)));
+    if (0x20 & temp_r1_11) {
+        (*(u16 *)((s8 *)(arg0) + (0x11E))) = (u16) (0xFFDF & temp_r1_11);
+        (*(s16 *)((s8 *)(arg0) + (0x10C))) = 0x100;
+    }
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8108C90.s\"");
 #else
-#error "TODO: write sub_8108C90 to match asm/nonmatching/sub_8108C90.s, then delete this #error"
+void sub_8108C90(void *arg0) {
+    u16 temp_r1_11;
+
+    temp_r1_11 = (*(u16 *)((s8 *)(arg0) + (0x11E)));
+    if (8 & temp_r1_11) {
+        (*(u16 *)((s8 *)(arg0) + (0x11E))) = (u16) (0xFFF7 & temp_r1_11);
+        (*(s16 *)((s8 *)(arg0) + (0x10A))) = 0x100;
+    }
+}
 #endif
