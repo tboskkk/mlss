@@ -97,13 +97,23 @@ def main():
     ap.add_argument("--limit", type=int, default=40)
     ap.add_argument("--states", nargs="*",
                     default=["needs_attempt", "stalled", "needs_human"])
+    ap.add_argument("--names-file", type=Path, default=None,
+                    help="measure exactly these functions (one name per line) "
+                         "instead of sampling by state. REQUIRED for comparing "
+                         "two versions of m2c_bridge: sampling by state against "
+                         "a live factory draws a DIFFERENT set every run, so "
+                         "before/after numbers are noise, not signal.")
     args = ap.parse_args()
 
     conn = db.connect()
-    q = ",".join("?" for _ in args.states)
-    rows = conn.execute(
-        f"SELECT name FROM functions WHERE state IN ({q}) ORDER BY lines ASC", args.states
-    ).fetchall()
+    if args.names_file:
+        rows = [{"name": n.strip()} for n in args.names_file.read_text().split()
+                if n.strip()]
+    else:
+        q = ",".join("?" for _ in args.states)
+        rows = conn.execute(
+            f"SELECT name FROM functions WHERE state IN ({q}) ORDER BY lines ASC", args.states
+        ).fetchall()
 
     counts: Counter[str] = Counter()
     examples: dict[str, list[str]] = defaultdict(list)
