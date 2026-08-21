@@ -53,18 +53,18 @@ void sub_814B7A4(u32* p1, u32* p2)
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_814B804.s\"");
-#else
 s32 sub_813B5B4(void *);                            /* extern */
 extern s32 sub_814A0A4;
-
-void sub_814B804(s32 arg0, void *arg1, s32 **arg2) {
-    if ((*(u8 *)((s8 *)((*(void **)((s8 *)(arg1) + (0x294)))) + (0x23))) == 2) {
-        (*(u8 *)((s8 *)(arg1) + (0x214))) = (u8) ((-8 & (*(u8 *)((s8 *)(arg1) + (0x214)))) | 5);
-    }
-    if ((sub_813B5B4(arg1) << 0x18) == 0) {
-        *arg2 = &sub_814A0A4;
-    }
+void sub_814B804(s32 arg0, void *arg1, s32 **arg2)
+{
+  int new_var;
+  new_var = 0x214;
+  if ((*((u8 *) (((s8 *) (*((void **) (((s8 *) arg1) + 0x294)))) + 0x23))) == 2)
+  {
+    *((u8 *) (((s8 *) arg1) + 0x214)) = (u8) (((-8) & (*(((s8 *) arg1) + new_var))) | 5);
+  }
+  if ((sub_813B5B4(arg1) << 0x18) == 0)
+  {
+    *arg2 = &sub_814A0A4;
+  }
 }
-#endif
