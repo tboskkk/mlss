@@ -31,5 +31,22 @@ loop_2:
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81DCE9C.s\"");
 #else
-#error "TODO: write sub_81DCE9C to match asm/nonmatching/sub_81DCE9C.s, then delete this #error"
+s32 sub_81DCE9C(s32 arg0) {
+    s32 *var_r0_14;
+
+    if (arg0 == M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */)) {
+        var_r0_14 = (s32 *)0x03001A6C;
+        goto block_7;
+    }
+    if (arg0 == M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */)) {
+        var_r0_14 = (s32 *)0x03001A70;
+        goto block_7;
+    }
+    if (arg0 != M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */)) {
+        return arg0 - 0x20;
+    }
+    var_r0_14 = (s32 *)0x03001A74;
+block_7:
+    return *var_r0_14;
+}
 #endif
