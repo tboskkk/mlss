@@ -713,6 +713,8 @@ groups:
   - {obj: asm/text08057568_p46, section: text}
   - {obj: src/fld_script_execute_next_command, section: text}
   - {obj: asm/text08057568_p331, section: text}
+  - {obj: src/sub_80ECB20, section: text}
+  - {obj: asm/text08057568_p462, section: text}
   - {obj: src/sub_80ED17C, section: text}
   - {obj: asm/text08057568_p338, section: text}
   - {obj: src/sub_80ED4EC, section: text}
