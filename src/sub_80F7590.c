@@ -40,3 +40,9 @@ void sub_80F75D8(s32 arg0) {
     (*(s32 *)((s8 *)(temp_r2_12) + (0x1798))) = (s32) ((*(s32 *)((s8 *)(temp_r2_12) + (0x1798))) | arg0);
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80F7608.s\"");
+#else
+#error "TODO: write sub_80F7608 to match asm/nonmatching/sub_80F7608.s, then delete this #error"
+#endif
