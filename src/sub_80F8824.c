@@ -97,3 +97,9 @@ s32 sub_80F8900(void *arg0, s32 *arg1, void *arg2, void *arg3) {
     return 1;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80F8940.s\"");
+#else
+#error "TODO: write sub_80F8940 to match asm/nonmatching/sub_80F8940.s, then delete this #error"
+#endif
