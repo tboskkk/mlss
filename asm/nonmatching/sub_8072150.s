@@ -1,11 +1,10 @@
-	.include "asm/macros.inc"
-
 	.syntax unified
 	.text
 
-	thumb_func_start sub_80720A8
-sub_80720A8:
+	thumb_func_start sub_8072150
+sub_8072150:
 	push {r4, r5, r6, lr}
+	add sp, #-0x004
 	adds r6, r0, #0x0
 	adds r0, #0xA4
 	adds r4, r6, #0x0
@@ -73,18 +72,48 @@ sub_80720A8:
 	adds r0, r0, r1
 	asrs r0, r0, #0x01
 	cmp r2, r0
-	blt _08072148
+	blt _08072228
 	ldr r0, [r6, #0x18]
 	cmp r0, #0x00
-	bgt _08072148
+	bgt _08072228
 	ldr r0, [r6, #0x28]
 	adds r0, #0xE0
 	ldr r0, [r0, #0x00]
 	str r0, [r6, #0x18]
-	movs r0, #0x00
+	ldr r1, [r6, #0x10]
+	cmp r1, #0x00
+	bge _080721F6
+	adds r1, #0xFF
+_080721F6:
+	asrs r1, r1, #0x08
+	ldr r2, [r6, #0x14]
+	cmp r2, #0x00
+	bge _08072200
+	adds r2, #0xFF
+_08072200:
+	asrs r2, r2, #0x08
+	cmp r0, #0x00
+	bge _08072208
+	adds r0, #0xFF
+_08072208:
+	asrs r3, r0, #0x08
+	str r6, [sp, #0x000]
+	ldr r0, _08072230 @ =0x00002214
+	bl sub_80DF024
+	ldr r2, _08072234 @ =0x000040B3
+	adds r0, r6, #0x0
+	movs r1, #0x00
+	movs r3, #0x00
+	bl sub_8082E1C
+	ldr r0, [r6, #0x30]
+	bl sub_807C298
+	ldr r0, _08072238 @ =0x0808750D
 	str r0, [r6, #0x4C]
-_08072148:
+_08072228:
+	add sp, #0x004
 	pop {r4, r5, r6}
 	pop {r0}
 	bx r0
-	.byte 0x00, 0x00
+_08072230: .4byte 0x00002214
+_08072234: .4byte 0x000040B3
+_08072238: .4byte sub_808750C
