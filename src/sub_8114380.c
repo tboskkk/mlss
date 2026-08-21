@@ -70,3 +70,9 @@ _081143AC:
     *(u32*)((u8*)r2 + 0x54) = (u32)sub_8114680;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8114404.s\"");
+#else
+#error "TODO: write sub_8114404 to match asm/nonmatching/sub_8114404.s, then delete this #error"
+#endif
