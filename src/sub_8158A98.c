@@ -21,3 +21,9 @@ void sub_8158A98(void *arg0, s32 arg1)
   *((s8 *) (((s8 *) arg0) + 0x24)) = 4;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8158ABC.s\"");
+#else
+#error "TODO: write sub_8158ABC to match asm/nonmatching/sub_8158ABC.s, then delete this #error"
+#endif
