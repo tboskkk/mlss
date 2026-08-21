@@ -151,3 +151,9 @@ asm_unified(".include \"asm/nonmatching/sub_8096EBC.s\"");
 #else
 #error "TODO: write sub_8096EBC to match asm/nonmatching/sub_8096EBC.s, then delete this #error"
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8096F08.s\"");
+#else
+#error "TODO: write sub_8096F08 to match asm/nonmatching/sub_8096F08.s, then delete this #error"
+#endif
