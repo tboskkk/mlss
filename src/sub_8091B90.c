@@ -7,30 +7,30 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8091B90.s\"");
-#else
 s32 sub_808DD2C(void *);                        /* extern */
-
-void sub_8091B90(void *arg0) {
-    u16 temp_r1_34;
-    void *temp_r1_8;
-
-    temp_r1_8 = (*(void **)((s8 *)(arg0) + (0x28)));
-    if (temp_r1_8 != NULL) {
-        (*(u8 *)((s8 *)(temp_r1_8) + (0x111))) = (u8) (-5 & (*(u8 *)((s8 *)(temp_r1_8) + (0x111))));
-    }
-    if (0x38 & (*(u8 *)((s8 *)(arg0) + (0x76)))) {
-        sub_808DD2C(arg0);
-        return;
-    }
-    temp_r1_34 = (*(u16 *)((s8 *)(arg0) + (0xAC)));
-    (*(u16 *)((s8 *)(arg0) + (0xAC))) = (u16) (temp_r1_34 + 1);
-    if ((s32) (s16) temp_r1_34 > 0x13) {
-        sub_808DD2C(arg0);
-    }
+void sub_8091B90(void *arg0)
+{
+  u16 temp_r1_34;
+  void *temp_r1_8;
+  int new_var;
+  temp_r1_8 = *((void **) (((s8 *) arg0) + 0x28));
+  new_var = -5;
+  if (temp_r1_8 != ((void *) 0))
+  {
+    *((u8 *) (((s8 *) temp_r1_8) + 0x111)) = (u8) (new_var & (*((u8 *) (((s8 *) temp_r1_8) + 0x111))));
+  }
+  if (0x38 & (*((u8 *) (((s8 *) arg0) + 0x76))))
+  {
+    sub_808DD2C(arg0);
+    return;
+  }
+  temp_r1_34 = *((u16 *) (((s8 *) arg0) + 0xAC));
+  *((u16 *) (((s8 *) arg0) + 0xAC)) = (u16) (temp_r1_34 + 1);
+  if (((s32) ((s16) temp_r1_34)) > 0x13)
+  {
+    sub_808DD2C(arg0);
+  }
 }
-#endif
 
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 s32 sub_808DD2C(void *);                        /* extern */
