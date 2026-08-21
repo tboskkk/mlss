@@ -38,5 +38,39 @@ void sub_814BEA8(void *arg1, s32 **arg2) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_814BF28.s\"");
 #else
-#error "TODO: write sub_814BF28 to match asm/nonmatching/sub_814BF28.s, then delete this #error"
+s32 sub_80FBD44(s32, u8 *);                         /* extern */
+s32 sub_8149AC8(s32, void *);                       /* extern */
+extern s32 sub_814998C;
+extern s32 sub_814BA70;
+
+void sub_814BF28(s32 arg0, void *arg1, s32 **arg2) {
+    u8 sp0;
+    s32 *var_r0_31;
+    void *temp_r1_55;
+
+    (*(s32 *)((s8 *)(arg1) + (0x18))) = (s32) ((*(s32 *)((s8 *)(arg1) + (0x18))) - M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */));
+    if ((*(s32 *)((s8 *)(arg1) + (0x24))) & 0x18000) {
+        if ((sub_8149AC8(arg0, arg1) << 0x18) != 0) {
+            var_r0_31 = &sub_814998C;
+        } else {
+            goto block_8;
+        }
+        goto block_9;
+    }
+    if ((sub_80FBD44(arg0, &sp0) << 0x18) == 0) {
+        (*(u8 *)((s8 *)(arg1) + (0x1D8))) = (u8) (-2 & (*(u8 *)((s8 *)(arg1) + (0x1D8))));
+        return;
+    }
+    temp_r1_55 = (*(void **)((s8 *)(((sp0 * 4) + arg0)) + (0x28)));
+    if ((s32) ((*(s32 *)((s8 *)(arg1) + (0x14))) + (*(s32 *)((s8 *)(arg1) + (0x18)))) <= (s32) ((*(s32 *)((s8 *)(temp_r1_55) + (0x14))) + (*(s32 *)((s8 *)(temp_r1_55) + (0x18))) + 0x2D00)) {
+        if ((sub_8149AC8(arg0, arg1) << 0x18) != 0) {
+            var_r0_31 = &sub_814998C;
+        } else {
+block_8:
+            var_r0_31 = &sub_814BA70;
+        }
+block_9:
+        *arg2 = var_r0_31;
+    }
+}
 #endif
