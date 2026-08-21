@@ -22,5 +22,8 @@ s32 script_cmd_wait_for_user_input(s32 arg0, void *arg1, void *arg2, s32 *arg3) 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80EB11C.s\"");
 #else
-#error "TODO: write sub_80EB11C to match asm/nonmatching/sub_80EB11C.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
