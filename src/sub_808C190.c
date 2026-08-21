@@ -275,3 +275,9 @@ asm_unified(".include \"asm/nonmatching/sub_808CDD4.s\"");
 #else
 #error "TODO: write sub_808CDD4 to match asm/nonmatching/sub_808CDD4.s, then delete this #error"
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_808CEAC.s\"");
+#else
+#error "TODO: write sub_808CEAC to match asm/nonmatching/sub_808CEAC.s, then delete this #error"
+#endif
