@@ -319,8 +319,26 @@ def run_pool(jobs: int, stall_min: float, max_functions: int):
             # is evidence that searching it again is not where the next
             # match comes from. If that turns out to be wrong the fix is a
             # better seed for it, not an earlier slot.
-            return db.claim_for_worker(conn, "tier2_ready", WORKER_ID,
-                                       order_by="best_score IS NULL ASC, best_score ASC")
+            # FEWEST-ATTEMPTS first, then closest-first within that round.
+            #
+            # Pure closest-first (best_score alone) spun. Measured live: 738
+            # launches and 736 stalls in ONE hour, producing a single match,
+            # with the same dozen function names in the slots across three
+            # checks 30 minutes apart. The cycle is: a search stalls ->
+            # tier_m2c claims `stalled` and re-seeds it -> it lands back in
+            # tier2_ready -> it is still the lowest-scoring row, so it is
+            # re-claimed immediately -> it stalls again in ~60s. Twelve
+            # slots, permanently, on twelve functions that had already
+            # failed. The old updated_at ordering did not have this problem
+            # because a re-queued row went to the back of the line.
+            #
+            # Sorting on attempts first restores that fairness: everything
+            # gets a first search before anything gets a second, while
+            # closest-first still decides the order within each round --
+            # which was the point of the change and is worth keeping.
+            return db.claim_for_worker(
+                conn, "tier2_ready", WORKER_ID,
+                order_by="escalation_count ASC, best_score IS NULL ASC, best_score ASC")
         finally:
             conn.close()
 
@@ -380,7 +398,14 @@ def run_pool(jobs: int, stall_min: float, max_functions: int):
             conn = db.connect()
             try:
                 with db.tx(conn):
+                    # Count this attempt. escalation_count was tier3's
+                    # (retired) retry counter and is otherwise unused, so
+                    # tier2 repurposes it as "how many searches has this
+                    # function already had". The claim ordering below sorts
+                    # on it FIRST, which is what stops the closest-first
+                    # spin loop -- see there.
                     db.set_state(conn, name, "permuting", worker_id=None, best_score=None,
+                                 escalation_count=(row["escalation_count"] or 0) + 1,
                                  last_improved_at=time.time())
                 db.log_event(conn, name, "t2_launch",
                              f"threads={threads_each}, stall={procs[name]['stall_s']:.0f}s")
