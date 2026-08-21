@@ -14,3 +14,9 @@ s32 sub_815EC8C(s32 arg0) {
     return M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */);
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_815ECA8.s\"");
+#else
+#error "TODO: write sub_815ECA8 to match asm/nonmatching/sub_815ECA8.s, then delete this #error"
+#endif
