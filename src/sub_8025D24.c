@@ -28,3 +28,9 @@ void sub_8025D24(u32* param_1, s32 param_2)
     }
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8025E94.s\"");
+#else
+#error "TODO: write sub_8025E94 to match asm/nonmatching/sub_8025E94.s, then delete this #error"
+#endif
