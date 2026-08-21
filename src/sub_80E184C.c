@@ -10,7 +10,22 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80E184C.s\"");
 #else
-#error "TODO: write sub_80E184C to match asm/nonmatching/sub_80E184C.s, then delete this #error"
+void sub_80E184C(void *arg0, s32 arg1) {
+    s32 temp_r0_10;
+    s32 temp_r1_12;
+
+    temp_r0_10 = M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */);
+    temp_r1_12 = (*(s32 *)((s8 *)(arg0) + (0xC))) + temp_r0_10;
+    (*(s32 *)((s8 *)(arg0) + (0xC))) = temp_r1_12;
+    if (temp_r0_10 < 0) {
+        if (temp_r1_12 < 0xFFFF8000) {
+            goto block_4;
+        }
+    } else if ((s32) (M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */) << 8) < temp_r1_12) {
+block_4:
+        (*(s16 *)((s8 *)(arg0) + (0x16))) = 0;
+    }
+}
 #endif
 
 #ifndef NONMATCHING
