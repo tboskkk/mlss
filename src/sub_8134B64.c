@@ -13,3 +13,9 @@ u32 sub_8134B64(u32 param_1) {
     *(u16*)(param_1 + 4) = 0x10;
     return param_1;
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8134B70.s\"");
+#else
+#error "TODO: write sub_8134B70 to match asm/nonmatching/sub_8134B70.s, then delete this #error"
+#endif
