@@ -81,5 +81,11 @@ asm_unified(".include \"asm/nonmatching/sub_8047E50.s\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8047EB8.s\"");
 #else
-#error "TODO: write sub_8047EB8 to match asm/nonmatching/sub_8047EB8.s, then delete this #error"
+void sub_8047EB8(void *arg0) {
+    (*(s32 *)((s8 *)(arg0) + (0x25C))) = -1;
+    (*(u8 *)((s8 *)(arg0) + (0x213))) = (u8) (-0x21 & (*(u8 *)((s8 *)(arg0) + (0x213))));
+    (*(s32 *)((s8 *)(arg0) + (0x250))) = -1;
+    (*(s32 *)((s8 *)(arg0) + (0x24C))) = -1;
+    (*(u16 *)((s8 *)(arg0) + (0x23E))) = (u16) (*(u16 *)((s8 *)(arg0) + (0x240)));
+}
 #endif
