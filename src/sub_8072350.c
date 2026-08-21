@@ -10,11 +10,28 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8072350.s\"");
 #else
-#error "TODO: write sub_8072350 to match asm/nonmatching/sub_8072350.s, then delete this #error"
+extern s32 sub_80722F8;
+
+void sub_8072350(void *arg0) {
+    u16 temp_r0_11;
+
+    temp_r0_11 = (*(u16 *)((s8 *)(arg0) + (0xAC))) - 1;
+    (*(u16 *)((s8 *)(arg0) + (0xAC))) = temp_r0_11;
+    if ((s32) (temp_r0_11 << 0x10) <= 0) {
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80722F8;
+    }
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8072370.s\"");
 #else
-#error "TODO: write sub_8072370 to match asm/nonmatching/sub_8072370.s, then delete this #error"
+extern s32 sub_8071B14;
+
+void sub_8072370(void *arg0) {
+    if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
+        (*(s16 *)((s8 *)(arg0) + (0xAC))) = 0x1E;
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8071B14;
+    }
+}
 #endif
