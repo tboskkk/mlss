@@ -32,3 +32,9 @@ void sub_810B884(void *arg0) {
     *(s32 *)0x04000044 = (*(u16 *)0x0200001A - temp_r5_43) | ((*(u16 *)0x0200001A - temp_r3_46) << 8) | (((*(u16 *)0x0200001A - temp_r5_43) | ((*(u16 *)0x0200001A - temp_r3_46) << 8)) << 0x10);
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_810B908.s\"");
+#else
+#error "TODO: write sub_810B908 to match asm/nonmatching/sub_810B908.s, then delete this #error"
+#endif
