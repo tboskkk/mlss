@@ -60,3 +60,9 @@ block_13:
     (*(u32 *)((s8 *)(arg1) + (0xC))) = (u32) ((var_r2_10 << 7) | 0x40000000);
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_81DBC1C.s\"");
+#else
+#error "TODO: write sub_81DBC1C to match asm/nonmatching/sub_81DBC1C.s, then delete this #error"
+#endif
