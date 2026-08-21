@@ -7,23 +7,23 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8143314.s\"");
-#else
 s32 sub_8047154(void *, s32, s32);              /* extern */
 s32 sub_81387C8(void *, s32);                   /* extern */
 extern s32 sub_8136D00;
-
-void sub_8143314(s32 arg0, void *arg1) {
-    sub_81387C8(arg1, 0x10);
-    (*(s32 (**)(s32, void *))((s8 *)(arg1) + (0x198))) = (s32 (*)(s32, void *)) (*(s32 (**)(s32, void *))((s8 *)(arg1) + (0x19C)));
-    (*(s32 **)((s8 *)(arg1) + (0x1A0))) = &sub_8136D00;
-    (*(s32 **)((s8 *)(arg1) + (0x1A4))) = &sub_8136D00;
-    (*(u8 *)((s8 *)(arg1) + (0x214))) = (u8) ((-8 & (*(u8 *)((s8 *)(arg1) + (0x214)))) | 1);
-    sub_8047154(arg1, 4, 0);
-    (*(s32 (**)(s32, void *))((s8 *)(arg1) + (0x198)))(arg0, arg1);
+void sub_8143314(s32 arg0, void *arg1)
+{
+  s32 (*new_var2)(s32, void *);
+  int new_var;
+  sub_81387C8(arg1, 0x10);
+  *((s32 (**)(s32, void *)) (((s8 *) arg1) + 0x198)) = (s32 (*)(s32, void *)) (*((s32 (**)(s32, void *)) (((s8 *) arg1) + 0x19C)));
+  *((s32 **) (((s8 *) arg1) + 0x1A0)) = &sub_8136D00;
+  new_var = 1;
+  *((s32 **) (((s8 *) arg1) + 0x1A4)) = &sub_8136D00;
+  *((u8 *) (((s8 *) arg1) + 0x214)) = (u8) (new_var | ((-8) & (*(((s8 *) arg1) + 0x214))));
+  sub_8047154(arg1, 4, 0);
+  new_var2 = *((s32 (**)(s32, void *)) (((s8 *) arg1) + 0x198));
+  new_var2(arg0, arg1);
 }
-#endif
 
 s32 sub_81387C8(void *, s32);                   /* extern */
 s32 sub_8139030(void *, s32);                   /* extern */
