@@ -23,3 +23,9 @@ s32 sub_8163A08(void *arg0) {
     }
     return 1;
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8163A24.s\"");
+#else
+#error "TODO: write sub_8163A24 to match asm/nonmatching/sub_8163A24.s, then delete this #error"
+#endif
