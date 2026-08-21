@@ -26,3 +26,9 @@ u32 sub_8047CE8(u8* param_1) {
   return uVar3 & 0x00000180;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8047D44.s\"");
+#else
+#error "TODO: write sub_8047D44 to match asm/nonmatching/sub_8047D44.s, then delete this #error"
+#endif
