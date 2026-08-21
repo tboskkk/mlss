@@ -120,6 +120,8 @@ SECTIONS
         build/asm/text0801A548_p63.o(.text);
         build/src/sub_8029380.o(.text);
         build/asm/text0801A548_p64.o(.text);
+        build/src/sub_802973C.o(.text);
+        build/asm/text0801A548_p65.o(.text);
         build/src/sub_8029804.o(.text);
         build/asm/text0801A548_p22.o(.text);
         build/src/sub_8029888.o(.text);
