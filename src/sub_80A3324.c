@@ -74,3 +74,9 @@ _080A3380:
     return;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80A339C.s\"");
+#else
+#error "TODO: write sub_80A339C to match asm/nonmatching/sub_80A339C.s, then delete this #error"
+#endif
