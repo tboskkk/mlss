@@ -23,5 +23,19 @@ void sub_8079320(void *arg0) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8079348.s\"");
 #else
-#error "TODO: write sub_8079348 to match asm/nonmatching/sub_8079348.s, then delete this #error"
+s32 sub_807F4FC(void *);                        /* extern */
+s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
+extern s32 sub_8079284;
+extern s32 sub_80797E0;
+
+void sub_8079348(void *arg0) {
+    if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
+        sub_8082E1C(arg0, 4, 0x4029, 0);
+        play_sfx_80195B4(0xE6, -1);
+        (*(s16 *)((s8 *)(arg0) + (0xAC))) = 4;
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8079284;
+        sub_807F4FC(arg0);
+        (*(s32 **)((s8 *)(arg0) + (0x60))) = &sub_80797E0;
+    }
+}
 #endif
