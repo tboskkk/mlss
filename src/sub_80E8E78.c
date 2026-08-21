@@ -34,9 +34,6 @@ asm_unified(".include \"asm/nonmatching/sub_80E8EE0.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80E8EFC.s\"");
-#else
 s32 free_heap_memory_8018C68(s32);              /* extern */
 
 void sub_80E8EFC(s32 *arg0, s32 arg1) {
@@ -45,4 +42,3 @@ void sub_80E8EFC(s32 *arg0, s32 arg1) {
         free_heap_8018DA8(arg0);
     }
 }
-#endif

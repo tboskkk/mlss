@@ -70,9 +70,6 @@ void sub_8132DA0(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8132DE4.s\"");
-#else
 s32 sub_8082B00();                                  /* extern */
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 extern s32 sub_8132E34;
@@ -83,11 +80,7 @@ void sub_8132DE4(void *arg0) {
         (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8132E34;
     }
 }
-#endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8132E0C.s\"");
-#else
 s32 sub_8082B00();                                  /* extern */
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 extern s32 sub_8132E68;
@@ -98,4 +91,3 @@ void sub_8132E0C(void *arg0) {
         (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8132E68;
     }
 }
-#endif
