@@ -34,3 +34,9 @@ void sub_814BEA8(void *arg1, s32 **arg2) {
     }
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_814BF28.s\"");
+#else
+#error "TODO: write sub_814BF28 to match asm/nonmatching/sub_814BF28.s, then delete this #error"
+#endif
