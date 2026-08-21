@@ -27,7 +27,7 @@ What it does, concretely:
      non-word-aligned address, the extraction is extended through the
      following function(s) until it doesn't — otherwise the object gets
      padded and the whole ROM shifts (see the alignment note below).
-  4. Adds a `#ifndef NONMATCHING / asm include / #else / #error` stub to the
+  4. Adds a `#ifndef NONMATCHING / asm include / #else / empty` stub to the
      owning src/*.c file (creating it, with --dest, if this is the first
      function pulled from this blob).
   5. Updates tools/splits.yaml and regenerates ld_script.ld.
@@ -48,7 +48,14 @@ STUB_TEMPLATE = '''
 #ifndef NONMATCHING
 asm_unified(".include \\"asm/nonmatching/{name}.s\\"");
 #else
-#error "TODO: write {name} to match asm/nonmatching/{name}.s, then delete this #error"
+/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
+   compiles a whole translation unit at a time, so an #error here fails
+   every OTHER function in this file under NONMATCHING=1 -- which is how
+   853 functions ended up blocked behind 936 placeholders. Nothing is lost
+   by leaving it empty: the #ifndef branch above is untouched, so the real
+   ROM still gets the verbatim retail bytes, and progress.py still counts
+   this function as unmatched because the guard is still here. Write the C
+   here, replacing this comment. */
 #endif
 '''
 

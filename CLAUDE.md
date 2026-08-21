@@ -117,16 +117,34 @@ looks for to count something as "matched" (it can't re-verify byte-
 matching itself; that's what asm-differ is for. "Matched" here means
 "someone already confirmed it and removed the guard").
 
-Before a real attempt exists, `split_func.py` leaves:
+Before a real attempt exists, `split_func.py` leaves an EMPTY `#else`:
 ```c
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/name.s\"");
 #else
-#error "TODO: write name to match asm/nonmatching/name.s, then delete this #error"
+/* No C attempt yet. Deliberately empty — see below. */
 #endif
 ```
-`#error` rather than a fake signature — better to fail loudly under
-`NONMATCHING=1` than compile a silently-wrong stub.
+
+**This used to be an `#error`, and that was a mistake worth understanding.**
+The reasoning for `#error` was "better to fail loudly under `NONMATCHING=1`
+than compile a silently-wrong stub", which is sound for the function you are
+working on and wrong for every one of its neighbours: agbcc compiles a whole
+translation unit, and `split_func.py` appends each new extraction to the
+preceding `src/*.c`, so one undrafted `#error` fails EVERY function in that
+file. Measured at its worst: **936 placeholders across 184 files, blocking
+853 other functions** — none of which could be compiled, diffed, or
+permuted. Worse, it was a treadmill: extraction adds a placeholder, and it
+stays until that function is drafted, so the block regenerates as fast as
+`unblock_files.py` clears it.
+
+An empty branch is not the "silently-wrong stub" the original note warned
+about — the function simply does not exist under `NONMATCHING=1`. Nothing
+can mistake it for progress: the guard is still there, so `progress.py`
+still counts the function as unmatched, and the `#ifndef` branch is
+untouched, so the real ROM still gets the verbatim retail bytes. And
+`NONMATCHING=1` never builds a shipped ROM — it exists to compile and diff
+one function.
 
 ## Workflow: decompiling a function
 

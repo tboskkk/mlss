@@ -44,6 +44,14 @@ BYTE_RE = re.compile(r"0x([0-9A-Fa-f]{2})")
 THUMB_PROLOGUE = ("B4", "B5")
 
 
+
+# Empty #else, not an #error -- see split_func.py STUB_TEMPLATE for why.
+NEW_ELSE_BRANCH = """/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
+   compiles a whole translation unit at a time, so an #error here fails
+   every OTHER function in this file under NONMATCHING=1. Guard intact, so
+   the real ROM still gets the verbatim retail bytes and progress.py still
+   counts this as unmatched. Write the C here, replacing this comment. */\n"""
+
 def trailing_start_address(text: str) -> int | None:
     """Absolute address of the first trailing byte, from the fragment's own
     labels -- `_0815941C: .4byte X` means address 0x0815941C holds 4 bytes,
@@ -236,8 +244,7 @@ def write_split(src_name: str, new_name: str, addr: int, raw: bytes,
         "#ifndef NONMATCHING\n"
         f'asm_unified(".include \\"asm/nonmatching/{new_name}.s\\"");\n'
         "#else\n"
-        f'#error "TODO: write {new_name} to match asm/nonmatching/{new_name}.s, '
-        'then delete this #error"\n'
+        + NEW_ELSE_BRANCH +
         "#endif\n"
     )
 
