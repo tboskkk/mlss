@@ -68,3 +68,9 @@ void sub_81634DC(void *arg0) {
     sub_8161E38((*(s32 *)((s8 *)(arg0) + (0xC))));
     sub_8161C9C((*(s32 *)((s8 *)(arg0) + (0xC))), 0, 0);
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8163528.s\"");
+#else
+#error "TODO: write sub_8163528 to match asm/nonmatching/sub_8163528.s, then delete this #error"
+#endif
