@@ -33,3 +33,9 @@ s32 sub_81DCDF4(s32 *arg0, s32 arg1) {
     return temp_r0_12;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/strcmp.s\"");
+#else
+#error "TODO: write strcmp to match asm/nonmatching/strcmp.s, then delete this #error"
+#endif
