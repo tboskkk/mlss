@@ -182,9 +182,6 @@ void sub_8028D6C(void *arg0, u16 arg1) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8028E14.s\"");
-#else
 s32 sub_8021574(s32, s32, s32, s32, s32, s32 *, s32); /* extern */
 s32 sub_802191C(s32);                           /* extern */
 
@@ -196,4 +193,3 @@ void sub_8028E14(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     }
     sub_8021574(arg1, arg2, 0, 0, 0, &spC, arg3);
 }
-#endif
