@@ -600,6 +600,8 @@ groups:
   - {obj: asm/text08057568_p342, section: text}
   - {obj: src/sub_80A16A0, section: text}
   - {obj: asm/text08057568_p448, section: text}
+  - {obj: src/sub_80A1990, section: text}
+  - {obj: asm/text08057568_p516, section: text}
   - {obj: src/sub_80A1AB8, section: text}
   - {obj: asm/text08057568_p182, section: text}
   - {obj: src/sub_80A231C, section: text}
