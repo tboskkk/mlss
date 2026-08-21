@@ -45,13 +45,34 @@ import tier3  # noqa: E402
 WORKER_ID = "tier_m2c"
 
 
+def _declined(reason: str) -> str:
+    """A decline note stamped with the ruleset that produced it."""
+    return f"m2c:{m2c_bridge.ruleset_version()}: {reason}"
+
+
 def _claim(conn, state: str):
-    """Like db.claim_for_worker(), but excludes rows this tier already
+    """Like db.claim_for_worker(), but excludes rows THIS RULESET already
     declined -- WITHOUT that exclusion, releasing a declined row back to
     its ORIGINAL state with worker_id cleared (so tier3 can still try it)
     makes it immediately re-claimable by this exact same query, forever,
     with the same deterministic result every time. Hit live: one function
     cycled thousands of times in under a second before this fix.
+
+    The exclusion used to be permanent (`notes NOT LIKE 'm2c:%'`), which
+    was right while tier3's LLM was still a fallback for whatever m2c gave
+    up on. tier3 is gone, so a permanent exclusion means nothing claims
+    those rows EVER: 2,882 of them, roughly half the game, sitting
+    unreachable -- not hard, invisible. Adding a rule to m2c_bridge could
+    not recover them either, because they were excluded by note text rather
+    than by anything about the rules.
+
+    Stamping the ruleset version fixes both halves at once. Within a
+    ruleset the exclusion is exactly as airtight as before, so the spin
+    cannot come back; the moment m2c_bridge (or the pinned m2c revision)
+    changes, every previously-declined function becomes claimable again on
+    its own. That is the project's own thesis wired into the queue: a new
+    deterministic rule automatically re-tries the whole corpus it might
+    now handle.
 
     Oldest-queued-first (updated_at ASC), not smallest-first -- this tier
     itself isn't really bottlenecked (near-instant per function, so size
@@ -62,9 +83,9 @@ def _claim(conn, state: str):
     with db.tx(conn):
         row = conn.execute(
             "SELECT * FROM functions WHERE state = ? AND worker_id IS NULL "
-            "AND (notes IS NULL OR notes NOT LIKE 'm2c:%') "
+            "AND (notes IS NULL OR notes NOT LIKE ?) "
             "ORDER BY updated_at ASC LIMIT 1",
-            (state,),
+            (state, f"m2c:{m2c_bridge.ruleset_version()}:%"),
         ).fetchone()
         if row is None:
             return None
@@ -87,7 +108,7 @@ def process_one(conn, no_score: bool = False) -> str | None:
     if tier3.blocking_siblings(name):
         with db.tx(conn):
             db.set_state(conn, name, row["state"], worker_id=None,
-                         notes="m2c: blocked by an undrafted #error sibling in the same file")
+                         notes=_declined("blocked by an undrafted #error sibling in the same file"))
         return name
 
     # EXTRACT FIRST. m2c_bridge.generate() reads asm/nonmatching/<name>.s,
@@ -112,7 +133,7 @@ def process_one(conn, no_score: bool = False) -> str | None:
         # current coverage.
         with db.tx(conn):
             db.set_state(conn, name, row["state"], worker_id=None,
-                         notes="m2c: declined (outside current translation coverage)")
+                         notes=_declined("declined (outside current translation coverage)"))
         db.log_event(conn, name, "m2c_declined", "no output")
         return name
 
@@ -142,7 +163,7 @@ def process_one(conn, no_score: bool = False) -> str | None:
         if c_path is None:
             with db.tx(conn):
                 db.set_state(conn, name, row["state"], worker_id=None,
-                             notes="m2c: produced output but couldn't splice (no guard block)")
+                             notes=_declined("produced output but couldn't splice (no guard block)"))
             return name
         try:
             score = gitops.asm_differ_score(name)
@@ -152,7 +173,7 @@ def process_one(conn, no_score: bool = False) -> str | None:
     if score is None:
         with db.tx(conn):
             db.set_state(conn, name, row["state"], worker_id=None,
-                         notes="m2c: produced output but it doesn't compile")
+                         notes=_declined("produced output but it doesn't compile"))
         db.log_event(conn, name, "m2c_declined", "output does not compile")
         return name
 

@@ -32,6 +32,8 @@ else. Nothing here bypasses a single check.
 """
 from __future__ import annotations
 
+import functools
+import hashlib
 import re
 import subprocess
 import sys
@@ -66,6 +68,39 @@ def _declared_in_common_h() -> set[str]:
     except OSError:
         return set()
     return set(re.findall(r"\b(\w+)\s*\(", text)) | set(re.findall(r"\b(\w+)\s*;", text))
+
+
+@functools.lru_cache(maxsize=1)
+def ruleset_version() -> str:
+    """Short hash identifying the current translation ruleset.
+
+    A decline records this. tier_m2c then excludes only the rows declined
+    by the ruleset it is CURRENTLY running -- so the moment a rule is added
+    here, every function m2c previously gave up on becomes claimable again
+    automatically, with no manual requeue and no risk of the infinite
+    re-claim loop that made a blanket exclusion necessary in the first
+    place.
+
+    That loop is the thing to respect: releasing a declined row back to its
+    original state with the same deterministic outcome makes it instantly
+    re-claimable, forever. One function cycled thousands of times in under
+    a second before the exclusion existed. Versioning keeps the exclusion
+    airtight WITHIN a ruleset while making it expire when the ruleset
+    changes, which is exactly the condition under which retrying is worth
+    anything.
+
+    Hashes this file plus the pinned m2c submodule revision -- the two
+    things that decide what a seed comes out as.
+    """
+    h = hashlib.sha1()
+    h.update(Path(__file__).read_bytes())
+    try:
+        rev = subprocess.run(["git", "rev-parse", "HEAD:tools/m2c"],
+                             cwd=gitops.REPO, capture_output=True, text=True).stdout.strip()
+        h.update(rev.encode())
+    except Exception:
+        pass
+    return h.hexdigest()[:8]
 
 
 def expand_macros(c: str) -> str:
