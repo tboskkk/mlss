@@ -71,3 +71,9 @@ void sub_80F056C(u32* p0, u32 p1, u32* p2)
     }
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80F05DC.s\"");
+#else
+#error "TODO: write sub_80F05DC to match asm/nonmatching/sub_80F05DC.s, then delete this #error"
+#endif
