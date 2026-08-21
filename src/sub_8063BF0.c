@@ -32,7 +32,22 @@ void sub_8063BF0(void *arg0) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8063C24.s\"");
 #else
-#error "TODO: write sub_8063C24 to match asm/nonmatching/sub_8063C24.s, then delete this #error"
+s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
+extern s32 sub_8063C60;
+
+void sub_8063C24(void *arg0) {
+    s32 temp_r0_11;
+    void *temp_r2_20;
+
+    temp_r0_11 = (*(s32 *)((s8 *)(arg0) + (0x84))) - 1;
+    (*(s32 *)((s8 *)(arg0) + (0x84))) = temp_r0_11;
+    if (temp_r0_11 <= 0) {
+        sub_8082E1C(arg0, 1, 0, 0);
+        temp_r2_20 = (*(void **)((s8 *)(arg0) + (8)));
+        (*(u8 *)((s8 *)(temp_r2_20) + (0x12))) = (u8) ((-7 & (*(u8 *)((s8 *)(temp_r2_20) + (0x12)))) | 2);
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8063C60;
+    }
+}
 #endif
 
 #ifndef NONMATCHING
