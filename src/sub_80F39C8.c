@@ -50,3 +50,9 @@ void sub_80F39C8(u32* param_1)
     return;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80F3BEC.s\"");
+#else
+#error "TODO: write sub_80F3BEC to match asm/nonmatching/sub_80F3BEC.s, then delete this #error"
+#endif
