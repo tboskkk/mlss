@@ -28,3 +28,9 @@ u32 sub_8028F40(u32 param_1) {
     return param_1;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/make_btl_8028F54.s\"");
+#else
+#error "TODO: write make_btl_8028F54 to match asm/nonmatching/make_btl_8028F54.s, then delete this #error"
+#endif
