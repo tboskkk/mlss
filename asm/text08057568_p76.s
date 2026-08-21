@@ -47,20 +47,3 @@ _08059FD4: .4byte 0x03000DD0
 _08059FD8: .4byte 0x02000080
 _08059FDC: .4byte 0x0300034C
 _08059FE0: .4byte 0x00007FFF
-	thumb_func_start sub_8059FE4
-sub_8059FE4:
-	push {r4, lr}
-	adds r4, r0, #0x0
-	bl sub_8059F24
-	adds r0, r4, #0x0
-	bl sub_80582DC
-	adds r0, r4, #0x0
-	movs r1, #0x00
-	bl sub_80587BC
-	adds r0, r4, #0x0
-	bl sub_8058278
-	adds r0, r4, #0x0
-	bl sub_80584F8
-	pop {r4}
-	pop {r0}
-	bx r0

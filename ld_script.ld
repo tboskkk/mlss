@@ -265,6 +265,7 @@ SECTIONS
         build/src/sub_8059EC8.o(.text);
         build/src/sub_8059EF0.o(.text);
         build/asm/text08057568_p76.o(.text);
+        build/src/sub_8059FE4.o(.text);
         build/src/stage_room_solidity_grid.o(.text);
         build/src/load_col_set_to_dest.o(.text);
         build/src/sub_805A0EC.o(.text);
