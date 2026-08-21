@@ -24,5 +24,16 @@ u16 sub_8116610(u16* param_1) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8116620.s\"");
 #else
-#error "TODO: write sub_8116620 to match asm/nonmatching/sub_8116620.s, then delete this #error"
+s32 sub_8116620(void *arg0) {
+    if ((*(u16 *)((s8 *)(arg0) + (0x44))) != 0) {
+        return 4;
+    }
+    if ((*(u16 *)((s8 *)(arg0) + (0x34))) == 0) {
+        return 0;
+    }
+    if (!(4 & (*(u8 *)((s8 *)(arg0) + (0x32))))) {
+        return 1;
+    }
+    return 2;
+}
 #endif
