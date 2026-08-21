@@ -33,5 +33,7 @@ s64 _negdi2(s64 x) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/abort.s\"");
 #else
-#error "TODO: write abort to match asm/nonmatching/abort.s, then delete this #error"
+void abort(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    M2C_ERROR(/* unknown instruction: swi 0xab */);
+}
 #endif
