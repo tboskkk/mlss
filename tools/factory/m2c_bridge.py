@@ -159,12 +159,76 @@ def generate(name: str) -> str | None:
     if f"{name}(" not in c:
         return None  # m2c emitted something, but not this function
     c = fix_void_dereference(c)
+    c = fix_uncast_address_dereference(c)
     return restore_omitted_leading_params(c, name)
 
 
 VOID_DEREF_RE = re.compile(r"\*\(void \*\)")
 VOID_STORE_RE = re.compile(r"\*\(void \*\)([^=;]+?)\s*=\s*([^;]+);")
 DECL_RE_TMPL = r"^\s*(u8|s8|u16|s16|u32|s32)\s+{var}\s*;"
+
+
+def fix_uncast_address_dereference(c: str) -> str:
+    """Give `*(0xADDRESS + ...)` a pointer cast.
+
+    Distinct from fix_void_dereference() below, which repairs
+    `*(void *)ADDR` -- a cast that exists but has no width. This is the case
+    where m2c emits NO cast at all and dereferences a plain integer
+    expression:
+
+        var_r4_8 = (u16) *(0x03000BEC + (arg0 * 2)) >> 8;
+        if (*(0x03000D80 + temp_r1_9) != arg0) {
+
+    agbcc rejects that outright (`invalid type argument of unary *`), so
+    the whole translation unit fails and the seed is worth nothing -- no
+    score, no permuter search, no possible match. It was the single biggest
+    mechanical bucket in a frozen-set measurement: 7 of 19 compile
+    failures.
+
+    Width is taken from an immediately-preceding cast when m2c supplied one
+    (`(u16) *(...)` is a halfword load), otherwise s32 -- word access is
+    both the commonest and the width m2c itself defaults to elsewhere. A
+    wrong guess costs a worse score, not a wrong match: every seed still
+    goes through asm-differ and the from-scratch build like any other.
+
+    Hand-parses balanced parens rather than using a regex, for the same
+    reason expand_macros() does: these expressions nest.
+    """
+    out = []
+    i = 0
+    n = len(c)
+    while i < n:
+        # A dereference of an open paren, not already a cast (`*(u8 *)`).
+        if c[i] == "*" and i + 1 < n and c[i + 1] == "(":
+            depth = 0
+            j = i + 1
+            while j < n:
+                if c[j] == "(":
+                    depth += 1
+                elif c[j] == ")":
+                    depth -= 1
+                    if depth == 0:
+                        break
+                j += 1
+            if j < n:
+                inner = c[i + 2:j]
+                stripped = inner.lstrip()
+                # Only touch a raw address expression. A cast inside
+                # (`(u8 *)x`) means m2c already knew the width, and a
+                # non-hex start is a normal pointer variable.
+                if stripped.startswith("0x") and "*)" not in inner:
+                    width = "s32"
+                    before = "".join(out).rstrip()
+                    for cast in ("(u8)", "(s8)", "(u16)", "(s16)", "(u32)", "(s32)"):
+                        if before.endswith(cast):
+                            width = cast.strip("()")
+                            break
+                    out.append(f"*({width} *)({inner})")
+                    i = j + 1
+                    continue
+        out.append(c[i])
+        i += 1
+    return "".join(out)
 
 
 def fix_void_dereference(c: str) -> str:
