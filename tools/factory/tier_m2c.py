@@ -90,11 +90,26 @@ def process_one(conn) -> str | None:
                          notes="m2c: blocked by an undrafted #error sibling in the same file")
         return name
 
+    # EXTRACT FIRST. m2c_bridge.generate() reads asm/nonmatching/<name>.s,
+    # so a function that was never split out yields nothing -- and this
+    # tier would mark it "declined" without m2c having seen a single byte.
+    # That is exactly what happened when tier3 was dropped from the
+    # pipeline: tier3 owned ensure_extracted(), nothing inherited it, and
+    # the moment the unknown-callee gate opened, ~5,200 never-extracted
+    # functions were burned through at ~6/second and falsely marked
+    # declined -- starving tier2_ready to ZERO and stalling the permuter.
+    if not tier3.ensure_extracted(name):
+        with db.tx(conn):
+            db.set_state(conn, name, "needs_human", worker_id=None,
+                         notes="extraction failed (split_func.py) -- cannot generate a seed")
+        db.log_event(conn, name, "error", "tier_m2c: extraction failed")
+        return name
+
     body = m2c_bridge.generate(name)
     if body is None:
-        # Not this tier's function -- release it back exactly as found so
-        # tier3 (LLM) still gets a shot. Not a claim that m2c "failed" in
-        # any strong sense, just outside current coverage.
+        # Not this tier's function -- release it back exactly as found.
+        # Not a claim that m2c "failed" in any strong sense, just outside
+        # current coverage.
         with db.tx(conn):
             db.set_state(conn, name, row["state"], worker_id=None,
                          notes="m2c: declined (outside current translation coverage)")
