@@ -10,10 +10,8 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8029024.s\"");
 #else
-u32 sub_8029024(u32 param_1, u8 param_2) {
-    u32 *ptr = (u32*)(param_1 + 0x12B);
-    *ptr = (u32)param_2;
-    return param_1;
+void sub_8029024(void *arg0, s8 arg1) {
+    (*(s8 *)((s8 *)(arg0) + (0x12B))) = arg1;
 }
 #endif
 
