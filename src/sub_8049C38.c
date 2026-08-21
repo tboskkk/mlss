@@ -208,3 +208,9 @@ block_47:
     }
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8049FF4.s\"");
+#else
+#error "TODO: write sub_8049FF4 to match asm/nonmatching/sub_8049FF4.s, then delete this #error"
+#endif
