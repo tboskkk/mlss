@@ -20,3 +20,9 @@ void sub_801ADC0(void) {
     }
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_801AE1C.s\"");
+#else
+#error "TODO: write sub_801AE1C to match asm/nonmatching/sub_801AE1C.s, then delete this #error"
+#endif
