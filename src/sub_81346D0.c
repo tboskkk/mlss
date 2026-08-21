@@ -10,53 +10,107 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81346D0.s\"");
 #else
-#error "TODO: write sub_81346D0 to match asm/nonmatching/sub_81346D0.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81346EC.s\"");
 #else
-#error "TODO: write sub_81346EC to match asm/nonmatching/sub_81346EC.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81347C0.s\"");
 #else
-#error "TODO: write sub_81347C0 to match asm/nonmatching/sub_81347C0.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_813481C.s\"");
 #else
-#error "TODO: write sub_813481C to match asm/nonmatching/sub_813481C.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_813489C.s\"");
 #else
-#error "TODO: write sub_813489C to match asm/nonmatching/sub_813489C.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81348BC.s\"");
 #else
-#error "TODO: write sub_81348BC to match asm/nonmatching/sub_81348BC.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8134928.s\"");
 #else
-#error "TODO: write sub_8134928 to match asm/nonmatching/sub_8134928.s, then delete this #error"
+s32 sub_8021308();                              /* extern */
+
+void sub_8134928(void *arg0) {
+    if ((*(s32 *)((s8 *)(arg0) + (0xC))) != 0) {
+        sub_8021308();
+        (*(s32 *)((s8 *)(arg0) + (0xC))) = 0;
+    }
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8134940.s\"");
 #else
-#error "TODO: write sub_8134940 to match asm/nonmatching/sub_8134940.s, then delete this #error"
+s32 sub_8021308();                              /* extern */
+
+void sub_8134940(void *arg0) {
+    if ((*(s32 *)((s8 *)(arg0) + (8))) != 0) {
+        sub_8021308();
+        (*(s32 *)((s8 *)(arg0) + (8))) = 0;
+    }
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81349CC.s\"");
 #else
-#error "TODO: write sub_81349CC to match asm/nonmatching/sub_81349CC.s, then delete this #error"
+void sub_81349CC(void *arg0) {
+    void *temp_r0_32;
+
+    (*(s32 *)((s8 *)(arg0) + (0))) = 0;
+    (*(s32 *)((s8 *)(arg0) + (4))) = 0;
+    (*(s32 *)((s8 *)(arg0) + (8))) = 0;
+    (*(s32 *)((s8 *)(arg0) + (0xC))) = 0;
+    (*(s32 *)((s8 *)(arg0) + (0x10))) = 0x0821253C;
+    (*(s32 *)((s8 *)(arg0) + (0x14))) = 0x08212544;
+    (*(s32 *)((s8 *)(arg0) + (0x18))) = 0;
+    (*(s16 *)((s8 *)(arg0) + (0x20))) = 0;
+    (*(s16 *)((s8 *)(arg0) + (0x1E))) = 0;
+    (*(s8 *)((s8 *)(arg0) + (0x1D))) = 0xFF;
+    (*(s8 *)((s8 *)(arg0) + (0x1C))) = -1;
+    (*(s8 *)((s8 *)(arg0) + (0x24))) = 0;
+    (*(s32 *)((s8 *)(arg0) + (0x28))) = 0;
+    (*(s32 *)((s8 *)(arg0) + (0x2C))) = 0;
+    (*(s32 *)((s8 *)(arg0) + (0x30))) = 0;
+    (*(s32 *)((s8 *)(arg0) + (0x34))) = 0;
+    temp_r0_32 = (arg0 + 0x24) - 2;
+    (*(s8 *)((s8 *)(temp_r0_32) + (0))) = 0;
+    (*(s8 *)((s8 *)(temp_r0_32) + (1))) = 0;
+}
 #endif
