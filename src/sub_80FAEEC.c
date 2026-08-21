@@ -14,3 +14,9 @@ u8 sub_80FAEEC(u8* param_1) {
     return param_1[0x24 + 0x9A1];
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80FAEFC.s\"");
+#else
+#error "TODO: write sub_80FAEFC to match asm/nonmatching/sub_80FAEFC.s, then delete this #error"
+#endif
