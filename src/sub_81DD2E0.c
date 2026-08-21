@@ -28,3 +28,9 @@ asm_unified(".include \"asm/nonmatching/sub_81DD4AC.s\"");
    NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
    still gets the verbatim retail bytes. */
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/strlen.s\"");
+#else
+#error "TODO: write strlen to match asm/nonmatching/strlen.s, then delete this #error"
+#endif
