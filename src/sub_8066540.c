@@ -19,3 +19,9 @@ void sub_8066540(void *arg0, s32 arg1, s32 arg2, s32 arg3)
   *((s32 *) (((s8 *) temp_r0_7) + new_var2)) = arg2;
   *((s32 *) (((s8 *) (temp_r0_7 + new_var2)) + new_var2)) = arg3;
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8066550.s\"");
+#else
+#error "TODO: write sub_8066550 to match asm/nonmatching/sub_8066550.s, then delete this #error"
+#endif
