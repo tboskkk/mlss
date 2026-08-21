@@ -81,5 +81,20 @@ void sub_80800DC(void *arg0) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8080168.s\"");
 #else
-#error "TODO: write sub_8080168 to match asm/nonmatching/sub_8080168.s, then delete this #error"
+s32 sub_8080168(void *arg0) {
+    s32 temp_r0_23;
+
+    if ((s32) (*(s32 *)((s8 *)(arg0) + (0x40))) <= 0) {
+        return 0;
+    }
+    (*(u16 *)((s8 *)(arg0) + (0xB2))) = (u16) ((*(u16 *)((s8 *)(arg0) + (0xB2))) - 0x5E);
+    temp_r0_23 = (*(s32 *)((s8 *)(arg0) + (0x40))) + M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */);
+    (*(s32 *)((s8 *)(arg0) + (0x18))) = temp_r0_23;
+    if (temp_r0_23 <= 0) {
+        (*(u16 *)((s8 *)(arg0) + (0xB2))) = 0U;
+        (*(s32 *)((s8 *)(arg0) + (0x18))) = 0;
+        return 0;
+    }
+    return 1;
+}
 #endif
