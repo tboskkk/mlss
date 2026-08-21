@@ -929,10 +929,24 @@ not the answer.
   5s; `--once` for a snapshot.
 - `python3 tools/factory/health.py` — asserts invariants and reports
   **violations**, one line each. Use this to check "is it actually
-  working", not the dashboard. Notably it distinguishes the real
+  working", not the dashboard. **But note its blind spot, found the hard
+  way:** it and the dashboard were fully green through the entire
+  section-F collapse, because queue depth, worker liveness and container
+  count were all genuinely fine — the searches were succeeding and the
+  results were being discarded. The check that would have caught it is
+  `t2_launch` vs `converged` per hour out of the events table; the
+  dashboard's matches/hr only says *that* something is wrong, never
+  whether the search or the plumbing around it is at fault. Notably it distinguishes the real
   starvation failure (`tier2_ready=0` **and** permuter idle) from the
   healthy case (`tier2_ready=0` because seeds are consumed as fast as
   they're produced, `permuting` high).
+
+- `python3 tools/factory/rescue_isolated_zeros.py [--dry-run]` — replays
+  permuter wins that tier2 rejected before the section-F fix, straight off
+  whatever is still in `nonmatchings/<name>/output-*/`. Not read-only (it
+  takes the repo lock per function, with a deliberate pause between so it
+  can't starve anything). Worth a run after any change to how candidates
+  are spliced.
 
 - `./container.sh tools/check_layout.py` — asserts the linked ROM layout
   hasn't shifted, straight from `mlss.map`. Run this first whenever `make`
@@ -1052,6 +1066,95 @@ callee signatures. The compounding fix is to feed the context the
 signatures of functions already matched -- marginal at ~280/5,986 matched,
 worth revisiting around 20-30%.
 
+**F. Throughput collapse is usually a BUG, not a tuning problem.**
+Worth leading with because the instinct — and the previous section's own
+framing — points the other way. Convergence had fallen to **0.6% over 12h**
+against a 15.6% baseline, and 0 matches in the hour it was noticed. Nothing
+about the scheduling was wrong. decomp-permuter was solving functions and
+tier2 was throwing the answers away.
+
+The permuter searches an ISOLATED copy of a function
+(`nonmatchings/<name>/base.c`) carrying m2c's guessed callee prototypes
+above the body. On a win, `trim_source()` spliced only the function text
+back into the real `src/*.c` — cutting exactly at the function, so those
+prototypes never came back with it. The callee was then undeclared, and
+agbcc runs `-Wimplicit -Werror`: the result did not merely score
+differently, **it did not compile**. `already_matches()` returned False,
+tier2 logged "permuter reached score 0 in isolation but the candidate does
+not match in its real source file", and the row went back to `tier2_ready`
+to be searched again from nothing.
+
+Measured when found: **178 distinct functions** had reached score 0 this
+way and only 10 were ever matched, while tier2 spent **1,599 of 2,897
+launches (55%)** over 24h re-searching them. Fixed in `tier2.py`
+(`decl_prefix` / `reattach_decls` / `_prefix_variants`), which reattaches a
+prefix and lets a real asm-differ score choose between variants — nothing
+is promoted without scoring 0 in the real file, and the validator's
+from-scratch gate is untouched. `rescue_isolated_zeros.py` replayed the
+backlog straight off disk: **26 matches recovered with no new search.**
+Matches went 281 → 294 within half an hour of the fix landing.
+
+**How to notice this class of thing:** compare `t2_launch` count against
+`converged` count per hour, straight out of the events table. If launches
+are healthy and convergence is not, the search is fine and something
+downstream of it is discarding results. Queue depth and worker liveness —
+what `health.py` and the dashboard show — were green through all of it.
+
+Three more real bugs surfaced in the same pass, all of them invisible to
+the dashboard:
+
+  * **`already_matches()` never reverted its splice.** It is a predicate,
+    but scoring requires writing the candidate into the real `src/*.c`,
+    and it left it there. `gitops.commit()` stages `FACTORY_PATHS`, which
+    includes `src/` — so every abandoned splice was swept into whatever
+    match committed next. `Match sub_8163A24` (`1f84d124`) carries edits to
+    **six unrelated source files, 271 insertions and 284 deletions**.
+    Harmless to the ROM (a `#else` branch never builds it) but it makes
+    commit messages lie and can commit non-compiling drafts that re-create
+    the section-D deadlock in a file nobody touched on purpose. Any
+    function that splices to measure something must revert in a `finally`.
+  * **tier2 leaked its `permuting` claims on exit.** It marks rows
+    `permuting` with `worker_id=None` (ownership lives in its in-process
+    `procs` dict), so an abandoned row sits in a state nothing claims from
+    until the supervisor's reaper notices — a **45-minute** window. Two
+    restarts ten minutes apart parked 24 functions behind a single live
+    container. `_cleanup_all()` now hands them back; the reaper stays as
+    the backstop for SIGKILL/crash/power-cut.
+  * **The permuter can solve a different problem than the real file
+    poses.** The isolated `base.c` is built from m2c's *guessed* callee
+    signatures, and a project header can contradict them
+    (`void *sub_8021A18(void *, s32);` vs. the real declaration). Then no
+    prefix can reconcile the two — adding the guess is a conflicting
+    declaration, omitting it is an implicit one. This is the residue the
+    rescue could not recover (10 of ~90 "no compiling prefix", plus several
+    that scored in the thousands in place despite a clean zero in
+    isolation). The real fix is for `permute.py`'s isolation to take
+    declarations from the actual translation unit rather than from m2c's
+    guesses; not attempted yet.
+
+**A measured claim ordering rule: high-score seeds are not worth a slot.**
+Over 1,020 seeds with a recorded asm-differ score, against whether they
+ever reached matched/validating:
+
+| seed score | seeds | converted |
+|---|---|---|
+| 1 – 99 | 43 | **25.6%** |
+| 100 – 499 | 147 | 12.9% |
+| 500 – 1499 | 213 | 3.3% |
+| 1500 – 4999 | 255 | 2.4% |
+| 5000 – 19999 | 135 | 0.7% |
+| 20000+ | 227 | **0.0%** |
+
+227 seeds above 20,000 have been searched and *none* has ever matched,
+while 1,975 of 2,923 queued seeds sit above 5,000 — so attempts-first
+fairness was spending most of the pool on the two bands that convert at
+0.7% and 0.0%. `tier2.SEED_SCORE_CEILING` (5000) is a **ceiling, not an
+exclusion**: those rows stay in `tier2_ready` and the pool takes them the
+moment nothing cheaper is claimable, so it can only reorder work, never
+drop it. A new m2c rule that re-seeds a function lower puts it straight
+back in contention — which is the section-E thesis expressed as a queue
+policy.
+
 **Next levers, in rough order of value:**
 1. **More deterministic rules.** This is the whole thesis and it keeps
    paying: the arg-register rule alone covered 15% of the corpus and
@@ -1061,7 +1164,9 @@ worth revisiting around 20-30%.
    note that `compile_errors.py` does NOT apply `blocking_siblings()`, so
    on a poisoned tree it measures the deadlock above rather than real m2c
    defects. Run `unblock_files.py` first or its output will mislead you.
-2. **The 93 "asm-differ said match but from-scratch build FAILED" rows.**
+2. **The "asm-differ said match but from-scratch build FAILED" rows**
+   (16 currently in `needs_human`; ~30 more isolated by `batch_validate`
+   as "the ROM does not reproduce with this candidate").
    Reproduced one (`sub_801ADC0`): it compiles fine, but the linked ROM's
    sha1 differs — so asm-differ and the real ROM genuinely disagree about
    the same bytes. Not corruption fallout (they date from 12h-19h on
