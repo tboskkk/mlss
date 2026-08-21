@@ -71,3 +71,9 @@ _080A6908:
     return;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80A6924.s\"");
+#else
+#error "TODO: write sub_80A6924 to match asm/nonmatching/sub_80A6924.s, then delete this #error"
+#endif
