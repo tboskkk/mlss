@@ -73,7 +73,7 @@ def _claim(conn, state: str):
     return row
 
 
-def process_one(conn) -> str | None:
+def process_one(conn, no_score: bool = False) -> str | None:
     row = _claim(conn, "needs_attempt")
     if row is None:
         row = _claim(conn, "stalled")
@@ -116,6 +116,27 @@ def process_one(conn) -> str | None:
         db.log_event(conn, name, "m2c_declined", "no output")
         return name
 
+    if no_score:
+        # FAST DRAIN MODE. Scoring costs ~2.4s of the ~2.55s per function
+        # AND runs under the repo lock, so it is the whole serialization
+        # bottleneck: measured at load 1.45 on 6 cores, i.e. ~25% machine
+        # utilisation, with extra workers unable to help because they would
+        # just queue on the same lock.
+        #
+        # Skipping it loses nothing permanent. The score is only used here
+        # to pick `validating` vs `tier2_ready`, and tier2 detects a
+        # perfect seed on its own -- decomp-permuter prints
+        # "base score = 0 / Found zero score!" and tier2.base_already_zero()
+        # catches exactly that. So a byte-exact m2c seed still becomes a
+        # match; it just gets discovered one hop later instead of here.
+        with db.tx(conn):
+            db.set_state(conn, name, "tier2_ready", worker_id=None,
+                         candidate_body=body, candidate_source="m2c",
+                         notes="m2c seed (fast drain -- not scored here; tier2 will "
+                               "detect it if it is already byte-exact)")
+        db.log_event(conn, name, "seeded", "m2c fast-drain seed, unscored")
+        return name
+
     with gitops.repo_lock(what=f"m2c measure {name}"):
         c_path = gitops.splice_into_else(name, body)
         if c_path is None:
@@ -149,6 +170,9 @@ def process_one(conn) -> str | None:
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--loop", type=int, default=None, metavar="SECONDS")
+    ap.add_argument("--no-score", action="store_true",
+                     help="fast drain: seed without scoring (tier2 still catches "
+                          "byte-exact seeds via base_already_zero)")
     args = ap.parse_args()
 
     while True:
@@ -156,7 +180,7 @@ def main():
         while True:
             conn = db.connect()
             try:
-                name = process_one(conn)
+                name = process_one(conn, no_score=args.no_score)
             except Exception as e:
                 print(f"[{time.strftime('%H:%M:%S')}] !! tier_m2c process_one() failed, skipping: {e}")
                 break
