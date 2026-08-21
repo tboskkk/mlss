@@ -16,3 +16,9 @@ void sub_8082C20(s32 arg0, s32 *arg1, s32 *arg2, s32 *arg3) {
     *arg3 += 0x1F0;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8082C58.s\"");
+#else
+#error "TODO: write sub_8082C58 to match asm/nonmatching/sub_8082C58.s, then delete this #error"
+#endif
