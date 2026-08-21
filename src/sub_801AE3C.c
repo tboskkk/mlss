@@ -22,3 +22,9 @@ void sub_801AE3C(void) {
     *(u8 *)0x03000D18 = (-0xF & *(u8 *)0x03000D18) | 0xC;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_801AEA0.s\"");
+#else
+#error "TODO: write sub_801AEA0 to match asm/nonmatching/sub_801AEA0.s, then delete this #error"
+#endif
