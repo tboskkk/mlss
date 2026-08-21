@@ -55,3 +55,9 @@ void *sub_815F8F4(void *arg0, void *arg1) {
     return arg0;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_815F97C.s\"");
+#else
+#error "TODO: write sub_815F97C to match asm/nonmatching/sub_815F97C.s, then delete this #error"
+#endif
