@@ -14,3 +14,9 @@ void sub_81169C8(void *arg0) {
     (*(u8 *)((s8 *)(arg0) + (0x1C))) = (u8) ((*(u8 *)((s8 *)(arg0) + (0x1C))) ^ 1);
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8116A2C.s\"");
+#else
+#error "TODO: write sub_8116A2C to match asm/nonmatching/sub_8116A2C.s, then delete this #error"
+#endif
