@@ -91,3 +91,9 @@ void sub_8063118(void* p0) {
         r0 = *(u32*)((u8*)r5 + 0x2C);
         r0 = *(u32*)((u8*)r0 +
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8063248.s\"");
+#else
+#error "TODO: write sub_8063248 to match asm/nonmatching/sub_8063248.s, then delete this #error"
+#endif
