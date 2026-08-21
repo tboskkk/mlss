@@ -1218,6 +1218,8 @@ groups:
   - {obj: asm/text08057568_p496, section: text}
   - {obj: src/sub_8142DB0, section: text}
   - {obj: asm/text08057568_p593, section: text}
+  - {obj: src/sub_8142E6C, section: text}
+  - {obj: asm/text08057568_p594, section: text}
   - {obj: src/sub_8144238, section: text}
   - {obj: asm/text08057568_p222, section: text}
   - {obj: src/sub_8145A58, section: text}
