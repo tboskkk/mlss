@@ -220,11 +220,27 @@ s32 sub_80903A0(void *arg0) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80903DC.s\"");
 #else
-#error "TODO: write sub_80903DC to match asm/nonmatching/sub_80903DC.s, then delete this #error"
+extern s32 sub_8090460;
+
+s32 sub_80903DC(void *arg0) {
+    (*(s32 *)((s8 *)(arg0) + (0x6C))) = 0x084FE9A4;
+    (*(u8 *)((s8 *)(arg0) + (0x77))) = (u8) (-0x41 & (*(u8 *)((s8 *)(arg0) + (0x77))) & ~0x20);
+    (*(s32 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x28)))) + (0x114))) = (s32) (*(u16 *)((s8 *)((*(s32 *)0x03000FF4 + 0x3C)) + (0x2A)));
+    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8090460;
+    return 1;
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8090420.s\"");
 #else
-#error "TODO: write sub_8090420 to match asm/nonmatching/sub_8090420.s, then delete this #error"
+extern s32 sub_80904C4;
+
+s32 sub_8090420(void *arg0) {
+    (*(s32 *)((s8 *)(arg0) + (0x6C))) = 0x084FE8A8;
+    (*(u8 *)((s8 *)(arg0) + (0x77))) = (u8) (-0x41 & (*(u8 *)((s8 *)(arg0) + (0x77))) & ~0x20);
+    (*(s32 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x28)))) + (0x114))) = (s32) (*(u16 *)((s8 *)(*(void **)0x03000FF4) + (0x2A)));
+    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80904C4;
+    return 1;
+}
 #endif
