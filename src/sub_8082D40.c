@@ -19,3 +19,9 @@ s16 sub_8082D50(int arg0)
 {
   return *((s16 *) (arg0 + 0x774));
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8082D60.s\"");
+#else
+#error "TODO: write sub_8082D60 to match asm/nonmatching/sub_8082D60.s, then delete this #error"
+#endif
