@@ -12,3 +12,9 @@ asm_unified(".include \"asm/nonmatching/init_btl_process_80FC25C.s\"");
 #else
 #error "TODO: write init_btl_process_80FC25C to match asm/nonmatching/init_btl_process_80FC25C.s, then delete this #error"
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/btl_80FC310.s\"");
+#else
+#error "TODO: write btl_80FC310 to match asm/nonmatching/btl_80FC310.s, then delete this #error"
+#endif
