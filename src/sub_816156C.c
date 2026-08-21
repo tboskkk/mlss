@@ -37,3 +37,9 @@ void sub_81615B4(void* p0, s32 p1)
         free_heap_8018DA8(p0);
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_81615E4.s\"");
+#else
+#error "TODO: write sub_81615E4 to match asm/nonmatching/sub_81615E4.s, then delete this #error"
+#endif
