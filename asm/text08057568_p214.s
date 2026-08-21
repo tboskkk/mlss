@@ -3,20 +3,6 @@
 	.syntax unified
 	.text
 
-	thumb_func_start sub_819B9B4
-sub_819B9B4:
-	push {lr}
-	lsls r0, r0, #0x08
-	ldr r3, _0819B9CC @ =0xFFFF9000
-	adds r2, r3, #0x0
-	orrs r0, r2
-	orrs r0, r1
-	lsls r0, r0, #0x10
-	lsrs r0, r0, #0x10
-	bl sub_819B418
-	pop {r1}
-	bx r1
-_0819B9CC: .4byte 0xFFFF9000
 	thumb_func_start sub_819B9D0
 sub_819B9D0:
 	push {lr}
