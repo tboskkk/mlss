@@ -113,6 +113,8 @@ groups:
   - {obj: asm/text0801A548_p60, section: text}
   - {obj: src/sub_80275F4, section: text}
   - {obj: asm/text0801A548_p61, section: text}
+  - {obj: src/start_battle_8027AC4, section: text}
+  - {obj: asm/text0801A548_p62, section: text}
   - {obj: src/sub_8028E4C, section: text}
   - {obj: src/sub_8028E70, section: text}
   - {obj: asm/text0801A548_p16, section: text}
