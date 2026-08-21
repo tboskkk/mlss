@@ -302,22 +302,48 @@ def asm_differ_score(name: str) -> int | None:
     # very same candidate by hand afterwards returned a clean match. A
     # score-0 candidate is confirmed-correct C -- losing one to a transient
     # build hiccup is the most expensive mistake this pipeline can make.
-    for attempt in (1, 2):
-        r = run(["./container.sh", "asm-differ", "-mwo", name])
-        out = ANSI_RE.sub("", r.stdout + r.stderr)
-        m = SCORE_RE.search(out)
-        if m:
-            return int(m.group(1))
-        if attempt == 1:
-            # Most likely cause is a half-written build tree from a
-            # concurrent step; force a clean rebuild of this object.
-            for stale in ((REPO / "build" / "src" / f"{stem}.o"),
-                          (REPO / "build" / "src" / f"{stem}.s")):
-                try:
-                    stale.unlink()
-                except FileNotFoundError:
-                    pass
-    return None
+    def _drop_built():
+        """asm-differ's -m rebuilds this object with NONMATCHING=1, so it
+        leaves a NONMATCHING object sitting in build/. Make decides what to
+        rebuild from mtimes and cannot see that -DNONMATCHING is not a
+        file, so the next PLAIN `make` LINKS that object into the ROM --
+        one where every `#else` branch was compiled instead of the retail
+        `.include`. The result is either an undefined reference (a callee
+        whose definition only exists in the `#ifndef` branch) or a silently
+        wrong ROM.
+
+        This is the single most contaminating operation in the factory,
+        because scoring runs constantly: after a scoring pass, a plain
+        `make` reported `undefined reference to sub_807BF34` and a 5,304
+        symbol layout shift against a git tree that was completely clean.
+        Anything that then judges tree health by a plain `make` --
+        score_sweep's startup check, tier3.ensure_extracted's post-
+        extraction check -- reads that as "the repo is broken" and can
+        revert perfectly good work.
+
+        Deleting the object costs one recompile and removes the whole
+        class."""
+        for stale in ((REPO / "build" / "src" / f"{stem}.o"),
+                      (REPO / "build" / "src" / f"{stem}.s")):
+            try:
+                stale.unlink()
+            except FileNotFoundError:
+                pass
+
+    try:
+        for attempt in (1, 2):
+            r = run(["./container.sh", "asm-differ", "-mwo", name])
+            out = ANSI_RE.sub("", r.stdout + r.stderr)
+            m = SCORE_RE.search(out)
+            if m:
+                return int(m.group(1))
+            if attempt == 1:
+                # Most likely cause is a half-written build tree from a
+                # concurrent step; force a clean rebuild of this object.
+                _drop_built()
+        return None
+    finally:
+        _drop_built()
 
 
 def asm_differ_matches(name: str) -> bool:
