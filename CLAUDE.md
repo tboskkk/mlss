@@ -1007,6 +1007,51 @@ sibling"). `unblock_files.py` now moves rows out of `stalled` too, which is
 the only thing that puts them back in play. Any future tier that declines
 work must leave SOMETHING able to reclaim it.
 
+**E. The queue is saturated; seed QUALITY is the only lever left.**
+Worth stating plainly because it is counter-intuitive and it changes what
+is worth working on. There are 12 permuter slots and ~2,900 seeds waiting:
+the permuter is ~240 deep per slot and **cannot be starved**. Adding seeds
+to that queue buys exactly nothing. Neither does "clearing the backlog to
+feed it" -- the ~2,600 functions in `needs_attempt` are not waiting for CPU,
+they have each been tried and their m2c draft does not COMPILE. That is a
+code problem, not a compute problem, and no scheduling change touches it.
+
+Three scheduling ideas were tried and measured against this, and the
+history is worth keeping because two of them looked obviously right:
+
+  * **Closest-first claiming** (order by `best_score`) fixed a real
+    problem -- 9 of 12 slots were searching seeds scoring 1,495-12,160 --
+    but caused a spin loop: a stalled seed got re-seeded, was immediately
+    the lowest-scoring row again, and was re-claimed at once. 738 launches
+    and 736 stalls in one hour, one match, the same dozen names in the
+    slots across three checks. Fixed by sorting on attempt count FIRST
+    (`escalation_count`, repurposed from retired tier3), closest-first
+    within a round.
+  * **Filling the queue faster** does nothing, per the saturation above.
+  * **Anything that holds the repo lock in a tight loop starves everything
+    else.** `repo_lock` has no fairness. A tool taking it every ~0.5s
+    (score_sweep, a churning tier_m2c) will stall `git commit`, the
+    validator, and tier2's isolation indefinitely. If two lock-heavy things
+    must run, run them sequentially.
+
+**A related trap: don't let two tiers re-derive the same verdict.**
+`score_sweep` wrote "score_sweep: seed does not compile", which tier_m2c did
+not recognise as already-judged, so it re-generated the identical seed for
+the identical verdict -- 1,759 re-tries in 30 minutes for 38 useful
+results, all of it holding the lock. Anything that writes a verdict
+tier_m2c would otherwise re-derive must stamp it with
+`m2c_bridge.ruleset_version()`.
+
+**Where the remaining work actually is:** ~2,400 seeds that do not compile.
+m2c now gets a real `--context` (preprocessed from the project headers),
+which recovered 290 of 2,706 previously-dead seeds (10.7%) and moved the
+near-miss pile (score 1-99) from 6 to 113. It is capped, though: the
+context only knows the ~1,295 symbols the headers declare, while ~5,700
+`sub_XXXXXXX` functions are declared nowhere, so m2c still guesses most
+callee signatures. The compounding fix is to feed the context the
+signatures of functions already matched -- marginal at ~280/5,986 matched,
+worth revisiting around 20-30%.
+
 **Next levers, in rough order of value:**
 1. **More deterministic rules.** This is the whole thesis and it keeps
    paying: the arg-register rule alone covered 15% of the corpus and
