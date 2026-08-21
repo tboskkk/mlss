@@ -25,34 +25,21 @@ asm_unified(".include \"asm/nonmatching/sub_8163134.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_816316C.s\"");
-#else
-void sub_816316C(u32* param_1) {
-    u16 temp;
-    
-    temp = *(u16*)((u8*)param_1 + 0x20);
-    if (temp & 1) {
-        *(u16*)0x02000010 = *(u32*)((u8*)param_1 + 0x18);
-        *(u16*)0x02000012 = *(u32*)((u8*)param_1 + 0x1C);
+void sub_816316C(void *arg0) {
+    if (1 & (*(u16 *)((s8 *)(arg0) + (0x20)))) {
+        (*(s16 *)((s8 *)((void *)0x02000010) + (0))) = (s16) (*(s32 *)((s8 *)(arg0) + (0x18)));
+        (*(s16 *)((s8 *)((void *)0x02000010) + (2))) = (s16) (*(s32 *)((s8 *)(arg0) + (0x1C)));
     }
-    
-    temp = *(u16*)((u8*)param_1 + 0x20);
-    if (temp & 2) {
-        *(u16*)0x02000014 = *(u32*)((u8*)param_1 + 0x18);
-        *(u16*)0x02000016 = *(u32*)((u8*)param_1 + 0x1C);
+    if (2 & (*(u16 *)((s8 *)(arg0) + (0x20)))) {
+        (*(s16 *)((s8 *)((void *)0x02000014) + (0))) = (s16) (*(s32 *)((s8 *)(arg0) + (0x18)));
+        (*(s16 *)((s8 *)((void *)0x02000014) + (2))) = (s16) (*(s32 *)((s8 *)(arg0) + (0x1C)));
     }
-    
-    temp = *(u16*)((u8*)param_1 + 0x20);
-    if (temp & 4) {
-        *(u16*)0x02000018 = *(u32*)((u8*)param_1 + 0x18);
-        *(u16*)0x0200001A = *(u32*)((u8*)param_1 + 0x1C);
+    if (4 & (*(u16 *)((s8 *)(arg0) + (0x20)))) {
+        (*(s16 *)((s8 *)((void *)0x02000018) + (0))) = (s16) (*(s32 *)((s8 *)(arg0) + (0x18)));
+        (*(s16 *)((s8 *)((void *)0x02000018) + (2))) = (s16) (*(s32 *)((s8 *)(arg0) + (0x1C)));
     }
-    
-    temp = *(u16*)((u8*)param_1 + 0x20);
-    if (temp & 8) {
-        *(u16*)0x0200001C = *(u32*)((u8*)param_1 + 0x18);
-        *(u16*)0x0200001E = *(u32*)((u8*)param_1 + 0x1C);
+    if (8 & (*(u16 *)((s8 *)(arg0) + (0x20)))) {
+        (*(s16 *)((s8 *)((void *)0x0200001C) + (0))) = (s16) (*(s32 *)((s8 *)(arg0) + (0x18)));
+        (*(s16 *)((s8 *)((void *)0x0200001C) + (2))) = (s16) (*(s32 *)((s8 *)(arg0) + (0x1C)));
     }
 }
-#endif
