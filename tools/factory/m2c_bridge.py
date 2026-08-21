@@ -158,7 +158,54 @@ def generate(name: str) -> str | None:
 
     if f"{name}(" not in c:
         return None  # m2c emitted something, but not this function
+    c = fix_void_dereference(c)
     return restore_omitted_leading_params(c, name)
+
+
+VOID_DEREF_RE = re.compile(r"\*\(void \*\)")
+VOID_STORE_RE = re.compile(r"\*\(void \*\)([^=;]+?)\s*=\s*([^;]+);")
+DECL_RE_TMPL = r"^\s*(u8|s8|u16|s16|u32|s32)\s+{var}\s*;"
+
+
+def fix_void_dereference(c: str) -> str:
+    """Give `*(void *)ADDR` a real width.
+
+    m2c emits a bare `*(void *)` when it can't infer an access width --
+    which is not valid C at all (void has no size, so it cannot be
+    dereferenced or assigned through), so the seed is guaranteed not to
+    compile, and a seed that doesn't compile is worth nothing to the
+    pipeline: no score, no permuter search, no possible match. Measured:
+    23 of 368 generated seeds (6%) hit this.
+
+    The width is recovered from the value being stored, whose type m2c
+    DOES declare locally -- e.g.
+
+        u8 var_r0_15;
+        var_r0_15 = *(u8 *)0x03000ED0 + 1;
+        *(void *)0x03000ED0 = var_r0_15;   <-- becomes *(u8 *)
+
+    Falls back to u32 (the natural word, and what a bare `str` would be)
+    when the stored value isn't a locally-declared variable. A wrong
+    guess here is cheap and self-correcting: it costs one asm-differ
+    score, exactly like any other imperfect seed, whereas leaving the
+    `void` in place costs the function entirely.
+    """
+    if not VOID_DEREF_RE.search(c):
+        return c
+
+    def store_repl(m: re.Match) -> str:
+        addr, value = m.group(1), m.group(2).strip()
+        ctype = "u32"
+        if re.fullmatch(r"\w+", value):
+            d = re.search(DECL_RE_TMPL.format(var=re.escape(value)), c, re.MULTILINE)
+            if d:
+                ctype = d.group(1)
+        return f"*({ctype} *){addr} = {value};"
+
+    c = VOID_STORE_RE.sub(store_repl, c)
+    # Any remaining read-side `*(void *)` has no value to infer from;
+    # u32 is the safe default rather than leaving uncompilable C.
+    return VOID_DEREF_RE.sub("*(u32 *)", c)
 
 
 FUNC_DEF_RE = re.compile(r"^(.*?\b)(\w+)\s*\(([^)]*)\)(\s*\{)", re.MULTILINE)

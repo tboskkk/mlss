@@ -309,6 +309,52 @@ def asm_differ_matches(name: str) -> bool:
     return asm_differ_score(name) == 0
 
 
+TRAILING_DATA_RE = re.compile(r"^\s*\.byte\b", re.MULTILINE)
+
+
+def fragment_trailing_bytes(name: str) -> str | None:
+    """Raw `.byte` content sitting AFTER this function's literal pool.
+
+    CLAUDE.md documents this as a landmine ("trailing orphaned data on the
+    LAST function extracted from a file"): when split_func.py pulls the
+    final function out of a blob it takes every remaining byte to
+    end-of-file, and twice now those trailing bytes turned out to be a
+    second, real, never-labeled function Luvdis missed rather than
+    padding. Deleting the fragment on a match then silently drops those
+    bytes and breaks the ROM.
+
+    Confirmed firing automatically in the pipeline: sub_8159400 and
+    sub_8161580 both reached a genuine asm-differ score of 0, had their
+    fragment deleted by finish_match(), and failed the from-scratch build
+    -- landing in needs_human with a truncated, undiagnosable link-command
+    tail as the only explanation. sub_8159400's fragment carried 32
+    trailing bytes starting `0x10, 0xB5` -- Thumb `push {r4, lr}`, i.e.
+    an entire unlabeled function.
+
+    Returns the offending text, or None when the tail is only padding
+    (all-zero .byte lines, which really are safe to drop).
+    """
+    frag = REPO / "asm" / "nonmatching" / f"{name}.s"
+    if not frag.exists():
+        return None
+    text = frag.read_text()
+    # Everything after the last literal-pool definition (or, failing that,
+    # after the last real instruction) is "trailing".
+    pool_ends = [m.end() for m in re.finditer(r"^_\w+:\s*\.4byte.*$", text, re.MULTILINE)]
+    tail = text[pool_ends[-1]:] if pool_ends else ""
+    if not tail.strip():
+        return None
+    data_lines = [ln for ln in tail.splitlines() if TRAILING_DATA_RE.match(ln)]
+    if not data_lines:
+        return None
+    # Alignment padding is genuinely disposable; real content is not.
+    joined = " ".join(data_lines)
+    values = re.findall(r"0x([0-9A-Fa-f]{2})", joined)
+    if values and all(v == "00" for v in values):
+        return None
+    return "\n".join(data_lines).strip()
+
+
 def finish_match(name: str) -> tuple[bool, str]:
     """The one non-negotiable check every match in this project requires:
     delete the now-unused fragment, rm -rf build/, make, confirm
@@ -316,6 +362,19 @@ def finish_match(name: str) -> tuple[bool, str]:
     responsible for git add/commit on success and revert_to_clean() on
     failure -- kept separate so a dry-run caller can check without
     committing."""
+    # Refuse BEFORE deleting anything if the fragment carries real
+    # trailing content. The build would fail anyway -- but it would fail
+    # with a 1500-character tail of a link command line, which is exactly
+    # what made these undiagnosable the first time. Failing here says what
+    # is actually wrong and what to do about it.
+    trailing = fragment_trailing_bytes(name)
+    if trailing is not None:
+        return False, (
+            f"REFUSING to delete asm/nonmatching/{name}.s: it carries real trailing "
+            f"data after the function's literal pool, which would be LOST and would "
+            f"break the ROM. This is usually a second, unlabeled function Luvdis "
+            f"missed (see CLAUDE.md's trailing-data landmine). Split it out with its "
+            f"own thumb_func_start first, then re-validate. Trailing content:\n{trailing}")
     frag = REPO / "asm" / "nonmatching" / f"{name}.s"
     if frag.exists():
         frag.unlink()
