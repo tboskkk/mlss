@@ -20,3 +20,9 @@ void sub_8087C4C(void *arg0) {
         (*(s32 *)((s8 *)(arg0) + (0x6C))) = temp_r5_9;
     }
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8087C6C.s\"");
+#else
+#error "TODO: write sub_8087C6C to match asm/nonmatching/sub_8087C6C.s, then delete this #error"
+#endif
