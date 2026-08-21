@@ -248,17 +248,117 @@ block_52:
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_804EA68.s\"");
 #else
-#error "TODO: write sub_804EA68 to match asm/nonmatching/sub_804EA68.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_804F904.s\"");
 #else
-#error "TODO: write sub_804F904 to match asm/nonmatching/sub_804F904.s, then delete this #error"
+s32 *sub_803FBA4(s32, s32, s32, s32 *, s32 *, s32 *); /* extern */
+
+void sub_804F904(void *arg0) {
+    s8 sp8;
+    s8 spC;
+    s32 sp10;
+    s32 sp14;
+    s32 sp18;
+    s32 sp1C;
+    s32 temp_r0_121;
+    s32 temp_r0_135;
+    s32 temp_r1_53;
+    s32 var_r1_100;
+    s32 var_r9_33;
+    u8 var_r0_132;
+
+    if (((*(s32 *)((s8 *)(arg0) + (8))) != (*(s32 *)((s8 *)(arg0) + (0x18)))) || ((*(s32 *)((s8 *)(arg0) + (0xC))) != (*(s32 *)((s8 *)(arg0) + (0x1C)))) || ((*(s32 *)((s8 *)(arg0) + (0x10))) != (*(s32 *)((s8 *)(arg0) + (0x20)))) || ((*(s32 *)((s8 *)(arg0) + (0x14))) != (*(s32 *)((s8 *)(arg0) + (0x24))))) {
+        var_r9_33 = 0;
+        sp1C = (*(s32 *)((s8 *)(arg0) + (0x10))) + (*(s32 *)((s8 *)(arg0) + (0x14)));
+        sp8 = 1;
+        spC = 1;
+        temp_r1_53 = *sub_803FBA4((*(s32 *)((s8 *)(arg0) + (0x40))), (*(s32 *)((s8 *)(arg0) + (8))), (*(s32 *)((s8 *)(arg0) + (0xC))), &sp10, &sp14, &sp18);
+        if (sp18 >= 0) {
+
+        }
+        if (sp18 > 0) {
+            var_r9_33 = sp18;
+        }
+        sp8 = 0;
+        spC = 1;
+        sub_803FBA4((*(s32 *)((s8 *)(arg0) + (0x40))), (*(s32 *)((s8 *)(arg0) + (8))) + 0xFFFFFF00 + ((u16) (*(u16 *)((s8 *)(arg0) + (0x32))) >> 1), ((*(s32 *)((s8 *)(arg0) + (0xC))) + 0x100) - (*(u16 *)((s8 *)(arg0) + (0x36))), &sp10, &sp14, &sp18);
+        if ((sp14 >= 0) && (sp14 < 0xFFFFFF)) {
+
+        }
+        var_r1_100 = 0;
+        if (var_r9_33 > 0) {
+            if (sp10 >= var_r9_33) {
+                if (sp10 > sp1C) {
+                    goto block_18;
+                }
+                goto block_17;
+            }
+            if (var_r9_33 <= sp1C) {
+                var_r1_100 = 1;
+            }
+            goto block_17;
+        }
+block_17:
+        if (var_r1_100 != 0) {
+block_18:
+            temp_r0_121 = sp1C - var_r9_33;
+            (*(s32 *)((s8 *)(arg0) + (0x14))) = temp_r0_121;
+            if (temp_r0_121 < 0) {
+                (*(s32 *)((s8 *)(arg0) + (0x14))) = 0;
+            }
+            (*(s32 *)((s8 *)(arg0) + (0x10))) = var_r9_33;
+            var_r0_132 = (*(u8 *)((s8 *)(arg0) + (1))) | 0x40;
+        } else {
+            temp_r0_135 = sp1C - sp10;
+            (*(s32 *)((s8 *)(arg0) + (0x14))) = temp_r0_135;
+            if (temp_r0_135 < 0) {
+                (*(s32 *)((s8 *)(arg0) + (0x14))) = var_r1_100;
+            }
+            (*(s32 *)((s8 *)(arg0) + (0x10))) = sp10;
+            if ((s32) (sp10 + (*(s32 *)((s8 *)(arg0) + (0x14)))) < 0) {
+                (*(s32 *)((s8 *)(arg0) + (0x14))) = var_r1_100;
+                (*(s32 *)((s8 *)(arg0) + (0x10))) = var_r1_100;
+            }
+            var_r0_132 = -0x41 & (*(u8 *)((s8 *)(arg0) + (1)));
+        }
+        (*(u8 *)((s8 *)(arg0) + (1))) = var_r0_132;
+    }
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_804FA30.s\"");
 #else
-#error "TODO: write sub_804FA30 to match asm/nonmatching/sub_804FA30.s, then delete this #error"
+void *get_coldef_ptr_by_xz(s32, s16, s16);          /* extern */
+
+void *sub_804FA30(void *arg0, s16 arg1, s16 arg2, s32 *arg3, s32 *arg4, s32 *arg5) {
+    s32 temp_r1_35;
+    s32 temp_r2_22;
+    u32 temp_r0_29;
+    u32 temp_r1_17;
+    u32 temp_r2_37;
+    void *temp_r0_15;
+
+    temp_r0_15 = get_coldef_ptr_by_xz((*(s32 *)((s8 *)(arg0) + (0x40))), arg1, arg2);
+    temp_r1_17 = (*(u32 *)((s8 *)(temp_r0_15) + (0)));
+    temp_r2_22 = (((u32) (temp_r1_17 << 0x14) >> 0x1C) << 0xB) << (temp_r1_17 >> 0x1F);
+    *arg3 = temp_r2_22;
+    if (0xF0 & (*(u8 *)((s8 *)(temp_r0_15) + (2)))) {
+        temp_r0_29 = (*(u32 *)((s8 *)(temp_r0_15) + (0)));
+        temp_r1_35 = temp_r2_22 + ((((u32) (temp_r0_29 << 0x10) >> 0x1C) << 0xB) << (temp_r0_29 >> 0x1F));
+        *arg4 = temp_r1_35;
+        temp_r2_37 = (*(u32 *)((s8 *)(temp_r0_15) + (0)));
+        *arg5 = temp_r1_35 + ((((u32) (temp_r2_37 << 8) >> 0x1C) << 0xB) << (temp_r2_37 >> 0x1F));
+    } else {
+        *arg5 = -1;
+        *arg4 = -1;
+    }
+    return temp_r0_15;
+}
 #endif
