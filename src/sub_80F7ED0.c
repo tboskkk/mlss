@@ -27,5 +27,21 @@ s32 sub_80F7ED0(void *arg2) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80F7EF8.s\"");
 #else
-#error "TODO: write sub_80F7EF8 to match asm/nonmatching/sub_80F7EF8.s, then delete this #error"
+s32 sub_80F746C(s32);                           /* extern */
+
+s32 sub_80F7EF8(s32 arg0, void *arg1, void *arg2) {
+    s32 temp_r0_8;
+
+    temp_r0_8 = (*(s32 *)((s8 *)(arg2) + (0)));
+    switch (temp_r0_8) {                            /* irregular */
+    case 0:
+        sub_80F746C((*(s32 *)((s8 *)((((s32) (*(u8 *)((s8 *)(arg2) + (4))) * 4) + *(s32 *)0x03000FD8)) + (0x58))));
+    default:
+        return 1;
+    case 1:
+        (*(u8 *)((s8 *)(arg1) + (0xFE))) = (u8) ((-8 & (*(u8 *)((s8 *)(arg1) + (0xFE)))) | ((*(u8 *)((s8 *)(arg2) + (4))) & 7));
+        (*(u16 *)((s8 *)(arg1) + (0xA0))) = (u16) (0x1000 | (*(u16 *)((s8 *)(arg1) + (0xA0))));
+        return 0;
+    }
+}
 #endif
