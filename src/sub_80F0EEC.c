@@ -51,5 +51,22 @@ void sub_80F0EEC(u32* p1, u32* p2, u32* p3)
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80F0F60.s\"");
 #else
-#error "TODO: write sub_80F0F60 to match asm/nonmatching/sub_80F0F60.s, then delete this #error"
+s32 sub_80F0F60(s32 arg0, void *arg1, void *arg3) {
+    s32 temp_r1_8;
+    s32 var_r0_18;
+    void *var_r2_7;
+
+    var_r2_7 = arg1;
+    temp_r1_8 = (*(s32 *)((s8 *)(arg3) + (0)));
+    if (2 & temp_r1_8) {
+        var_r2_7 = (*(void **)((s8 *)(var_r2_7) + (0x344)));
+    }
+    var_r0_18 = 1;
+    if (temp_r1_8 & 1) {
+        var_r0_18 = 0x10;
+    }
+    (*(s16 *)((s8 *)(var_r2_7) + (0x130))) = (s16) ((*(s32 *)((s8 *)(arg3) + (4))) * var_r0_18);
+    (*(s16 *)((s8 *)(var_r2_7) + (0x132))) = (s16) ((*(s32 *)((s8 *)((arg3 + 4)) + (4))) * var_r0_18);
+    return 1;
+}
 #endif
