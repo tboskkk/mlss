@@ -7,20 +7,17 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8112498.s\"");
-#else
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 extern s32 sub_8112740;
-
-void sub_8112498(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
-        (*(u16 *)((s8 *)(arg0) + (0xAC))) = (u16) ((*(u16 *)((s8 *)(arg0) + (0xAC))) + 1);
-        sub_8082E1C(arg0, -1, -1, 0);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8112740;
-    }
+void sub_8112498(void *arg0)
+{
+  if (8 & (*((u8 *) (((s8 *) (*((void **) (((s8 *) arg0) + 8)))) + 0x12))))
+  {
+    *((u16 *) (((s8 *) arg0) + 0xAC)) = (u16) ((*((u16 *) (((s8 *) arg0) + 0xAC))) + 1);
+    sub_8082E1C(arg0, -1, -1, 0);
+    *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_8112740;
+  }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81124D0.s\"");
