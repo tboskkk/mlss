@@ -12,3 +12,9 @@ asm_unified(".include \"asm/nonmatching/script_cmd_start_dialogue.s\"");
 #else
 #error "TODO: write script_cmd_start_dialogue to match asm/nonmatching/script_cmd_start_dialogue.s, then delete this #error"
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/script_cmd_show_reaction_bubble.s\"");
+#else
+#error "TODO: write script_cmd_show_reaction_bubble to match asm/nonmatching/script_cmd_show_reaction_bubble.s, then delete this #error"
+#endif
