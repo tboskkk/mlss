@@ -32,8 +32,6 @@ void sub_8029830(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8029878.s\"");
-#else
-#error "TODO: write sub_8029878 to match asm/nonmatching/sub_8029878.s, then delete this #error"
-#endif
+void sub_8029878(void) {
+    play_sfx_80195B4(0x50, -1);
+}
