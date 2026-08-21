@@ -52,12 +52,30 @@ LOCK_BREATH_S = 0.75
 
 
 def affected(conn) -> list[str]:
-    """Functions whose search reached zero in isolation and was rejected."""
+    """Functions whose permuter result was recorded but never turned into a
+    match. Two shapes, both recoverable from what is still on disk:
+
+      1. The search reached zero in isolation and tier2 rejected it (the
+         bug this tool exists for).
+      2. The permuter reported the BASE score was already 0 -- the seed
+         itself matched -- but `candidate_body` was NULL, so tier2 had
+         nothing to promote and filed it under needs_human as "permuter
+         says base score 0 but no candidate_body on record". The body is
+         not actually lost: `nonmatchings/<name>/base.c` IS the source the
+         permuter scored, so winning_source() falls back to it.
+    """
     names = {
         r["function_name"]
         for r in conn.execute(
             "SELECT function_name FROM events WHERE kind = 'state:stalled' "
             "AND detail LIKE '%score 0 in isolation%'"
+        )
+    }
+    names |= {
+        r["name"]
+        for r in conn.execute(
+            "SELECT name FROM functions WHERE notes LIKE "
+            "'%base score 0 but no candidate_body%'"
         )
     }
     out = []
@@ -83,7 +101,10 @@ def winning_source(name: str) -> Path | None:
         score_file = src.parent / "score.txt"
         if score_file.is_file() and score_file.read_text().strip() == "0":
             return src
-    return None
+    # No improvement was ever written because none was needed: the base
+    # attempt already scored 0. base.c is then the winning source.
+    base = Path("nonmatchings", name, "base.c")
+    return base if base.is_file() else None
 
 
 def rescue_one(conn, name: str, dry_run: bool) -> str:

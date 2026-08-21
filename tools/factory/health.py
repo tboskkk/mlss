@@ -33,7 +33,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import db  # noqa: E402
-import gitops  # noqa: E402
+import gitops
+
+REPO = gitops.REPO  # noqa: E402
 
 WORKERS = ["scanner", "validator", "tier1", "tier_m2c", "tier2"]
 OK, WARN, FAIL = "ok", "warn", "fail"
@@ -155,6 +157,74 @@ def checks(conn) -> list[tuple[str, str, str]]:
                     + ", ".join(x[3:] for x in odd[:3])))
     else:
         out.append(("working tree", OK, f"{len(dirty)} in-flight src/ splice(s)"))
+
+    # --- search productivity ---------------------------------------------
+    # THE check that would have caught the section-F collapse, and the one
+    # nothing here had. Every other check was green throughout it: queue
+    # depth fine, workers alive, containers running, tree clean -- because
+    # decomp-permuter really was searching and really was converging. tier2
+    # was discarding the results. Launches versus convergences is the only
+    # number that separates "the search is failing" from "something
+    # downstream is eating the wins", and the difference decides whether
+    # you go looking at seeds or at plumbing.
+    launches = conn.execute("SELECT COUNT(*) FROM events WHERE kind='t2_launch' AND ts>?",
+                            (now - 3 * 3600,)).fetchone()[0]
+    converged = conn.execute("SELECT COUNT(*) FROM events WHERE kind='converged' AND ts>?",
+                             (now - 3 * 3600,)).fetchone()[0]
+    aborts = conn.execute("SELECT COUNT(*) FROM events WHERE kind='t2_ceiling_abort' AND ts>?",
+                          (now - 3 * 3600,)).fetchone()[0]
+    real = launches - aborts
+    if real >= 40 and converged == 0:
+        out.append(("search yield", FAIL,
+                    f"{real} real searches in 3h, ZERO converged -- the searches are "
+                    f"running, so suspect what happens to a win (tier2's promotion "
+                    f"path), not the seeds"))
+    elif real >= 25 and converged / real < 0.03:
+        out.append(("search yield", WARN,
+                    f"{converged}/{real} converged in 3h ({100*converged/real:.1f}%) "
+                    f"vs a ~15% baseline -- check the promotion path before the seeds"))
+    else:
+        rate = f"{100*converged/real:.0f}%" if real else "--"
+        out.append(("search yield", OK,
+                    f"{converged}/{real} converged in 3h ({rate}), {aborts} ceiling abort(s)"))
+
+    # --- inert rows ------------------------------------------------------
+    # needs_human is claimed by NOTHING (tier2 says so in its own comment,
+    # and reclaim_extraction.py only reads the no-fragment subset). A row
+    # filed there by a tool rather than by a real anomaly is invisible
+    # work, not hard work: 1,165 rows went inert this way once already.
+    # Counting them keeps that from happening quietly a second time.
+    inert = conn.execute(
+        "SELECT COUNT(*) FROM functions WHERE state='needs_human' AND ("
+        " notes LIKE '%unblock_files%' OR notes LIKE '%extraction failed%')"
+    ).fetchone()[0]
+    if inert:
+        out.append(("inert rows", WARN,
+                    f"{inert} needs_human row(s) filed by a TOOL, not a real anomaly -- "
+                    f"nothing re-claims needs_human, so these are invisible, not hard"))
+    else:
+        out.append(("inert rows", OK, "no tool-filed rows parked in needs_human"))
+
+    # --- stale NONMATCHING objects ---------------------------------------
+    # Make cannot see that -DNONMATCHING is not a file, so an object left
+    # behind by a NONMATCHING build is declared up to date by the next
+    # plain `make` -- which is how the length check came to measure an
+    # object a fraction of its real size and reject good candidates for
+    # months of queue time. Cheap proxy: an object in build/src/ that is
+    # dramatically smaller than the same object in expected/.
+    stale = []
+    exp = REPO / "expected" / "build" / "src"
+    if exp.is_dir():
+        for obj in (REPO / "build" / "src").glob("*.o"):
+            ref = exp / obj.name
+            if ref.is_file() and obj.stat().st_size * 2 < ref.stat().st_size:
+                stale.append(obj.name)
+    if stale:
+        out.append(("stale objects", WARN,
+                    f"{len(stale)} object(s) in build/src/ far smaller than expected/ "
+                    f"-- likely NONMATCHING leftovers: " + ", ".join(stale[:3])))
+    else:
+        out.append(("stale objects", OK, "no NONMATCHING leftovers in build/src/"))
 
     return out
 
