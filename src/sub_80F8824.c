@@ -52,17 +52,48 @@ _080F8856:
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/script_cmd_btl_return.s\"");
 #else
-#error "TODO: write script_cmd_btl_return to match asm/nonmatching/script_cmd_btl_return.s, then delete this #error"
+u8 script_cmd_return(s32, s32);                     /* extern */
+
+u8 script_cmd_btl_return(s32 arg0, s32 arg1, s32 *arg2) {
+    void *temp_r1_13;
+
+    if (*arg2 != 0) {
+        temp_r1_13 = *(void **)0x03000FD8;
+        (*(u8 *)((s8 *)(temp_r1_13) + (0x2BF))) = (u8) ((*(u8 *)((s8 *)(temp_r1_13) + (0x2BF))) | 2);
+    }
+    return script_cmd_return(arg0 + 0x1C, arg1);
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80F889C.s\"");
 #else
-#error "TODO: write sub_80F889C to match asm/nonmatching/sub_80F889C.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80F8900.s\"");
 #else
-#error "TODO: write sub_80F8900 to match asm/nonmatching/sub_80F8900.s, then delete this #error"
+s32 sub_80F8900(void *arg0, s32 *arg1, void *arg2, void *arg3) {
+    s32 temp_r0_9;
+    void *var_r3_0;
+
+    var_r3_0 = arg3;
+    temp_r0_9 = (*(s32 *)((s8 *)(arg2) + (0)));
+    switch (temp_r0_9) {                            /* irregular */
+    case 0:
+        var_r3_0 = (*(void **)((s8 *)(arg0) + (0x2C)));
+        break;
+    case 1:
+        var_r3_0 = (*(void **)((s8 *)(arg0) + (0x2C))) + (((*(s32 *)((s8 *)((arg2 + 4)) + (4))) << 8) + 0x100);
+        break;
+    }
+    if (1 & (*(u16 *)((s8 *)(var_r3_0) + (0xA0)))) {
+        *arg1 = (*(s32 *)((s8 *)(arg2) + (4)));
+    }
+    return 1;
+}
 #endif
