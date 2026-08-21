@@ -21,7 +21,10 @@ void sub_815F7FC(void *arg0, s32 arg1) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_815F81C.s\"");
 #else
-#error "TODO: write sub_815F81C to match asm/nonmatching/sub_815F81C.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
