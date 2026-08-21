@@ -51,3 +51,9 @@ s32 sub_80EA9B8(s32 arg0, s32 *arg1, void *arg2)
   }
   return 1;
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80EAA04.s\"");
+#else
+#error "TODO: write sub_80EAA04 to match asm/nonmatching/sub_80EAA04.s, then delete this #error"
+#endif
