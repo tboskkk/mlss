@@ -20,47 +20,90 @@ void sub_8171B44(void *arg0)
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8171B60.s\"");
 #else
-#error "TODO: write sub_8171B60 to match asm/nonmatching/sub_8171B60.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8171BF0.s\"");
 #else
-#error "TODO: write sub_8171BF0 to match asm/nonmatching/sub_8171BF0.s, then delete this #error"
+s32 sub_8163A24(s32);                           /* extern */
+
+void sub_8171BF0(void *arg0) {
+    sub_8163A24((*(s32 *)((s8 *)(arg0) + (0x6C))));
+    sub_8163A24((*(s32 *)((s8 *)(arg0) + (0x70))));
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8171C20.s\"");
 #else
-#error "TODO: write sub_8171C20 to match asm/nonmatching/sub_8171C20.s, then delete this #error"
+s32 sub_8163B60();                              /* extern */
+
+void sub_8171C20(void *arg0) {
+    (*(s32 *)((s8 *)(arg0) + (0xC))) = 0x08CDD2A8;
+    sub_8163B60();
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8171C88.s\"");
 #else
-#error "TODO: write sub_8171C88 to match asm/nonmatching/sub_8171C88.s, then delete this #error"
+s32 sub_8163B60();                              /* extern */
+
+void sub_8171C88(void *arg0) {
+    (*(s32 *)((s8 *)(arg0) + (0xC))) = 0x08CDD2B8;
+    sub_8163B60();
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8171D58.s\"");
 #else
-#error "TODO: write sub_8171D58 to match asm/nonmatching/sub_8171D58.s, then delete this #error"
+s32 sub_8163B60();                              /* extern */
+
+void sub_8171D58(void *arg0) {
+    (*(s32 *)((s8 *)(arg0) + (0xC))) = 0x08CDD2C8;
+    sub_8163B60();
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8171DD4.s\"");
 #else
-#error "TODO: write sub_8171DD4 to match asm/nonmatching/sub_8171DD4.s, then delete this #error"
+s32 stop_sfx_80195A8(s32);                      /* extern */
+
+void sub_8171DD4(void *arg0) {
+    if ((*(u16 *)((s8 *)(arg0) + (0xEA))) != 0) {
+        (*(u16 *)((s8 *)(arg0) + (0xEA))) = 0U;
+        stop_sfx_80195A8(0x97);
+    }
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8171DF0.s\"");
 #else
-#error "TODO: write sub_8171DF0 to match asm/nonmatching/sub_8171DF0.s, then delete this #error"
+void sub_8171DF0(void *arg0) {
+    u16 temp_r0_9;
+
+    temp_r0_9 = (*(u16 *)((s8 *)(arg0) + (0xEA)));
+    if (temp_r0_9 == 0) {
+        (*(u16 *)((s8 *)(arg0) + (0xEA))) = (u16) (temp_r0_9 + 1);
+        play_sfx_80195B4(0x97, -1);
+    }
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8171E2C.s\"");
 #else
-#error "TODO: write sub_8171E2C to match asm/nonmatching/sub_8171E2C.s, then delete this #error"
+s32 sub_8171E2C(void *arg0) {
+    if (((*(s32 *)((s8 *)(arg0) + (0xA8))) != 0) || ((*(s32 *)((s8 *)(arg0) + (0xAC))) != 0) || ((*(s32 *)((s8 *)(arg0) + (0xB0))) != 0) || ((*(s32 *)((s8 *)(arg0) + (0xB4))) != 0) || ((*(s32 *)((s8 *)(arg0) + (0xB8))) != 0) || ((*(s32 *)((s8 *)(arg0) + (0xBC))) != 0) || ((*(s32 *)((s8 *)(arg0) + (0xC0))) != 0) || ((*(s32 *)((s8 *)(arg0) + (0xC4))) != 0) || ((*(s32 *)((s8 *)(arg0) + (0xC8))) != 0) || ((*(s32 *)((s8 *)(arg0) + (0xCC))) != 0) || ((*(s32 *)((s8 *)(arg0) + (0xD0))) != 0) || ((*(s32 *)((s8 *)(arg0) + (0xD4))) != 0)) {
+        return 1;
+    }
+    return 0;
+}
 #endif
