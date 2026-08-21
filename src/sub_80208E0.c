@@ -16,3 +16,9 @@ void sub_80208E0(void *arg0) {
     (*(s32 *)((s8 *)(temp_r2_6) + (8))) = (s32) (*(s32 *)((s8 *)(arg0) + (0x4C)));
     (*(s32 *)((s8 *)(temp_r2_6) + (0xC))) = 0;
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80208F4.s\"");
+#else
+#error "TODO: write sub_80208F4 to match asm/nonmatching/sub_80208F4.s, then delete this #error"
+#endif
