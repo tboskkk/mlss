@@ -25,3 +25,9 @@ void sub_801AA70(s32 r0, u32 r1, u32 r2, u32 r3)
     r0 = r3;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_801ABE8.s\"");
+#else
+#error "TODO: write sub_801ABE8 to match asm/nonmatching/sub_801ABE8.s, then delete this #error"
+#endif
