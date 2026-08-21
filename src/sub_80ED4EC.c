@@ -34,3 +34,9 @@ void sub_80ED4EC(u32 r0, u32 r1, u32 r2)
     }
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80ED6A8.s\"");
+#else
+#error "TODO: write sub_80ED6A8 to match asm/nonmatching/sub_80ED6A8.s, then delete this #error"
+#endif
