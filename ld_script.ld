@@ -156,6 +156,8 @@ SECTIONS
         build/asm/text0801A548_p31.o(.text);
         build/src/option_screens.o(.text);
         build/asm/option_screens.o(.text);
+        build/src/sub_8052EFC.o(.text);
+        build/asm/option_screens_p2.o(.text);
         build/src/opening_sequence.o(.text);
         build/asm/text080542C4.o(.text);
         build/src/title_screen.o(.text);

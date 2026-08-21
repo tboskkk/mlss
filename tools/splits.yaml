@@ -168,6 +168,8 @@ groups:
   - {obj: asm/text0801A548_p31, section: text}
   - {obj: src/option_screens, section: text}
   - {obj: asm/option_screens, section: text}
+  - {obj: src/sub_8052EFC, section: text}
+  - {obj: asm/option_screens_p2, section: text}
   - {obj: src/opening_sequence, section: text}
   - {obj: asm/text080542C4, section: text}
   - {obj: src/title_screen, section: text}
