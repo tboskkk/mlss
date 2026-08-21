@@ -47,3 +47,9 @@ void sub_805F508(u32* p0, s16 p1, s16 p2, u16 p3)
     *(u16*)((u8*)r5 + 0xB2) = r1;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_805F554.s\"");
+#else
+#error "TODO: write sub_805F554 to match asm/nonmatching/sub_805F554.s, then delete this #error"
+#endif
