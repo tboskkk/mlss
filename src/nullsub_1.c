@@ -14,3 +14,9 @@ void nullsub_1(void) {
 
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/__modsi3.s\"");
+#else
+#error "TODO: write __modsi3 to match asm/nonmatching/__modsi3.s, then delete this #error"
+#endif
