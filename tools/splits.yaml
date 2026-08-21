@@ -1084,6 +1084,8 @@ groups:
   - {obj: src/__divsi3, section: text}
   - {obj: src/nullsub_1, section: text}
   - {obj: asm/text08057568_p328, section: text}
+  - {obj: src/__udivsi3, section: text}
+  - {obj: asm/text08057568_p395, section: text}
   - {obj: src/sub_81DBBA0, section: text}
   - {obj: asm/text08057568_p291, section: text}
   - {obj: src/sub_81DC43C, section: text}
