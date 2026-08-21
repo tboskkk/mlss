@@ -51,3 +51,9 @@ void sub_8136708(void *arg0) {
     }
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_81367AC.s\"");
+#else
+#error "TODO: write sub_81367AC to match asm/nonmatching/sub_81367AC.s, then delete this #error"
+#endif
