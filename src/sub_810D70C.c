@@ -224,29 +224,30 @@ asm_unified(".include \"asm/nonmatching/sub_810FE1C.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_810FE44.s\"");
-#else
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 s32 sub_80883F0(void *);                            /* extern */
 extern s32 sub_810FA8C;
-
-void sub_810FE44(void *arg0) {
-    void *temp_r2_29;
-    void *temp_r2_8;
-
-    temp_r2_8 = (*(void **)((s8 *)(arg0) + (8)));
-    if ((*(u8 *)((s8 *)(temp_r2_8) + (0x23))) == 1) {
-        (*(u8 *)((s8 *)(temp_r2_8) + (0x12))) = (u8) ((*(u8 *)((s8 *)(temp_r2_8) + (0x12))) | 0x10);
-    }
-    if ((sub_80883F0(arg0) << 0x18) == 0) {
-        sub_8082E1C(arg0, 0xB, 0, 0);
-        temp_r2_29 = (*(void **)((s8 *)(arg0) + (8)));
-        (*(u8 *)((s8 *)(temp_r2_29) + (0x12))) = (u8) ((-7 & (*(u8 *)((s8 *)(temp_r2_29) + (0x12)))) | 2);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_810FA8C;
-    }
+void sub_810FE44(void *arg0)
+{
+  void *temp_r2_8;
+  int new_var2;
+  void *temp_r2_29;
+  s8 *new_var;
+  temp_r2_8 = *((void **) (((s8 *) arg0) + 8));
+  new_var2 = -7;
+  if ((*((u8 *) (((s8 *) (*((void **) (((s8 *) arg0) + 8)))) + 0x23))) == 1)
+  {
+    *((u8 *) (((s8 *) temp_r2_8) + 0x12)) = (u8) ((*((u8 *) (((s8 *) (*((void **) (((s8 *) arg0) + 8)))) + 0x12))) | 0x10);
+  }
+  if ((sub_80883F0(arg0) << 0x18) == 0)
+  {
+    sub_8082E1C(arg0, 0xB, 0, 0);
+    temp_r2_29 = *((void **) (((s8 *) arg0) + 8));
+    *((u8 *) (((s8 *) temp_r2_29) + 0x12)) = (u8) ((new_var2 & (*((u8 *) (((s8 *) temp_r2_29) + 0x12)))) | 2);
+    new_var = ((s8 *) arg0) + 0x4C;
+    *((s32 **) new_var) = &sub_810FA8C;
+  }
 }
-#endif
 
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 s32 sub_80883A0(void *, s32);                   /* extern */
