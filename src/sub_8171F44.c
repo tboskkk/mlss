@@ -30,5 +30,10 @@ void sub_8171F84(void *arg0) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8171FC0.s\"");
 #else
-#error "TODO: write sub_8171FC0 to match asm/nonmatching/sub_8171FC0.s, then delete this #error"
+s32 process_remove();                           /* extern */
+
+void sub_8171FC0(void *arg0) {
+    (*(s32 *)((s8 *)(arg0) + (0x18))) = 0x08CDD290;
+    process_remove();
+}
 #endif
