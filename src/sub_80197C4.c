@@ -33,3 +33,9 @@ void sub_80197E0(void) {
     *(s32 *)0x03000C78 = 0;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8019808.s\"");
+#else
+#error "TODO: write sub_8019808 to match asm/nonmatching/sub_8019808.s, then delete this #error"
+#endif
