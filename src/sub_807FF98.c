@@ -57,3 +57,9 @@ void sub_807FFD8(void **arg0, s32 arg1) {
     *arg0 = temp_r0_10;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_807FFFC.s\"");
+#else
+#error "TODO: write sub_807FFFC to match asm/nonmatching/sub_807FFFC.s, then delete this #error"
+#endif
