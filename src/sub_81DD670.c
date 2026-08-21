@@ -13,3 +13,9 @@ void sub_81DD670(void* p0, s32 p1)
     if (p1 & 1)
         free_heap_8018DA8(p0);
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_81DD690.s\"");
+#else
+#error "TODO: write sub_81DD690 to match asm/nonmatching/sub_81DD690.s, then delete this #error"
+#endif
