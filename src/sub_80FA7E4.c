@@ -110,3 +110,9 @@ s32 sub_80FAC30(s32 arg0, void *arg2) {
     return 1;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80FAC5C.s\"");
+#else
+#error "TODO: write sub_80FAC5C to match asm/nonmatching/sub_80FAC5C.s, then delete this #error"
+#endif
