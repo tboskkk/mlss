@@ -10,35 +10,23 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8083EEC.s\"");
 #else
-void sub_8083EEC(u32 param_1, u32 param_2)
-{
-    u8 *puVar1;
-    u32 uVar2;
-    
-    puVar1 = (u8 *)(param_1 + 0xF0);
-    uVar2 = *(u8 *)(puVar1 + 0x1D);
-    if (param_2 == 1) {
-        uVar2 = uVar2 >> 4;
+u32 sub_8083EEC(void *arg0, s32 arg1) {
+    s32 var_r0_25;
+    u8 temp_r0_9;
+
+    temp_r0_9 = (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (0xF0)))) + (0x1D)));
+    switch (arg1) {                                 /* irregular */
+    case 0:
+        return temp_r0_9 >> 6;
+    case 1:
+        var_r0_25 = (s32) temp_r0_9 >> 4;
+block_9:
+        return var_r0_25 & 3;
+    case 2:
+        var_r0_25 = (s32) temp_r0_9 >> 2;
+        goto block_9;
+    default:
+        return -1U;
     }
-    else {
-        if (param_2 < 2) {
-            if (param_2 != 0) {
-                uVar2 = -1;
-            }
-            else {
-                uVar2 = uVar2 >> 6;
-            }
-        }
-        else {
-            if (param_2 == 2) {
-                uVar2 = uVar2 >> 2;
-            }
-            else {
-                uVar2 = -1;
-            }
-        }
-    }
-    uVar2 = uVar2 & 3;
-    *(u32 *)puVar1 = uVar2;
 }
 #endif
