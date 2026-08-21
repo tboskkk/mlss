@@ -49,3 +49,9 @@ void sub_80E19EC(u32* p0)
     *(u16*)0x0200001A = temp4;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80E1A2C.s\"");
+#else
+#error "TODO: write sub_80E1A2C to match asm/nonmatching/sub_80E1A2C.s, then delete this #error"
+#endif
