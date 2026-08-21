@@ -70,3 +70,9 @@ void sub_8117C50(s32 r0, s32 r1, s32 r2)
     bx r1;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8117C9C.s\"");
+#else
+#error "TODO: write sub_8117C9C to match asm/nonmatching/sub_8117C9C.s, then delete this #error"
+#endif
