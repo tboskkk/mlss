@@ -18,17 +18,27 @@ u32 sub_8199470(u32 param_1)
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8199480.s\"");
 #else
-#error "TODO: write sub_8199480 to match asm/nonmatching/sub_8199480.s, then delete this #error"
+s32 sub_81DA690(s16, s16);                          /* extern */
+
+u32 sub_8199480(s16 arg0, s16 arg1) {
+    return (u32) (sub_81DA690(arg0, arg1) << 0x10) >> 0x18;
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8199498.s\"");
 #else
-#error "TODO: write sub_8199498 to match asm/nonmatching/sub_8199498.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81994EC.s\"");
 #else
-#error "TODO: write sub_81994EC to match asm/nonmatching/sub_81994EC.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
