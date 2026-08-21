@@ -10,7 +10,28 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80275F4.s\"");
 #else
-#error "TODO: write sub_80275F4 to match asm/nonmatching/sub_80275F4.s, then delete this #error"
+s32 process_disable(s32);                       /* extern */
+s32 sub_80273E4(void *);                        /* extern */
+s32 sub_805A1A8(s32);                           /* extern */
+s32 sub_8122BA0(s32, s32);                      /* extern */
+
+void sub_80275F4(void *arg0) {
+    process_disable(*(s32 *)0x03000D44);
+    sub_801A6B0();
+    (*(u16 *)((s8 *)(arg0) + (0x1FA))) = (u16) *(u16 *)0x03000BE8;
+    sub_80193B4(0, 0x80, 8);
+    (*(u8 *)((s8 *)(arg0) + (0xFC))) = (u8) ((*(u8 *)((s8 *)(arg0) + (0xFC))) | 1);
+    sub_80273E4(arg0);
+    sub_805A1A8((*(s32 *)((s8 *)(arg0) + (0x304))));
+    process_disable((*(s32 *)((s8 *)(arg0) + (0x304))));
+    sub_8018B78(2, 0);
+    (*(s8 *)((s8 *)(arg0) + (0))) = 2;
+    *(s8 *)0x03000C24 = 2;
+    if (*(s32 *)0x03000C78 == 0) {
+        *(s32 *)0x03000C78 = 0x0800063C;
+    }
+    sub_8122BA0(-1, 1);
+}
 #endif
 
 #ifndef NONMATCHING
