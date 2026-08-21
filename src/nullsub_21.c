@@ -22,6 +22,12 @@ void sub_8159378(void *arg0, s32 arg1) {
 #endif
 
 #ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8159398.s\"");
+#else
+#error "TODO: write sub_8159398 to match asm/nonmatching/sub_8159398.s, then delete this #error"
+#endif
+
+#ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81593B8.s\"");
 #else
 void sub_81593B8(void *arg0, s32 arg1) {
