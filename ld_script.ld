@@ -260,6 +260,7 @@ SECTIONS
         build/asm/text08057568_p324.o(.text);
         build/src/sub_8059A8C.o(.text);
         build/asm/text08057568_p366.o(.text);
+        build/src/sub_8059DDC.o(.text);
         build/src/sub_8059E5C.o(.text);
         build/src/sub_8059EC8.o(.text);
         build/src/sub_8059EF0.o(.text);
