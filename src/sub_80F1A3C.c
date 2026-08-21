@@ -10,38 +10,20 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80F1A3C.s\"");
 #else
-void sub_80F1A3C(u32* param_1, u32* param_2, u32* param_3, u32* param_4)
-{
-  u32 *puVar1;
-  u32 *puVar2;
-  u32 uVar3;
-  u32 uVar4;
-  u32 uVar5;
-  u8 *puVar6;
-  
-  puVar1 = param_1;
-  puVar2 = param_4;
-  uVar3 = *(u32*)((u8*)param_4 + 0x0);
-  if (uVar3 < 0x40) {
-    uVar4 = *(u32*)((u8*)param_1 + 0x14);
-    uVar5 = uVar3 << 2;
-    puVar1 = (u32*)((u8*)uVar4 + uVar5);
-    uVar3 = *(u32*)((u8*)puVar1 + 0x28);
-  }
-  puVar2 = (u32*)((u8*)param_4 + 0x4);
-  uVar4 = 0xA5 << 2;
-  puVar1 = (u32*)((u8*)uVar3 + uVar4);
-  uVar3 = *(u32*)((u8*)puVar1 + 0x0);
-  puVar6 = (u8*)uVar3 + 0x11;
-  uVar4 = *puVar6;
-  uVar5 = uVar4 << 0x19;
-  uVar5 = uVar5 >> 0x1f;
-  uVar3 = *(u32*)((u8*)puVar2 + 0x0);
-  uVar5 = uVar5 ^ uVar3;
-  uVar5 = uVar5 & 1;
-  uVar5 = uVar5 << 6;
-  uVar4 = uVar4 & 0xff;
-  uVar4 = uVar4 | uVar5;
-  *(u8*)puVar6 = uVar4;
+s32 sub_80F1A3C(void *arg0, void *arg1, void *arg3) {
+    s32 temp_r0_9;
+    u8 temp_r2_22;
+    void *temp_r3_21;
+    void *var_r1_0;
+
+    var_r1_0 = arg1;
+    temp_r0_9 = (*(s32 *)((s8 *)(arg3) + (0)));
+    if (temp_r0_9 != 0x3F) {
+        var_r1_0 = (*(void **)((s8 *)(((temp_r0_9 * 4) + (*(s32 *)((s8 *)(arg0) + (0x14))))) + (0x28)));
+    }
+    temp_r3_21 = (*(void **)((s8 *)(var_r1_0) + (0x294)));
+    temp_r2_22 = (*(u8 *)((s8 *)(temp_r3_21) + (0x11)));
+    (*(u8 *)((s8 *)(temp_r3_21) + (0x11))) = (u8) ((-0x41 & temp_r2_22) | (((((u32) (temp_r2_22 << 0x19) >> 0x1F) ^ (*(s32 *)((s8 *)(arg3) + (4)))) & 1) << 6));
+    return 1;
 }
 #endif
