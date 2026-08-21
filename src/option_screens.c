@@ -516,3 +516,9 @@ void sub_8052B54(struct OPTNProcess* optn, int a2) {
         CpuFastSet((void*)optn->field_28, (void*)0x6001000, 0x600);
     }
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8052C50.s\"");
+#else
+#error "TODO: write sub_8052C50 to match asm/nonmatching/sub_8052C50.s, then delete this #error"
+#endif
