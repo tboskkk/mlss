@@ -10,17 +10,33 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80F7590.s\"");
 #else
-#error "TODO: write sub_80F7590 to match asm/nonmatching/sub_80F7590.s, then delete this #error"
+void sub_80F7590(s32 arg0) {
+    void *temp_r2_12;
+
+    temp_r2_12 = (*(void **)((s8 *)((*(void **)((s8 *)(*(void **)0x03000FD8) + (0x244)))) + (0x2C)));
+    (*(s32 *)((s8 *)(temp_r2_12) + (0x1788))) = (s32) ((*(s32 *)((s8 *)(temp_r2_12) + (0x1788))) & ~arg0);
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80F75B4.s\"");
 #else
-#error "TODO: write sub_80F75B4 to match asm/nonmatching/sub_80F75B4.s, then delete this #error"
+void sub_80F75B4(s32 arg0) {
+    void *temp_r2_12;
+
+    temp_r2_12 = (*(void **)((s8 *)((*(void **)((s8 *)(*(void **)0x03000FD8) + (0x244)))) + (0x2C)));
+    (*(s32 *)((s8 *)(temp_r2_12) + (0x1788))) = (s32) ((*(s32 *)((s8 *)(temp_r2_12) + (0x1788))) | arg0);
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80F75D8.s\"");
 #else
-#error "TODO: write sub_80F75D8 to match asm/nonmatching/sub_80F75D8.s, then delete this #error"
+void sub_80F75D8(s32 arg0) {
+    void *temp_r2_12;
+
+    temp_r2_12 = (*(void **)((s8 *)((*(void **)((s8 *)(*(void **)0x03000FD8) + (0x244)))) + (0x2C)));
+    (*(s32 *)((s8 *)(temp_r2_12) + (0x1788))) = (s32) ((*(s32 *)((s8 *)(temp_r2_12) + (0x1788))) | arg0);
+    (*(s32 *)((s8 *)(temp_r2_12) + (0x1798))) = (s32) ((*(s32 *)((s8 *)(temp_r2_12) + (0x1798))) | arg0);
+}
 #endif
