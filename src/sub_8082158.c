@@ -19,9 +19,3 @@ void sub_8082158(void *arg0) {
         (*(s32 **)((s8 *)(arg0) + (4))) = &sub_8080A40;
     }
 }
-
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8082180.s\"");
-#else
-#error "TODO: write sub_8082180 to match asm/nonmatching/sub_8082180.s, then delete this #error"
-#endif
