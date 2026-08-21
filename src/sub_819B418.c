@@ -84,3 +84,15 @@ asm_unified(".include \"asm/nonmatching/sub_819BA2C.s\"");
 #else
 #error "TODO: write sub_819BA2C to match asm/nonmatching/sub_819BA2C.s, then delete this #error"
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_819BABC.s\"");
+#else
+#error "TODO: write sub_819BABC to match asm/nonmatching/sub_819BABC.s, then delete this #error"
+#endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_81C0F7E.s\"");
+#else
+#error "TODO: write sub_81C0F7E to match asm/nonmatching/sub_81C0F7E.s, then delete this #error"
+#endif
