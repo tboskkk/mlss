@@ -731,6 +731,8 @@ groups:
   - {obj: src/sub_80EF27C, section: text}
   - {obj: src/sub_80EF2EC, section: text}
   - {obj: asm/text08057568_p243, section: text}
+  - {obj: src/sub_80F0000, section: text}
+  - {obj: asm/text08057568_p464, section: text}
   - {obj: src/script_enable_flag_2, section: text}
   - {obj: asm/text08057568_p47, section: text}
   - {obj: src/sub_80F0540, section: text}
