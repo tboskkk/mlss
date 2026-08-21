@@ -16,7 +16,14 @@ asm_unified(".include \"asm/nonmatching/sub_802973C.s\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8029788.s\"");
 #else
-#error "TODO: write sub_8029788 to match asm/nonmatching/sub_8029788.s, then delete this #error"
+s32 sub_805C6B8(s32);                           /* extern */
+
+void sub_8029788(void *arg0) {
+    if (((s32) ((*(u16 *)((s8 *)(arg0) + (0xFC))) << 0x15) >> 0x1C) == 0) {
+        sub_805C6B8((*(s32 *)((s8 *)(arg0) + (0x304))));
+    }
+    (*(u16 *)((s8 *)(arg0) + (0xFC))) = (u16) ((*(u16 *)((s8 *)(arg0) + (0xFC))) | 0x780);
+}
 #endif
 
 #ifndef NONMATCHING

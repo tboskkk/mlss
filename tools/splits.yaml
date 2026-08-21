@@ -148,6 +148,8 @@ groups:
   - {obj: asm/text0801A548_p68, section: text}
   - {obj: src/sub_802C428, section: text}
   - {obj: asm/text0801A548_p69, section: text}
+  - {obj: src/sub_802C774, section: text}
+  - {obj: asm/text0801A548_p70, section: text}
   - {obj: src/sub_80316FC, section: text}
   - {obj: asm/text0801A548_p32, section: text}
   - {obj: src/sub_803C424, section: text}
