@@ -30,6 +30,7 @@ import atexit
 import re
 import shutil
 import signal
+import sqlite3
 import subprocess
 import sys
 import time
@@ -157,10 +158,40 @@ def ensure_isolated(name: str, candidate_body: str | None) -> bool:
     # lock, entirely inside nonmatchings/<name>/, so searches stay fully
     # parallel with everything else. See gitops.repo_lock().
     with gitops.repo_lock(what=f"tier2 isolate {name}"):
+        c_path = None
         if candidate_body:
-            if gitops.splice_into_else(name, candidate_body) is None:
+            c_path = gitops.splice_into_else(name, candidate_body)
+            if c_path is None:
                 return False
-        r = gitops.run(["./container.sh", "tools/permute.py", name])
+        try:
+            r = gitops.run(["./container.sh", "tools/permute.py", name])
+        finally:
+            # REVERT. permute.py has already copied the function into
+            # nonmatchings/<name>/ by now -- synchronously, inside this same
+            # lock -- so nothing downstream needs the src/*.c to keep
+            # holding the candidate: tier2's exit path re-splices via
+            # already_matches(), and the validator re-splices from the DB.
+            #
+            # Leaving it was the second, longer-lived half of a bug whose
+            # first half was fixed in already_matches() (01b41f88): a search
+            # runs for up to 15 minutes with an unverified draft sitting in
+            # a real source file, and gitops.commit() stages FACTORY_PATHS,
+            # which includes src/. So whatever the validator committed next
+            # absorbed every in-flight splice. Across history, 180
+            # Match/Extract commits swept in 720 extra src files touching
+            # 497 distinct files -- including one that overwrote an
+            # unblock_files.py placeholder with a seed known not to compile,
+            # re-creating the section-D translation-unit deadlock in a file
+            # nobody touched on purpose, under a commit message promising a
+            # verified from-scratch build.
+            #
+            # It also poisoned MEASUREMENT, which is the more expensive
+            # half: agbcc compiles a whole translation unit, so scoring
+            # function F while F's neighbours hold unverified drafts makes
+            # the verdict about F partly a verdict about them.
+            if c_path is not None:
+                gitops.run(["git", "checkout", "--",
+                            str(c_path.relative_to(gitops.REPO))])
     return r.returncode == 0
 
 
@@ -530,6 +561,22 @@ def run_pool(jobs: int, stall_min: float, max_functions: int):
             conn.close()
 
     while True:
+      # A transient DB error must NOT escape to main(). main() responds to
+      # any exception by cleaning up -- killing every running container and
+      # requeuing its row -- which is right for a real crash and wildly
+      # disproportionate for `database is locked`. Measured: 25 exceptions
+      # in one day, ALL of them `database is locked`, costing 48 killed and
+      # requeued searches in three hours, 22 of which had already made real
+      # score improvements. The progress is not merely paused: the next
+      # claim calls ensure_isolated(), which rmtree's nonmatchings/<name>/,
+      # taking any output-N-* directories with it. None had reached zero
+      # that day, which was luck rather than safety -- losing a score-0 is
+      # the most expensive thing this pipeline can do.
+      #
+      # db.tx()'s BEGIN IMMEDIATE removes the usual cause; this keeps the
+      # pool alive if any other transient DB fault appears. `procs` stays
+      # intact across the retry, so the running searches are undisturbed.
+      try:
         # --- refill every free slot -------------------------------------
         while len(procs) < max_functions:
             row = claim_one()
@@ -612,6 +659,11 @@ def run_pool(jobs: int, stall_min: float, max_functions: int):
             break  # nothing running and nothing left to claim
 
         time.sleep(10)
+      except sqlite3.OperationalError as e:
+        print(f"[{time.strftime('%H:%M:%S')}] transient DB error ({e}) -- "
+              f"{len(procs)} search(es) left running, retrying", flush=True)
+        time.sleep(2)
+        continue
 
         for name in list(procs):
             info = procs[name]

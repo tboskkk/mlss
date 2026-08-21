@@ -93,10 +93,57 @@ MIGRATIONS = [
 ]
 
 
-def connect() -> sqlite3.Connection:
+def _schema_is_current(conn: sqlite3.Connection) -> bool:
+    """Read-only check that the DDL below would be a no-op."""
+    try:
+        have = {r[0] for r in conn.execute(
+            "SELECT name FROM sqlite_master WHERE type='table'")}
+        if not {"functions", "edges", "events"} <= have:
+            return False
+        cols = {r[1] for r in conn.execute("PRAGMA table_info(functions)")}
+        return all(col in cols for col, _ in MIGRATIONS)
+    except sqlite3.Error:
+        return False
+
+
+def connect(readonly: bool = False) -> sqlite3.Connection:
+    """Open the state DB.
+
+    `readonly=True` opens with SQLite's `mode=ro` URI and touches nothing.
+    Use it for anything that only reports -- health.py, dashboard.py, ad-hoc
+    queries. It is not merely tidier: this function USED to run
+    `executescript(SCHEMA)`, a migration check and `commit()` on EVERY open,
+    i.e. a write transaction per connection, and both monitors reconnect on
+    a timer. A dashboard left running 18.4 hours at its 5s refresh was
+    issuing on the order of 13,000 write transactions an hour against the
+    same DB the pipeline writes to -- while CLAUDE.md described both tools
+    as read-only and safe to run against a live factory as often as you
+    like. `database is locked` errors then clustered in exactly the hours
+    that monitoring was heaviest, and each one cost 12 killed permuter
+    searches (see tier2.main()). The observer was perturbing the system.
+
+    Even for writers the DDL now runs only when it would actually change
+    something, checked with a read query first.
+    """
+    if readonly:
+        conn = sqlite3.connect(f"file:{DB_PATH}?mode=ro", uri=True, timeout=30)
+        conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA busy_timeout = 30000")
+        return conn
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(DB_PATH, timeout=30)
     conn.row_factory = sqlite3.Row
+    # Autocommit mode, so tx()'s explicit BEGIN IMMEDIATE is legal (Python's
+    # default implicit BEGIN would make it "cannot start a transaction
+    # within a transaction"). It also fixes a silent data-loss bug: several
+    # callers do `with db.tx(conn): set_state(...)` and then log_event()
+    # OUTSIDE the block, and the connection is closed in a finally -- so
+    # under the old implicit-transaction behaviour that event was rolled
+    # back and vanished. Measured: 139 state:tier2_ready transitions in one
+    # hour with ZERO matching `seeded` events on record. The events table is
+    # what health.py's search-yield check and every incident post-mortem
+    # read, so those holes were being read as fact.
+    conn.isolation_level = None
     conn.execute("PRAGMA journal_mode=WAL")
     # Belt and suspenders alongside the connect() timeout= kwarg above:
     # found live, running all 5 processes together for the first time,
@@ -107,12 +154,13 @@ def connect() -> sqlite3.Connection:
     # error to Python immediately.
     conn.execute("PRAGMA busy_timeout = 30000")
     conn.execute("PRAGMA foreign_keys=OFF")  # edges/functions can reference rows not yet scanned
-    conn.executescript(SCHEMA)
-    existing_cols = {r[1] for r in conn.execute("PRAGMA table_info(functions)")}
-    for col, sqltype in MIGRATIONS:
-        if col not in existing_cols:
-            conn.execute(f"ALTER TABLE functions ADD COLUMN {col} {sqltype}")
-    conn.commit()
+    if not _schema_is_current(conn):
+        conn.executescript(SCHEMA)
+        existing_cols = {r[1] for r in conn.execute("PRAGMA table_info(functions)")}
+        for col, sqltype in MIGRATIONS:
+            if col not in existing_cols:
+                conn.execute(f"ALTER TABLE functions ADD COLUMN {col} {sqltype}")
+        conn.commit()
     return conn
 
 
@@ -120,7 +168,32 @@ def connect() -> sqlite3.Connection:
 def tx(conn: sqlite3.Connection):
     """One transaction, committed on clean exit, rolled back on exception --
     every write in this package goes through this so a crash mid-update
-    can never leave a function half-transitioned between states."""
+    can never leave a function half-transitioned between states.
+
+    BEGIN IMMEDIATE, not Python's default deferred transaction. Two real
+    problems came from the default:
+
+    1. `database is locked`, thrown rather than waited out. A deferred
+       transaction takes its write lock only at the first write, so a
+       SELECT-then-UPDATE block (which is what claim_for_worker and every
+       read-modify-write here is) can find that another writer committed in
+       between. SQLite cannot safely wait at that point -- upgrading a read
+       lock to a write lock is a deadlock risk -- so it returns SQLITE_BUSY
+       IMMEDIATELY and `busy_timeout` never applies, however generous it
+       is. That is why a 30-second busy_timeout was still producing 25
+       `database is locked` failures in three hours.
+    2. claim_for_worker's advertised atomicity was not real. Its docstring
+       says two workers grabbing the same function is "structurally
+       impossible"; with a deferred transaction both could pass the
+       `worker_id IS NULL` SELECT before either wrote. Unexercised so far
+       (one claimant per state), but the guarantee is load-bearing and
+       several tools now read unclaimed rows.
+
+    BEGIN IMMEDIATE takes the write lock up front, so contention becomes a
+    wait governed by busy_timeout instead of an exception, and the SELECT
+    sees a snapshot nothing can change underneath it.
+    """
+    conn.execute("BEGIN IMMEDIATE")
     try:
         yield conn
         conn.commit()

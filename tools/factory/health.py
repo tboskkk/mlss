@@ -34,6 +34,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import db  # noqa: E402
 import gitops
+import m2c_bridge
 import tier2
 
 REPO = gitops.REPO  # noqa: E402
@@ -231,6 +232,35 @@ def checks(conn) -> list[tuple[str, str, str]]:
     else:
         out.append(("inert rows", OK, "no tool-filed rows parked in needs_human"))
 
+    # --- parked pending a ruleset change ---------------------------------
+    # needs_attempt and stalled LOOK like an active backlog on the
+    # dashboard, and mostly are not: tier_m2c excludes any row already
+    # declined by the ruleset it is running, which is correct (it is what
+    # stops an infinite re-claim loop on a deterministic generator) but
+    # means those rows wait for a CODE change, not for a worker.
+    #
+    # Reported because the alternative is what actually happened: 2,697
+    # rows -- 45% of the corpus -- sitting in states with zero claimants,
+    # while every health check read green. Parked is a legitimate state;
+    # silently parked is not. This number only moves when m2c_bridge.py,
+    # the pinned m2c revision, or a header under include/ changes.
+    try:
+        ruleset = m2c_bridge.ruleset_version()
+        parked = conn.execute(
+            "SELECT COUNT(*) FROM functions WHERE state IN ('needs_attempt','stalled') "
+            "AND notes LIKE ?", (f"m2c:{ruleset}:%",)).fetchone()[0]
+        backlog = conn.execute(
+            "SELECT COUNT(*) FROM functions WHERE state IN ('needs_attempt','stalled')"
+        ).fetchone()[0]
+        live = backlog - parked
+        pct = 100 * parked / 5986
+        out.append(("parked", OK if live or not parked else WARN,
+                    f"{parked} row(s) ({pct:.0f}% of corpus) judged by ruleset "
+                    f"{ruleset} and waiting on a RULE change, not a worker; "
+                    f"{live} still claimable"))
+    except Exception as e:
+        out.append(("parked", WARN, f"could not measure parked rows: {e}"))
+
     # --- stale NONMATCHING objects ---------------------------------------
     # Make cannot see that -DNONMATCHING is not a file, so an object left
     # behind by a NONMATCHING build is declared up to date by the next
@@ -260,7 +290,7 @@ def main():
     ap.add_argument("--quiet", action="store_true")
     args = ap.parse_args()
 
-    conn = db.connect()
+    conn = db.connect(readonly=True)
     try:
         results = checks(conn)
     finally:

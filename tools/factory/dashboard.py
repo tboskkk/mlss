@@ -172,7 +172,7 @@ def main():
 
     while True:
         try:
-            conn = db.connect()
+            conn = db.connect(readonly=True)
             try:
                 frame = render(conn)
             finally:

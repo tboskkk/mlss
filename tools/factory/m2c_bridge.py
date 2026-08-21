@@ -89,8 +89,25 @@ def ruleset_version() -> str:
     changes, which is exactly the condition under which retrying is worth
     anything.
 
-    Hashes this file plus the pinned m2c submodule revision -- the two
-    things that decide what a seed comes out as.
+    Hashes this file, the pinned m2c submodule revision, AND every header
+    under include/ -- the three things that decide what a seed comes out as.
+
+    The headers are not padding. ensure_context() regenerates m2c's
+    `--context` whenever any include/**/*.h is newer than it, and that
+    context is what tells m2c the struct layouts, globals and callee
+    signatures it would otherwise GUESS -- this module's own docstring
+    calls the guessing the failure. So a header change materially changes
+    every seed while leaving the ruleset hash untouched.
+
+    That gap is not theoretical: 2,697 rows -- 45% of the corpus -- are
+    currently parked in needs_attempt/stalled behind this exclusion, and
+    CLAUDE.md's own stated next lever ("feed the context the signatures of
+    functions already matched") is a header change. Without this, that
+    improvement would regenerate every seed and re-open none of the rows
+    waiting for exactly it.
+
+    Sorted, and hashing content rather than mtimes, so the value is stable
+    across checkouts and only moves when a header really changes.
     """
     h = hashlib.sha1()
     h.update(Path(__file__).read_bytes())
@@ -98,6 +115,12 @@ def ruleset_version() -> str:
         rev = subprocess.run(["git", "rev-parse", "HEAD:tools/m2c"],
                              cwd=gitops.REPO, capture_output=True, text=True).stdout.strip()
         h.update(rev.encode())
+    except Exception:
+        pass
+    try:
+        for hdr in sorted((gitops.REPO / "include").rglob("*.h")):
+            h.update(hdr.relative_to(gitops.REPO).as_posix().encode())
+            h.update(hdr.read_bytes())
     except Exception:
         pass
     return h.hexdigest()[:8]
