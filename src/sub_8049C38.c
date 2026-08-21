@@ -212,5 +212,95 @@ block_47:
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8049FF4.s\"");
 #else
-#error "TODO: write sub_8049FF4 to match asm/nonmatching/sub_8049FF4.s, then delete this #error"
+void *sub_8049FF4(void *arg0, void *arg1) {
+    s32 sp0;
+    s32 sp4;
+    s32 sp8;
+    u32 spC;
+    s32 sp10;
+    s32 sp14;
+    u32 sp18;
+    s32 sp1C;
+    s32 temp_r0_39;
+    s32 temp_r0_90;
+    s32 temp_r1_152;
+    s32 temp_r1_94;
+    s32 temp_r3_81;
+    s32 temp_r4_75;
+    s32 temp_r6_84;
+    s32 temp_r7_78;
+    s32 var_r0_24;
+    s32 var_r0_31;
+    s32 var_r12_86;
+    s32 var_r1_40;
+    s32 var_r3_114;
+    s32 var_r4_112;
+    s32 var_r5_113;
+    s32 var_r8_97;
+    u8 temp_r0_59;
+    void *var_r2_65;
+
+    if (((*(s32 *)((s8 *)(arg0) + (0x20C))) & 0x01000001) != 0x01000001) {
+        goto block_25;
+    }
+    var_r0_24 = (*(s32 *)((s8 *)(arg0) + (0xC)));
+    if (var_r0_24 < 0) {
+        var_r0_24 += 0xFF;
+    }
+    sp0 = var_r0_24 >> 8;
+    var_r0_31 = (*(s32 *)((s8 *)(arg0) + (0x10)));
+    if (var_r0_31 < 0) {
+        var_r0_31 += 0xFF;
+    }
+    sp4 = var_r0_31 >> 8;
+    temp_r0_39 = (*(s32 *)((s8 *)(arg0) + (0x18)));
+    var_r1_40 = (*(s32 *)((s8 *)(arg0) + (0x14))) + temp_r0_39;
+    sp1C = temp_r0_39;
+    if (var_r1_40 < 0) {
+        var_r1_40 += 0xFF;
+    }
+    sp8 = var_r1_40 >> 8;
+    spC = (u16) (*(u16 *)((s8 *)(arg0) + (0x27C))) >> 8;
+    temp_r0_59 = (*(u8 *)((s8 *)(arg1) + (4)));
+    sp10 = (s32) temp_r0_59;
+    var_r2_65 = arg1 - (((*(u8 *)((s8 *)(arg1) + (6))) << 8) | (*(u8 *)((s8 *)(arg1) + (5))));
+    sp14 = 0;
+    if ((s32) temp_r0_59 > 0) {
+        sp18 = (u32) (((u16) (*(u16 *)((s8 *)(arg0) + (0x278))) >> 8) << 0x10) >> 0x11;
+loop_10:
+        temp_r4_75 = (*(u8 *)((s8 *)(var_r2_65) + (0))) * 0x10;
+        temp_r7_78 = temp_r4_75 + ((*(u8 *)((s8 *)(var_r2_65) + (2))) * 0x10);
+        temp_r3_81 = (*(u8 *)((s8 *)(var_r2_65) + (1))) * 0x10;
+        temp_r6_84 = temp_r3_81 + ((*(u8 *)((s8 *)(var_r2_65) + (3))) * 0x10);
+        var_r12_86 = temp_r6_84 - 1;
+        temp_r0_90 = (0x7F & (*(u8 *)((s8 *)(var_r2_65) + (4)))) * 8;
+        temp_r1_94 = 0x7F & (*(u8 *)((s8 *)(var_r2_65) + (5)));
+        var_r8_97 = 0x7F8;
+        if (temp_r1_94 != 0x7F) {
+            var_r8_97 = temp_r1_94 * 8;
+        }
+        if (!(3 & (*(u8 *)((s8 *)(var_r2_65) + (6))))) {
+            var_r4_112 = temp_r4_75 - sp18;
+            var_r5_113 = (temp_r7_78 - 1) + sp18;
+            var_r3_114 = temp_r3_81 - 1;
+            var_r12_86 = (temp_r6_84 - 2) + spC;
+        } else {
+            var_r4_112 = temp_r4_75 + 4;
+            var_r5_113 = temp_r7_78 - 5;
+            var_r3_114 = temp_r3_81 + 7;
+        }
+        if ((sp0 >= var_r4_112) && (sp0 <= var_r5_113) && (sp4 >= var_r3_114) && (sp4 <= var_r12_86) && (sp8 >= temp_r0_90) && (sp8 <= (s32) (temp_r0_90 + var_r8_97)) && ((var_r8_97 != 0) || (sp1C <= 0))) {
+            return var_r2_65;
+        }
+        temp_r1_152 = sp14 + 1;
+        sp14 = temp_r1_152;
+        var_r2_65 += 0xB;
+        if (temp_r1_152 >= sp10) {
+            goto block_25;
+        }
+        goto loop_10;
+    }
+block_25:
+    return NULL;
+}
 #endif
