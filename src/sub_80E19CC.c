@@ -10,7 +10,10 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80E19CC.s\"");
 #else
-#error "TODO: write sub_80E19CC to match asm/nonmatching/sub_80E19CC.s, then delete this #error"
+s32 sub_80E19CC(s32 *arg0, s32 arg1) {
+    *arg0 = M2C_ERROR(/* unknown instruction: ldsh $r2, ($mem_loc_fictive_) */);
+    return (arg1 * 2) + 0x0838F8B2;
+}
 #endif
 
 #ifndef NONMATCHING
