@@ -980,6 +980,8 @@ groups:
   - {obj: asm/text08057568_p490, section: text}
   - {obj: src/sub_8139200, section: text}
   - {obj: asm/text08057568_p246, section: text}
+  - {obj: src/sub_81393D8, section: text}
+  - {obj: asm/text08057568_p491, section: text}
   - {obj: src/sub_8139970, section: text}
   - {obj: asm/text08057568_p263, section: text}
   - {obj: src/sub_813B178, section: text}
