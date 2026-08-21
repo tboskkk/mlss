@@ -17,3 +17,9 @@ void sub_810D5F4(void *arg0) {
     (*(u16 *)((s8 *)((void *)0x0400001A) + (0))) = (u16) *(u16 *)0x0200001A;
     (*(u16 *)((s8 *)((void *)0x0400001A) + (4))) = (u16) *(u16 *)0x0200001E;
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_810D624.s\"");
+#else
+#error "TODO: write sub_810D624 to match asm/nonmatching/sub_810D624.s, then delete this #error"
+#endif

@@ -98,3 +98,5 @@ __pycache__
 # straight from the copyrighted ROM (like baserom.gba itself, never
 # committed) and fully regenerable by re-running the tool
 assets/
+
+CLAUDE.md
