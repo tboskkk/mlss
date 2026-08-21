@@ -24,3 +24,9 @@ void sub_8142B4C(void *arg1, s32 **arg2) {
     }
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8142B88.s\"");
+#else
+#error "TODO: write sub_8142B88 to match asm/nonmatching/sub_8142B88.s, then delete this #error"
+#endif
