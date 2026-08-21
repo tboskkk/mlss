@@ -45,29 +45,45 @@ void sub_801AF50(void) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/make_fldm_801AF5C.s\"");
 #else
-#error "TODO: write make_fldm_801AF5C to match asm/nonmatching/make_fldm_801AF5C.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_801AFA0.s\"");
 #else
-#error "TODO: write sub_801AFA0 to match asm/nonmatching/sub_801AFA0.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_801AFE4.s\"");
 #else
-#error "TODO: write sub_801AFE4 to match asm/nonmatching/sub_801AFE4.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_801B034.s\"");
 #else
-#error "TODO: write sub_801B034 to match asm/nonmatching/sub_801B034.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_801B084.s\"");
 #else
-#error "TODO: write sub_801B084 to match asm/nonmatching/sub_801B084.s, then delete this #error"
+void sub_801B084(void) {
+    if (*(u16 *)0x03000D3C & (*(u16 *)((s8 *)((void *)0x0300034C) + (0x2A)))) {
+        play_sfx_80195B4(0x50, -1);
+    }
+}
 #endif
