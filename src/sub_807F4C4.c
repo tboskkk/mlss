@@ -31,5 +31,21 @@ void sub_807F4C4(void *arg0, s32 arg1) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_807F4FC.s\"");
 #else
-#error "TODO: write sub_807F4FC to match asm/nonmatching/sub_807F4FC.s, then delete this #error"
+extern s32 sub_8086C64;
+extern s32 sub_8087124;
+extern s32 sub_810DD7C;
+
+void sub_807F4FC(void *arg0) {
+    void *temp_r1_12;
+
+    if ((*(void **)((s8 *)(arg0) + (0x34))) == NULL) {
+        temp_r1_12 = *(void **)0x03000FD8;
+        (*(void **)((s8 *)(arg0) + (0x34))) = (void *) (*(void **)((s8 *)(temp_r1_12) + (0x54)));
+        (*(void **)((s8 *)(temp_r1_12) + (0x54))) = arg0;
+        (*(s32 **)((s8 *)(arg0) + (0x58))) = &sub_810DD7C;
+        (*(s32 **)((s8 *)(arg0) + (0x5C))) = &sub_8086C64;
+        (*(s32 **)((s8 *)(arg0) + (0x60))) = &sub_8087124;
+        (*(u8 *)((s8 *)(arg0) + (0x77))) = (u8) (-8 & (*(u8 *)((s8 *)(arg0) + (0x77))));
+    }
+}
 #endif
