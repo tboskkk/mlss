@@ -179,6 +179,8 @@ groups:
   - {obj: asm/text0801A548_p48, section: text}
   - {obj: src/sub_804034C, section: text}
   - {obj: asm/text0801A548_p36, section: text}
+  - {obj: src/sub_8040C50, section: text}
+  - {obj: asm/text0801A548_p79, section: text}
   - {obj: src/sub_8046A10, section: text}
   - {obj: asm/text0801A548_p35, section: text}
   - {obj: src/sub_8047258, section: text}
