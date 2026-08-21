@@ -10,3 +10,9 @@ asm_unified(".include \"asm/macros.inc\"");
 unsigned int alarm(unsigned int seconds) {
     return seconds;
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_81DC7F4.s\"");
+#else
+#error "TODO: write sub_81DC7F4 to match asm/nonmatching/sub_81DC7F4.s, then delete this #error"
+#endif
