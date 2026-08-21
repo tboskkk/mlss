@@ -81,8 +81,28 @@ def scan_once() -> dict:
                 # this goes straight to tier 2 rather than through queued.
                 target_state = "tier2_ready"
             else:
-                unknowns = triage.unknown_callees(f, funcs)
-                target_state = "queued" if not unknowns else "raw"
+                # NO LONGER GATED ON UNKNOWN CALLEES. This used to be
+                # `"queued" if not unknowns else "raw"` -- work leaf-first,
+                # because the LLM tier needed callee signatures to write a
+                # sensible call. m2c does not: it emits a plain
+                # `extern s32 sub_XXXXXXX();` for anything it doesn't know
+                # and carries on, so an unresolved callee costs nothing.
+                #
+                # That obsolete gate was parking 4,713 functions (88% of
+                # the game) in `raw` where NOTHING claims them -- the
+                # pipeline could only ever work the ~1,100 already-known
+                # leaves and would have idled once those ran out.
+                # Verified end-to-end before changing this: sub_81DAC0C
+                # (raw, calls the then-unknown sub_81DC43C) extracted
+                # cleanly, m2c emitted the extern, and it scored **0** --
+                # an exact match, straight out of the supposedly-blocked
+                # pile.
+                #
+                # `unknown_callees` is still computed because triage.score()
+                # uses it for tractability ranking -- being callee-complete
+                # is a fine reason to try something SOONER, just not a
+                # reason to refuse to try it at all.
+                target_state = "queued"
 
             s, reasons = triage.score(f, funcs)
 
