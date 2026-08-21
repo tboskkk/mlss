@@ -21,15 +21,9 @@ void sub_801ADC0(void) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_801AE1C.s\"");
-#else
-s32 CpuSet(s32 *, s32, s32);                    /* extern */
-
 void sub_801AE1C(void) {
     s32 sp0;
 
     sp0 = 0;
-    CpuSet(&sp0, 0x03000D28, 0x05000002);
+    CpuSet(&sp0, (void *)0x03000D28, 0x05000002U);
 }
-#endif

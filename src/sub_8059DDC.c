@@ -7,12 +7,30 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8059DDC.s\"");
-#else
-/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
-   compiles a whole translation unit at a time, so an #error here fails
-   every OTHER function in this file under NONMATCHING=1. Guard intact, so
-   the real ROM still gets the verbatim retail bytes and progress.py still
-   counts this as unmatched. Write the C here, replacing this comment. */
-#endif
+s32 sub_8059924(void *);                        /* extern */
+s32 sub_8059AF4(void *);                        /* extern */
+s32 sub_8059D04(void *, s32);                   /* extern */
+
+void sub_8059DDC(void *arg0) {
+    s32 sp0;
+    void *temp_r0_41;
+    void *temp_r0_46;
+
+    (*(void **)((s8 *)(arg0) + (0x6C))) = alloc_zero_8018DB4(0x3000U, 1U, (s8 *)0x081E27DC, 0U);
+    (*(void **)((s8 *)(arg0) + (0x74))) = alloc_zero_8018DB4(0x2800U, 1U, (s8 *)0x081E27E4, 0U);
+    sp0 = 0;
+    CpuFastSet(&sp0, (*(void **)((s8 *)(arg0) + (0x6C))), 0x01000C00U);
+    sp0 = 0;
+    CpuFastSet(&sp0, (*(void **)((s8 *)(arg0) + (0x74))), 0x01000A00U);
+    sub_8059AF4(arg0);
+    sub_8059D04(arg0, 0);
+    sub_8059924(arg0);
+    temp_r0_41 = (*(void **)((s8 *)(arg0) + (0x74)));
+    if (temp_r0_41 != NULL) {
+        free_heap_8018D9C(temp_r0_41);
+    }
+    temp_r0_46 = (*(void **)((s8 *)(arg0) + (0x6C)));
+    if (temp_r0_46 != NULL) {
+        free_heap_8018D9C(temp_r0_46);
+    }
+}
