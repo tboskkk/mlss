@@ -18,11 +18,13 @@ void sub_8163D4C(void *arg0, s32 arg1) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8163D80.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+void sub_8163D80(u16 arg0) {
+    s32 sp0;
+    s32 temp_r4_10;
+
+    temp_r4_10 = arg0 | (arg0 << 0x10);
+    sp0 = temp_r4_10;
+    CpuFastSet(&sp0, (void *)0x05000000, 0x01000080U);
+    sp0 = temp_r4_10;
+    CpuFastSet(&sp0, (void *)0x05000200, 0x01000080U);
+}
