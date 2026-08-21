@@ -37,6 +37,18 @@ FUNC_START_RE = re.compile(
     r"^\s*(thumb_func_start|arm_func_start|non_word_aligned_thumb_func_start)\s+(\S+)\s*$"
 )
 
+# The .text output section's exact extent, straight from ld_script.ld's own
+# `. = 0x8000000;` and the 16MB cartridge size the ROM checksum is taken
+# over. Used to assert the layout didn't shift (see verify_layout).
+ROM_TEXT_BASE = 0x08000000
+ROM_TEXT_SIZE = 0x01000000
+
+# Luvdis names every function it couldn't identify after its own address, so
+# the symbol name IS a checkable assertion about where it must link. That
+# makes a whole-ROM layout shift diagnosable in one pass over mlss.map
+# instead of by bisecting builds — see verify_layout().
+_SELF_ADDRESSED_SYMBOL_RE = re.compile(r"^(?:sub|nullsub)_0?([0-9A-Fa-f]{7,8})$")
+
 MANIFEST_HEADER = '''\
 # Layout manifest for the MLSS ROM.
 #
@@ -235,6 +247,8 @@ _MAP_SECTION_SUMMARY_RE = re.compile(
     r"^ \.\w+\s+0x([0-9a-fA-F]+)\s+0x([0-9a-fA-F]+)\s+(\S+)\s*$"
 )
 _MAP_SYMBOL_RE = re.compile(r"^\s+0x([0-9a-fA-F]+)\s+(\S+)\s*$")
+# Output-section line, flush left: ".text           0x08000000  0x1000000"
+_MAP_OUTPUT_SECTION_RE = re.compile(r"^(\.\w+)\s+0x([0-9a-fA-F]+)\s+0x([0-9a-fA-F]+)\s*$")
 
 
 @dataclass
@@ -252,7 +266,7 @@ class MapSymbol:
 
 
 def parse_map(path: Path = MAP_FILE) -> list:
-    symbols, _ = _parse_map_full(path)
+    symbols, _, _ = _parse_map_full(path)
     if not symbols:
         raise SystemExit(f"parsed 0 symbols from {path} — map format may have changed")
     return symbols
@@ -261,8 +275,33 @@ def parse_map(path: Path = MAP_FILE) -> list:
 def parse_object_bases(path: Path = MAP_FILE) -> dict:
     """{(obj_path, section): base_address} for every object contribution,
     e.g. {("build/asm/heap.o", "text"): 0x08018CEC}."""
-    _, bases = _parse_map_full(path)
-    return bases
+    _, extents, _ = _parse_map_full(path)
+    return {k: v[0] for k, v in extents.items()}
+
+
+def parse_object_extents(path: Path = MAP_FILE) -> dict:
+    """{(obj_path, section): (base_address, size)} for every object
+    contribution — the same rows parse_object_bases() reads, keeping the
+    size instead of throwing it away.
+
+    The size matters because it is not always the number of bytes the
+    object's source actually describes: GNU as rounds a section's size UP
+    to that section's alignment, so an object whose content ends at a
+    2-mod-4 address but which contains a `.align 2, 0` (which every
+    `thumb_func_start` does) comes out two bytes too long, and everything
+    linked after it slides. That is the extraction landmine documented in
+    CLAUDE.md; next_content_address() below is what lets split_func.py see
+    it coming."""
+    _, extents, _ = _parse_map_full(path)
+    return extents
+
+
+def parse_output_sections(path: Path = MAP_FILE) -> dict:
+    """{section_name: (address, size)} for the linker's OUTPUT sections
+    (the flush-left `.text 0x08000000 0x1000000` rows), not the per-object
+    contributions under them."""
+    _, _, outputs = _parse_map_full(path)
+    return outputs
 
 
 def file_base_address(entry: "Entry", path: Path = MAP_FILE) -> int:
@@ -278,10 +317,15 @@ def _parse_map_full(path: Path):
         raise SystemExit(f"{path} not found. Build first: ./container.sh make")
 
     symbols = []
-    bases = {}
+    extents = {}
+    outputs = {}
     cur_obj = None
     cur_section = None
     for line in path.read_text().splitlines():
+        m = _MAP_OUTPUT_SECTION_RE.match(line)
+        if m:
+            outputs[m.group(1)] = (int(m.group(2), 16), int(m.group(3), 16))
+            continue
         m = _MAP_ENTRY_HEADER_RE.match(line)
         if m:
             cur_obj, section_dot = m.group(1), m.group(2)
@@ -297,15 +341,15 @@ def _parse_map_full(path: Path):
             continue
         m = _MAP_SECTION_SUMMARY_RE.match(line)
         if m:
-            addr_hex, _size_hex, objpath = m.groups()
-            bases[(objpath, cur_section)] = int(addr_hex, 16)
+            addr_hex, size_hex, objpath = m.groups()
+            extents[(objpath, cur_section)] = (int(addr_hex, 16), int(size_hex, 16))
             continue
         m = _MAP_SYMBOL_RE.match(line)
         if m and cur_obj is not None:
             symbols.append(
                 MapSymbol(addr=int(m.group(1), 16), name=m.group(2), obj=cur_obj, section=cur_section)
             )
-    return symbols, bases
+    return symbols, extents, outputs
 
 
 def find_symbol(token: str, symbols: list) -> MapSymbol:
@@ -439,3 +483,124 @@ def extract_function_lines(path: Path, name: str, allow_midfile: bool = False):
                 start_line = header_end
 
     return lines, start_line, end_line
+
+
+# --------------------------------------------------------------------------
+# Alignment / layout safety
+# --------------------------------------------------------------------------
+
+
+def next_content_address(sym: "MapSymbol", source_path: Path, symbols: list):
+    """ROM address of the first byte AFTER an extraction of `sym` from
+    `source_path` — i.e. exactly where the extracted object's .text has to
+    end for the rest of the ROM to stay put.
+
+    Returns None when it can't be derived (an unlabeled successor, a symbol
+    missing from the map). Callers should treat None as "couldn't check",
+    not as "safe" — the whole point of this is that the failure mode it
+    guards against is silent.
+    """
+    _lines, starts = function_starts(source_path)
+    idx = next((i for i, (n, _) in enumerate(starts) if n == sym.name), None)
+    if idx is None:
+        return None
+
+    if idx + 1 < len(starts):
+        # The extraction is cut at the next function-start directive, so
+        # that function's own linked address is the end of this one.
+        by_name = {s.name: s for s in symbols}
+        nxt = by_name.get(starts[idx + 1][0])
+        return nxt.addr if nxt else None
+
+    # Last function in the blob: the extraction runs to end-of-file, so it
+    # ends where the blob's whole contribution ends.
+    extent = parse_object_extents().get((f"build/{sym.obj_stem}.o", sym.section))
+    return None if extent is None else extent[0] + extent[1]
+
+
+def alignment_padding_hazard(end_addr) -> bool:
+    """True when an object ending at `end_addr` will be silently padded.
+
+    GNU as rounds a section's size up to the section's own alignment, and
+    `thumb_func_start` expands to `.align 2, 0` — so a fragment whose bytes
+    stop at a 2-mod-4 address becomes a 4-aligned object two bytes too
+    long, sliding every symbol after it. Confirmed directly: 0x2BE bytes of
+    content under `thumb_func_start` assemble to a .text of size 0x2C0,
+    while the identical bytes under `non_word_aligned_thumb_func_start`
+    (which omits the `.align`) assemble to exactly 0x2BE.
+    """
+    return end_addr is not None and end_addr % 4 != 0
+
+
+def verify_layout(path: Path = MAP_FILE) -> list:
+    """Check a linked map for the whole-ROM shift this project's extraction
+    landmine produces. Returns a list of human-readable problems (empty ==
+    clean).
+
+    Two independent assertions, both cheap:
+
+      1. The .text OUTPUT section must be exactly ROM_TEXT_SIZE at
+         ROM_TEXT_BASE. A shift shows up here as a size of 0x01000008 or
+         similar — that alone says "something grew" without saying where.
+
+      2. Every self-addressed symbol (`sub_XXXXXXX`, named by Luvdis after
+         its own ROM address) must link at that address. The FIRST symbol
+         that doesn't is where the shift starts, and the object contribution
+         covering it is the culprit — which is the actual diagnosis, and it
+         costs one pass over the map instead of a bisect over rebuilds.
+    """
+    symbols, extents, outputs = _parse_map_full(path)
+    problems = []
+
+    text = outputs.get(".text")
+    if text is None:
+        problems.append("no .text output section found in the map — did the link change shape?")
+    else:
+        addr, size = text
+        if addr != ROM_TEXT_BASE or size != ROM_TEXT_SIZE:
+            problems.append(
+                f".text output section is 0x{addr:08X} size 0x{size:X}, expected "
+                f"0x{ROM_TEXT_BASE:08X} size 0x{ROM_TEXT_SIZE:X}"
+            )
+
+    mismatched = []
+    for s in symbols:
+        if s.section != "text":
+            continue
+        m = _SELF_ADDRESSED_SYMBOL_RE.match(s.name)
+        if not m:
+            continue
+        want = int(m.group(1), 16)
+        if s.addr != want:
+            mismatched.append((s, want))
+
+    if mismatched:
+        mismatched.sort(key=lambda t: t[1])
+        first, want = mismatched[0]
+        problems.append(
+            f"{len(mismatched)} symbol(s) linked at the wrong address; the first is "
+            f"{first.name} at 0x{first.addr:08X} (should be 0x{want:08X}, "
+            f"off by {first.addr - want:+d}) in {first.obj}"
+        )
+        culprit = _preceding_contribution(extents, first.addr)
+        if culprit:
+            (obj, _sec), (base, size) = culprit
+            problems.append(
+                f"  -> the contribution immediately before it is {obj} "
+                f"(0x{base:08X}, size 0x{size:X}, ends 0x{base + size:08X}) — that is "
+                f"where the extra bytes came from"
+            )
+
+    return problems
+
+
+def _preceding_contribution(extents: dict, addr: int):
+    """The .text object contribution that ends closest to (but at or before)
+    `addr` — i.e. whoever pushed the symbol at `addr` off its mark."""
+    best = None
+    for key, (base, size) in extents.items():
+        if key[1] != "text" or base >= addr:
+            continue
+        if best is None or base > best[1][0]:
+            best = (key, (base, size))
+    return best

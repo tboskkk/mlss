@@ -147,7 +147,22 @@ def ensure_extracted(name: str) -> bool:
         r = gitops.run(["./container.sh", "tools/split_func.py", name])
         if r.returncode != 0:
             return False
-        gitops.run(["./container.sh", "make"])
+        build = gitops.run(["./container.sh", "make"])
+        # The build result was previously thrown away here. That is exactly
+        # how a ROM-shifting extraction got COMMITTED: split_func.py
+        # succeeded, `make` failed, nobody looked, and from then on every
+        # match in the pipeline failed to validate against a ROM that no
+        # longer reproduced -- surfacing as a needs_human/stalled spike
+        # rather than as the one bad extraction it was. Check both the
+        # build and the layout, and undo the extraction if either is
+        # unhappy, so a bad extraction costs one function instead of the
+        # whole run.
+        ok, detail = gitops.layout_ok()
+        if build.returncode != 0 or not ok:
+            why = "build failed" if build.returncode != 0 else "ROM layout shifted"
+            print(f"      !! {name}: extraction reverted -- {why}\n{detail}")
+            gitops.revert_to_clean()
+            return False
         gitops.refresh_expected()
         # Commit immediately, still under the lock -- see tier1.py's
         # matching comment. An uncommitted extraction is vulnerable to

@@ -23,7 +23,10 @@ What it does, concretely:
   2. Refuses unless it's the frontmost remaining function in its asm/*.s
      file — see CLAUDE.md for why extraction is front-to-back only.
   3. Cuts its lines (body + trailing literal pool) into
-     asm/nonmatching/<name>.s.
+     asm/nonmatching/<name>.s. If the function's bytes would end on a
+     non-word-aligned address, the extraction is extended through the
+     following function(s) until it doesn't — otherwise the object gets
+     padded and the whole ROM shifts (see the alignment note below).
   4. Adds a `#ifndef NONMATCHING / asm include / #else / #error` stub to the
      owning src/*.c file (creating it, with --dest, if this is the first
      function pulled from this blob).
@@ -119,7 +122,82 @@ def main() -> None:
     lines, start, end = splitlib.extract_function_lines(
         source_path, sym.name, allow_midfile=midfile
     )
-    extracted = lines[start:end]
+
+    # --- alignment padding hazard -------------------------------------
+    # Whatever an extraction lands in has to END on a word boundary, or the
+    # whole rest of the ROM slides forward and stops reproducing.
+    #
+    # Two independent mechanisms force this, which is why it can't be
+    # dodged by tweaking the fragment:
+    #   * GNU as rounds a section's size UP to that section's alignment, and
+    #     `thumb_func_start` expands to `.align 2, 0`. Measured: 0x2BE bytes
+    #     of content assemble to a .text of size 0x2C0.
+    #   * The Makefile appends a literal `.text / .align 2, 0` to every
+    #     agbcc-generated .s (see the $(CC1) rule), so ANY src/*.c object is
+    #     4-aligned at the end no matter what its fragments say.
+    #
+    # So the fix is neither "drop the .align" nor "give it its own object" —
+    # both were tried and measured, and the Makefile's trailing align defeats
+    # them. The fix is to make the extraction end where the ROM already has a
+    # word boundary: keep pulling in following functions until it does. This
+    # ROM genuinely has functions at 2-mod-4 addresses (that's what
+    # non_word_aligned_thumb_func_start exists for), and such a function is
+    # physically un-splittable from its predecessor.
+    #
+    # This shipped once and corrupted the ROM (see CLAUDE.md). It is
+    # especially nasty in the factory, where the visible symptom is every
+    # subsequent match failing to validate — a needs_human/stalled spike that
+    # looks nothing like "one bad extraction".
+    by_name = {s.name: s for s in symbols}
+    blob_extent = splitlib.parse_object_extents().get(
+        (f"build/{sym.obj_stem}.o", sym.section)
+    )
+
+    def end_addr_after(i: int):
+        """ROM address just past function `i` of this blob, or None if the
+        map can't tell us (an unlabeled successor, a symbol the map doesn't
+        carry). None means 'unknown', never 'safe'."""
+        if i + 1 < len(_starts):
+            nxt = by_name.get(_starts[i + 1][0])
+            return nxt.addr if nxt else None
+        return None if blob_extent is None else blob_extent[0] + blob_extent[1]
+
+    last = _idx
+    end_addr = end_addr_after(last)
+    while splitlib.alignment_padding_hazard(end_addr):
+        if last + 1 >= len(_starts):
+            raise SystemExit(
+                f"{sym.name}'s extraction would end at 0x{end_addr:08X}, which is not "
+                f"word-aligned, and there is no following function in "
+                f"{source_path.name} to extend it through.\n"
+                f"Extracting it would pad the object and shift every symbol after it "
+                f"(see CLAUDE.md). Refusing — this one needs a human."
+            )
+        last += 1
+        end_addr = end_addr_after(last)
+
+    if end_addr is None:
+        print("  !! could not determine this extraction's end address from mlss.map, so the\n"
+              "     alignment-padding check was SKIPPED. Run tools/check_layout.py after\n"
+              "     the next build.")
+
+    # Names of every function this extraction covers — normally just the one
+    # asked for, more only when the alignment walk above had to extend.
+    extract_names = [_starts[j][0] for j in range(_idx, last + 1)]
+    if last != _idx:
+        end = _starts[last + 1][1] if last + 1 < len(_starts) else len(lines)
+
+    # One fragment file per function, even when the extraction covers
+    # several: decomp-permuter wants exactly one function per file, and
+    # tools/permute.py relies on that (see CLAUDE.md). The first fragment
+    # additionally carries any unlabeled leading data folded in by
+    # extract_function_lines.
+    frag_spans = []
+    for j in range(_idx, last + 1):
+        fs = start if j == _idx else _starts[j][1]
+        fe = _starts[j + 1][1] if j + 1 <= last else end
+        frag_spans.append((_starts[j][0], fs, fe))
+
     before_lines = lines[:start]
     after_lines = lines[end:]
     remaining = before_lines + after_lines
@@ -174,11 +252,12 @@ def main() -> None:
         dest_obj = dest_entry.obj
         dest_path = dest_entry.source_path
 
-    frag_path = splitlib.NONMATCHING_DIR / f"{sym.name}.s"
-    if frag_path.exists():
-        raise SystemExit(f"{frag_path} already exists — refusing to overwrite.")
+    frag_paths = [splitlib.NONMATCHING_DIR / f"{n}.s" for n, _, _ in frag_spans]
+    for p in frag_paths:
+        if p.exists():
+            raise SystemExit(f"{p} already exists — refusing to overwrite.")
 
-    stub = STUB_TEMPLATE.format(name=sym.name)
+    stub = "".join(STUB_TEMPLATE.format(name=n) for n, _, _ in frag_spans)
 
     # Mid-file: the blob has to be cut in three (before / this function /
     # after), because the bytes on either side must keep their exact ROM
@@ -195,7 +274,16 @@ def main() -> None:
 
     print(f"{sym.name}  0x{sym.addr:08X}  {source_path.relative_to(splitlib.ROOT)}"
           f" (lines {start + 1}-{end})")
-    print(f"  -> {frag_path.relative_to(splitlib.ROOT)}  ({end - start} lines)")
+    for (n, fs, fe), p in zip(frag_spans, frag_paths):
+        print(f"  -> {p.relative_to(splitlib.ROOT)}  ({fe - fs} lines)")
+    if last != _idx:
+        carried = ", ".join(extract_names[1:])
+        print(f"  -> ALIGNMENT: {sym.name} alone would end at "
+              f"0x{end_addr_after(_idx):08X}, which is not word-aligned — the object would be")
+        print(f"     padded and every symbol after it would shift. Extended the extraction "
+              f"through {carried}")
+        print(f"     so it ends at 0x{end_addr:08X} instead. Those functions are physically "
+              f"un-splittable from it.")
     if midfile:
         print(f"  -> MID-FILE extraction (not the front-most function in this blob)")
         print(f"  -> {dest_path.relative_to(splitlib.ROOT)}  (NEW FILE)")
@@ -220,8 +308,9 @@ def main() -> None:
         print("(dry run, nothing written)")
         return
 
-    frag_path.parent.mkdir(parents=True, exist_ok=True)
-    frag_path.write_text(FRAGMENT_PREAMBLE + "".join(extracted))
+    splitlib.NONMATCHING_DIR.mkdir(parents=True, exist_ok=True)
+    for (n, fs, fe), p in zip(frag_spans, frag_paths):
+        p.write_text(FRAGMENT_PREAMBLE + "".join(lines[fs:fe]))
 
     if midfile:
         # Before-half keeps the original name; tail becomes its own blob.

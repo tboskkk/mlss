@@ -83,6 +83,27 @@ def run(cmd, **kw):
     return subprocess.run(cmd, cwd=REPO, capture_output=True, text=True, **kw)
 
 
+def layout_ok():
+    """(ok, detail) -- did the last link put every symbol at its own address?
+
+    Guards the extraction landmine documented in CLAUDE.md: an object whose
+    bytes end at a 2-mod-4 address gets padded to a word boundary, shifting
+    every symbol after it. split_func.py now prevents that at the source,
+    but this is the cheap independent check that it stayed prevented --
+    reading mlss.map, no rebuild.
+
+    Worth having as a SEPARATE check from `make` succeeding, because the
+    two fail very differently in the factory. `make` reports a bare
+    `mlss.gba: FAILED` checksum mismatch, and from there every subsequent
+    match fails to validate -- so the visible symptom is a needs_human /
+    stalled spike, which sends you looking at the candidates rather than at
+    the one extraction that actually broke the tree. This names the culprit
+    directly.
+    """
+    r = run(["./container.sh", "tools/check_layout.py", "--quiet"])
+    return r.returncode == 0, (r.stderr or r.stdout).strip()
+
+
 def revert_to_clean():
     """Undo every tracked modification and delete every untracked file --
     but ONLY within FACTORY_PATHS, never repo-wide. Learned the hard way

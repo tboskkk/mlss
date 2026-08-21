@@ -157,6 +157,10 @@ error on their own without it being reported back.
 3. `./container.sh make` — confirm still `mlss.gba: OK` (the asm include
    path should never break the ROM; if it does, something's wrong with the
    extraction, not your C — you haven't written any C yet at this point).
+   If it says `FAILED`, run `./container.sh tools/check_layout.py` before
+   anything else: it tells you in one line whether the extraction shifted
+   the ROM's layout and which object did it, instead of leaving you with a
+   bare checksum mismatch.
 4. Write the C in the `#else` branch, replacing the `#error`.
 5. `./container.sh asm-differ -mwo <name>` — iterate. `-m` rebuilds with
    `NONMATCHING=1` automatically (see diff_settings.py), `-w` re-diffs on
@@ -575,12 +579,45 @@ doesn't count toward headline progress numbers unless that changes.
   is where the shift starts; its preceding object is the culprit, and
   `objdump -h` on that object vs the address gap shows the padding
   directly. Cross-check with `objdump -h mlss.elf` — `.text` must be
-  exactly `0x01000000`.
-  **Not yet fixed at the tool level.** `split_func.py` should refuse (or
-  emit the non-word-aligned macro / suppress end padding) when the next
-  function is not word-aligned. Until then, a from-scratch `make` after
-  extraction is the only thing that catches it, which is exactly why the
-  workflow demands one.
+  exactly `0x01000000`. **`tools/check_layout.py` now does exactly this**
+  in one pass over `mlss.map` — no rebuild, no bisect, safe to run against
+  a live factory (read-only). It names the first wrong symbol and the
+  object contribution that pushed it.
+  **FIXED at the tool level.** Two things had to be understood first, both
+  measured rather than assumed:
+  1. GNU as rounds a section's size UP to the section's alignment.
+     Verified directly: 0x2BE bytes of content under `thumb_func_start`
+     assemble to a `.text` of size **0x2C0**; the identical bytes under
+     `non_word_aligned_thumb_func_start` (no `.align`) assemble to exactly
+     **0x2BE**.
+  2. That is *not* the only source of the padding, which is why the
+     obvious fixes don't work. **The Makefile appends a literal
+     `.text` / `.align 2, 0` to every agbcc-generated `.s`** (the `$(CC1)`
+     rule) — so every `src/*.c` object is 4-aligned at the end no matter
+     what its fragments say. Both "drop the `.align` from the fragment"
+     and "give the function its own object" were implemented and tested
+     against the real `sub_8079688` case; both still shifted the ROM by
+     +2, because of this.
+  The fix that actually works: **make the extraction end where the ROM
+  already has a word boundary.** `split_func.py` now walks forward from
+  the requested function, pulling in following functions until the
+  extraction's end address is word-aligned — emitting one
+  `asm/nonmatching/*.s` fragment and one `#ifndef NONMATCHING` stub per
+  function, so decomp-permuter's one-function-per-file assumption still
+  holds. A function at a 2-mod-4 address is physically un-splittable from
+  its predecessor, so this isn't a workaround, it's the actual shape of
+  the data. If there's no following function to extend through (the blob
+  itself ends non-word-aligned), it refuses instead of guessing.
+  Verified end to end: `sub_8079688` — the exact extraction that corrupted
+  the ROM — now pulls `sub_80796B2` with it and builds `mlss.gba: OK` from
+  scratch with a clean layout check. There are exactly three such sites in
+  the game proper (`sub_80796B2`, `sub_819A5D2`, `sub_81C0F7E`); all three
+  are detected, and an ordinary extraction is unchanged.
+  `tier3.ensure_extracted()` also used to **throw away `make`'s exit
+  code** — that's how the bad extraction got committed in the first place.
+  It now checks the build *and* `layout_ok()`, and calls
+  `revert_to_clean()` if either fails, so a bad extraction costs one
+  function instead of the whole run.
 
 ## Finishing the disassembly (Phase 3)
 
@@ -852,7 +889,14 @@ not the answer.
   healthy case (`tier2_ready=0` because seeds are consumed as fast as
   they're produced, `permuting` high).
 
-Both are strictly read-only — no repo lock, no builds, no writes — so
+- `./container.sh tools/check_layout.py` — asserts the linked ROM layout
+  hasn't shifted, straight from `mlss.map`. Run this first whenever `make`
+  reports `mlss.gba: FAILED`, or whenever `needs_human`/`stalled` spikes:
+  a shifted layout makes *every* match fail to validate, so it looks like
+  a pipeline problem when it's one bad extraction. Names the first
+  wrong-addressed symbol and the object that pushed it.
+
+All three are strictly read-only — no repo lock, no builds, no writes — so
 they're safe to run against a live factory as often as you like.
 
 ## Work status (updated as tracks close)
