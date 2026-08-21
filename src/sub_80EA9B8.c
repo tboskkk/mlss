@@ -10,33 +10,33 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80EA9B8.s\"");
 #else
-void sub_80EA9B8(u32* p1, u32* p2, u32 p3)
-{
-    u32 r6 = (u32)p2;
-    u32 r4 = (u32)p3;
-    u32 r5 = *(u16*)((u8*)0x0300034C + 0x2E);
-    u32 r2 = *(u32*)((u8*)p2 + 0x08);
-    u32 r3 = r2;
-    u32 r0 = *(u32*)((u8*)p2 + 0x04);
-    r0 += 0x0B;
-    if (r0 == 0x0B)
-        r2 = 0x00;
-    else if (r0 == 0x0C)
-        r2 = ~r2;
-    r0 = *(u32*)((u8*)p2);
-    r0 &= 0x01;
-    if (r0 != 0x00)
-    {
-        r3 &= r5;
-        if (r3 == r2)
-            r0 = *(u32*)((u8*)p2 + 0x0C);
+s32 sub_80EA9B8(s32 arg0, s32 *arg1, void *arg2) {
+    s32 temp_r0_14;
+    s32 var_r2_11;
+    s32 var_r3_12;
+    u16 temp_r5_10;
+
+    temp_r5_10 = (*(u16 *)((s8 *)((void *)0x0300034C) + (0x2E)));
+    var_r2_11 = (*(s32 *)((s8 *)(arg2) + (8)));
+    var_r3_12 = var_r2_11;
+    temp_r0_14 = (*(s32 *)((s8 *)(arg2) + (4))) + 0xB;
+    switch (temp_r0_14) {                           /* irregular */
+    case 11:
+        var_r2_11 = 0;
+        break;
+    case 12:
+        var_r2_11 = ~var_r2_11;
+        var_r3_12 = var_r2_11;
+        break;
     }
-    else
-    {
-        r3 &= r5;
-        if (r3 != r2)
-            r0 = *(u32*)((u8*)p2 + 0x0C);
+    if ((*(s32 *)((s8 *)(arg2) + (0))) & 1) {
+        if ((var_r3_12 & temp_r5_10) != var_r2_11) {
+            goto block_9;
+        }
+    } else if ((var_r3_12 & temp_r5_10) == var_r2_11) {
+block_9:
+        *arg1 = (*(s32 *)((s8 *)(arg2) + (0xC)));
     }
-    *(u32*)((u8*)p1) = r0;
+    return 1;
 }
 #endif
