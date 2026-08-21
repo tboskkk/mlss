@@ -102,11 +102,21 @@ void sub_801AC7C(void) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_801AD3C.s\"");
 #else
-#error "TODO: write sub_801AD3C to match asm/nonmatching/sub_801AD3C.s, then delete this #error"
+void sub_801AD3C(void) {
+    if ((6 & *(u8 *)0x03000BD4) == 2) {
+        *(u8 *)0x03000D18 = (-0x31 & *(u8 *)0x03000D18) | 0x10;
+        *(u8 *)0x03000D28 &= -4;
+    }
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_801AD80.s\"");
 #else
-#error "TODO: write sub_801AD80 to match asm/nonmatching/sub_801AD80.s, then delete this #error"
+void sub_801AD80(void) {
+    if ((6 & *(u8 *)0x03000BD4) == 2) {
+        *(u8 *)0x03000D18 &= -0x31;
+        *(u8 *)0x03000D28 &= -4;
+    }
+}
 #endif
