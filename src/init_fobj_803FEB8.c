@@ -42,3 +42,9 @@ void *init_fobj_803FEB8(void *arg0, u16 arg1, u8 arg2) {
     return arg0;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8040020.s\"");
+#else
+#error "TODO: write sub_8040020 to match asm/nonmatching/sub_8040020.s, then delete this #error"
+#endif
