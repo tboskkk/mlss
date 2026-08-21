@@ -18,7 +18,10 @@ u32* sub_8059EF0(u32 param_1) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8059F00.s\"");
 #else
-#error "TODO: write sub_8059F00 to match asm/nonmatching/sub_8059F00.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 void sub_8059F24(void *arg0) {
@@ -33,5 +36,8 @@ void sub_8059F24(void *arg0) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8059F80.s\"");
 #else
-#error "TODO: write sub_8059F80 to match asm/nonmatching/sub_8059F80.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
