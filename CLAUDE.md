@@ -552,6 +552,36 @@ doesn't count toward headline progress numbers unless that changes.
   running, suspect contention before suspecting the code, and confirm by
   re-running under the lock before treating it as a real regression.
 
+- **`split_func.py` can silently shift the whole ROM by extracting a
+  function whose SUCCESSOR sits at a non-word-aligned address.** Found the
+  hard way: the ROM stopped reproducing, `.text` came out `0x01000008`
+  instead of `0x01000000`, and every validator match started failing as a
+  result — which looks exactly like "the pipeline broke" and inflates
+  `needs_human`/`stalled`, because `finish_match()` can never succeed when
+  the ROM won't build. The bytes themselves were fine: a `.byte`-level
+  audit of the offending commit showed **perfect conservation** (delta 0).
+  The extra bytes were ALIGNMENT PADDING. An extracted function becomes
+  its own linker object, and an object carrying `thumb_func_start` gets
+  4-byte alignment (`.align 2, 0`); if the next function in ROM order is
+  at a 2-mod-4 address — this ROM really does have those, that's what
+  `non_word_aligned_thumb_func_start` exists for — the object's size gets
+  rounded up and everything after it slides. Concretely: `sub_80793F4.o`
+  came out `0x2C0` when the gap to the next function is `0x2BE`, pushing
+  `sub_80796B2` from `0x080796B2` to `0x080796B4`, and 5,391 symbols
+  after it landed at the wrong address.
+  **How to diagnose fast** (much faster than bisecting): symbol names
+  encode their own correct address, so parse `mlss.map` and flag any
+  `sub_XXXXXXX` whose linked address != `0xXXXXXXX`. The FIRST mismatch
+  is where the shift starts; its preceding object is the culprit, and
+  `objdump -h` on that object vs the address gap shows the padding
+  directly. Cross-check with `objdump -h mlss.elf` — `.text` must be
+  exactly `0x01000000`.
+  **Not yet fixed at the tool level.** `split_func.py` should refuse (or
+  emit the non-word-aligned macro / suppress end padding) when the next
+  function is not word-aligned. Until then, a from-scratch `make` after
+  extraction is the only thing that catches it, which is exactly why the
+  workflow demands one.
+
 ## Finishing the disassembly (Phase 3)
 
 `tools/map_raw_regions.py` walks every asm/*.s file's actual address space
