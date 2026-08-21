@@ -39,21 +39,17 @@ void sub_81124D0(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_811251C.s\"");
-#else
 s32 stop_sfx_80195A8(s32);                      /* extern */
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 u8 sub_8087CE4();                                   /* extern */
-
-void sub_811251C(void *arg0) {
-    u8 temp_r5_10;
-
-    temp_r5_10 = sub_8087CE4();
-    if (temp_r5_10 == 0) {
-        sub_8082E1C(arg0, -1, -1, 0);
-        (*(s32 *)((s8 *)(arg0) + (0x4C))) = (s32) temp_r5_10;
-        stop_sfx_80195A8(0x11B);
-    }
+void sub_811251C(void *arg0)
+{
+  u8 temp_r5_10;
+  temp_r5_10 = sub_8087CE4();
+  if (temp_r5_10 == 0)
+  {
+ do { sub_8082E1C(arg0, -1, -1, 0); } while (0);
+    *((s32 *) (((s8 *) arg0) + 0x4C)) = (s32) temp_r5_10;
+    stop_sfx_80195A8(0x11B);
+  }
 }
-#endif
