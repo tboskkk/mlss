@@ -22,8 +22,9 @@ u32 sub_804790C(u32 param_1, s16 param_2) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8047928.s\"");
-#else
-#error "TODO: write sub_8047928 to match asm/nonmatching/sub_8047928.s, then delete this #error"
-#endif
+void sub_8047928(void *arg0) {
+    void *temp_r0_11;
+
+    temp_r0_11 = (*(void **)((s8 *)(arg0) + (0x294)));
+    sub_801E150(temp_r0_11, (*(u8 *)((s8 *)(temp_r0_11) + (0x21))), 0, 0, 0);
+}
