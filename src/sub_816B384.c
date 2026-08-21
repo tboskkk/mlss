@@ -24,3 +24,9 @@ void sub_816B3C4(u32* p0)
     bx r0;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_816B3D8.s\"");
+#else
+#error "TODO: write sub_816B3D8 to match asm/nonmatching/sub_816B3D8.s, then delete this #error"
+#endif
