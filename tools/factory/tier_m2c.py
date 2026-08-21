@@ -40,6 +40,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import db  # noqa: E402
 import gitops  # noqa: E402
 import m2c_bridge  # noqa: E402
+import werror_casts  # noqa: E402
 import tier3  # noqa: E402
 
 WORKER_ID = "tier_m2c"
@@ -158,6 +159,7 @@ def process_one(conn, no_score: bool = False) -> str | None:
         db.log_event(conn, name, "seeded", "m2c fast-drain seed, unscored")
         return name
 
+    cast_note = ""
     with gitops.repo_lock(what=f"m2c measure {name}"):
         c_path = gitops.splice_into_else(name, body)
         if c_path is None:
@@ -170,6 +172,30 @@ def process_one(conn, no_score: bool = False) -> str | None:
         finally:
             gitops.run(["git", "checkout", "--", str(c_path.relative_to(gitops.REPO))])
 
+        # Doesn't compile? Before declining, check whether the ONLY thing
+        # wrong is a pointer/integer warning that -Werror promoted to an
+        # error. Measured across a 40-seed sample: 18% of this pile builds
+        # as soon as warnings are allowed, and werror_casts recovers 7.5%
+        # outright -- roughly 116 seeds over the full 1,547.
+        #
+        # Codegen-neutral by construction (a cast between a 32-bit int and a
+        # pointer changes what the front end accepts, not what the back end
+        # emits) and PROVEN per function: apply() requires the -Werror
+        # object to be byte-identical to the warnings-allowed one, and
+        # rejects the candidate otherwise. So this can add a match but
+        # cannot invent one.
+        if score is None:
+            fixed, why = werror_casts.apply(name, body)
+            if fixed is not None:
+                body = fixed
+                cast_note = " (casts inserted to satisfy -Werror; object verified identical)"
+                c_path = gitops.splice_into_else(name, body)
+                try:
+                    score = gitops.asm_differ_score(name)
+                finally:
+                    gitops.run(["git", "checkout", "--",
+                                str(c_path.relative_to(gitops.REPO))])
+
     if score is None:
         with db.tx(conn):
             db.set_state(conn, name, row["state"], worker_id=None,
@@ -181,7 +207,7 @@ def process_one(conn, no_score: bool = False) -> str | None:
     with db.tx(conn):
         db.set_state(conn, name, new_state, worker_id=None, candidate_body=body,
                      candidate_source="m2c",
-                     notes=f"m2c seed, raw asm-differ score {score}")
+                     notes=f"m2c seed, raw asm-differ score {score}{cast_note}")
     db.log_event(conn, name, "converged" if score == 0 else "seeded", f"m2c score={score}")
     if score == 0:
         print(f"      -> {name}: byte-exact from m2c, zero search needed")

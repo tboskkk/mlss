@@ -205,7 +205,12 @@ def ensure_context():
     CONTEXT_DIR.mkdir(parents=True, exist_ok=True)
     headers = list((gitops.REPO / "include").rglob("*.h"))
     newest = max((h.stat().st_mtime for h in headers), default=0)
-    if CONTEXT.exists() and CONTEXT.stat().st_mtime >= newest:
+    sigs = matched_signatures()
+    sig_hash = hashlib.sha1(sigs.encode()).hexdigest()[:12]
+    stamp = CONTEXT_DIR / "m2c_ctx_sigs.stamp"
+    fresh = (CONTEXT.exists() and CONTEXT.stat().st_mtime >= newest
+             and stamp.exists() and stamp.read_text() == sig_hash)
+    if fresh:
         return CONTEXT
 
     CONTEXT_SRC.write_text('#include "global.h"\n#include "common.h"\n')
@@ -219,7 +224,137 @@ def ensure_context():
                     str(rel_src), "-o", str(rel_out)])
     if r.returncode != 0 or not CONTEXT.exists():
         return None
+
+    # Append the signatures of functions we have already MATCHED.
+    #
+    # This is the "compounding fix" CLAUDE.md parks as marginal until
+    # 20-30% matched. The measurement in section G says the binding
+    # constraint is now: ~50% of the non-compiling pile fails on an unknown
+    # callee signature (`called object is not a function`, `void value not
+    # ignored`, `too few arguments`, `redeclared as a different kind of
+    # symbol`), and each function matched removes one more guess for every
+    # function that calls it.
+    #
+    # Appended AFTER preprocessing rather than #include'd before it: these
+    # are plain prototypes whose types (s32, struct Process *, ...) the
+    # preprocessed text above already declares, and a matched function's
+    # definition is authoritative -- it compiled and reproduced the ROM
+    # byte-for-byte, so it cannot conflict with a header without the build
+    # already being broken.
+    if sigs:
+        with CONTEXT.open("a") as f:
+            f.write("\n/* signatures of already-matched functions */\n")
+            f.write(sigs)
+
+    # VALIDATE, and fall back if this made things worse. The blast radius
+    # of a malformed context is every seed the factory generates, not one
+    # function -- so a bad append must never ship. If m2c cannot parse the
+    # augmented context, rebuild the header-only version and use that.
+    if sigs and not _context_parses():
+        r = gitops.run(["./container.sh",
+                        "arm-none-eabi-cpp", "-I", "tools/agbcc/include", "-nostdinc",
+                        "-undef", "-iquote", "include", "-Wno-trigraphs",
+                        str(rel_src), "-o", str(rel_out)])
+        print("m2c_bridge: augmented context failed to parse -- "
+              "falling back to headers only")
+        if r.returncode != 0 or not CONTEXT.exists():
+            return None
+        sig_hash = "headers-only"
+
+    stamp.write_text(sig_hash)
     return CONTEXT
+
+
+# A definition at column 0, allowing a multi-line signature (88 of the 342
+# matched functions have one) but stopping at the first `;` or `{` so a
+# prototype or a call can never be mistaken for a definition.
+_DEF_RE = re.compile(r"^([A-Za-z_][\w \t\*]*?)\b(\w+)\s*\(([^;{]*?)\)\s*\{",
+                     re.MULTILINE | re.DOTALL)
+
+
+def matched_signatures() -> str:
+    """Prototypes for every already-matched function, from the real source.
+
+    A matched function has had its `#ifndef NONMATCHING` guard removed --
+    that is what "matched" MEANS here -- so its definition in src/*.c is
+    plain C and is the authoritative signature. Nothing is inferred.
+
+    `static` definitions are skipped: they are not callable from another
+    translation unit, so a prototype for one would be wrong rather than
+    merely useless.
+    """
+    out, seen = [], set()
+    try:
+        for c_path in sorted((gitops.REPO / "src").glob("*.c")):
+            text = c_path.read_text()
+            # Only the parts NOT inside a NONMATCHING guard are real
+            # definitions; a #else branch holds an unproven attempt.
+            for m in _DEF_RE.finditer(text):
+                ret, name, args = m.group(1).strip(), m.group(2), m.group(3).strip()
+                if name in seen or ret.startswith("static") or "static" in ret.split():
+                    continue
+                if _inside_guard(text, m.start()):
+                    continue
+                seen.add(name)
+                ret = " ".join(ret.split())
+                out.append(f"{ret} {name}({args or 'void'});")
+    except OSError:
+        return ""
+    return "\n".join(out) + ("\n" if out else "")
+
+
+def _inside_guard(text: str, pos: int) -> bool:
+    """Is `pos` inside a `#ifndef NONMATCHING` ... `#endif` block?
+
+    An unproven `#else` attempt must not be published as a signature: it has
+    not compiled, let alone matched, and m2c would then guess CONFIDENTLY
+    wrong instead of merely guessing.
+    """
+    depth = 0
+    for m in re.finditer(r"^\s*#\s*(ifndef\s+NONMATCHING|if|ifdef|ifndef|endif)",
+                         text[:pos], re.MULTILINE):
+        tok = m.group(1)
+        if tok.startswith("endif"):
+            depth = max(0, depth - 1)
+        else:
+            depth += 1
+    return depth > 0
+
+
+def _context_parses() -> bool:
+    """Can m2c actually load the context we just wrote?
+
+    Checked by running m2c against a real fragment. A context that fails to
+    parse does not fail loudly per-function -- m2c falls back to guessing,
+    which is precisely the failure this whole mechanism exists to remove,
+    so it would look like "the fix did not help" rather than "the fix is
+    broken".
+    """
+    frag_dir = gitops.REPO / "asm" / "nonmatching"
+    try:
+        frag = next(iter(sorted(frag_dir.glob("*.s"))))
+    except (StopIteration, OSError):
+        return True  # nothing to test with; don't block on it
+    # Use the SAME invocation run_m2c() uses -- target "gba", M2C_PY, the
+    # real interpreter. A first version of this guessed `--target
+    # arm32-gcc-c` and m2c rejected the ARGUMENT, so the check failed for
+    # every context including a perfectly good one, and the fallback fired
+    # unconditionally. The validator was broken, not the thing it validated,
+    # which is the more embarrassing of the two and completely silent: the
+    # feature simply never took effect.
+    import subprocess as _sp
+    cmd = [sys.executable, str(M2C_PY), "--target", "gba", "--valid-syntax",
+           "--context", str(CONTEXT), str(frag)]
+    try:
+        r = _sp.run(cmd, capture_output=True, text=True, timeout=120, cwd=gitops.REPO)
+    except Exception:
+        return False
+    # m2c reports a context it could not parse on stderr and then carries on
+    # guessing, so a zero exit code alone does not mean the context loaded.
+    stderr = r.stderr or ""
+    if "Error:" in stderr or "Unsupported" in stderr and "context" in stderr.lower():
+        return False
+    return r.returncode == 0 and bool((r.stdout or "").strip())
 
 
 def run_m2c(name: str, extra_args: list[str] | None = None) -> str | None:
@@ -240,6 +375,64 @@ def run_m2c(name: str, extra_args: list[str] | None = None) -> str | None:
     if r.returncode != 0 or not r.stdout.strip():
         return None
     return r.stdout
+
+
+@functools.lru_cache(maxsize=1)
+def _matched_prototypes() -> dict:
+    """name -> real prototype, for every already-matched function."""
+    out = {}
+    for proto in matched_signatures().split(";"):
+        proto = " ".join(proto.split())
+        if not proto:
+            continue
+        m = re.match(r"^(.*?\b(\w+))\s*\(", proto)
+        if m:
+            out[m.group(2)] = proto + ";"
+    return out
+
+
+_CALL_RE = re.compile(r"\b([A-Za-z_]\w*)\s*\(")
+
+
+def restore_context_declarations(body: str, known: set) -> str:
+    """Re-declare callees that m2c knew from --context but the SOURCE won't.
+
+    Subtle and it bit immediately. Once a matched function's signature is in
+    m2c's `--context`, m2c stops emitting its `/* extern */ ` guess for it --
+    correctly, from m2c's point of view, since it is no longer guessing. But
+    the context is m2c's private input; the real `src/*.c` includes only
+    global.h/common.h, and ~5,700 `sub_XXXXXXX` functions are declared in
+    neither. So the callee became IMPLICIT, and agbcc runs `-Wimplicit
+    -Werror`.
+
+    Measured: adding the context alone took a 45-function sample from
+    0/45 compiling to 0/45 -- no gain -- and diffing the seeds showed
+    exactly this, whole `extern` lines disappearing (`s32 sub_808863C(void
+    *);`). The context has to be paired with putting those declarations
+    BACK, now with m2c's real signature rather than its guess.
+
+    Declarations go in the `#else` branch alongside the candidate, so they
+    are local to the attempt and cannot affect the shipped ROM -- unlike
+    adding them to a shared header, which would change argument promotion
+    for already-matched CALLERS and risk breaking matches that are already
+    byte-exact.
+    """
+    protos = _matched_prototypes()
+    if not protos:
+        return body
+    head = body[: body.find("{")] if "{" in body else body
+    already = set(re.findall(r"\b(\w+)\s*\(", head))
+    needed = []
+    for callee in dict.fromkeys(_CALL_RE.findall(body)):
+        if callee in known or callee in already or callee not in protos:
+            continue
+        if re.search(rf"^[\w \t\*]*\b{re.escape(callee)}\s*\(", body, re.MULTILINE) \
+                and f"{callee}(" in head:
+            continue
+        needed.append(protos[callee])
+    if not needed:
+        return body
+    return "\n".join(needed) + "\n" + body
 
 
 def generate(name: str) -> str | None:
@@ -264,6 +457,7 @@ def generate(name: str) -> str | None:
         kept.append(line)
 
     c = "\n".join(kept)
+    c = restore_context_declarations(c, known)
     try:
         c = expand_macros(c)
     except ValueError:
