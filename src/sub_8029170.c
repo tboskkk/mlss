@@ -35,15 +35,15 @@ block_5:
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80291C8.s\"");
 #else
-s32 sub_8116610(s32);                           /* extern */
-
-void sub_80291C8(void *arg0) {
-    u32 temp_r0_11;
-
-    temp_r0_11 = (u32) ((*(u8 *)((s8 *)(arg0) + (0xFC))) << 0x19) >> 0x1C;
-    if (((s32) temp_r0_11 <= 2) && ((s32) temp_r0_11 >= 1)) {
-        sub_8116610((*(s32 *)((s8 *)(arg0) + (0x314))));
-    }
+void sub_80291C8(void *arg0)
+{
+  int new_var;
+  u32 temp_r0_11;
+  temp_r0_11 = ((u32) ((*((u8 *) (((s8 *) arg0) + 0xFC))) << 0x19)) >> 0x1C;
+  if ((((s32) temp_r0_11) <= 2) && (((s32) temp_r0_11) >= (new_var = 1)))
+  {
+    sub_8116610(*((s32 *) (((s8 *) arg0) + 0x314)));
+  }
 }
 #endif
 
