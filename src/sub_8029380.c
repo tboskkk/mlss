@@ -80,5 +80,41 @@ asm_unified(".include \"asm/nonmatching/sub_802955C.s\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8029624.s\"");
 #else
-#error "TODO: write sub_8029624 to match asm/nonmatching/sub_8029624.s, then delete this #error"
+void sub_8029624(void *arg0) {
+    void *temp_r1_7;
+    void *temp_r2_17;
+    void *temp_r2_36;
+    void *temp_r2_55;
+    void *temp_r2_74;
+    void *temp_r3_11;
+    void *temp_r3_35;
+    void *temp_r3_54;
+    void *temp_r3_73;
+
+    temp_r1_7 = (*(void **)((s8 *)(arg0) + (0x1C)));
+    temp_r3_11 = temp_r1_7 + 0x25C;
+    temp_r2_17 = (*(void **)((s8 *)(temp_r1_7) + (0x25C)));
+    if (!(0x20 & (*(u8 *)((s8 *)(temp_r2_17) + (0x12))))) {
+        (*(s16 *)((s8 *)(temp_r2_17) + (0))) = (s16) ((*(u16 *)((s8 *)(temp_r3_11) + (4))) - (*(u16 *)((s8 *)(arg0) + (0x27E))));
+        (*(s16 *)((s8 *)((*(void **)((s8 *)(temp_r1_7) + (0x25C)))) + (2))) = (s16) ((*(u16 *)((s8 *)(temp_r3_11) + (6))) - (*(u16 *)((s8 *)(arg0) + (0x280))));
+    }
+    temp_r3_35 = temp_r1_7 + 0x264;
+    temp_r2_36 = (*(void **)((s8 *)(temp_r1_7) + (0x264)));
+    if (!(0x20 & (*(u8 *)((s8 *)(temp_r2_36) + (0x12))))) {
+        (*(s16 *)((s8 *)(temp_r2_36) + (0))) = (s16) ((*(u16 *)((s8 *)(temp_r3_35) + (4))) - (*(u16 *)((s8 *)(arg0) + (0x27E))));
+        (*(s16 *)((s8 *)((*(void **)((s8 *)(temp_r1_7) + (0x264)))) + (2))) = (s16) ((*(u16 *)((s8 *)(temp_r3_35) + (6))) - (*(u16 *)((s8 *)(arg0) + (0x280))));
+    }
+    temp_r3_54 = temp_r1_7 + 0x26C;
+    temp_r2_55 = (*(void **)((s8 *)(temp_r1_7) + (0x26C)));
+    if (!(0x20 & (*(u8 *)((s8 *)(temp_r2_55) + (0x12))))) {
+        (*(s16 *)((s8 *)(temp_r2_55) + (0))) = (s16) ((*(u16 *)((s8 *)(temp_r3_54) + (4))) - (*(u16 *)((s8 *)(arg0) + (0x27E))));
+        (*(s16 *)((s8 *)((*(void **)((s8 *)(temp_r1_7) + (0x26C)))) + (2))) = (s16) ((*(u16 *)((s8 *)(temp_r3_54) + (6))) - (*(u16 *)((s8 *)(arg0) + (0x280))));
+    }
+    temp_r3_73 = temp_r1_7 + 0x274;
+    temp_r2_74 = (*(void **)((s8 *)(temp_r1_7) + (0x274)));
+    if (!(0x20 & (*(u8 *)((s8 *)(temp_r2_74) + (0x12))))) {
+        (*(s16 *)((s8 *)(temp_r2_74) + (0))) = (s16) ((*(u16 *)((s8 *)(temp_r3_73) + (4))) - (*(u16 *)((s8 *)(arg0) + (0x27E))));
+        (*(s16 *)((s8 *)((*(void **)((s8 *)(temp_r1_7) + (0x274)))) + (2))) = (s16) ((*(u16 *)((s8 *)(temp_r3_73) + (6))) - (*(u16 *)((s8 *)(arg0) + (0x280))));
+    }
+}
 #endif
