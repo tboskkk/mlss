@@ -833,6 +833,8 @@ groups:
   - {obj: asm/text08057568_p347, section: text}
   - {obj: src/sub_80EE594, section: text}
   - {obj: asm/text08057568_p463, section: text}
+  - {obj: src/script_cmd_start_dialogue, section: text}
+  - {obj: asm/text08057568_p617, section: text}
   - {obj: src/sub_80EEC18, section: text}
   - {obj: src/sub_80EECD0, section: text}
   - {obj: asm/text08057568_p317, section: text}

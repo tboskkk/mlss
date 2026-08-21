@@ -821,6 +821,8 @@ SECTIONS
         build/asm/text08057568_p347.o(.text);
         build/src/sub_80EE594.o(.text);
         build/asm/text08057568_p463.o(.text);
+        build/src/script_cmd_start_dialogue.o(.text);
+        build/asm/text08057568_p617.o(.text);
         build/src/sub_80EEC18.o(.text);
         build/src/sub_80EECD0.o(.text);
         build/asm/text08057568_p317.o(.text);
