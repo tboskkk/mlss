@@ -25,3 +25,9 @@ s32 sub_806E690(void *arg0) {
     return 0;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_806E6BC.s\"");
+#else
+#error "TODO: write sub_806E6BC to match asm/nonmatching/sub_806E6BC.s, then delete this #error"
+#endif
