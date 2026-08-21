@@ -18,3 +18,9 @@ void sub_810CBDC(void *arg0) {
     (*(u16 *)((s8 *)((void *)0x0400001A) + (0))) = (u16) *(u16 *)0x0200001A;
     (*(u16 *)((s8 *)((void *)0x0400001A) + (4))) = (u16) *(u16 *)0x0200001E;
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_810CC0C.s\"");
+#else
+#error "TODO: write sub_810CC0C to match asm/nonmatching/sub_810CC0C.s, then delete this #error"
+#endif
