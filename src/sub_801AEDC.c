@@ -78,12 +78,15 @@ asm_unified(".include \"asm/nonmatching/sub_801B034.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_801B084.s\"");
-#else
-void sub_801B084(void) {
-    if (*(u16 *)0x03000D3C & (*(u16 *)((s8 *)((void *)0x0300034C) + (0x2A)))) {
-        play_sfx_80195B4(0x50, -1);
-    }
+void sub_801B084(void)
+{
+  void *new_var;
+  new_var = (void *) 0x0300034C;
+  if (1)
+  {
+  }
+  if ((*((u16 *) (((s8 *) new_var) + 0x2A))) & (*((u16 *) 0x03000D3C)))
+  {
+    play_sfx_80195B4(0x50, -1);
+  }
 }
-#endif

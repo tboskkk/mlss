@@ -24,8 +24,12 @@ void sub_801ADC0(void) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_801AE1C.s\"");
 #else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
+s32 CpuSet(s32 *, s32, s32);                    /* extern */
+
+void sub_801AE1C(void) {
+    s32 sp0;
+
+    sp0 = 0;
+    CpuSet(&sp0, 0x03000D28, 0x05000002);
+}
 #endif
