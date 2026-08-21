@@ -3,45 +3,6 @@
 	.syntax unified
 	.text
 
-	thumb_func_start sub_803C5A4
-sub_803C5A4:
-	push {r4, r5, r6, r7, lr}
-	adds r6, r0, #0x0
-	movs r0, #0x80
-	lsls r0, r0, #0x02
-	adds r5, r6, r0
-	ldr r0, [r5, #0x00]
-	adds r4, r6, #0x0
-	adds r4, #0x28
-	adds r1, r4, #0x0
-	bl sub_80461B4
-	movs r0, #0x81
-	lsls r0, r0, #0x02
-	adds r7, r6, r0
-	ldr r0, [r7, #0x00]
-	adds r1, r4, #0x0
-	bl sub_80461B4
-	ldr r0, [r5, #0x00]
-	bl sub_8047B78
-	lsls r0, r0, #0x18
-	cmp r0, #0x00
-	bne _0803C5EE
-	ldr r0, [r7, #0x00]
-	bl sub_8047B78
-	lsls r0, r0, #0x18
-	cmp r0, #0x00
-	bne _0803C5EE
-	adds r0, r6, #0x0
-	bl sub_802EA70
-	adds r0, r6, #0x0
-	movs r1, #0x00
-	bl sub_802DF80
-_0803C5EE:
-	pop {r4, r5, r6, r7}
-	pop {r0}
-	bx r0
-	.byte 0x82, 0x22, 0x92, 0x00, 0x80, 0x18, 0x01, 0x22, 0x11, 0x40, 0xC9, 0x00, 0x03, 0x78, 0x09, 0x22
-	.byte 0x52, 0x42, 0x1A, 0x40, 0x0A, 0x43, 0x02, 0x70, 0x70, 0x47, 0x00, 0x00
 	thumb_func_start sub_803C610
 sub_803C610:
 	push {lr}
