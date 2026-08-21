@@ -36,3 +36,9 @@ s32 sub_8047B78(void *arg0)
   }
   return var_r1_12;
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8047B98.s\"");
+#else
+#error "TODO: write sub_8047B98 to match asm/nonmatching/sub_8047B98.s, then delete this #error"
+#endif
