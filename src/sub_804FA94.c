@@ -32,3 +32,9 @@ void sub_804FA94(void *arg0, u16 arg1, u16 arg2) {
     (*(s16 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x44)))) + (0xE))) = (s16) ((((u32) ((*(u16 *)((s8 *)(arg0) + (0))) << 0x15) >> 0x1C) << 0xC) | (0x800 - (var_r0_43 >> 8)));
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_804FAF8.s\"");
+#else
+#error "TODO: write sub_804FAF8 to match asm/nonmatching/sub_804FAF8.s, then delete this #error"
+#endif
