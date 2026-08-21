@@ -144,6 +144,8 @@ groups:
   - {obj: asm/text0801A548_p66, section: text}
   - {obj: src/sub_802A608, section: text}
   - {obj: asm/text0801A548_p67, section: text}
+  - {obj: src/sub_802C068, section: text}
+  - {obj: asm/text0801A548_p68, section: text}
   - {obj: src/sub_80316FC, section: text}
   - {obj: asm/text0801A548_p32, section: text}
   - {obj: src/sub_803C424, section: text}
