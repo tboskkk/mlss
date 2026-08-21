@@ -21,9 +21,6 @@ void sub_8163864(void **arg0, s32 arg1, s32 arg2) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8163888.s\"");
-#else
 s32 sub_8163BE4(void *);                        /* extern */
 
 void sub_8163888(void *arg0, s32 arg1) {
@@ -33,4 +30,3 @@ void sub_8163888(void *arg0, s32 arg1) {
         free_heap_8018DA8(arg0);
     }
 }
-#endif
