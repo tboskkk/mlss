@@ -237,15 +237,12 @@ void sub_806B528(void *arg0) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_806B540.s\"");
-#else
-s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
+void play_sfx_80195B4(int, int);
+s32 sub_8082E1C(void *, s32, s32, s32);
 extern s32 sub_806B5A8;
-
-void sub_806B540(void *arg0) {
-    sub_8082E1C(arg0, (*(s32 *)((s8 *)(arg0) + (0xA4))), 0, 0);
-    play_sfx_80195B4(0x88, -1);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_806B5A8;
+void sub_806B540(void *arg0)
+{
+  sub_8082E1C(arg0, *((s32 *) (((s8 *) arg0) + 0xA4)), 0, 0);
+  play_sfx_80195B4(0x88, -1);
+  *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_806B5A8;
 }
-#endif
