@@ -18,3 +18,9 @@ asm_unified(".include \"asm/nonmatching/btl_80FC5C0.s\"");
 #else
 #error "TODO: write btl_80FC5C0 to match asm/nonmatching/btl_80FC5C0.s, then delete this #error"
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/btl_80FC8A4.s\"");
+#else
+#error "TODO: write btl_80FC8A4 to match asm/nonmatching/btl_80FC8A4.s, then delete this #error"
+#endif
