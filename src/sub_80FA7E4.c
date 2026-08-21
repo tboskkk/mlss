@@ -18,3 +18,9 @@ s32 sub_80FA7E4(void *arg0, void *arg1) {
     return 0;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80FA818.s\"");
+#else
+#error "TODO: write sub_80FA818 to match asm/nonmatching/sub_80FA818.s, then delete this #error"
+#endif
