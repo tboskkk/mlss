@@ -36,3 +36,9 @@ void sub_80E13B4(void *arg0) {
     (*(s32 **)((s8 *)(arg0) + (4))) = var_r0_17;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80E13F8.s\"");
+#else
+#error "TODO: write sub_80E13F8 to match asm/nonmatching/sub_80E13F8.s, then delete this #error"
+#endif
