@@ -18,3 +18,9 @@ void sub_801B820(void *arg0) {
         process_remove(arg0, 3);
     }
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_801B85C.s\"");
+#else
+#error "TODO: write sub_801B85C to match asm/nonmatching/sub_801B85C.s, then delete this #error"
+#endif
