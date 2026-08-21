@@ -10,7 +10,7 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/script_cmd_wait_frames.s\"");
 #else
-s32 script_cmd_wait_frames(void *arg1, s32 *arg2) {
+s32 script_cmd_wait_frames(s32 arg0, void *arg1, s32 *arg2) {
     s32 temp_r0_9;
 
     temp_r0_9 = *arg2;

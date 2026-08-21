@@ -10,7 +10,7 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/script_cmd_wait_for_user_input.s\"");
 #else
-s32 script_cmd_wait_for_user_input(void *arg1, void *arg2, s32 *arg3) {
+s32 script_cmd_wait_for_user_input(s32 arg0, void *arg1, void *arg2, s32 *arg3) {
     if (!(((s32) (*(u8 *)((s8 *)((*(void **)((s8 *)(arg1) + (4)))) + (0x1B4))) >> *arg3) & 1)) {
         return 1;
     }
