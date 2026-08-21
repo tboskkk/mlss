@@ -1,0 +1,26 @@
+	.syntax unified
+	.text
+
+	thumb_func_start sub_80D8F68
+sub_80D8F68:
+	push {r4, lr}
+	adds r4, r0, #0x0
+	adds r0, #0x80
+	ldr r0, [r0, #0x00]
+	cmp r0, #0x00
+	bne _080D8F8A
+	movs r0, #0x81
+	bl stop_sfx_80195A8
+	adds r0, r4, #0x0
+	movs r1, #0x02
+	movs r2, #0x00
+	movs r3, #0x00
+	bl sub_8082E1C
+	ldr r0, _080D8F90 @ =0x0808750D
+	str r0, [r4, #0x4C]
+_080D8F8A:
+	pop {r4}
+	pop {r0}
+	bx r0
+_080D8F90: .4byte sub_808750C
+	.byte 0x01, 0x49, 0xC1, 0x64, 0x01, 0x20, 0x70, 0x47, 0xA1, 0x8F, 0x0D, 0x08
