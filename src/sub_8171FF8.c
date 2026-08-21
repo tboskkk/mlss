@@ -3006,3 +3006,9 @@ asm_unified(".include \"asm/nonmatching/sub_81980C8.s\"");
 #else
 #error "TODO: write sub_81980C8 to match asm/nonmatching/sub_81980C8.s, then delete this #error"
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/copy_callarm_fill_memory.s\"");
+#else
+#error "TODO: write copy_callarm_fill_memory to match asm/nonmatching/copy_callarm_fill_memory.s, then delete this #error"
+#endif
