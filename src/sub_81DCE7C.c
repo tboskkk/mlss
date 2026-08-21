@@ -27,3 +27,9 @@ loop_2:
     return var_r1_7;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_81DCE9C.s\"");
+#else
+#error "TODO: write sub_81DCE9C to match asm/nonmatching/sub_81DCE9C.s, then delete this #error"
+#endif
