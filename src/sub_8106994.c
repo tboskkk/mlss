@@ -7,13 +7,13 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8106994.s\"");
-#else
 s32 sub_810CA30();                              /* extern */
-
-void sub_8106994(void *arg0) {
-    (*(u8 *)((s8 *)(*(void **)0x03000FD8) + (0x2F9))) = (u8) (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x6C)))) + (0xA)));
-    sub_810CA30();
+void sub_8106994(void *arg0)
+{
+  s8 *new_var;
+  u8 new_var2;
+  new_var = (s8 *) (*((void **) 0x03000FD8));
+  new_var2 = (u8) (*((u8 *) (((s8 *) (*((void **) (((s8 *) arg0) + 0x6C)))) + 0xA)));
+  *((u8 *) (new_var + 0x2F9)) = new_var2;
+  sub_810CA30();
 }
-#endif
