@@ -275,11 +275,26 @@ block_10:
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_807F448.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+s32 sub_81165CC(s32, s32);                      /* extern */
+void sub_807F448(void)
+{
+  s8 *new_var2;
+  s8 *new_var;
+  s8 **new_var3;
+  void *temp_r2_20;
+  void *temp_r2_8;
+  s8 *new_var4;
+  unsigned long long new_var5;
+  new_var3 = &new_var;
+  temp_r2_8 = *((void **) 0x03000FD8);
+  new_var2 = (s8 *) temp_r2_8;
+  new_var = (s8 *) temp_r2_8;
+  new_var4 = *new_var3;
+  if (2 & (*((u8 *) (new_var2 + 0xC))))
+  {
+    sub_81165CC(*((s32 *) (new_var4 + 0x248)), 1);
+    temp_r2_20 = *((void **) 0x03000FD8);
+    new_var5 = -3;
+    *((u8 *) (((s8 *) temp_r2_20) + 0xC)) = (u8) (new_var5 & (*((u8 *) (((s8 *) temp_r2_20) + 0xC))));
+  }
+}
