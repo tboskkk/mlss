@@ -49,6 +49,7 @@ SECTIONS
         build/asm/text0801A548.o(.text);
         build/src/sub_801A6B0.o(.text);
         build/asm/text0801A548_p37.o(.text);
+        build/src/sub_801AA0C.o(.text);
         build/src/sub_801AA70.o(.text);
         build/asm/text0801A548_p40.o(.text);
         build/src/sub_801ADC0.o(.text);

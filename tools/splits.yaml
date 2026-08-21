@@ -61,6 +61,7 @@ groups:
   - {obj: asm/text0801A548, section: text}
   - {obj: src/sub_801A6B0, section: text}
   - {obj: asm/text0801A548_p37, section: text}
+  - {obj: src/sub_801AA0C, section: text}
   - {obj: src/sub_801AA70, section: text}
   - {obj: asm/text0801A548_p40, section: text}
   - {obj: src/sub_801ADC0, section: text}
