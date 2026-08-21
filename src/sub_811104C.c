@@ -40,5 +40,21 @@ void sub_811108C(void *arg0) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81110B4.s\"");
 #else
-#error "TODO: write sub_81110B4 to match asm/nonmatching/sub_81110B4.s, then delete this #error"
+s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
+extern s32 sub_81111C0;
+
+void sub_81110B4(void *arg0) {
+    s32 var_r1_14;
+    void *temp_r2_23;
+
+    var_r1_14 = 0xF;
+    if ((0 - M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */)) != 1) {
+        var_r1_14 = 0x10;
+    }
+    sub_8082E1C(arg0, var_r1_14, 0, 0);
+    temp_r2_23 = (*(void **)((s8 *)(arg0) + (8)));
+    (*(u8 *)((s8 *)(temp_r2_23) + (0x12))) = (u8) ((-7 & (*(u8 *)((s8 *)(temp_r2_23) + (0x12)))) | 2);
+    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_81111C0;
+    play_sfx_80195B4(0x89, -1);
+}
 #endif
