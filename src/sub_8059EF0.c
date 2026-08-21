@@ -29,3 +29,9 @@ void sub_8059F24(void *arg0) {
     (*(s16 *)((s8 *)((void *)0x02000016) + (4))) = (s16) (*(u8 *)((s8 *)(arg0) + (0x62)));
     (*(s16 *)((s8 *)(((void *)0x02000016 + 4)) + (4))) = (s16) (*(u8 *)((s8 *)(arg0) + (0x64)));
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8059F80.s\"");
+#else
+#error "TODO: write sub_8059F80 to match asm/nonmatching/sub_8059F80.s, then delete this #error"
+#endif
