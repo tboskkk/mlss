@@ -33,5 +33,17 @@ u8 sub_8029070(u8 arg0) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8029080.s\"");
 #else
-#error "TODO: write sub_8029080 to match asm/nonmatching/sub_8029080.s, then delete this #error"
+s32 process_disable();                          /* extern */
+s32 sub_8122BA0(s32, s32);                      /* extern */
+
+void sub_8029080(void *arg0) {
+    process_disable();
+    (*(s8 *)((s8 *)(arg0) + (0))) = 2;
+    *(s8 *)0x03000C24 = 2;
+    if (*(s32 *)0x03000C78 == 0) {
+        *(s32 *)0x03000C78 = 0x0800063C;
+    }
+    sub_8122BA0((s32) ((*(u8 *)((s8 *)(arg0) + (0x12C))) << 0x18) >> 0x1A, 0);
+    (*(u8 *)((s8 *)(arg0) + (0x12C))) = (u8) ((3 & (*(u8 *)((s8 *)(arg0) + (0x12C)))) | 0xF8);
+}
 #endif
