@@ -10,7 +10,18 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80504BC.s\"");
 #else
-#error "TODO: write sub_80504BC to match asm/nonmatching/sub_80504BC.s, then delete this #error"
+s32 init_fobj_803FEB8();                        /* extern */
+s32 sub_80FB448(u8, s32, void *);               /* extern */
+
+void *sub_80504BC(void *arg0, u8 arg3, s32 arg4) {
+    init_fobj_803FEB8();
+    (*(s32 *)((s8 *)(arg0) + (0x338))) = 0x08CDBFC8;
+    sub_80FB448(arg3, arg4, arg0);
+    (*(u8 *)((s8 *)(arg0) + (0x20C))) = (u8) (-2 & (*(u8 *)((s8 *)(arg0) + (0x20C))));
+    (*(u8 *)((s8 *)(arg0) + (0x20F))) = (u8) (-3 & (*(u8 *)((s8 *)(arg0) + (0x20F))));
+    (*(s32 *)((s8 *)(arg0) + (0x344))) = arg4;
+    return arg0;
+}
 #endif
 
 #ifndef NONMATCHING
