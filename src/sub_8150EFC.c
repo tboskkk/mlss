@@ -14,3 +14,9 @@ s32 sub_8150EFC(s32 arg0) {
     return arg0 + 0xC;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8150F60.s\"");
+#else
+#error "TODO: write sub_8150F60 to match asm/nonmatching/sub_8150F60.s, then delete this #error"
+#endif
