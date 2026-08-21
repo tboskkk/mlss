@@ -18,3 +18,9 @@ s32 script_cmd_wait_for_user_input(s32 arg0, void *arg1, void *arg2, s32 *arg3) 
     return 0;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80EB11C.s\"");
+#else
+#error "TODO: write sub_80EB11C to match asm/nonmatching/sub_80EB11C.s, then delete this #error"
+#endif
