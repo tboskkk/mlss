@@ -45,5 +45,12 @@ asm_unified(".include \"asm/nonmatching/sub_8081F34.s\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8081F84.s\"");
 #else
-#error "TODO: write sub_8081F84 to match asm/nonmatching/sub_8081F84.s, then delete this #error"
+s32 process_enable(s32);                        /* extern */
+s32 sub_80FC9A4(void *);                        /* extern */
+
+void sub_8081F84(void *arg0) {
+    process_enable((*(s32 *)((s8 *)(*(void **)0x03000FD8) + (0x244))));
+    (*(s32 (**)(void *))((s8 *)(arg0) + (4))) = sub_80FC9A4;
+    sub_80FC9A4(arg0);
+}
 #endif
