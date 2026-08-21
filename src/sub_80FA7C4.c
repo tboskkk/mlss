@@ -10,5 +10,10 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80FA7C4.s\"");
 #else
-#error "TODO: write sub_80FA7C4 to match asm/nonmatching/sub_80FA7C4.s, then delete this #error"
+u8 script_cmd_return(void *);                       /* extern */
+
+u8 sub_80FA7C4(void *arg0) {
+    (*(s8 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x24)))) + (0x9A1))) = 1;
+    return script_cmd_return(arg0 + 0x1C);
+}
 #endif
