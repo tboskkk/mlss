@@ -292,18 +292,35 @@ def run_pool(jobs: int, stall_min: float, max_functions: int):
     def claim_one():
         conn = db.connect()
         try:
-            # Oldest-queued-first, NOT the default tractability ASC.
-            # Tractability-first made sense early (front-load quick wins to
-            # prove the pipeline works), but once generation runs
-            # continuously it means every new easy seed cuts in line ahead
-            # of older, harder ones -- confirmed live via the events log:
-            # 35 functions sitting 3.6-12.5 HOURS in tier2_ready while
-            # newer arrivals kept getting claimed first. updated_at is a
-            # coarse proxy (the scanner's own 5-min reconciliation pass
-            # touches every row, so it's not a precise per-second signal),
-            # but it's far better than none at all for a starvation window
-            # measured in hours, not minutes.
-            return db.claim_for_worker(conn, "tier2_ready", WORKER_ID, order_by="updated_at ASC")
+            # CLOSEST-FIRST, by the seed's actual asm-differ score.
+            #
+            # This used to be updated_at ASC, which was itself a fix for
+            # tractability-first starving older functions (35 of them sat
+            # 3.6-12.5 HOURS while newer easy arrivals cut in line). But
+            # age is arbitrary with respect to difficulty, and there are
+            # only 12 permuter slots -- so what actually matters is not
+            # WHEN a seed arrived, it is how far the search has to travel.
+            #
+            # Measured live, with updated_at ordering: 9 of 12 slots were
+            # searching seeds scoring 1,495-12,160 while only 245 seeds
+            # under 500 existed in the whole queue, mostly waiting. A
+            # 15-minute stochastic search does not close a 12,160-point
+            # gap; that function needs a better SEED, which is the
+            # project's whole thesis, not more search.
+            #
+            # This only became possible tonight: score_sweep gave 1,928
+            # queued seeds a real score for the first time. Before that
+            # best_score was almost entirely NULL and this ordering would
+            # have been meaningless.
+            #
+            # Scored seeds come first, ascending; unscored ones last. The
+            # starvation this replaced was functions never being TRIED --
+            # here every seed has been tried and measured, and a high score
+            # is evidence that searching it again is not where the next
+            # match comes from. If that turns out to be wrong the fix is a
+            # better seed for it, not an earlier slot.
+            return db.claim_for_worker(conn, "tier2_ready", WORKER_ID,
+                                       order_by="best_score IS NULL ASC, best_score ASC")
         finally:
             conn.close()
 
