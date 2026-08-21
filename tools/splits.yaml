@@ -160,6 +160,8 @@ groups:
   - {obj: asm/text0801A548_p32, section: text}
   - {obj: src/sub_8034FE8, section: text}
   - {obj: asm/text0801A548_p74, section: text}
+  - {obj: src/sub_803AAE4, section: text}
+  - {obj: asm/text0801A548_p75, section: text}
   - {obj: src/sub_803C424, section: text}
   - {obj: asm/text0801A548_p19, section: text}
   - {obj: src/sub_803C4D8, section: text}
