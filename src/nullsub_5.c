@@ -12,3 +12,9 @@ void nullsub_5(void) {
 
 void nullsub_6(void) {
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_81DCDF4.s\"");
+#else
+#error "TODO: write sub_81DCDF4 to match asm/nonmatching/sub_81DCDF4.s, then delete this #error"
+#endif
