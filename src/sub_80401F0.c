@@ -41,9 +41,7 @@ void sub_80401F0(void *arg0, s32 arg1, s32 arg2, u16 arg3) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80402C4.s\"");
-#else
+s32 sub_8047EB8(void *);                        /* extern */
 void sub_80402C4(void *arg0)
 {
   s32 temp_r1_58;
@@ -82,4 +80,3 @@ void sub_80402C4(void *arg0)
     }
   }
 }
-#endif
