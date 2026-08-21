@@ -10,11 +10,16 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80F7590.s\"");
 #else
-void sub_80F7590(s32 arg0) {
-    void *temp_r2_12;
-
-    temp_r2_12 = (*(void **)((s8 *)((*(void **)((s8 *)(*(void **)0x03000FD8) + (0x244)))) + (0x2C)));
-    (*(s32 *)((s8 *)(temp_r2_12) + (0x1788))) = (s32) ((*(s32 *)((s8 *)(temp_r2_12) + (0x1788))) & ~arg0);
+u32* sub_80F7590(u32* param_1) {
+    u32* puVar1;
+    u32* puVar2;
+    
+    puVar1 = (u32*)0x03000FD8;
+    puVar1 = (u32*)((u32)puVar1 + 0x244);
+    puVar2 = (u32*)0x00001788;
+    puVar2 = (u32*)((u32)puVar2 + (u32)puVar1);
+    *puVar2 = (*puVar2 & ~*param_1);
+    return param_1;
 }
 #endif
 
