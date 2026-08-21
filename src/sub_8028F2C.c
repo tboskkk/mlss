@@ -34,3 +34,9 @@ asm_unified(".include \"asm/nonmatching/make_btl_8028F54.s\"");
 #else
 #error "TODO: write make_btl_8028F54 to match asm/nonmatching/make_btl_8028F54.s, then delete this #error"
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8028FBC.s\"");
+#else
+#error "TODO: write sub_8028FBC to match asm/nonmatching/sub_8028FBC.s, then delete this #error"
+#endif
