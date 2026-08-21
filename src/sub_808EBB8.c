@@ -57,9 +57,6 @@ void sub_808EC08(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_808EC58.s\"");
-#else
 s32 sub_808DD2C(void *);                        /* extern */
 
 void sub_808EC58(void *arg0) {
@@ -71,4 +68,3 @@ void sub_808EC58(void *arg0) {
         sub_808DD2C(arg0);
     }
 }
-#endif

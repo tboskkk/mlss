@@ -27,9 +27,6 @@ void sub_8079394(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80793C4.s\"");
-#else
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 extern s32 sub_80798A8;
 
@@ -40,4 +37,3 @@ void sub_80793C4(void *arg0) {
         play_sfx_80195B4(0xAD, -1);
     }
 }
-#endif

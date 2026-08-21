@@ -173,9 +173,6 @@ void sub_815EF80(void *arg0, void *arg1) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_815EFAC.s\"");
-#else
 s32 sub_8021308();                              /* extern */
 s32 sub_815FB14(void *, s32);                   /* extern */
 
@@ -187,4 +184,3 @@ void sub_815EFAC(void *arg0, s32 arg1) {
     }
     sub_815FB14(arg0, arg1);
 }
-#endif

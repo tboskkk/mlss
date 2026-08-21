@@ -10,9 +10,6 @@ asm_unified(".include \"asm/macros.inc\"");
 void nullsub_15(void) {
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_806E794.s\"");
-#else
 s32 stop_sfx_80195A8(s32);                      /* extern */
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 extern s32 sub_806E98C;
@@ -25,4 +22,3 @@ void sub_806E794(void *arg0) {
         (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_806E98C;
     }
 }
-#endif

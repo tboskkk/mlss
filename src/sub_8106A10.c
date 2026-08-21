@@ -297,9 +297,6 @@ void sub_8107040(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_810707C.s\"");
-#else
 void sub_810707C(void *arg0) {
     s32 (*temp_r1_23)(void *);
 
@@ -309,4 +306,3 @@ void sub_810707C(void *arg0) {
         temp_r1_23(arg0);
     }
 }
-#endif
