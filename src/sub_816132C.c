@@ -14,11 +14,24 @@ u32 sub_816132C(void) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8161330.s\"");
 #else
-#error "TODO: write sub_8161330 to match asm/nonmatching/sub_8161330.s, then delete this #error"
+s32 sub_81612E4(void *);                        /* extern */
+
+void sub_8161330(void *arg0, s32 arg1) {
+    (*(s32 *)((s8 *)(arg0) + (0x2C))) = 0x08CDD018;
+    if ((*(s32 *)((s8 *)(arg0) + (0xC))) != 0) {
+        sub_81612E4(arg0);
+    }
+    if (1 & arg1) {
+        free_heap_8018DA8(arg0);
+    }
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81613D8.s\"");
 #else
-#error "TODO: write sub_81613D8 to match asm/nonmatching/sub_81613D8.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
