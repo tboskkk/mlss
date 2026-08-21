@@ -1353,6 +1353,7 @@ SECTIONS
         build/asm/text08057568_p93.o(.text);
         build/src/sub_81604A8.o(.text);
         build/asm/text08057568_p270.o(.text);
+        build/src/get_surface_height_at_x.o(.text);
         build/src/sub_8160C18.o(.text);
         build/asm/text08057568_p419.o(.text);
         build/src/sub_8160E4C.o(.text);
