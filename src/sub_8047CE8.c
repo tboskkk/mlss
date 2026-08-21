@@ -30,7 +30,11 @@ u32 sub_8047CE8(u8* param_1) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8047D44.s\"");
 #else
-#error "TODO: write sub_8047D44 to match asm/nonmatching/sub_8047D44.s, then delete this #error"
+s32 sub_8116654(s32, u8);                       /* extern */
+
+void sub_8047D44(void *arg0) {
+    sub_8116654((*(s32 *)((s8 *)(arg0) + (0x334))), (*(u8 *)((s8 *)(arg0) + (0x26E))));
+}
 #endif
 
 #ifndef NONMATCHING
