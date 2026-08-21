@@ -31,3 +31,9 @@ void sub_8029830(void *arg0) {
     (*(u8 *)((s8 *)(temp_r1_26) + (0x351))) = (u8) (-0x41 & (*(u8 *)((s8 *)(temp_r1_26) + (0x351))));
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8029878.s\"");
+#else
+#error "TODO: write sub_8029878 to match asm/nonmatching/sub_8029878.s, then delete this #error"
+#endif
