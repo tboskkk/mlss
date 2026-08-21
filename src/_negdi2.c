@@ -29,3 +29,9 @@ s64 _negdi2(s64 x) {
     return ((s64)r1 << 32) | (r0 & 0xFFFFFFFF);
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/abort.s\"");
+#else
+#error "TODO: write abort to match asm/nonmatching/abort.s, then delete this #error"
+#endif
