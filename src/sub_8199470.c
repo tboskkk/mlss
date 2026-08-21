@@ -14,3 +14,9 @@ u32 sub_8199470(u32 param_1)
   *((u8 *) param_1) = *ptr;
   return *((u8 *) param_1);
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8199480.s\"");
+#else
+#error "TODO: write sub_8199480 to match asm/nonmatching/sub_8199480.s, then delete this #error"
+#endif
