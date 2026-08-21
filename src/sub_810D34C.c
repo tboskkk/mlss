@@ -45,3 +45,9 @@ void sub_810D34C(u32 r0, u32 r1, u32 r2, u32 r3)
     *(u32 *)(r0_final + 0x0) = r1_val;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_810D3B8.s\"");
+#else
+#error "TODO: write sub_810D3B8 to match asm/nonmatching/sub_810D3B8.s, then delete this #error"
+#endif
