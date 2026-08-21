@@ -31,3 +31,9 @@ u32 sub_801AEDC(void) {
     return (u32) ((0 - temp_r1_27) | temp_r1_27) >> 0x1F;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_801AF50.s\"");
+#else
+#error "TODO: write sub_801AF50 to match asm/nonmatching/sub_801AF50.s, then delete this #error"
+#endif

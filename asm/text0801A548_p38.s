@@ -3,13 +3,6 @@
 	.syntax unified
 	.text
 
-	thumb_func_start sub_801AF50
-sub_801AF50:
-	push {lr}
-	bl sub_80FC1F8
-	pop {r0}
-	bx r0
-	.byte 0x00, 0x00
 	thumb_func_start make_fldm_801AF5C
 make_fldm_801AF5C: @ 0801AF5C
 	push {r4, r5, lr}
