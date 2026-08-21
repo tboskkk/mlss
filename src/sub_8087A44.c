@@ -101,3 +101,9 @@ void sub_8087AE0(u32* p0)
     *(u32*)((u8*)p0 + 0x04) = (u32)sub_8086F0C;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8087B34.s\"");
+#else
+#error "TODO: write sub_8087B34 to match asm/nonmatching/sub_8087B34.s, then delete this #error"
+#endif
