@@ -22,11 +22,33 @@ void sub_810CBDC(void *arg0) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_810CC0C.s\"");
 #else
-#error "TODO: write sub_810CC0C to match asm/nonmatching/sub_810CC0C.s, then delete this #error"
+void sub_810CC0C(void *arg0) {
+    s16 temp_r0_11;
+
+    temp_r0_11 = 0x19 - (*(u16 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x14)));
+    (*(s16 *)((s8 *)(arg0) + (0x10))) = temp_r0_11;
+    if ((s32) temp_r0_11 > 0x17) {
+        (*(s32 *)((s8 *)(arg0) + (4))) = 0;
+        return;
+    }
+    (*(s16 *)((s8 *)((void *)0x0400001A) + (0))) = (s16) (*(u16 *)0x0200001A - 0x18);
+    (*(s16 *)((s8 *)((void *)0x0400001A) + (4))) = (s16) (*(u16 *)0x0200001E - 0x18);
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_810CC4C.s\"");
 #else
-#error "TODO: write sub_810CC4C to match asm/nonmatching/sub_810CC4C.s, then delete this #error"
+void sub_810CC4C(void *arg0) {
+    u16 temp_r2_9;
+
+    temp_r2_9 = (*(u16 *)((s8 *)(arg0) + (0x14))) - 3;
+    (*(u16 *)((s8 *)(arg0) + (0x14))) = temp_r2_9;
+    if ((s32) (temp_r2_9 << 0x10) <= 0) {
+        (*(s32 *)((s8 *)(arg0) + (4))) = 0;
+        return;
+    }
+    *(s16 *)0x0400001A = *(u16 *)0x0200001A + temp_r2_9;
+    *(s16 *)0x0400001E = *(u16 *)0x0200001E + (*(u16 *)((s8 *)(arg0) + (0x14)));
+}
 #endif
