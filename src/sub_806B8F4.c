@@ -213,7 +213,39 @@ void sub_806BE30(void *arg0) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_806BEA8.s\"");
 #else
-#error "TODO: write sub_806BEA8 to match asm/nonmatching/sub_806BEA8.s, then delete this #error"
+s32 sub_80DF024(s32, s32, s32, s32, void *);    /* extern */
+s32 sub_810DD7C(void *, void *, s32);           /* extern */
+extern s32 sub_806BDA4;
+extern s32 sub_806BF70;
+
+s32 sub_806BEA8(void *arg0, void *arg1) {
+    s32 *var_r0_40;
+    s32 var_r1_10;
+    s32 var_r2_16;
+    s32 var_r3_22;
+
+    var_r1_10 = (*(s32 *)((s8 *)(arg1) + (0x38)));
+    if (var_r1_10 < 0) {
+        var_r1_10 += 0xFF;
+    }
+    var_r2_16 = (*(s32 *)((s8 *)(arg1) + (0x3C)));
+    if (var_r2_16 < 0) {
+        var_r2_16 += 0xFF;
+    }
+    var_r3_22 = (*(s32 *)((s8 *)(arg1) + (0x40)));
+    if (var_r3_22 < 0) {
+        var_r3_22 += 0xFF;
+    }
+    sub_80DF024(0x1C4A, var_r1_10 >> 8, var_r2_16 >> 8, var_r3_22 >> 8, arg0);
+    sub_810DD7C(arg0, arg1, 0xFF);
+    if ((*(s32 *)((s8 *)(arg0) + (0x84))) == 0) {
+        var_r0_40 = &sub_806BF70;
+    } else {
+        var_r0_40 = &sub_806BDA4;
+    }
+    (*(s32 **)((s8 *)(arg0) + (0x4C))) = var_r0_40;
+    return 0;
+}
 #endif
 
 #ifndef NONMATCHING
