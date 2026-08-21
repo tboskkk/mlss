@@ -19,26 +19,27 @@ bool32 sub_8134B24(u16 *param_1)
   return 1;
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8134B38.s\"");
-#else
 s32 sub_8134AA8(void *);                        /* extern */
-
-void sub_8134B38(void *arg0, u16 arg1, u16 arg2) {
-    u16 temp_r2_11;
-    u16 var_r1_9;
-
-    var_r1_9 = arg1;
-    temp_r2_11 = arg2;
-    if ((u32) var_r1_9 > 3U) {
-        var_r1_9 = 3;
-    }
-    (*(u16 *)((s8 *)(arg0) + (0))) = var_r1_9;
-    (*(s16 *)((s8 *)(arg0) + (2))) = 0;
-    (*(u16 *)((s8 *)(arg0) + (4))) = temp_r2_11;
-    if (temp_r2_11 == 0) {
-        (*(u16 *)((s8 *)(arg0) + (4))) = 1U;
-        sub_8134AA8(arg0);
-    }
+void sub_8134B38(void *arg0, u16 arg1, unsigned long arg2)
+{
+  u16 *new_var;
+  int new_var2;
+  u16 temp_r2_11;
+  u16 var_r1_9;
+  var_r1_9 = arg1;
+  temp_r2_11 = arg2;
+  if (((u32) var_r1_9) > 3U)
+  {
+    var_r1_9 = 3;
+  }
+  new_var = (u16 *) (((s8 *) arg0) + 4);
+  new_var2 = 0;
+  *((u16 *) (((s8 *) arg0) + new_var2)) = var_r1_9;
+  *((s16 *) (((s8 *) arg0) + 2)) = new_var2;
+  *new_var = temp_r2_11;
+  if (temp_r2_11 == new_var2)
+  {
+    *((u16 *) (((s8 *) arg0) + 4)) = 1U;
+    sub_8134AA8(arg0);
+  }
 }
-#endif
