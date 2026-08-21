@@ -1064,6 +1064,7 @@ groups:
   - {obj: asm/text08057568_p19, section: text}
   - {obj: src/sub_8150E2C, section: text}
   - {obj: asm/text08057568_p50, section: text}
+  - {obj: src/sub_8150EC0, section: text}
   - {obj: src/sub_8150EFC, section: text}
   - {obj: asm/text08057568_p67, section: text}
   - {obj: src/sub_81525C8, section: text}
