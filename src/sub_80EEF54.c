@@ -55,3 +55,9 @@ void sub_80EEF54(u32* p0, u32* p1, u32* p2)
         *(u32*)((u8*)r5 + 0x58) = *(u32*)((u8*)r3 + 0x58);
         *(u32*)((u8*)r5 + 0x5C) = *(u32*)((u8*)
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80EF0B0.s\"");
+#else
+#error "TODO: write sub_80EF0B0 to match asm/nonmatching/sub_80EF0B0.s, then delete this #error"
+#endif
