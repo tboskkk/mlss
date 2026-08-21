@@ -75,7 +75,39 @@ void sub_806BB48(void *arg0) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_806BC40.s\"");
 #else
-#error "TODO: write sub_806BC40 to match asm/nonmatching/sub_806BC40.s, then delete this #error"
+s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
+s32 sub_8086858(void *, s32);                       /* extern */
+extern s32 sub_806BEA8;
+extern s32 sub_806BF70;
+
+void sub_806BC40(void *arg0) {
+    s32 var_r1_58;
+    u16 temp_r0_17;
+    u8 temp_r2_24;
+
+    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+        temp_r0_17 = (*(u16 *)((s8 *)(arg0) + (0xAC))) - 1;
+        (*(u16 *)((s8 *)(arg0) + (0xAC))) = temp_r0_17;
+        if ((s32) (temp_r0_17 << 0x10) <= 0) {
+            temp_r2_24 = (*(u8 *)((s8 *)(arg0) + (0x77)));
+            (*(u8 *)((s8 *)(arg0) + (0x77))) = (u8) (((-0x41 & temp_r2_24) | (0x40 & temp_r2_24)) & ~0x20);
+            (*(s32 *)((s8 *)(arg0) + (0x84))) = 0;
+            play_sfx_80195B4(0x119, -1);
+            if ((*(s32 *)((s8 *)(arg0) + (0xA8))) == 0) {
+                sub_8082E1C(arg0, 9, 0, 0);
+                sub_8082E1C((*(void **)((s8 *)(arg0) + (0x30))), 9, 0, 0);
+                var_r1_58 = 0x1534;
+            } else {
+                sub_8082E1C(arg0, 0x11, 0, 0);
+                sub_8082E1C((*(void **)((s8 *)(arg0) + (0x30))), 0x11, 0, 0);
+                var_r1_58 = 0x159E;
+            }
+            *(s32 *)0x03000E3C = sub_8086858(arg0, var_r1_58);
+            (*(s32 **)((s8 *)(arg0) + (0x58))) = &sub_806BEA8;
+            (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_806BF70;
+        }
+    }
+}
 #endif
 
 #ifndef NONMATCHING

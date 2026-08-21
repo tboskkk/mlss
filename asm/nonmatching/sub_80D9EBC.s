@@ -1,17 +1,10 @@
-	.include "asm/macros.inc"
-
 	.syntax unified
 	.text
 
-	thumb_func_start sub_80D9EF4
-sub_80D9EF4:
+	thumb_func_start sub_80D9EBC
+sub_80D9EBC:
 	push {r4, lr}
 	adds r4, r0, #0x0
-	adds r1, r4, #0x0
-	adds r1, #0xAC
-	movs r0, #0x00
-	strh r0, [r1, #0x00]
-	adds r0, r4, #0x0
 	movs r1, #0x02
 	movs r2, #0x00
 	movs r3, #0x00
@@ -28,9 +21,10 @@ sub_80D9EF4:
 	movs r1, #0x02
 	orrs r0, r1
 	strb r0, [r2, #0x12]
-	ldr r0, _080D9F30 @ =0x080DA025
+	ldr r0, _080D9EF0 @ =0x080D9FB1
 	str r0, [r4, #0x4C]
 	pop {r4}
 	pop {r0}
 	bx r0
-_080D9F30: .4byte sub_80DA024
+	.byte 0x00, 0x00
+_080D9EF0: .4byte sub_80D9FB0
