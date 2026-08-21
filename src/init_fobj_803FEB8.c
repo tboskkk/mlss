@@ -46,5 +46,8 @@ void *init_fobj_803FEB8(void *arg0, u16 arg1, u8 arg2) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8040020.s\"");
 #else
-#error "TODO: write sub_8040020 to match asm/nonmatching/sub_8040020.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
