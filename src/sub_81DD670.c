@@ -17,5 +17,9 @@ void sub_81DD670(void* p0, s32 p1)
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81DD690.s\"");
 #else
-#error "TODO: write sub_81DD690 to match asm/nonmatching/sub_81DD690.s, then delete this #error"
+s32 sub_8161330();                              /* extern */
+
+void sub_81DD690(void) {
+    sub_8161330();
+}
 #endif
