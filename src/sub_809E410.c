@@ -25,3 +25,9 @@ void sub_809E410(void* p0)
         *(u32*)((u8*)p0 + 0x4C) = (u32)sub_809E0EC;
     }
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_809E438.s\"");
+#else
+#error "TODO: write sub_809E438 to match asm/nonmatching/sub_809E438.s, then delete this #error"
+#endif
