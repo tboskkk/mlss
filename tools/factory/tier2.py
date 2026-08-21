@@ -381,6 +381,26 @@ def run_pool(jobs: int, stall_min: float, max_functions: int):
             except Exception as e:
                 print(f"  {name}: pre-check failed ({e}), falling through to permuter")
 
+            # A function with no fragment was never extracted, so there is
+            # no `#ifndef NONMATCHING` guard block to isolate and permute.py
+            # cannot possibly succeed. Send it back to be EXTRACTED rather
+            # than to needs_human, which is a dead end nothing re-claims.
+            #
+            # This is how 54 functions ended up parked as "couldn't isolate
+            # for permuter" -- every single one of them, checked, had no
+            # fragment. They are residue from when tier3 owned
+            # ensure_extracted() and was retired without anything inheriting
+            # it; they carried a candidate_body from that era but had never
+            # been extracted at all. A further 13 were sitting in
+            # tier2_ready about to fail the same way.
+            if not (gitops.REPO / "asm" / "nonmatching" / f"{name}.s").exists():
+                resolve(name, "needs_attempt",
+                        notes="tier2: no fragment -- never extracted, sent back for "
+                              "extraction rather than parked in needs_human")
+                print(f"  {name}: not extracted -> back to needs_attempt")
+                processed += 1
+                continue
+
             if not ensure_isolated(name, body):
                 resolve(name, "needs_human",
                         notes="tier2: couldn't isolate for permuter (permute.py failed)")
