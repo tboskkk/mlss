@@ -101,5 +101,29 @@ s32 sub_80F8900(void *arg0, s32 *arg1, void *arg2, void *arg3) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80F8940.s\"");
 #else
-#error "TODO: write sub_80F8940 to match asm/nonmatching/sub_80F8940.s, then delete this #error"
+s32 sub_80F8940(void *arg0, void *arg1, void *arg2) {
+    s32 temp_r3_8;
+    u32 temp_r0_34;
+    u32 var_r1_30;
+    void *var_r1_0;
+
+    var_r1_0 = arg1;
+    temp_r3_8 = (*(s32 *)((s8 *)(arg2) + (0)));
+    switch (temp_r3_8) {                            /* irregular */
+    case 0:
+        var_r1_0 = (*(void **)((s8 *)(arg0) + (0x2C)));
+        break;
+    case 1:
+        var_r1_0 = (*(void **)((s8 *)(arg0) + (0x2C))) + (u16) (((*(s32 *)((s8 *)(arg2) + (4))) + 1) << 8);
+        break;
+    }
+    (*(s32 *)((s8 *)(var_r1_0) + (4))) = (s32) (*(s32 *)((s8 *)(var_r1_0) + (0)));
+    (*(s16 *)((s8 *)(var_r1_0) + (0xA0))) = 1;
+    var_r1_30 = 0x17;
+    do {
+        temp_r0_34 = (var_r1_30 << 0x10) + 0xFFFF0000;
+        var_r1_30 = temp_r0_34 >> 0x10;
+    } while ((s32) temp_r0_34 > 0);
+    return 1;
+}
 #endif
