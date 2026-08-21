@@ -740,6 +740,42 @@ undefined symbol reference from inside a standalone-assembled `.s` file —
 mechanically different from Phase 3's local-label-only renames, though
 confirmed working the same way.
 
+## Queued work (agreed, in priority order)
+
+Three tracks, queued deliberately rather than picked up ad hoc. **A
+unblocks the other two**, so do it first unless there's a reason not to.
+
+**A. Finish `split_trailing.py` — split out the hidden functions.**
+`--list`/`--dry-run` already work and the address derivation is verified;
+what's missing is the writer. It needs to: emit the new
+`asm/nonmatching/sub_XXXXXXX.s` with a real `thumb_func_start`, truncate
+the trailing bytes off the source fragment, insert a guard block into the
+SAME `src/*.c` **immediately after the source function's** (byte order in
+that file is link order — getting this wrong silently moves code), update
+`splits.yaml`, and verify with a from-scratch build that the ROM is still
+byte-identical before keeping any of it. Two known complications: some
+regions hold MORE than one function (436 bytes after `sub_80F1CF8`), and
+one of the 29 can't have its address derived and must stay manual. Payoff:
+unblocks the 77 fragments currently armed to fail `finish_match`, and adds
+~29 genuinely new functions.
+
+**B. Chase the physics thread.** The function found after `sub_8158E18`
+(at `0x08158E70`) does a `lsls #16` / `asrs #8` 8.8 fixed-point conversion
+and writes fields at `+0x08` and `+0x44` plus a state byte at `+0x24` —
+almost certainly movement/velocity code, which is the maintainer's stated
+reason for the whole project. Worth tracing: what calls it, what struct
+those offsets belong to, and how it connects to the already-documented
+room-properties / solidity-grid pipeline (see the section above and
+`docs/formats/README.md`). Several of the other 28 hidden functions are
+likely in the same subsystem — another reason A comes first.
+
+**C. Crack the m4a sound driver.** The ~84KB Thumb region at
+`~0x08003000`-`0x08017A00` that Phase 3 identifies as real, unstarted
+code. It's self-contained, and pret projects have fully decompiled m4a
+("Sappy") copies to signature-match against, which makes it far more
+tractable than its size suggests. Biggest single contiguous win left in
+the disassembly, but the least connected to the rest of the work.
+
 ## Housekeeping still outstanding
 
 - No CI job runs `tools/progress.py` or posts a progress badge yet.
