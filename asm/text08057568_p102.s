@@ -3,59 +3,6 @@
 	.syntax unified
 	.text
 
-	thumb_func_start sub_806B7BC
-sub_806B7BC:
-	push {r4, lr}
-	adds r4, r0, #0x0
-	adds r1, r4, #0x0
-	adds r1, #0xAC
-	ldrh r0, [r1, #0x00]
-	subs r0, #0x01
-	strh r0, [r1, #0x00]
-	lsls r0, r0, #0x10
-	cmp r0, #0x00
-	bgt _0806B818
-	subs r1, #0x28
-	ldr r0, [r4, #0x2C]
-	ldr r2, [r0, #0x28]
-	adds r0, r2, #0x0
-	adds r0, #0xD8
-	ldr r0, [r0, #0x00]
-	str r0, [r1, #0x00]
-	adds r1, #0x04
-	adds r0, r2, #0x0
-	adds r0, #0xDC
-	ldr r0, [r0, #0x00]
-	str r0, [r1, #0x00]
-	adds r1, #0x04
-	adds r0, r2, #0x0
-	adds r0, #0xE0
-	ldr r0, [r0, #0x00]
-	str r0, [r1, #0x00]
-	adds r2, r4, #0x0
-	adds r2, #0x79
-	ldrb r0, [r2, #0x00]
-	movs r1, #0x20
-	orrs r0, r1
-	strb r0, [r2, #0x00]
-	adds r1, r4, #0x0
-	adds r1, #0x7C
-	movs r0, #0xB3
-	lsls r0, r0, #0x01
-	strh r0, [r1, #0x00]
-	subs r1, #0x02
-	movs r0, #0x00
-	strh r0, [r1, #0x00]
-	adds r0, r4, #0x0
-	bl sub_8085B38
-	ldr r0, _0806B820 @ =0x0806C191
-	str r0, [r4, #0x4C]
-_0806B818:
-	pop {r4}
-	pop {r0}
-	bx r0
-	.byte 0x00, 0x00
-_0806B820: .4byte sub_806C190
 	thumb_func_start sub_806B824
 sub_806B824:
 	push {r4, r5, r6, r7, lr}
