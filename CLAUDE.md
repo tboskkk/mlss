@@ -1222,6 +1222,49 @@ drop it. A new m2c rule that re-seeds a function lower puts it straight
 back in contention — which is the section-E thesis expressed as a queue
 policy.
 
+**G. What the ~1,547 non-compiling seeds ACTUALLY fail on (measured).**
+"2,400 seeds do not compile" was the headline for a long time without
+anyone asking what the compiler says. Clustered over a random sample of 45,
+compiling with warnings ALLOWED so only genuine errors remain:
+
+| fatal error | share | root cause |
+|---|---|---|
+| `called object is not a function` | 24.4% | unknown callee signature |
+| *(compiles once warnings are allowed)* | 22.2% | `-Werror` only |
+| `void value not ignored as it ought to be` | 13.3% | unknown callee signature |
+| `invalid type argument of ...` | 11.1% | mostly signature/type |
+| `X undeclared` (raw `r1`/`r2`) | 8.9% | m2c could not recover a value |
+| `X redeclared as different kind of symbol` | 6.7% | signature conflicts a header |
+| `too few arguments to function` | 4.4% | unknown callee signature |
+| `syntax error before X` | 4.4% | m2c could not recover |
+
+So roughly **half the pile is one root cause — m2c guessing callee
+signatures** — about **22% is nothing but `-Werror`**, and only ~13% is m2c
+genuinely failing to recover the function.
+
+**Two deterministic levers follow directly, and this is the thesis working
+exactly as intended:**
+
+1. **Extend m2c's `--context` with the signatures of already-matched
+   functions.** This is the "compounding fix" section E parks as "marginal
+   at ~280/5,986, worth revisiting around 20-30%". The measurement says
+   otherwise: the binding constraint *right now* is unknown signatures, at
+   ~50% of the pile, and every function matched makes the context better.
+   The plumbing landed with the review fixes — `ruleset_version()` hashes
+   `include/**/*.h`, so improving the context automatically re-opens all
+   2,702 parked rows instead of leaving them stamped shut.
+2. **A cast-insertion rule for the `-Werror` class.** agbcc's warnings do
+   not change codegen, so a cast added purely to silence a pointer/int
+   conversion is a no-op at the instruction level — safe by construction,
+   and verifiable by comparing the object before and after.
+
+**Method note, because getting this wrong is easy and I did.** The first
+clustering pass keyed on the FIRST diagnostic line and produced a confident
+"69% are pointer/int conversion warnings". Testing that directly — compile
+the same seeds without `-Werror` — showed only **1 of 5** then compiled. The
+warning was a symptom sitting *above* the real error. Cluster on the fatal
+error, and confirm a cluster by acting on it, before believing a share.
+
 **Next levers, in rough order of value:**
 1. **More deterministic rules.** This is the whole thesis and it keeps
    paying: the arg-register rule alone covered 15% of the corpus and
