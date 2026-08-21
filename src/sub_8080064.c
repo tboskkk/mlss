@@ -77,3 +77,9 @@ void sub_80800DC(void *arg0) {
     }
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8080168.s\"");
+#else
+#error "TODO: write sub_8080168 to match asm/nonmatching/sub_8080168.s, then delete this #error"
+#endif
