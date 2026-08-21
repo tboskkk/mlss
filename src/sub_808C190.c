@@ -632,5 +632,13 @@ asm_unified(".include \"asm/nonmatching/sub_808DD2C.s\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_808DD9C.s\"");
 #else
-#error "TODO: write sub_808DD9C to match asm/nonmatching/sub_808DD9C.s, then delete this #error"
+extern s32 sub_808DE44;
+
+s32 sub_808DD9C(void *arg0) {
+    (*(s32 *)((s8 *)(arg0) + (0x6C))) = 0x084FE9A4;
+    (*(u8 *)((s8 *)(arg0) + (0x77))) = (u8) (-0x41 & (*(u8 *)((s8 *)(arg0) + (0x77))) & ~0x20);
+    (*(s32 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x28)))) + (0x114))) = (s32) (*(u16 *)((s8 *)((*(s32 *)0x03000FF4 + 0x3C)) + (0x2A)));
+    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_808DE44;
+    return 1;
+}
 #endif
