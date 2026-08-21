@@ -37,3 +37,9 @@ void sub_80F86F0(u32* p1, u32 p2, u32* p3)
         *(u32*)((u8*)p1) = *(u32*)((u8*)p3 + 0x08);
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80F8740.s\"");
+#else
+#error "TODO: write sub_80F8740 to match asm/nonmatching/sub_80F8740.s, then delete this #error"
+#endif
