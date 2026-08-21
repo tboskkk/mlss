@@ -628,3 +628,9 @@ asm_unified(".include \"asm/nonmatching/sub_808DD2C.s\"");
    NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
    still gets the verbatim retail bytes. */
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_808DD9C.s\"");
+#else
+#error "TODO: write sub_808DD9C to match asm/nonmatching/sub_808DD9C.s, then delete this #error"
+#endif
