@@ -77,3 +77,9 @@ _080FD210:
     *(u32**)r0 = (u32*)sub_80FDA34;
     *(u32**)r
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80FD244.s\"");
+#else
+#error "TODO: write sub_80FD244 to match asm/nonmatching/sub_80FD244.s, then delete this #error"
+#endif
