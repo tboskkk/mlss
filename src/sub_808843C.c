@@ -43,5 +43,21 @@ void sub_808843C(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80884AC.s\"");
 #else
-#error "TODO: write sub_80884AC to match asm/nonmatching/sub_80884AC.s, then delete this #error"
+s32 sub_80884AC(void *arg0) {
+    s32 var_r0_21;
+    u16 temp_r1_27;
+
+    var_r0_21 = M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */) * M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */);
+    if (var_r0_21 < 0) {
+        var_r0_21 += 0xFF;
+    }
+    temp_r1_27 = M2C_ERROR(/* unknown instruction: ldsh $r2, ($mem_loc_fictive_) */) + (var_r0_21 >> 8);
+    (*(u16 *)((s8 *)(arg0) + (0xAC))) = (u16) (*(u16 *)((s8 *)(arg0) + (0x7E)));
+    (*(u16 *)((s8 *)(arg0) + (0x7E))) = temp_r1_27;
+    if ((s32) temp_r1_27 > 0x3FFF) {
+        (*(u8 *)((s8 *)(arg0) + (0x79))) = (u8) ((*(u8 *)((s8 *)(arg0) + (0x79))) | 0x20);
+        return 0;
+    }
+    return 1;
+}
 #endif
