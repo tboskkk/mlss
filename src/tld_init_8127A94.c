@@ -14,3 +14,9 @@ void *tld_init_8127A94(void *arg0, u8 arg1) {
     (*(s32 *)((s8 *)(arg0) + (0x18))) = 0x08CDC3C8;
     return arg0;
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8127AB0.s\"");
+#else
+#error "TODO: write sub_8127AB0 to match asm/nonmatching/sub_8127AB0.s, then delete this #error"
+#endif
