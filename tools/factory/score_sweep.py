@@ -48,6 +48,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import db  # noqa: E402
 import gitops  # noqa: E402
+import m2c_bridge  # noqa: E402
 
 
 # How many no-compiles in a row before we stop trusting them and go check
@@ -164,10 +165,20 @@ def main() -> None:
                 consecutive_nocompile = 0
             if not args.dry_run:
                 with db.tx(conn):
+                    # Stamp it with the ruleset, exactly like tier_m2c's own
+                    # declines. Without the stamp tier_m2c does not recognise
+                    # this as already-judged and re-generates the identical
+                    # seed for the identical verdict: measured at 1,759
+                    # pointless re-tries in 30 minutes for 38 useful results,
+                    # all of it holding the repo lock that tier2's isolation
+                    # and the validator need. The verdict is a property of the
+                    # ruleset, so it should expire with the ruleset and not a
+                    # moment sooner.
                     db.set_state(conn, name, "needs_attempt", worker_id=None,
-                                 notes="score_sweep: seed does not compile -- pulled "
-                                       "out of the permuter queue rather than "
-                                       "spending a slot to find out")
+                                 notes=f"m2c:{m2c_bridge.ruleset_version()}: seed does "
+                                       "not compile (found by score_sweep, pulled out of "
+                                       "the permuter queue rather than spending a slot "
+                                       "to find out)")
         elif score == 0:
             zero += 1
             consecutive_nocompile = 0
