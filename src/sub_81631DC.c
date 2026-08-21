@@ -16,3 +16,9 @@ s32 sub_81631DC(void *arg0) {
     }
     return var_r1_7;
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_81631F0.s\"");
+#else
+#error "TODO: write sub_81631F0 to match asm/nonmatching/sub_81631F0.s, then delete this #error"
+#endif
