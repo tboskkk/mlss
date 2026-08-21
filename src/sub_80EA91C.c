@@ -17,3 +17,9 @@ s32 sub_80EA928(s32 arg0, void *arg1, s32 *arg2) {
     (*(u8 *)((s8 *)(arg1) + (0xA6))) = (u8) ((*(u8 *)((s8 *)(arg1) + (0xA6))) + 1);
     return 1;
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80EA940.s\"");
+#else
+#error "TODO: write sub_80EA940 to match asm/nonmatching/sub_80EA940.s, then delete this #error"
+#endif
