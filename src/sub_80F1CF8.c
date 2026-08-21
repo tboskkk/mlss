@@ -63,3 +63,9 @@ asm_unified(".include \"asm/nonmatching/ybai_update.s\"");
 #else
 #error "TODO: write ybai_update to match asm/nonmatching/ybai_update.s, then delete this #error"
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80F2524.s\"");
+#else
+#error "TODO: write sub_80F2524 to match asm/nonmatching/sub_80F2524.s, then delete this #error"
+#endif
