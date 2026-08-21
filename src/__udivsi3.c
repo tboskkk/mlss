@@ -12,3 +12,9 @@ asm_unified(".include \"asm/nonmatching/__udivsi3.s\"");
 #else
 #error "TODO: write __udivsi3 to match asm/nonmatching/__udivsi3.s, then delete this #error"
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/__umodsi3.s\"");
+#else
+#error "TODO: write __umodsi3 to match asm/nonmatching/__umodsi3.s, then delete this #error"
+#endif
