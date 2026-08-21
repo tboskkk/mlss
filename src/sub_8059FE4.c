@@ -7,8 +7,16 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8059FE4.s\"");
-#else
-#error "TODO: write sub_8059FE4 to match asm/nonmatching/sub_8059FE4.s, then delete this #error"
-#endif
+s32 sub_8058278(s32);                           /* extern */
+s32 sub_80582DC(s32);                           /* extern */
+s32 sub_80584F8(s32);                           /* extern */
+s32 sub_80587BC(s32, s32);                      /* extern */
+s32 sub_8059F24();                              /* extern */
+
+void sub_8059FE4(s32 arg0) {
+    sub_8059F24();
+    sub_80582DC(arg0);
+    sub_80587BC(arg0, 0);
+    sub_8058278(arg0);
+    sub_80584F8(arg0);
+}
