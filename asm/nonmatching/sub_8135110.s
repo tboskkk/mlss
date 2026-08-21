@@ -1,10 +1,8 @@
-	.include "asm/macros.inc"
-
 	.syntax unified
 	.text
 
-	thumb_func_start sub_81352B4
-sub_81352B4:
+	thumb_func_start sub_8135110
+sub_8135110:
 	push {r4, r5, r6, r7, lr}
 	mov r7, r10
 	mov r6, r9
@@ -12,7 +10,7 @@ sub_81352B4:
 	push {r5, r6, r7}
 	add sp, #-0x198
 	adds r7, r0, #0x0
-	ldr r0, _0813544C @ =0x08198504
+	ldr r0, _081352A8 @ =0x08198504
 	mov r8, r0
 	movs r6, #0xFF
 	ands r1, r6
@@ -21,19 +19,19 @@ sub_81352B4:
 	movs r5, #0x00
 	ldsh r1, [r0, r5]
 	cmp r1, #0x00
-	bge _081352D8
+	bge _08135134
 	adds r1, #0x3F
-_081352D8:
+_08135134:
 	asrs r1, r1, #0x06
 	mov r12, r1
-	ldr r5, _08135450 @ =0x08198584
+	ldr r5, _081352AC @ =0x08198584
 	adds r0, r4, r5
 	movs r1, #0x00
 	ldsh r0, [r0, r1]
 	cmp r0, #0x00
-	bge _081352EA
+	bge _08135146
 	adds r0, #0x3F
-_081352EA:
+_08135146:
 	asrs r0, r0, #0x06
 	mov r9, r0
 	ands r2, r6
@@ -43,18 +41,18 @@ _081352EA:
 	movs r4, #0x00
 	ldsh r1, [r0, r4]
 	cmp r1, #0x00
-	bge _08135300
+	bge _0813515C
 	adds r1, #0x3F
-_08135300:
+_0813515C:
 	asrs r1, r1, #0x06
 	mov r10, r1
 	adds r0, r2, r5
 	movs r1, #0x00
 	ldsh r0, [r0, r1]
 	cmp r0, #0x00
-	bge _08135310
+	bge _0813516C
 	adds r0, #0x3F
-_08135310:
+_0813516C:
 	asrs r4, r0, #0x06
 	ands r3, r6
 	lsls r3, r3, #0x01
@@ -63,25 +61,25 @@ _08135310:
 	movs r2, #0x00
 	ldsh r1, [r0, r2]
 	cmp r1, #0x00
-	bge _08135324
+	bge _08135180
 	adds r1, #0x3F
-_08135324:
+_08135180:
 	asrs r1, r1, #0x06
 	mov r8, r1
 	adds r0, r3, r5
 	movs r5, #0x00
 	ldsh r0, [r0, r5]
 	cmp r0, #0x00
-	bge _08135334
+	bge _08135190
 	adds r0, #0x3F
-_08135334:
+_08135190:
 	asrs r3, r0, #0x06
 	mov r0, r12
 	negs r1, r0
 	movs r2, #0x80
 	lsls r2, r2, #0x01
 	movs r0, #0x00
-	ldr r6, _08135454 @ =0x08CDC470
+	ldr r6, _081352B0 @ =0x08CDC470
 	str r6, [sp, #0x040]
 	str r2, [sp, #0x000]
 	str r0, [sp, #0x004]
@@ -150,13 +148,13 @@ _08135334:
 	add r2, sp
 	mov r9, r2
 	mov r0, r9
-	adds r1, r5, #0x0
+	adds r1, r4, #0x0
 	mov r2, sp
 	bl sub_8134CAC
 	add r0, sp, #0x0CC
 	mov r8, r0
 	mov r1, r9
-	adds r2, r4, #0x0
+	adds r2, r5, #0x0
 	bl sub_8134CAC
 	add r0, sp, #0x154
 	adds r1, r7, #0x0
@@ -212,6 +210,6 @@ _08135334:
 	pop {r0}
 	bx r0
 	.byte 0x00, 0x00
-_0813544C: .4byte 0x08198504
-_08135450: .4byte 0x08198584
-_08135454: .4byte 0x08CDC470
+_081352A8: .4byte 0x08198504
+_081352AC: .4byte 0x08198584
+_081352B0: .4byte 0x08CDC470
