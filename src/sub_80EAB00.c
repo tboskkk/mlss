@@ -50,3 +50,9 @@ asm_unified(".include \"asm/nonmatching/script_cmd_conditional_jump.s\"");
 #else
 #error "TODO: write script_cmd_conditional_jump to match asm/nonmatching/script_cmd_conditional_jump.s, then delete this #error"
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80EAB98.s\"");
+#else
+#error "TODO: write sub_80EAB98 to match asm/nonmatching/sub_80EAB98.s, then delete this #error"
+#endif
