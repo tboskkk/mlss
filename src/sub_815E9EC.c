@@ -7,16 +7,11 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_815E9EC.s\"");
-#else
-u32* sub_815E9EC(u32* param_1) {
-    param_1[0] = 0;
-    param_1[1] = 0x08CDCAD0;
-    param_1[2] = 0;
-    param_1[3] = 0;
-    param_1[4] = 0xFFFFFF00;
-    param_1[5] = 0;
-    return param_1;
+void sub_815E9EC(void *arg0) {
+    (*(s32 *)((s8 *)(arg0) + (0))) = 0;
+    (*(s32 *)((s8 *)(arg0) + (4))) = 0x08CDCAD0;
+    (*(s32 *)((s8 *)(arg0) + (8))) = 0;
+    (*(s32 *)((s8 *)(arg0) + (0xC))) = 0;
+    (*(s32 *)((s8 *)(arg0) + (0x10))) = 0x7E00;
+    (*(s32 *)((s8 *)(arg0) + (0x14))) = 0;
 }
-#endif

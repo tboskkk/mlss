@@ -10,15 +10,12 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8047B5C.s\"");
 #else
-u16 sub_8047B5C(u16* param_1, u16 param_2) {
-    u16* puVar1;
-    u16 uVar2;
-    
-    puVar1 = param_1 + 0x9A;
-    uVar2 = *puVar1;
-    *param_1 = uVar2;
-    *puVar1 = param_2;
-    return uVar2;
+void sub_8047B5C(void *arg0, u16 arg1)
+{
+  unsigned long new_var;
+  new_var = *((u16 *) (((s8 *) arg0) + 0x266));
+  *((u16 *) (((s8 *) arg0) + 0x268)) = (u16) new_var;
+  *((u16 *) (((s8 *) arg0) + 0x266)) = arg1;
 }
 #endif
 

@@ -50,16 +50,12 @@ void sub_80297B8(void *arg0) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80297D8.s\"");
 #else
-void sub_80297D8(void *arg0, s32 arg1)
-{
-  unsigned long long new_var2;
-  s8 *new_var;
-  new_var = (s8 *) arg0;
-  if (0 == arg1)
-  {
-    sub_805BED8(*((s32 *) (0x304 + new_var)));
-    new_var2 = 0xFFFFF87F;
-    *((u16 *) (new_var + 0xFC)) = (u16) (new_var2 & (*((u16 *) (new_var + 0xFC))));
-  }
+s32 sub_805BED8(s32);                           /* extern */
+
+void sub_80297D8(void *arg0, s32 arg1) {
+    if (arg1 == 0) {
+        sub_805BED8((*(s32 *)((s8 *)(arg0) + (0x304))));
+        (*(u16 *)((s8 *)(arg0) + (0xFC))) = (u16) (0xFFFFF87F & (*(u16 *)((s8 *)(arg0) + (0xFC))));
+    }
 }
 #endif
