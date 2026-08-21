@@ -58,7 +58,7 @@ void sub_8158E18(u32* p0)
 #endif
 
 #ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8158E70.s\"");
+asm_unified(".include \"asm/nonmatching/set_surface_height_fields.s\"");
 #else
-#error "TODO: write sub_8158E70 to match asm/nonmatching/sub_8158E70.s, then delete this #error"
+#error "TODO: write set_surface_height_fields to match asm/nonmatching/set_surface_height_fields.s, then delete this #error"
 #endif

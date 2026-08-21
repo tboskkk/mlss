@@ -681,6 +681,59 @@ still-raw territory, nowhere near being split) calls
 `get_coldef_ptr_by_xz(ctx, x, z)` and feeds the returned 4-byte pointer
 into `sub_80E9C4C`.
 
+### SOLVED: the slope/height semantics, decoded from `sub_8160854`
+
+**This closes the "which byte is height, which is a slope/edge type enum"
+question left open above** — and it confirms the `b0`/`b1` hypothesis
+rather than overturning it.
+
+Found by pulling on a thread from the other end: `split_trailing.py`
+recovered `sub_8158E70`, a 32-byte function Luvdis never labeled, whose
+only job is to call `sub_8160854`, convert the result to 8.8 fixed point
+(`lsls #16` / `asrs #8`), and store it to two fields. Following that call
+led straight into the height lookup.
+
+`sub_8160854(ctx, x_8_8)` resolves **surface height in pixels at a given
+X**:
+
+```
+tile_x = (x_8_8 >> 8) >> 3           // 8.8 fixed -> pixels -> 8px tiles
+idx    = tile_x % *(u16*)(ctx+0x820) // 0x820 = row width in tiles
+rec    = ((u32**)(ctx+0x80C))[0][idx]  // 4-byte record per tile
+h      = (s8)(rec & 0xFF) * 8        // byte 0: signed height in TILES -> pixels
+type   = (rec >> 8) & 0xF            // byte 1 low nibble: slope type
+f      = pixel_x % 8                 // offset within the tile, 0..7
+```
+
+then dispatches `type` through a 7-entry jump table at `0x0816089C`
+(anything `> 6` falls through to the flat case). Every handler was
+disassembled and the arithmetic read out; the full set is a textbook 2D
+slope tileset:
+
+| type | returns | meaning |
+|------|---------|---------|
+| 0 (and >6) | `h` | flat |
+| 1 | `h + f` | 45° ascending |
+| 2 | `h + 8 - f` | 45° descending |
+| 3 | `h + 8 - f/2` | 22.5° descending, upper half |
+| 4 | `h + 4 - f/2` | 22.5° descending, lower half |
+| 5 | `h + f/2` | 22.5° ascending, lower half |
+| 6 | `h + f/2 + 4` | 22.5° ascending, upper half |
+
+Two 45° directions plus four 22.5° half-slopes (two halves × two
+directions) plus flat — exactly the shape a platformer needs, and it
+explains the "three variants per type" clustering noticed in `b3` above.
+All divisions are round-toward-zero (`cmp/bge/adds #7` before `asrs #3`,
+`lsrs #31/adds/asrs #1` for the halves), which matters for matching.
+
+**Honest scoping**: the record `sub_8160854` indexes lives behind
+`ctx+0x80C`, and this trace does *not* prove that pointer resolves to the
+same 14 coldef arrays documented above — it proves the record has the
+same 4-byte shape and that its first two bytes decode as height + slope
+type. Confirming `ctx+0x80C` is the coldef array (rather than a parallel
+per-row structure) is the remaining step, and it's a pointer trace, not a
+semantics question.
+
 ### `sub_80E9C4C` traced by hand — result: generic engine flag/counter storage, not physics data
 
 Register-level trace (not decompiled, just read by hand — three functions,
