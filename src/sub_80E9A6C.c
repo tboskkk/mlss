@@ -45,3 +45,9 @@ void sub_80E9A6C(u16 param_1, s16 param_2)
     *(u8 *)sVar3 = (u8)param_2;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80E9AF8.s\"");
+#else
+#error "TODO: write sub_80E9AF8 to match asm/nonmatching/sub_80E9AF8.s, then delete this #error"
+#endif
