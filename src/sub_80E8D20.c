@@ -47,3 +47,9 @@ void sub_80E8D20(u8* param_1, u16 param_2)
     *(u8*)puVar2 = 0x00;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80E8D74.s\"");
+#else
+#error "TODO: write sub_80E8D74 to match asm/nonmatching/sub_80E8D74.s, then delete this #error"
+#endif
