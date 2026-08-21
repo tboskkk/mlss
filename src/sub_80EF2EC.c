@@ -46,3 +46,9 @@ asm_unified(".include \"asm/nonmatching/evts_process_init_80EF3FC.s\"");
 #else
 #error "TODO: write evts_process_init_80EF3FC to match asm/nonmatching/evts_process_init_80EF3FC.s, then delete this #error"
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/evts_update.s\"");
+#else
+#error "TODO: write evts_update to match asm/nonmatching/evts_update.s, then delete this #error"
+#endif
