@@ -65,3 +65,9 @@ _080BED72:
     return;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80BED8C.s\"");
+#else
+#error "TODO: write sub_80BED8C to match asm/nonmatching/sub_80BED8C.s, then delete this #error"
+#endif
