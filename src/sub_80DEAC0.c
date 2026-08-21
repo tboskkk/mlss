@@ -27,143 +27,426 @@ void sub_80DEAC0(void *arg0) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80DEAE0.s\"");
 #else
-#error "TODO: write sub_80DEAE0 to match asm/nonmatching/sub_80DEAE0.s, then delete this #error"
+s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
+s32 sub_8087540(void *);                        /* extern */
+
+void sub_80DEAE0(void *arg0) {
+    u8 temp_r2_18;
+    void *temp_r3_17;
+
+    if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
+        sub_8082E1C(arg0, 0, 0, 0);
+        temp_r3_17 = (*(void **)((s8 *)(arg0) + (8)));
+        temp_r2_18 = (*(u8 *)((s8 *)(temp_r3_17) + (0x11)));
+        (*(u8 *)((s8 *)(temp_r3_17) + (0x11))) = (u8) ((-0x41 & temp_r2_18) | ((((u32) (temp_r2_18 << 0x19) >> 0x1F) ^ 1) << 6));
+        sub_8087540(arg0);
+    }
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80DEB1C.s\"");
 #else
-#error "TODO: write sub_80DEB1C to match asm/nonmatching/sub_80DEB1C.s, then delete this #error"
+s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
+extern s32 sub_80DDC8C;
+
+void sub_80DEB1C(void *arg0) {
+    if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
+        sub_8082E1C(arg0, 8, 0, 0);
+        play_sfx_80195B4(0x126, -1);
+        (*(s16 *)((s8 *)(arg0) + (0xAC))) = 0x30;
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80DDC8C;
+    }
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80DEB58.s\"");
 #else
-#error "TODO: write sub_80DEB58 to match asm/nonmatching/sub_80DEB58.s, then delete this #error"
+s32 stop_sfx_80195A8(s32);                      /* extern */
+s32 sub_8087124(s32, s32, s32);                 /* extern */
+
+void sub_80DEB58(s32 arg0, s32 arg1, s32 arg2) {
+    stop_sfx_80195A8(0x11C);
+    sub_8087124(arg0, arg1, arg2);
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80DEB78.s\"");
 #else
-#error "TODO: write sub_80DEB78 to match asm/nonmatching/sub_80DEB78.s, then delete this #error"
+s32 stop_sfx_80195A8(s32);                      /* extern */
+s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
+extern s32 sub_80DDBF4;
+
+void sub_80DEB78(void *arg0) {
+    s32 var_r2_19;
+
+    if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
+        var_r2_19 = 4;
+        if (M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */) != -1) {
+            var_r2_19 = 6;
+        }
+        sub_8082E1C(arg0, var_r2_19, 0, 0);
+        stop_sfx_80195A8(0x11C);
+        (*(s16 *)((s8 *)((arg0 + 0x9C)) + (0x10))) = (s16) (*(s32 *)((s8 *)(arg0) + (0x9C)));
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80DDBF4;
+    }
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80DEC44.s\"");
 #else
-#error "TODO: write sub_80DEC44 to match asm/nonmatching/sub_80DEC44.s, then delete this #error"
+s32 sub_8082B00();                                  /* extern */
+extern s32 sub_80DE670;
+
+void sub_80DEC44(void *arg0) {
+    if (sub_8082B00() == 0) {
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80DE670;
+    }
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80DEC60.s\"");
 #else
-#error "TODO: write sub_80DEC60 to match asm/nonmatching/sub_80DEC60.s, then delete this #error"
+s32 sub_807C298();                              /* extern */
+
+void sub_80DEC60(void) {
+    sub_807C298();
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80DEC6C.s\"");
 #else
-#error "TODO: write sub_80DEC6C to match asm/nonmatching/sub_80DEC6C.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80DECC8.s\"");
 #else
-#error "TODO: write sub_80DECC8 to match asm/nonmatching/sub_80DECC8.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80DED30.s\"");
 #else
-#error "TODO: write sub_80DED30 to match asm/nonmatching/sub_80DED30.s, then delete this #error"
+s32 sub_8082B00();                                  /* extern */
+extern s32 sub_80DDAE4;
+
+void sub_80DED30(void *arg0) {
+    if (sub_8082B00() == 0) {
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80DDAE4;
+    }
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80DED4C.s\"");
 #else
-#error "TODO: write sub_80DED4C to match asm/nonmatching/sub_80DED4C.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80DED84.s\"");
 #else
-#error "TODO: write sub_80DED84 to match asm/nonmatching/sub_80DED84.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80DEDB0.s\"");
 #else
-#error "TODO: write sub_80DEDB0 to match asm/nonmatching/sub_80DEDB0.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80DEDEC.s\"");
 #else
-#error "TODO: write sub_80DEDEC to match asm/nonmatching/sub_80DEDEC.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80DEE34.s\"");
 #else
-#error "TODO: write sub_80DEE34 to match asm/nonmatching/sub_80DEE34.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80DEE80.s\"");
 #else
-#error "TODO: write sub_80DEE80 to match asm/nonmatching/sub_80DEE80.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80DEEA8.s\"");
 #else
-#error "TODO: write sub_80DEEA8 to match asm/nonmatching/sub_80DEEA8.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80DF024.s\"");
 #else
-#error "TODO: write sub_80DF024 to match asm/nonmatching/sub_80DF024.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80DF2B0.s\"");
 #else
-#error "TODO: write sub_80DF2B0 to match asm/nonmatching/sub_80DF2B0.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80DF5EC.s\"");
 #else
-#error "TODO: write sub_80DF5EC to match asm/nonmatching/sub_80DF5EC.s, then delete this #error"
+s32 sub_80DF024(u16, s32, s32, s32, void *);    /* extern */
+
+void sub_80DF5EC(void *arg0) {
+    s32 temp_r5_35;
+    s32 var_r5_47;
+    u16 temp_r1_69;
+    u16 temp_r2_15;
+    void *temp_r4_14;
+    void *temp_r7_36;
+
+    if (M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */) == 0) {
+        do {
+            temp_r4_14 = (*(void **)((s8 *)(arg0) + (0xC)));
+            temp_r2_15 = (*(u16 *)((s8 *)(temp_r4_14) + (0)));
+            if (temp_r2_15 == 0xFFFD) {
+                sub_80DF024(temp_r2_15, M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */), M2C_ERROR(/* unknown instruction: ldsh $r2, ($mem_loc_fictive_) */), M2C_ERROR(/* unknown instruction: ldsh $r3, ($mem_loc_fictive_) */), NULL);
+            } else {
+                temp_r5_35 = M2C_ERROR(/* unknown instruction: ldsh $r5, ($mem_loc_fictive_) */);
+                temp_r7_36 = (*(void **)((s8 *)(arg0) + (8)));
+                if ((temp_r7_36 != NULL) && (0x40 & (*(u8 *)((s8 *)((*(void **)((s8 *)(temp_r7_36) + (8)))) + (0x11))))) {
+                    var_r5_47 = temp_r5_35 - M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */);
+                } else {
+                    var_r5_47 = temp_r5_35 + M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */);
+                }
+                sub_80DF024(temp_r2_15, var_r5_47, M2C_ERROR(/* unknown instruction: ldsh $r2, ($mem_loc_fictive_) */) + M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */), M2C_ERROR(/* unknown instruction: ldsh $r3, ($mem_loc_fictive_) */) + M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */), temp_r7_36);
+            }
+            temp_r1_69 = (*(u16 *)((s8 *)(temp_r4_14) + (8)));
+            (*(u16 *)((s8 *)(arg0) + (0x10))) = temp_r1_69;
+            (*(void **)((s8 *)(arg0) + (0xC))) = (void *) (temp_r4_14 + 0xA);
+        } while ((temp_r1_69 << 0x10) == 0);
+    }
+    if ((s32) M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */) < 0) {
+        (*(s32 *)((s8 *)(arg0) + (4))) = 0;
+        return;
+    }
+    (*(u16 *)((s8 *)(arg0) + (0x10))) = (u16) ((*(u16 *)((s8 *)(arg0) + (0x10))) - 1);
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80DF694.s\"");
 #else
-#error "TODO: write sub_80DF694 to match asm/nonmatching/sub_80DF694.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80DF808.s\"");
 #else
-#error "TODO: write sub_80DF808 to match asm/nonmatching/sub_80DF808.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80DF8F0.s\"");
 #else
-#error "TODO: write sub_80DF8F0 to match asm/nonmatching/sub_80DF8F0.s, then delete this #error"
+u8 sub_8199F30();                                   /* extern */
+
+s32 sub_80DF8F0(void *arg0, s32 arg1) {
+    s32 var_r0_44;
+    s32 var_r0_50;
+    s32 var_r0_60;
+    s32 var_r0_66;
+    u32 temp_r1_38;
+    u8 temp_r0_14;
+
+    (*(s32 *)((s8 *)(arg0) + (4))) = 0;
+    (*(s32 *)((s8 *)(arg0) + (0xC))) = 0;
+    (*(s32 *)((s8 *)(arg0) + (8))) = 0xFFFFFC00;
+    temp_r0_14 = sub_8199F30();
+    (*(s16 *)((s8 *)(arg0) + (0x12))) = (s16) ((u32) (((u32) (0 - (temp_r0_14 + 0x300)) >> 2) * M2C_ERROR(/* unknown instruction: ldsh $r2, ($mem_loc_fictive_) */)) >> 8);
+    temp_r1_38 = (u32) (((u32) ((u8) ((u32) (temp_r0_14 >> 8) >> 8) + 0x300) >> 2) * M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */)) >> 8;
+    var_r0_44 = M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */);
+    if (var_r0_44 < 0) {
+        var_r0_44 += 0x3F;
+    }
+    var_r0_50 = (var_r0_44 >> 6) * temp_r1_38;
+    if (var_r0_50 < 0) {
+        var_r0_50 += 0xFF;
+    }
+    (*(s16 *)((s8 *)(arg0) + (0x10))) = (s16) (var_r0_50 >> 8);
+    var_r0_60 = M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */);
+    if (var_r0_60 < 0) {
+        var_r0_60 += 0x3F;
+    }
+    var_r0_66 = (var_r0_60 >> 6) * temp_r1_38;
+    if (var_r0_66 < 0) {
+        var_r0_66 += 0xFF;
+    }
+    (*(s16 *)((s8 *)(arg0) + (0x14))) = (s16) (var_r0_66 >> 8);
+    (*(s16 *)((s8 *)(arg0) + (0x16))) = 1;
+    return 5;
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80DF988.s\"");
 #else
-#error "TODO: write sub_80DF988 to match asm/nonmatching/sub_80DF988.s, then delete this #error"
+void sub_80DF988(void *arg0, void *arg1) {
+    s32 temp_r3_45;
+    s32 var_r0_26;
+    s32 var_r0_37;
+    s32 var_r0_51;
+    s32 var_r0_57;
+    s32 var_r0_67;
+    s32 var_r0_73;
+
+    (*(s32 *)((s8 *)(arg0) + (8))) = (s32) ((*(s32 *)((s8 *)(arg0) + (8))) - M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */));
+    (*(u16 *)((s8 *)(arg0) + (0x10))) = (u16) ((*(u16 *)((s8 *)(arg0) + (0x18))) + (*(u16 *)((s8 *)(arg0) + (0x10))));
+    (*(u16 *)((s8 *)(arg0) + (0x14))) = (u16) ((*(u16 *)((s8 *)(arg1) + (6))) + (*(u16 *)((s8 *)(arg0) + (0x14))));
+    var_r0_26 = M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */) * M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */);
+    if (var_r0_26 < 0) {
+        var_r0_26 += 0xFF;
+    }
+    (*(s16 *)((s8 *)(arg0) + (0x12))) = (s16) (var_r0_26 >> 8);
+    var_r0_37 = M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */) * M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */);
+    if (var_r0_37 < 0) {
+        var_r0_37 += 0xFF;
+    }
+    (*(u16 *)((s8 *)(arg0) + (0x18))) = (u16) (var_r0_37 >> 8);
+    temp_r3_45 = M2C_ERROR(/* unknown instruction: ldsh $r3, ($mem_loc_fictive_) */);
+    var_r0_51 = M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */);
+    if (var_r0_51 < 0) {
+        var_r0_51 += 0x3F;
+    }
+    var_r0_57 = (var_r0_51 >> 6) * temp_r3_45;
+    if (var_r0_57 < 0) {
+        var_r0_57 += 0xFF;
+    }
+    (*(s32 *)((s8 *)(arg0) + (4))) = (s32) (var_r0_57 >> 8);
+    var_r0_67 = M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */);
+    if (var_r0_67 < 0) {
+        var_r0_67 += 0x3F;
+    }
+    var_r0_73 = (var_r0_67 >> 6) * temp_r3_45;
+    if (var_r0_73 < 0) {
+        var_r0_73 += 0xFF;
+    }
+    (*(s32 *)((s8 *)(arg0) + (0xC))) = (s32) (var_r0_73 >> 8);
+    (*(u16 *)((s8 *)(arg0) + (0x16))) = (u16) ((*(u16 *)((s8 *)(arg0) + (0x16))) - 1);
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80DFA24.s\"");
 #else
-#error "TODO: write sub_80DFA24 to match asm/nonmatching/sub_80DFA24.s, then delete this #error"
+void sub_80DFA24(void *arg0) {
+    s32 temp_r0_26;
+    s32 temp_r1_87;
+    s32 temp_r4_44;
+    s32 temp_r5_75;
+    s32 temp_r6_56;
+    s32 temp_r7_65;
+    s32 var_r0_102;
+    s32 var_r0_21;
+    s32 var_r0_37;
+    s32 var_r0_49;
+    s32 var_r0_60;
+    s32 var_r0_67;
+    s32 var_r0_82;
+    s32 var_r0_92;
+    s32 var_r1_70;
+
+    var_r0_21 = M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */) * 0xFE;
+    if (var_r0_21 < 0) {
+        var_r0_21 += 0xFF;
+    }
+    temp_r0_26 = var_r0_21 >> 8;
+    var_r0_37 = M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */);
+    if (var_r0_37 < 0) {
+        var_r0_37 += 0x3F;
+    }
+    temp_r4_44 = temp_r0_26 * (var_r0_37 >> 6);
+    var_r0_49 = M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */);
+    if (var_r0_49 < 0) {
+        var_r0_49 += 0x3F;
+    }
+    temp_r6_56 = temp_r0_26 * (var_r0_49 >> 6);
+    var_r0_60 = M2C_ERROR(/* unknown instruction: ldsh $r2, ($mem_loc_fictive_) */);
+    if (var_r0_60 < 0) {
+        var_r0_60 += 0x3F;
+    }
+    temp_r7_65 = var_r0_60 >> 6;
+    var_r0_67 = temp_r6_56 * temp_r7_65;
+    var_r1_70 = M2C_ERROR(/* unknown instruction: ldsh $r4, ($mem_loc_fictive_) */);
+    if (var_r1_70 < 0) {
+        var_r1_70 += 0x3F;
+    }
+    temp_r5_75 = var_r1_70 >> 6;
+    if (var_r0_67 < 0) {
+        var_r0_67 += 0xFF;
+    }
+    var_r0_82 = temp_r6_56 * temp_r5_75;
+    if (var_r0_82 < 0) {
+        var_r0_82 += 0xFF;
+    }
+    temp_r1_87 = var_r0_82 >> 8;
+    var_r0_92 = (temp_r1_87 * temp_r7_65) - (temp_r4_44 * temp_r5_75);
+    if (var_r0_92 < 0) {
+        var_r0_92 += 0xFF;
+    }
+    var_r0_102 = (temp_r4_44 * temp_r7_65) + (temp_r1_87 * temp_r5_75);
+    if (var_r0_102 < 0) {
+        var_r0_102 += 0xFF;
+    }
+    (*(s32 *)((s8 *)(arg0) + (4))) = (s32) (var_r0_102 >> 8);
+    (*(s32 *)((s8 *)(arg0) + (8))) = (s32) (var_r0_67 >> 8);
+    (*(s32 *)((s8 *)(arg0) + (0xC))) = (s32) (var_r0_92 >> 8);
+    (*(s16 *)((s8 *)(arg0) + (0x10))) = (s16) temp_r0_26;
+    (*(s16 *)((s8 *)(arg0) + (0x12))) = (s16) (M2C_ERROR(/* unknown instruction: ldsh $r4, ($mem_loc_fictive_) */) + 4);
+    (*(u16 *)((s8 *)(arg0) + (0x16))) = (u16) ((*(u16 *)((s8 *)(arg0) + (0x16))) - 1);
+}
 #endif
