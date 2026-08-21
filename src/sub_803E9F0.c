@@ -10,3 +10,9 @@ asm_unified(".include \"asm/macros.inc\"");
 s32 sub_803E9F0(void *arg0) {
     return 1 & (*(u8 *)((s8 *)(arg0) + (0x291)));
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_803EA00.s\"");
+#else
+#error "TODO: write sub_803EA00 to match asm/nonmatching/sub_803EA00.s, then delete this #error"
+#endif
