@@ -64,3 +64,9 @@ _080A540C:
     return;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80A5428.s\"");
+#else
+#error "TODO: write sub_80A5428 to match asm/nonmatching/sub_80A5428.s, then delete this #error"
+#endif
