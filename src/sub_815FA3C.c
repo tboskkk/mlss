@@ -14,17 +14,34 @@ u32 sub_815FA3C(u32* param_1) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_815FA40.s\"");
 #else
-#error "TODO: write sub_815FA40 to match asm/nonmatching/sub_815FA40.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_815FA50.s\"");
 #else
-#error "TODO: write sub_815FA50 to match asm/nonmatching/sub_815FA50.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_815FA70.s\"");
 #else
-#error "TODO: write sub_815FA70 to match asm/nonmatching/sub_815FA70.s, then delete this #error"
+void sub_815FA70(void **arg0, u16 arg1) {
+    s16 temp_r3_17;
+    void *temp_r2_10;
+
+    temp_r2_10 = *arg0;
+    if (temp_r2_10 != NULL) {
+        temp_r3_17 = (s16) arg1;
+        if ((*(u8 *)((s8 *)(temp_r2_10) + (0x21))) != temp_r3_17) {
+            sub_801E150(temp_r2_10, temp_r3_17, 0, 0, 0);
+        }
+    }
+}
 #endif
