@@ -100,7 +100,18 @@ def main() -> None:
     print("Reading: real code in the correct mode should sit near 0% bad, consistently, not just on\n"
           "average -- a mode/region with scattered HIGH windows is more likely misaligned code or\n"
           "real data than a genuine match. Compare ARM vs THUMB overall %% first; a big gap between\n"
-          "them for the same bytes is a strong signal for whichever mode is lower.")
+          "them for the same bytes is a strong signal for whichever mode is lower.\n")
+    print("!! THE THUMB NUMBER CANNOT DISTINGUISH CODE FROM DATA. Measured directly: known\n"
+          "   rodata (0x081E2764) scores 0.0% bad as THUMB -- better than regions that are\n"
+          "   definitely not code. Thumb's 16-bit encoding space is dense enough that almost\n"
+          "   any byte decodes to something valid, so 'THUMB beats ARM' is close to\n"
+          "   meaningless on its own; ARM's sparser encoding makes ITS number worth something.\n"
+          "   A low Thumb %% is necessary but nowhere near sufficient. To actually tell code\n"
+          "   from data, measure FUNCTION PROLOGUE DENSITY instead -- count `push {...,lr}`\n"
+          "   (0xB5xx) / `pop {...,pc}` (0xBDxx) halfwords per KB. Real Thumb code in this ROM\n"
+          "   runs 3.4-6.9 per KB; rodata is 0.0; a region well under 1 is data no matter how\n"
+          "   cleanly it disassembles. This tool once 'confirmed' 84KB of data as the m4a\n"
+          "   sound driver on the strength of its Thumb number alone -- see CLAUDE.md.")
 
 
 if __name__ == "__main__":

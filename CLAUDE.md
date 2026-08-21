@@ -598,26 +598,44 @@ reverse engineering.
 **Still open, and the actual bulk of this phase:**
 
 - `asm/text08000000.s`'s first ~94.5KB (0x08000000-0x08017A00, right after
-  the header) — **confirmed real missed code, not a guess anymore**, via
-  `tools/probe_code_region.py` (new: disassembles a raw range as both ARM
-  and Thumb, buckets by address, and measures how often each mode
-  produces invalid instructions — real code in the right mode sits near
-  0%, misaligned/wrong-mode code or genuine data reliably doesn't). Two
-  distinct pieces: **`0x08000000`-~`0x08002E00`** (~11.7KB) is clean ARM —
+  the header). **`0x08000000`-~`0x08002E00`** (~11.7KB) is clean ARM —
   textbook GBA crt0 (mode switches to IRQ/System via `msr CPSR_fc`,
   interrupt-vector install, REG_IE (`0x04000200`) bit-testing dispatch),
-  0.0% bad instructions through most of it. **`~0x08003000`-`0x08017A00`**
-  (~84KB) is genuinely real code too, but disassembles far better as
-  **Thumb** (2.4-2.5% bad) than ARM (6.6%+ and climbing) — almost
-  certainly the m4a ("Sappy") sound driver, which is known to be
-  Thumb-mode; the file's own "ARM-mode, 4.2% disassembled" framing was
-  right about the first ~12KB but not the rest. `find_library_code.py`
-  still finds nothing here (isn't libgcc/libc) and there's no pinned m4a
-  reference build in this repo to signature-match against yet — actually
-  splitting/labeling this ~84KB (function boundaries, real symbol names)
-  against a known m4a disassembly (pret projects have fully decompiled
-  copies) is real, unstarted work, just narrower and now evidence-backed
-  instead of a guess.
+  0.0% bad instructions through most of it. That part is solid.
+
+  **`~0x08003000`-`0x08017A00`** (~84KB) — **CORRECTED: this is NOT the
+  m4a sound driver, and there is no good evidence it is code at all.**
+  This file previously recorded it as "confirmed real missed code, not a
+  guess anymore" and "almost certainly the m4a ('Sappy') sound driver" on
+  the strength of `probe_code_region.py`'s bad-instruction rate (2.4-2.5%
+  as Thumb vs 6.6%+ as ARM). **That metric does not support the claim**,
+  measured three ways:
+
+  1. *The Thumb number can't tell code from data.* Known rodata at
+     `0x081E2764` scores **0.0% bad as Thumb** — better than this region.
+     Thumb's 16-bit encoding is dense enough that nearly anything decodes
+     to something valid, so "Thumb beats ARM" is close to meaningless.
+     (ARM's sparser encoding makes *its* number worth something.)
+  2. *Function-prologue density says data.* Counting `push {...,lr}`
+     (0xB5xx) / `pop {...,pc}` (0xBDxx) per KB: real Thumb code in this
+     ROM runs **3.4-6.9/KB**, rodata is **0.0**, and this region is
+     **0.5** — an order of magnitude short of code. ARM prologues
+     (`stmfd`/`ldmfd`) are **0.02/KB** here vs **9.39/KB** in the crt0
+     above it, so it isn't ARM either.
+  3. *It doesn't touch sound hardware.* A sound driver is saturated with
+     `0x04000080`-`0x040000A8` and DMA register literals. This entire
+     84KB contains **zero**; the first such literal in the ROM is at
+     `0x08017D30`, just *past* the region's end. The m4a `SoundInfo`
+     ident `0x68736D53` appears **42 times in the ROM and every single
+     one is inside the embedded Mario Bros. ROM** (`0x08F6xxxx`), never
+     in the main game.
+
+  What it actually is: entropy 6.75 bits/byte with all 256 values present
+  and visible repeating structure (long `77 C0` runs, recurring `0B FC`)
+  — data, most likely compressed. Worth cross-checking against Phase 4's
+  `find_compressed_blocks.py` results. **Do not spend time trying to
+  decompile it as m4a.** `find_library_code.py` finding nothing here is
+  consistent with this, not with the old m4a theory.
 - Two enormous, nearly-adjacent runs in `asm/text08057568.s`
   (0x0818A658-0x081AFAAA and 0x081AFAAC-0x081C91BC, ~257KB combined,
   current live boundaries per `map_raw_regions.py` have drifted slightly
@@ -769,12 +787,16 @@ room-properties / solidity-grid pipeline (see the section above and
 `docs/formats/README.md`). Several of the other 28 hidden functions are
 likely in the same subsystem — another reason A comes first.
 
-**C. Crack the m4a sound driver.** The ~84KB Thumb region at
-`~0x08003000`-`0x08017A00` that Phase 3 identifies as real, unstarted
-code. It's self-contained, and pret projects have fully decompiled m4a
-("Sappy") copies to signature-match against, which makes it far more
-tractable than its size suggests. Biggest single contiguous win left in
-the disassembly, but the least connected to the rest of the work.
+**C. ~~Crack the m4a sound driver.~~ CLOSED — the premise was wrong.**
+Investigated, and the ~84KB region at `~0x08003000`-`0x08017A00` is not
+the m4a sound driver and probably isn't code; see the corrected Phase 3
+entry above for the three independent measurements. The work that
+*replaces* it: figure out what that 84KB of data actually is (start by
+cross-checking Phase 4's `find_compressed_blocks.py` output against the
+range), and separately find where the real sound code lives — the first
+sound/DMA register literals appear at `0x08017D30` onward, i.e. in the
+already-disassembled code right after this region, so it may already be
+extracted and simply unlabeled.
 
 ## Housekeeping still outstanding
 
