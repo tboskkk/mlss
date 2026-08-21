@@ -52,3 +52,9 @@ asm_unified(".include \"asm/nonmatching/_lshrdi3.s\"");
 #else
 #error "TODO: write _lshrdi3 to match asm/nonmatching/_lshrdi3.s, then delete this #error"
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/_muldi3.s\"");
+#else
+#error "TODO: write _muldi3 to match asm/nonmatching/_muldi3.s, then delete this #error"
+#endif
