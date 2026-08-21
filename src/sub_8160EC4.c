@@ -15,3 +15,9 @@ void sub_8160EC4(void *arg0) {
     (*(s32 *)((s8 *)(arg0) + (0x80C))) = 0;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8160EDC.s\"");
+#else
+#error "TODO: write sub_8160EDC to match asm/nonmatching/sub_8160EDC.s, then delete this #error"
+#endif
