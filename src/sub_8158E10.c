@@ -62,3 +62,9 @@ asm_unified(".include \"asm/nonmatching/set_surface_height_fields.s\"");
 #else
 #error "TODO: write set_surface_height_fields to match asm/nonmatching/set_surface_height_fields.s, then delete this #error"
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8158E90.s\"");
+#else
+#error "TODO: write sub_8158E90 to match asm/nonmatching/sub_8158E90.s, then delete this #error"
+#endif
