@@ -18,3 +18,9 @@ void sub_80D9F34(void *arg0) {
     }
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80D9F50.s\"");
+#else
+#error "TODO: write sub_80D9F50 to match asm/nonmatching/sub_80D9F50.s, then delete this #error"
+#endif
