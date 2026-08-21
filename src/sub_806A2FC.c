@@ -10,7 +10,22 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_806A2FC.s\"");
 #else
-#error "TODO: write sub_806A2FC to match asm/nonmatching/sub_806A2FC.s, then delete this #error"
+s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
+s32 sub_8086858(void *, s32);                       /* extern */
+extern s32 sub_8069558;
+
+void sub_806A2FC(void *arg0) {
+    u16 temp_r0_11;
+
+    temp_r0_11 = (*(u16 *)((s8 *)(arg0) + (0xAC))) - 1;
+    (*(u16 *)((s8 *)(arg0) + (0xAC))) = temp_r0_11;
+    if ((s32) (temp_r0_11 << 0x10) <= 0) {
+        sub_8082E1C(arg0, 5, 0, 0);
+        *(s32 *)0x03000E3C = sub_8086858(arg0, 0x1810);
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8069558;
+        play_sfx_80195B4(0xAF, -1);
+    }
+}
 #endif
 
 #ifndef NONMATCHING
