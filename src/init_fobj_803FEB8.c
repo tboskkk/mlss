@@ -55,5 +55,73 @@ asm_unified(".include \"asm/nonmatching/sub_8040020.s\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80400B0.s\"");
 #else
-#error "TODO: write sub_80400B0 to match asm/nonmatching/sub_80400B0.s, then delete this #error"
+void sub_80400B0(void *arg0, s32 arg1, s32 arg2, u16 arg3) {
+    s32 *var_r1_37;
+    s32 *var_r2_34;
+    s32 temp_r1_84;
+    s32 temp_r4_72;
+    s32 var_r0_41;
+    s32 var_r0_96;
+    s32 var_r1_74;
+    s32 var_r3_113;
+    s32 var_r6_73;
+
+    if (arg2 == -1) {
+        (*(s32 *)((s8 *)(arg0) + (0x248))) = (s32) M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */);
+    } else {
+        (*(s32 *)((s8 *)(arg0) + (0x248))) = arg2;
+    }
+    switch (arg1) {                                 /* irregular */
+    case -1:
+        var_r2_34 = arg0 + 0x254;
+        var_r1_37 = arg0 + 0x258;
+        var_r0_41 = M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */);
+block_9:
+        *var_r1_37 = var_r0_41;
+        *var_r2_34 = var_r0_41;
+        break;
+    case 0:
+        (*(s32 *)((s8 *)(arg0) + (0x258))) = arg1;
+        (*(s32 *)((s8 *)(arg0) + (0x254))) = arg1;
+        break;
+    case 30:
+        var_r2_34 = arg0 + 0x254;
+        var_r1_37 = arg0 + 0x258;
+        var_r0_41 = 0x52C;
+        goto block_9;
+    default:
+        temp_r4_72 = arg1 << 8;
+        var_r6_73 = 0;
+        var_r1_74 = 0;
+        do {
+            var_r6_73 += (*(s32 *)((s8 *)(arg0) + (0x248)));
+            var_r1_74 += var_r6_73;
+        } while (var_r1_74 < temp_r4_72);
+        temp_r1_84 = var_r1_74 - temp_r4_72;
+        if (temp_r1_84 > 0) {
+            var_r0_96 = (*(s32 *)((s8 *)(arg0) + (0x248))) * ((s32) (temp_r1_84 << 8) / var_r6_73);
+            if (var_r0_96 < 0) {
+                var_r0_96 += 0xFF;
+            }
+            var_r6_73 -= var_r0_96 >> 8;
+        }
+        (*(s32 *)((s8 *)(arg0) + (0x254))) = var_r6_73;
+        (*(s32 *)((s8 *)(arg0) + (0x258))) = var_r6_73;
+        break;
+    }
+    var_r3_113 = 0;
+    if ((s32) (*(s32 *)((s8 *)(arg0) + (0x258))) > 0) {
+        var_r3_113 = 1;
+    }
+    (*(u8 *)((s8 *)(arg0) + (0x213))) = (u8) ((-0x21 & (*(u8 *)((s8 *)(arg0) + (0x213)))) | (var_r3_113 << 5));
+    (*(s32 *)((s8 *)(arg0) + (0x25C))) = 0;
+    (*(s32 *)((s8 *)(arg0) + (0x24C))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x14))) + (*(s32 *)((s8 *)(arg0) + (0x18))));
+    (*(s32 *)((s8 *)(arg0) + (0x250))) = (s32) (*(s32 *)((s8 *)(arg0) + (0x18)));
+    (*(u16 *)((s8 *)(arg0) + (0x240))) = (u16) (*(u16 *)((s8 *)(arg0) + (0x23E)));
+    if (arg3 == -1U) {
+        (*(u16 *)((s8 *)(arg0) + (0x23E))) = (u16) (*(u16 *)((s8 *)(arg0) + (0x262)));
+        return;
+    }
+    (*(u16 *)((s8 *)(arg0) + (0x23E))) = arg3;
+}
 #endif
