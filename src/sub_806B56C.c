@@ -22,3 +22,9 @@ u32 sub_806B56C(u32* param_1) {
     return (u32)puVar1;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_806B584.s\"");
+#else
+#error "TODO: write sub_806B584 to match asm/nonmatching/sub_806B584.s, then delete this #error"
+#endif
