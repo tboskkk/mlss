@@ -148,13 +148,66 @@ void sub_806BD00(void *arg0) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_806BDA4.s\"");
 #else
-#error "TODO: write sub_806BDA4 to match asm/nonmatching/sub_806BDA4.s, then delete this #error"
+s32 sub_807C298(s32);                           /* extern */
+s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
+extern s32 sub_806BC40;
+extern s32 sub_806BE30;
+
+void sub_806BDA4(void *arg0) {
+    s32 *var_r0_43;
+    s32 temp_r0_17;
+
+    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+        temp_r0_17 = (*(s32 *)((s8 *)(arg0) + (0x9C))) - 1;
+        (*(s32 *)((s8 *)(arg0) + (0x9C))) = temp_r0_17;
+        if (temp_r0_17 > 0) {
+            if ((*(s32 *)((s8 *)(arg0) + (0xA8))) == 0) {
+                sub_8082E1C(arg0, 8, 0, 0);
+            } else {
+                sub_8082E1C(arg0, 0x10, 0, 0);
+            }
+            (*(s16 *)((s8 *)(arg0) + (0xAC))) = 8;
+            var_r0_43 = &sub_806BC40;
+        } else {
+            sub_807C298((*(s32 *)((s8 *)(arg0) + (0x30))));
+            if ((*(s32 *)((s8 *)(arg0) + (0xA8))) == 0) {
+                sub_8082E1C(arg0, 0xC, 0, 0);
+            } else {
+                sub_8082E1C(arg0, 0x14, 0, 0);
+            }
+            var_r0_43 = &sub_806BE30;
+        }
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = var_r0_43;
+    }
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_806BE30.s\"");
 #else
-#error "TODO: write sub_806BE30 to match asm/nonmatching/sub_806BE30.s, then delete this #error"
+s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
+s32 sub_8085B38(void *);                        /* extern */
+extern s32 sub_806BF0C;
+
+void sub_806BE30(void *arg0) {
+    void *temp_r1_20;
+    void *temp_r2_21;
+
+    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+        sub_8082E1C(arg0, 0xD, 0, 0);
+        temp_r1_20 = arg0 + 0x84;
+        temp_r2_21 = (*(void **)((s8 *)(arg0) + (0x28)));
+        (*(s32 *)((s8 *)(arg0) + (0x84))) = (s32) (*(s32 *)((s8 *)(temp_r2_21) + (0xD8)));
+        (*(s32 *)((s8 *)(temp_r1_20) + (4))) = (s32) (*(s32 *)((s8 *)(temp_r2_21) + (0xDC)));
+        (*(s32 *)((s8 *)((temp_r1_20 + 4)) + (4))) = (s32) (*(s32 *)((s8 *)(temp_r2_21) + (0xE0)));
+        (*(u8 *)((s8 *)(arg0) + (0x79))) = (u8) ((*(u8 *)((s8 *)(arg0) + (0x79))) | 0x20);
+        (*(s16 *)((s8 *)(arg0) + (0x7C))) = 0x180;
+        (*(s16 *)((s8 *)(arg0) + (0x7A))) = 0;
+        sub_8085B38(arg0);
+        (*(s16 *)((s8 *)(arg0) + (0xAC))) = 0xA;
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_806BF0C;
+    }
+}
 #endif
 
 #ifndef NONMATCHING
