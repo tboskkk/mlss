@@ -37,5 +37,8 @@ s32 sub_81DCDF4(s32 *arg0, s32 arg1) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/strcmp.s\"");
 #else
-#error "TODO: write strcmp to match asm/nonmatching/strcmp.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
