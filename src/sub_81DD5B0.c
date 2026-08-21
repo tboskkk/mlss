@@ -40,3 +40,9 @@ void sub_81DD61C(void *arg0, s32 arg1) {
     }
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_81DD648.s\"");
+#else
+#error "TODO: write sub_81DD648 to match asm/nonmatching/sub_81DD648.s, then delete this #error"
+#endif

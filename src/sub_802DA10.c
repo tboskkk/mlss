@@ -218,10 +218,77 @@ asm_unified(".include \"asm/nonmatching/sub_802E2F4.s\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_802E4C8.s\"");
 #else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
+s32 sub_802DF80(void *, s32);                   /* extern */
+s32 sub_8045A94(void *, s32, s32, s32, s32, s32, s32); /* extern */
+
+void sub_802E4C8(void *arg0, s32 arg1, s32 arg3) {
+    s32 temp_r0_196;
+    s32 temp_r0_199;
+    s32 temp_r1_126;
+    s32 temp_r1_136;
+    s32 temp_r2_82;
+    s32 temp_r3_66;
+    s32 temp_r4_96;
+    s32 var_r0_150;
+    s32 var_r0_75;
+    s32 var_r0_89;
+    s32 var_r3_144;
+    void *temp_r6_28;
+    void *temp_r7_32;
+
+    if (0x10 & (*(u8 *)((s8 *)(arg0) + (0x208)))) {
+        return;
+    }
+    temp_r6_28 = (*(void **)((s8 *)(arg0) + (0x204)));
+    temp_r7_32 = (*(void **)((s8 *)(arg0) + (0x200)));
+    (*(u8 *)((s8 *)(temp_r7_32) + (0x20C))) = (u8) (-0x21 & (*(u8 *)((s8 *)(temp_r7_32) + (0x20C))) & 0x7F & ~0x40);
+    (*(u8 *)((s8 *)(temp_r6_28) + (0x20C))) = (u8) (-0x21 & (*(u8 *)((s8 *)(temp_r6_28) + (0x20C))) & 0x7F & ~0x40);
+    temp_r3_66 = M2C_ERROR(/* unknown instruction: ldsh $r3, ($mem_loc_fictive_) */);
+    var_r0_75 = temp_r3_66 * M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */);
+    if (var_r0_75 < 0) {
+        var_r0_75 += 0x3FFF;
+    }
+    temp_r2_82 = (*(s32 *)((s8 *)(temp_r7_32) + (0xC))) + (var_r0_75 >> 0xE);
+    var_r0_89 = temp_r3_66 * M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */);
+    if (var_r0_89 < 0) {
+        var_r0_89 += 0x3FFF;
+    }
+    temp_r4_96 = (*(s32 *)((s8 *)(temp_r7_32) + (0x10))) - (var_r0_89 >> 0xE);
+    if (!(0x1C & (*(u8 *)((s8 *)(arg0) + (0x246))))) {
+        (*(u8 *)((s8 *)(arg0) + (0x208))) = (u8) ((*(u8 *)((s8 *)(arg0) + (0x208))) | 1);
+    } else {
+        (*(u8 *)((s8 *)(arg0) + (0x208))) = (u8) (-2 & (*(u8 *)((s8 *)(arg0) + (0x208))));
+    }
+    if ((arg1 == 0) && ((temp_r1_126 = (*(s32 *)((s8 *)(temp_r6_28) + (0xC))), (temp_r2_82 >= (s32) (temp_r1_126 + 0x100))) || (temp_r2_82 <= (s32) (temp_r1_126 + 0xFFFFFF00)) || (temp_r1_136 = (*(s32 *)((s8 *)(temp_r6_28) + (0x10))), (temp_r4_96 >= (s32) (temp_r1_136 + 0x100))) || (temp_r4_96 <= (s32) (temp_r1_136 + 0xFFFFFF00)))) {
+        var_r3_144 = temp_r2_82;
+        if (temp_r2_82 < 0) {
+            var_r3_144 += 0xFF;
+        }
+        var_r0_150 = temp_r4_96;
+        if (temp_r4_96 < 0) {
+            var_r0_150 += 0xFF;
+        }
+        sub_8045A94(temp_r6_28, 1, 0, var_r3_144 >> 8, var_r0_150 >> 8, 0, (s32) (*(u16 *)((s8 *)(temp_r6_28) + (0x23E))));
+        (*(u8 *)((s8 *)(temp_r6_28) + (0x2B6))) = (u8) ((*(u8 *)((s8 *)(temp_r6_28) + (0x2B6))) | 0x80 | 0x40);
+        (*(u8 *)((s8 *)(temp_r7_32) + (0x351))) = (u8) ((*(u8 *)((s8 *)(temp_r7_32) + (0x351))) | 0x40);
+        (*(s8 *)((s8 *)(arg0) + (0x12A))) = 3;
+        return;
+    }
+    (*(s32 *)((s8 *)(temp_r6_28) + (0x34))) = temp_r2_82;
+    (*(s32 *)((s8 *)(temp_r6_28) + (0xC))) = temp_r2_82;
+    (*(s32 *)((s8 *)(temp_r6_28) + (0x38))) = temp_r4_96;
+    (*(s32 *)((s8 *)(temp_r6_28) + (0x10))) = temp_r4_96;
+    temp_r0_196 = (*(s32 *)((s8 *)(temp_r7_32) + (0x14)));
+    (*(s32 *)((s8 *)(temp_r6_28) + (0x3C))) = temp_r0_196;
+    (*(s32 *)((s8 *)(temp_r6_28) + (0x14))) = temp_r0_196;
+    temp_r0_199 = (*(s32 *)((s8 *)(temp_r7_32) + (0x18)));
+    (*(s32 *)((s8 *)(temp_r6_28) + (0x40))) = temp_r0_199;
+    (*(s32 *)((s8 *)(temp_r6_28) + (0x18))) = temp_r0_199;
+    (*(s16 *)((s8 *)(temp_r7_32) + (0x242))) = 0;
+    (*(s16 *)((s8 *)(temp_r7_32) + (0x244))) = 0;
+    (*(u8 *)((s8 *)(arg0) + (0x208))) = (u8) ((*(u8 *)((s8 *)(arg0) + (0x208))) | 0x10);
+    sub_802DF80(arg0, 0);
+}
 #endif
 
 #ifndef NONMATCHING
