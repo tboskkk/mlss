@@ -1088,6 +1088,8 @@ groups:
   - {obj: asm/text08057568_p341, section: text}
   - {obj: src/sub_8167F30, section: text}
   - {obj: asm/text08057568_p62, section: text}
+  - {obj: src/sub_81682CC, section: text}
+  - {obj: asm/text08057568_p427, section: text}
   - {obj: src/sub_816AFDC, section: text}
   - {obj: src/sub_816AFF0, section: text}
   - {obj: asm/text08057568_p63, section: text}
