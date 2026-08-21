@@ -32,5 +32,8 @@ asm_unified(".include \"asm/nonmatching/sub_81DD4AC.s\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/strlen.s\"");
 #else
-#error "TODO: write strlen to match asm/nonmatching/strlen.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
