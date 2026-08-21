@@ -115,3 +115,9 @@ void sub_819A8EC(u16 param_1,u16 param_2)
   u16 *puVar101;
   u16 *pu
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_819A928.s\"");
+#else
+#error "TODO: write sub_819A928 to match asm/nonmatching/sub_819A928.s, then delete this #error"
+#endif
