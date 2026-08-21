@@ -960,6 +960,8 @@ groups:
   - {obj: asm/text08057568_p369, section: text}
   - {obj: src/sub_80FFD20, section: text}
   - {obj: asm/text08057568_p472, section: text}
+  - {obj: src/sub_81026DC, section: text}
+  - {obj: asm/text08057568_p552, section: text}
   - {obj: src/sub_81065D0, section: text}
   - {obj: asm/text08057568_p234, section: text}
   - {obj: src/sub_81066DC, section: text}
