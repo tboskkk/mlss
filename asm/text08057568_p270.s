@@ -224,8 +224,8 @@ _0816084C:
 	pop {r4, r5, r6, r7}
 	pop {r1}
 	bx r1
-	thumb_func_start sub_8160854
-sub_8160854:
+	thumb_func_start get_surface_height_at_x
+get_surface_height_at_x:
 	push {r4, r5, lr}
 	add sp, #-0x004
 	adds r4, r0, #0x0
@@ -333,13 +333,13 @@ sub_8160C18:
 	adds r6, r0, #0x0
 	mov r8, r1
 	adds r5, r2, #0x0
-	bl sub_8160854
+	bl get_surface_height_at_x
 	adds r4, r0, #0x0
 	lsls r4, r4, #0x10
 	lsrs r4, r4, #0x10
 	adds r0, r6, #0x0
 	adds r1, r5, #0x0
-	bl sub_8160854
+	bl get_surface_height_at_x
 	adds r1, r0, #0x0
 	mov r0, r8
 	subs r5, r5, r0

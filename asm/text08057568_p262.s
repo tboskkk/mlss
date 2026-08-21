@@ -644,7 +644,7 @@ _08153026:
 _08153048:
 	ldr r1, [r5, #0x04]
 	adds r0, r3, #0x0
-	bl sub_8160854
+	bl get_surface_height_at_x
 	lsls r0, r0, #0x10
 	asrs r0, r0, #0x08
 	str r0, [r5, #0x38]
@@ -743,7 +743,7 @@ _081531EE:
 _08153210:
 	ldr r1, [r4, #0x04]
 	adds r0, r3, #0x0
-	bl sub_8160854
+	bl get_surface_height_at_x
 	lsls r0, r0, #0x10
 	asrs r0, r0, #0x08
 	str r0, [r4, #0x38]
@@ -1080,7 +1080,7 @@ _0815352A:
 	adds r0, r0, r2
 	str r0, [r4, #0x08]
 	mov r0, r9
-	bl sub_8160854
+	bl get_surface_height_at_x
 	lsls r0, r0, #0x10
 	asrs r0, r0, #0x08
 	ldr r1, _0815358C @ =0xFFFFF000
@@ -2341,7 +2341,7 @@ _08154506:
 _08154510:
 	ldr r1, [r5, #0x04]
 	mov r0, r8
-	bl sub_8160854
+	bl get_surface_height_at_x
 	lsls r0, r0, #0x10
 	asrs r0, r0, #0x08
 	str r0, [r5, #0x08]

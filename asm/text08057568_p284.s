@@ -296,7 +296,7 @@ sub_8154D38:
 	adds r0, r7, #0x0
 	adds r0, #0x1C
 	ldr r1, [r4, #0x04]
-	bl sub_8160854
+	bl get_surface_height_at_x
 	lsls r0, r0, #0x10
 	asrs r0, r0, #0x08
 	str r0, [r4, #0x44]
@@ -311,7 +311,7 @@ sub_8154D38:
 	lsls r1, r1, #0x04
 	adds r0, r7, r1
 	ldr r1, [r4, #0x04]
-	bl sub_8160854
+	bl get_surface_height_at_x
 	lsls r0, r0, #0x10
 	asrs r0, r0, #0x08
 	str r0, [r4, #0x44]
@@ -1401,7 +1401,7 @@ _08157764:
 	mov r0, r10
 	adds r0, #0x1C
 	ldr r1, [r5, #0x04]
-	bl sub_8160854
+	bl get_surface_height_at_x
 	lsls r0, r0, #0x10
 	asrs r2, r0, #0x08
 	str r2, [r5, #0x44]
@@ -1434,7 +1434,7 @@ _081577C6:
 	lsls r0, r0, #0x04
 	add r0, r10
 	ldr r1, [r4, #0x04]
-	bl sub_8160854
+	bl get_surface_height_at_x
 	lsls r0, r0, #0x10
 	asrs r2, r0, #0x08
 	str r2, [r4, #0x44]
@@ -1579,7 +1579,7 @@ _08157B58:
 	mov r0, r10
 	adds r0, #0x1C
 	ldr r1, [r5, #0x04]
-	bl sub_8160854
+	bl get_surface_height_at_x
 	lsls r0, r0, #0x10
 	asrs r2, r0, #0x08
 	str r2, [r5, #0x44]
@@ -1612,7 +1612,7 @@ _08157BBA:
 	lsls r0, r0, #0x04
 	add r0, r10
 	ldr r1, [r4, #0x04]
-	bl sub_8160854
+	bl get_surface_height_at_x
 	lsls r0, r0, #0x10
 	asrs r2, r0, #0x08
 	str r2, [r4, #0x44]
@@ -1753,7 +1753,7 @@ _08157F10:
 	mov r0, r10
 	adds r0, #0x1C
 	ldr r1, [r5, #0x04]
-	bl sub_8160854
+	bl get_surface_height_at_x
 	lsls r0, r0, #0x10
 	asrs r2, r0, #0x08
 	str r2, [r5, #0x44]
@@ -1786,7 +1786,7 @@ _08157F72:
 	lsls r0, r0, #0x04
 	add r0, r10
 	ldr r1, [r4, #0x04]
-	bl sub_8160854
+	bl get_surface_height_at_x
 	lsls r0, r0, #0x10
 	asrs r2, r0, #0x08
 	str r2, [r4, #0x44]

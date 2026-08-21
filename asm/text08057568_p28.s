@@ -9,7 +9,7 @@ sub_8158E90:
 	adds r4, r0, #0x0
 	adds r0, r1, #0x0
 	ldr r1, [r4, #0x04]
-	bl sub_8160854
+	bl get_surface_height_at_x
 	lsls r0, r0, #0x10
 	asrs r2, r0, #0x08
 	str r2, [r4, #0x44]
