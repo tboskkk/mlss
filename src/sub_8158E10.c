@@ -56,3 +56,9 @@ void sub_8158E18(u32* p0)
     *(u8*)r1 = 0x02;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8158E70.s\"");
+#else
+#error "TODO: write sub_8158E70 to match asm/nonmatching/sub_8158E70.s, then delete this #error"
+#endif
