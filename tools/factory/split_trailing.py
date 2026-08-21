@@ -171,8 +171,118 @@ def main():
                   "automatically, needs a human look")
         if args.dry_run:
             continue
-        print("    (writing the split is not implemented yet -- see module "
-              "docstring; --dry-run/--list are the supported modes)")
+        if not complete:
+            print("    refusing to split automatically")
+            continue
+        ok, detail = write_split(name, new_name, addr, raw, text)
+        print(f"    {'SPLIT' if ok else 'FAILED'}: {detail}")
+
+
+def format_bytes(raw: bytes) -> str:
+    lines = []
+    for i in range(0, len(raw), 16):
+        chunk = raw[i:i + 16]
+        lines.append("\t.byte " + ", ".join(f"0x{b:02X}" for b in chunk))
+    return "\n".join(lines)
+
+
+def write_split(src_name: str, new_name: str, addr: int, raw: bytes,
+                src_text: str) -> tuple[bool, str]:
+    """Give the trailing bytes their own labeled fragment + guard block.
+
+    Emits `.byte` data under the label rather than reconstructed assembly.
+    That is deliberate and not laziness: reproducing assembly source would
+    mean re-deriving branch targets, local labels and literal-pool
+    references, any one of which could assemble to different bytes. Raw
+    `.byte` under a real `thumb_func_start` is byte-identical BY
+    CONSTRUCTION, and leaves the function in exactly the state every other
+    not-yet-decompiled function is in -- the pipeline can pick it up
+    normally from there.
+
+    Everything is verified by a from-scratch build before it is kept; any
+    failure reverts the whole change.
+    """
+    frag_dir = gitops.REPO / "asm" / "nonmatching"
+    new_frag = frag_dir / f"{new_name}.s"
+    src_frag = frag_dir / f"{src_name}.s"
+    if new_frag.exists():
+        return False, f"{new_frag.name} already exists"
+
+    c_path, block = gitops.find_guard_block(src_name)
+    if c_path is None:
+        return False, f"no guard block found for {src_name}"
+
+    # `.align 2, 0` inside thumb_func_start pads to a 4-byte boundary. For a
+    # function that genuinely isn't word-aligned that would INSERT padding
+    # and shift every following byte, so pick the macro that matches
+    # reality rather than assuming.
+    macro = "thumb_func_start" if addr % 4 == 0 else "non_word_aligned_thumb_func_start"
+
+    new_text = (
+        "\t.syntax unified\n\t.text\n\n"
+        f"\t{macro} {new_name}\n{new_name}:\n"
+        f"{format_bytes(raw)}\n"
+    )
+
+    # Strip the trailing run off the source fragment.
+    trailing_block = gitops.fragment_trailing_bytes(src_name)
+    first_line = trailing_block.splitlines()[0]
+    idx = src_text.find(first_line)
+    if idx == -1:
+        return False, "couldn't locate the trailing run in the source fragment"
+    truncated = src_text[:idx].rstrip() + "\n"
+
+    new_block = (
+        "#ifndef NONMATCHING\n"
+        f'asm_unified(".include \\"asm/nonmatching/{new_name}.s\\"");\n'
+        "#else\n"
+        f'#error "TODO: write {new_name} to match asm/nonmatching/{new_name}.s, '
+        'then delete this #error"\n'
+        "#endif\n"
+    )
+
+    with gitops.repo_lock(what=f"split trailing {new_name}"):
+        original_c = c_path.read_text()
+        try:
+            new_frag.write_text(new_text)
+            src_frag.write_text(truncated)
+            # Order matters: byte order in the .c IS link order, so the new
+            # function must land immediately AFTER the one it followed in
+            # the ROM. Anywhere else silently relocates code.
+            pos = original_c.find(block)
+            c_path.write_text(
+                original_c[:pos + len(block)] + "\n" + new_block + original_c[pos + len(block):])
+
+            r = gitops.run(["rm", "-rf", str(gitops.REPO / "build")])
+            r = gitops.run(["./container.sh", "make"])
+            if "mlss.gba: OK" not in r.stdout:
+                raise RuntimeError("ROM no longer byte-identical")
+        except Exception as e:
+            new_frag.unlink(missing_ok=True)
+            src_frag.write_text(src_text)
+            c_path.write_text(original_c)
+            return False, f"reverted: {e}"
+
+        gitops.commit(new_name,
+                      f"Split out {new_name}, an unlabeled function found after {src_name}\n\n"
+                      f"{len(raw)} bytes of trailing data in "
+                      f"asm/nonmatching/{src_name}.s that Luvdis never labeled. Address "
+                      f"0x{addr:08X} derived from the fragment's own local labels, not "
+                      f"guessed. Emitted as .byte under a real {macro} so it is "
+                      f"byte-identical by construction; verified with a from-scratch "
+                      f"build before committing.")
+
+    conn = db.connect()
+    try:
+        with db.tx(conn):
+            db.set_state(conn, new_name, "needs_attempt", worker_id=None,
+                         notes=f"split out of {src_name}'s trailing data by split_trailing.py")
+        conn.commit()
+    except Exception:
+        pass  # a brand-new symbol may not have a row yet; the scanner will add it
+    finally:
+        conn.close()
+    return True, f"{new_name} at 0x{addr:08X}, ROM still byte-identical"
 
 
 if __name__ == "__main__":
