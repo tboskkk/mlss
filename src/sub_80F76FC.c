@@ -37,17 +37,29 @@ void sub_80F76FC(u16 r0, u16 r1, u16 r2, u16 r3)
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80F7770.s\"");
 #else
-#error "TODO: write sub_80F7770 to match asm/nonmatching/sub_80F7770.s, then delete this #error"
+/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
+   compiles a whole translation unit at a time, so an #error here fails
+   every OTHER function in this file under NONMATCHING=1. Guard intact, so
+   the real ROM still gets the verbatim retail bytes and progress.py still
+   counts this as unmatched. Write the C here, replacing this comment. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80F77AC.s\"");
 #else
-#error "TODO: write sub_80F77AC to match asm/nonmatching/sub_80F77AC.s, then delete this #error"
+/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
+   compiles a whole translation unit at a time, so an #error here fails
+   every OTHER function in this file under NONMATCHING=1. Guard intact, so
+   the real ROM still gets the verbatim retail bytes and progress.py still
+   counts this as unmatched. Write the C here, replacing this comment. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80F7804.s\"");
 #else
-#error "TODO: write sub_80F7804 to match asm/nonmatching/sub_80F7804.s, then delete this #error"
+/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
+   compiles a whole translation unit at a time, so an #error here fails
+   every OTHER function in this file under NONMATCHING=1. Guard intact, so
+   the real ROM still gets the verbatim retail bytes and progress.py still
+   counts this as unmatched. Write the C here, replacing this comment. */
 #endif

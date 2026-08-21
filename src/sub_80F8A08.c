@@ -10,7 +10,11 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80F8A08.s\"");
 #else
-#error "TODO: write sub_80F8A08 to match asm/nonmatching/sub_80F8A08.s, then delete this #error"
+/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
+   compiles a whole translation unit at a time, so an #error here fails
+   every OTHER function in this file under NONMATCHING=1. Guard intact, so
+   the real ROM still gets the verbatim retail bytes and progress.py still
+   counts this as unmatched. Write the C here, replacing this comment. */
 #endif
 
 #ifndef NONMATCHING
@@ -193,5 +197,9 @@ void sub_80F8A90(u32* p0, u32* p2)
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/ybai_script_update_80F8ACC.s\"");
 #else
-#error "TODO: write ybai_script_update_80F8ACC to match asm/nonmatching/ybai_script_update_80F8ACC.s, then delete this #error"
+/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
+   compiles a whole translation unit at a time, so an #error here fails
+   every OTHER function in this file under NONMATCHING=1. Guard intact, so
+   the real ROM still gets the verbatim retail bytes and progress.py still
+   counts this as unmatched. Write the C here, replacing this comment. */
 #endif

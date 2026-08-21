@@ -119,5 +119,9 @@ void sub_819A8EC(u16 param_1,u16 param_2)
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_819A928.s\"");
 #else
-#error "TODO: write sub_819A928 to match asm/nonmatching/sub_819A928.s, then delete this #error"
+/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
+   compiles a whole translation unit at a time, so an #error here fails
+   every OTHER function in this file under NONMATCHING=1. Guard intact, so
+   the real ROM still gets the verbatim retail bytes and progress.py still
+   counts this as unmatched. Write the C here, replacing this comment. */
 #endif
