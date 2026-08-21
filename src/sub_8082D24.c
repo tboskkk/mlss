@@ -7,16 +7,7 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8082D24.s\"");
-#else
-u16* sub_8082D24(u16* param_1, u16 param_2, u16 param_3) {
-    u16* puVar1;
-    
-    puVar1 = param_1 + 0x77A;
-    *puVar1 = param_2;
-    param_1 = param_1 + 0x77A;
-    *param_1 = param_3;
-    return param_1;
+void sub_8082D24(void *arg0, s16 arg1, s16 arg2) {
+    (*(s16 *)((s8 *)(arg0) + (0x778))) = arg1;
+    (*(s16 *)((s8 *)(arg0) + (0x77A))) = arg2;
 }
-#endif
