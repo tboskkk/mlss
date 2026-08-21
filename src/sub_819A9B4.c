@@ -10,7 +10,10 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_819A9B4.s\"");
 #else
-#error "TODO: write sub_819A9B4 to match asm/nonmatching/sub_819A9B4.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
@@ -52,5 +55,16 @@ u16 sub_819A9DC(u16 a)
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_819AA38.s\"");
 #else
-#error "TODO: write sub_819AA38 to match asm/nonmatching/sub_819AA38.s, then delete this #error"
+s32 sub_819A770(void *);                            /* extern */
+s16 sub_819A96C(u16);                               /* extern */
+
+void sub_819AA38(void *arg0) {
+    u16 var_r4_21;
+
+    var_r4_21 = (u16) (((*(u8 *)((s8 *)(arg0) + (0xB))) << 8) + ((*(u8 *)((s8 *)(arg0) + (0xF))) * M2C_ERROR(/* unknown instruction: ldsb $r1, ($mem_loc_fictive_) */))) + M2C_ERROR(/* unknown instruction: ldsb $r0, ($mem_loc_fictive_) */);
+    if (0x100 & (*(u16 *)((s8 *)(arg0) + (0)))) {
+        var_r4_21 += sub_819A770(arg0);
+    }
+    (*(s16 *)((s8 *)((*(s32 *)0x03007FF0 + ((3 & (*(u8 *)((s8 *)(arg0) + (0x12)))) * 0xC))) + (0x4D0))) = sub_819A96C(var_r4_21);
+}
 #endif
