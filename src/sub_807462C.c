@@ -20,5 +20,19 @@ void sub_807462C(void *arg0)
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8074648.s\"");
 #else
-#error "TODO: write sub_8074648 to match asm/nonmatching/sub_8074648.s, then delete this #error"
+s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
+extern s32 sub_8072B68;
+
+void sub_8074648(void *arg0) {
+    s32 var_r1_18;
+
+    if (M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */) == -1) {
+        var_r1_18 = 0xC;
+    } else {
+        var_r1_18 = 0xD;
+    }
+    sub_8082E1C(arg0, var_r1_18, 0, 0);
+    (*(s16 *)((s8 *)(arg0) + (0xAC))) = 4;
+    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8072B68;
+}
 #endif
