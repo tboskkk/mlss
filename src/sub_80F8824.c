@@ -48,3 +48,9 @@ _080F8856:
     }
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/script_cmd_btl_return.s\"");
+#else
+#error "TODO: write script_cmd_btl_return to match asm/nonmatching/script_cmd_btl_return.s, then delete this #error"
+#endif
