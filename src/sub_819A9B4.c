@@ -48,3 +48,9 @@ u16 sub_819A9DC(u16 a)
     return a;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_819AA38.s\"");
+#else
+#error "TODO: write sub_819AA38 to match asm/nonmatching/sub_819AA38.s, then delete this #error"
+#endif
