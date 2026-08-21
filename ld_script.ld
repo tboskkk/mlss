@@ -942,6 +942,8 @@ SECTIONS
         build/asm/text08057568_p167.o(.text);
         build/src/init_btl_process_80FC25C.o(.text);
         build/asm/text08057568_p471.o(.text);
+        build/src/btl_update_80FC8F4.o(.text);
+        build/asm/text08057568_p551.o(.text);
         build/src/sub_80FD1AC.o(.text);
         build/asm/text08057568_p369.o(.text);
         build/src/sub_80FFD20.o(.text);
