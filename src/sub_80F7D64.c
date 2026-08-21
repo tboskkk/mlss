@@ -21,3 +21,9 @@ u32 sub_80F7D64(u32 param_1) {
     return 1;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80F7D80.s\"");
+#else
+#error "TODO: write sub_80F7D80 to match asm/nonmatching/sub_80F7D80.s, then delete this #error"
+#endif
