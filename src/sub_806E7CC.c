@@ -23,5 +23,21 @@ void sub_806E7CC(void *arg0) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_806E804.s\"");
 #else
-#error "TODO: write sub_806E804 to match asm/nonmatching/sub_806E804.s, then delete this #error"
+extern s32 sub_806DAF0;
+
+s32 sub_806E804(void *arg0) {
+    s32 *var_r1_18;
+    s32 var_r0_19;
+
+    if (M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */) == -1) {
+        var_r1_18 = arg0 + 0xA0;
+        var_r0_19 = 0;
+    } else {
+        var_r1_18 = arg0 + 0xA0;
+        var_r0_19 = 1;
+    }
+    *var_r1_18 = var_r0_19;
+    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_806DAF0;
+    return 1;
+}
 #endif
