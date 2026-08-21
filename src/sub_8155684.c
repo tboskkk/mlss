@@ -19,60 +19,77 @@ asm_unified(".include \"asm/nonmatching/sub_8155684.s\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_815731C.s\"");
 #else
-s32 sub_8161888(s32);                           /* extern */
-
-void *sub_815731C(void *arg0, void *arg1) {
-    s32 var_r3_16;
-    s32 var_r3_69;
-    void *temp_r6_18;
-    void *var_r0_108;
-    void *var_r0_57;
-    void *var_r1_21;
-    void *var_r1_72;
-    void *var_r2_19;
-    void *var_r2_70;
-
-    (*(s32 *)((s8 *)(arg0) + (0))) = 0;
-    (*(s32 *)((s8 *)(arg0) + (4))) = 0x08CDC510;
-    (*(s32 *)((s8 *)(arg0) + (0x10))) = 0;
-    (*(s32 *)((s8 *)(arg0) + (0x14))) = 0;
-    (*(s32 *)((s8 *)(arg0) + (0x18))) = 0;
+void *sub_815731C(void *arg0, void *arg1)
+{
+  s32 var_r3_16;
+  s32 var_r3_69;
+  void *temp_r6_18;
+  void *var_r0_108;
+  void *var_r0_57;
+  void *var_r1_21;
+  void *var_r1_72;
+  void *var_r2_19;
+  void *var_r2_70;
+  s32 new_var;
+  *((s32 *) (((s8 *) arg0) + 0)) = 0;
+  *((s32 *) (((s8 *) arg0) + 4)) = 0x08CDC510;
+  if (1)
+  {
+    *((s32 *) (((s8 *) arg0) + 0x10)) = 0;
+    *((s32 *) (((s8 *) arg0) + 0x14)) = 0;
+    *((s32 *) (((s8 *) arg0) - -0x18)) = 0;
     var_r3_16 = 0;
     temp_r6_18 = arg1 + 0x1898;
-    var_r2_19 = temp_r6_18;
-loop_1:
-    var_r1_21 = (*(void **)((s8 *)(var_r2_19) + (0)));
-    if (((var_r1_21 != NULL) && ((*(u8 *)((s8 *)(var_r1_21) + (0x25))) == 0xC)) || ((var_r1_21 = (*(void **)((s8 *)(var_r2_19) + (4))), (var_r1_21 != NULL)) && ((*(u8 *)((s8 *)(var_r1_21) + (0x25))) == 0xC)) || ((var_r1_21 = (*(void **)((s8 *)(var_r2_19) + (8))), (var_r1_21 != NULL)) && ((*(u8 *)((s8 *)(var_r1_21) + (0x25))) == 0xC)) || ((var_r1_21 = (*(void **)((s8 *)(var_r2_19) + (0xC))), (var_r1_21 != NULL)) && ((*(u8 *)((s8 *)(var_r1_21) + (0x25))) == 0xC))) {
-        var_r0_57 = var_r1_21;
-    } else {
-        var_r2_19 += 0x10;
-        var_r3_16 += 4;
-        if (var_r3_16 > 0xFF) {
-            var_r0_57 = NULL;
-        } else {
-            goto loop_1;
-        }
+  }
+  var_r2_19 = temp_r6_18;
+  loop_1:
+  var_r1_21 = *((void **) (((s8 *) var_r2_19) + 0));
+
+  if (((((var_r1_21 != ((void *) 0)) && ((*((u8 *) (((s8 *) var_r1_21) + 0x25))) == 0xC)) || (((var_r1_21 = *((void **) (((s8 *) var_r2_19) + 4)), var_r1_21 != ((void *) 0))) && ((*((u8 *) (((s8 *) var_r1_21) + 0x25))) == 0xC))) || (((var_r1_21 = *((void **) (((s8 *) var_r2_19) + 8)), var_r1_21 != ((void *) 0))) && ((*((u8 *) (((s8 *) var_r1_21) + 0x25))) == 0xC))) || (((var_r1_21 = *((void **) (((s8 *) var_r2_19) + 0xC)), var_r1_21 != ((void *) 0))) && ((*((u8 *) (((s8 *) var_r1_21) + 0x25))) == 0xC)))
+  {
+    var_r0_57 = var_r1_21;
+  }
+  else
+  {
+    var_r2_19 += 0x10;
+    var_r3_16 += 4;
+    if (var_r3_16 > 0xFF)
+    {
+      var_r0_57 = (void *) 0;
     }
-    (*(void **)((s8 *)(arg0) + (8))) = var_r0_57;
-    var_r3_69 = 0;
-    var_r2_70 = temp_r6_18;
-loop_13:
-    var_r1_72 = (*(void **)((s8 *)(var_r2_70) + (0)));
-    if (((var_r1_72 != NULL) && ((*(u8 *)((s8 *)(var_r1_72) + (0x25))) == 0xD)) || ((var_r1_72 = (*(void **)((s8 *)(var_r2_70) + (4))), (var_r1_72 != NULL)) && ((*(u8 *)((s8 *)(var_r1_72) + (0x25))) == 0xD)) || ((var_r1_72 = (*(void **)((s8 *)(var_r2_70) + (8))), (var_r1_72 != NULL)) && ((*(u8 *)((s8 *)(var_r1_72) + (0x25))) == 0xD)) || ((var_r1_72 = (*(void **)((s8 *)(var_r2_70) + (0xC))), (var_r1_72 != NULL)) && ((*(u8 *)((s8 *)(var_r1_72) + (0x25))) == 0xD))) {
-        var_r0_108 = var_r1_72;
-    } else {
-        var_r2_70 += 0x10;
-        var_r3_69 += 4;
-        if (var_r3_69 > 0xFF) {
-            var_r0_108 = NULL;
-        } else {
-            goto loop_13;
-        }
+    else
+    {
+      goto loop_1;
     }
-    (*(void **)((s8 *)(arg0) + (0xC))) = var_r0_108;
-    sub_8161888((*(s32 *)((s8 *)(arg1) + (0x1CA4))));
-    (*(s16 *)((s8 *)(arg1) + (0x1F2C))) = (s16) (*(s32 *)((s8 *)((*(void **)((s8 *)(arg1) + (0x1CB0)))) + (0x1C)));
-    return arg0;
+  }
+  *((void **) (((s8 *) arg0) + 8)) = var_r0_57;
+  var_r3_69 = 0;
+  var_r2_70 = temp_r6_18;
+  loop_13:
+  var_r1_72 = *((void **) (((s8 *) var_r2_70) + 0));
+
+  if (((((var_r1_72 != ((void *) 0)) && ((*((u8 *) (((s8 *) var_r1_72) + 0x25))) == 0xD)) || (((var_r1_72 = *((void **) (((s8 *) var_r2_70) + 4)), var_r1_72 != ((void *) 0))) && ((*((u8 *) (((s8 *) var_r1_72) + 0x25))) == 0xD))) || (((var_r1_72 = *((void **) (((s8 *) var_r2_70) + 8)), var_r1_72 != ((void *) 0))) && ((*((u8 *) (((s8 *) var_r1_72) + 0x25))) == 0xD))) || (((var_r1_72 = *((void **) (((s8 *) var_r2_70) + 0xC)), var_r1_72 != ((void *) 0))) && ((*((u8 *) (((s8 *) var_r1_72) + 0x25))) == 0xD)))
+  {
+    var_r0_108 = var_r1_72;
+  }
+  else
+  {
+    var_r2_70 += 0x10;
+    var_r3_69 += 4;
+    if (var_r3_69 > 0xFF)
+    {
+      var_r0_108 = (void *) 0;
+    }
+    else
+    {
+      goto loop_13;
+    }
+  }
+  *((void **) (((s8 *) arg0) + 0xC)) = var_r0_108;
+  sub_8161888(*((s32 *) (((s8 *) arg1) + 0x1CA4)));
+  new_var = *((s32 *) (((s8 *) (*((void **) (((s8 *) arg1) + 0x1CB0)))) + 0x1C));
+  *((s16 *) (((s8 *) arg1) + 0x1F2C)) = (s16) new_var;
+  return arg0;
 }
 #endif
 

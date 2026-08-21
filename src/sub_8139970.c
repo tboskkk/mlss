@@ -12,7 +12,7 @@ asm_unified(".include \"asm/nonmatching/sub_8139970.s\"");
 #else
 s32 sub_81395AC();                              /* extern */
 
-void sub_8139970(void *arg1) {
+void sub_8139970(s32 arg0, void *arg1) {
     (*(s32 (**)())((s8 *)(arg1) + (0x198))) = sub_81395AC;
     sub_81395AC();
 }

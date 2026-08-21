@@ -10,12 +10,12 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8029804.s\"");
 #else
-void sub_8029804(void *arg0) {
-    void *temp_r1_18;
-
-    (*(u8 *)((s8 *)(arg0) + (0x208))) = (u8) (-3 & (*(u8 *)((s8 *)(arg0) + (0x208))));
-    temp_r1_18 = (*(void **)((s8 *)(arg0) + (0x200)));
-    (*(u8 *)((s8 *)(temp_r1_18) + (0x351))) = (u8) ((*(u8 *)((s8 *)(temp_r1_18) + (0x351))) | 0x40);
+void sub_8029804(void *arg0)
+{
+  void *temp_r1_18;
+  *((u8 *) (((s8 *) arg0) + 0x208)) = (u8) ((-3) & (*(((s8 *) arg0) + 0x208)));
+  temp_r1_18 = *((void **) (((s8 *) arg0) + 0x200));
+  *((u8 *) (((s8 *) temp_r1_18) + 0x351)) = (u8) ((*((u8 *) (((s8 *) temp_r1_18) + 0x351))) | 0x40);
 }
 #endif
 
