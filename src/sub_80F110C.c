@@ -125,3 +125,9 @@ asm_unified(".include \"asm/nonmatching/script_cmd_80F17C4.s\"");
 #else
 #error "TODO: write script_cmd_80F17C4 to match asm/nonmatching/script_cmd_80F17C4.s, then delete this #error"
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80F17DC.s\"");
+#else
+#error "TODO: write sub_80F17DC to match asm/nonmatching/sub_80F17DC.s, then delete this #error"
+#endif
