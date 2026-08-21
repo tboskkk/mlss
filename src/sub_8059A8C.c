@@ -65,3 +65,9 @@ void sub_8059A8C(u32 p0, u32 p1, u32 p2, u32 p3)
     *(u16*)((u8*)r1 + 0x2) = r2;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8059AF4.s\"");
+#else
+#error "TODO: write sub_8059AF4 to match asm/nonmatching/sub_8059AF4.s, then delete this #error"
+#endif
