@@ -390,59 +390,126 @@ block_125:
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8041FFC.s\"");
 #else
-#error "TODO: write sub_8041FFC to match asm/nonmatching/sub_8041FFC.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8044630.s\"");
 #else
-#error "TODO: write sub_8044630 to match asm/nonmatching/sub_8044630.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80457E8.s\"");
 #else
-#error "TODO: write sub_80457E8 to match asm/nonmatching/sub_80457E8.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80458B0.s\"");
 #else
-#error "TODO: write sub_80458B0 to match asm/nonmatching/sub_80458B0.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80459C0.s\"");
 #else
-#error "TODO: write sub_80459C0 to match asm/nonmatching/sub_80459C0.s, then delete this #error"
+s32 sub_804761C(void *, s32);                   /* extern */
+
+void sub_80459C0(void *arg0) {
+    s32 var_r2_74;
+    u8 *temp_r2_39;
+    u8 *var_r1_43;
+    u8 temp_r0_21;
+    u8 var_r0_49;
+    void *temp_r3_94;
+
+    if (0x180 & (*(u16 *)((s8 *)(arg0) + (0x212)))) {
+        temp_r0_21 = (*(u8 *)((s8 *)(arg0) + (0x2B4))) - 1;
+        (*(u8 *)((s8 *)(arg0) + (0x2B4))) = temp_r0_21;
+        if ((temp_r0_21 << 0x18) == 0) {
+            if (2 & (*(u8 *)((s8 *)(arg0) + (0x20F)))) {
+                sub_804761C(arg0, 0);
+                temp_r2_39 = (*(u8 **)((s8 *)(arg0) + (0x2B0)));
+                var_r1_43 = temp_r2_39 + 2;
+                if ((0x180 & (*(u16 *)((s8 *)(arg0) + (0x212)))) == 0x80) {
+                    var_r1_43 = temp_r2_39 - 2;
+                }
+                (*(u8 **)((s8 *)(arg0) + (0x2B0))) = var_r1_43;
+                var_r0_49 = *var_r1_43;
+            } else {
+                sub_804761C(arg0, 1);
+                var_r0_49 = (*(u8 *)((s8 *)((*(u8 **)((s8 *)(arg0) + (0x2B0)))) + (1)));
+            }
+            (*(u8 *)((s8 *)(arg0) + (0x2B4))) = var_r0_49;
+        }
+        if (M2C_ERROR(/* unknown instruction: ldsb $r1, ($mem_loc_fictive_) */) == -1) {
+            var_r2_74 = 0;
+            if ((0x180 & (*(u16 *)((s8 *)(arg0) + (0x212)))) == 0x80) {
+                var_r2_74 = 1;
+            }
+            sub_804761C(arg0, var_r2_74);
+            (*(u16 *)((s8 *)(arg0) + (0x212))) = (u16) (0xFFFFFE7F & (*(u16 *)((s8 *)(arg0) + (0x212))));
+            temp_r3_94 = (*(void **)((s8 *)(arg0) + (0x294)));
+            (*(u8 *)((s8 *)(temp_r3_94) + (0x12))) = (u8) ((-7 & (*(u8 *)((s8 *)(temp_r3_94) + (0x12)))) | (((u8) (*(u8 *)((s8 *)(arg0) + (0x213))) >> 6) * 2));
+        }
+    }
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8045A94.s\"");
 #else
-#error "TODO: write sub_8045A94 to match asm/nonmatching/sub_8045A94.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8045F04.s\"");
 #else
-#error "TODO: write sub_8045F04 to match asm/nonmatching/sub_8045F04.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80461B4.s\"");
 #else
-#error "TODO: write sub_80461B4 to match asm/nonmatching/sub_80461B4.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80465D8.s\"");
 #else
-#error "TODO: write sub_80465D8 to match asm/nonmatching/sub_80465D8.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8046980.s\"");
 #else
-#error "TODO: write sub_8046980 to match asm/nonmatching/sub_8046980.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
