@@ -286,8 +286,28 @@ def asm_differ_score(name: str) -> int | None:
     # infinite loop (the pre-check kept saying match on stale bytes, the
     # validator kept correctly rejecting, forever, burning a rebuild each
     # lap). Found live: sub_81DA6A0 cycled 10+ times in nine minutes.
-    c_path, _blk = find_guard_block(name)
-    stem = c_path.stem if c_path is not None else name
+    # _owning_source_stem(), NOT find_guard_block() alone. The validator
+    # calls this AFTER splice_candidate() has removed the guard -- that is
+    # what makes it a match -- so find_guard_block() returns None and the
+    # stem silently fell back to the FUNCTION's name. For a function that
+    # lives in someone else's file (sub_8028E14 in start_battle_8027AC4.c,
+    # the normal case, since split_func.py appends) that deleted
+    # build/src/sub_8028E14.o -- a no-op -- while asm-differ's -m rebuilt
+    # build/src/start_battle_8027AC4.o with NONMATCHING=1 and nothing
+    # removed it.
+    #
+    # What that costs: object_size_matches() then runs `make <obj>`, Make
+    # sees an object newer than its source and declines to rebuild, and the
+    # size check measures the NONMATCHING object -- where every `#else`
+    # branch was compiled in place of the retail `.include`, so the object
+    # is a fraction of its real size. It reports a "length mismatch" of
+    # -4652 bytes and rejects a candidate that was fine. Measured: 13 of
+    # the 25 candidates recovered by rescue_isolated_zeros.py were failed
+    # this way, and the whole "asm-differ said match but from-scratch build
+    # FAILED" pile in needs_human is suspect for the same reason. A clean
+    # rebuild of all four files checked reproduced expected/ exactly, so
+    # expected/ was never the problem.
+    stem = _owning_source_stem(name) or name
     for stale in ((REPO / "build" / "src" / f"{stem}.o"),
                   (REPO / "build" / "src" / f"{stem}.s")):
         try:
@@ -454,6 +474,18 @@ def object_size_matches(name: str) -> tuple:
     if not (REPO / "expected" / obj).exists():
         return True, f"no expected/{obj} to compare against -- check skipped"
 
+    # Force the rebuild. `make <obj>` alone is not enough: Make decides
+    # staleness from mtime and cannot see that -DNONMATCHING is not a file,
+    # so an object left behind by an earlier NONMATCHING build is simply
+    # declared up to date and measured as if it were real. Belt-and-braces
+    # against the same bug fixed in asm_differ_score() above -- this check
+    # is the one that turns a stale object into a wrong VERDICT, so it
+    # should not depend on someone else having cleaned up.
+    for stale in ((REPO / obj), (REPO / f"build/src/{stem}.s")):
+        try:
+            stale.unlink()
+        except FileNotFoundError:
+            pass
     r = run(["./container.sh", "make", obj])
     if r.returncode != 0:
         return False, f"candidate doesn't compile:\n{(r.stdout + r.stderr)[-500:]}"
