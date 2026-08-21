@@ -19,3 +19,9 @@ void sub_80679FC(void *arg0) {
         (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8067A4C;
     }
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8067A24.s\"");
+#else
+#error "TODO: write sub_8067A24 to match asm/nonmatching/sub_8067A24.s, then delete this #error"
+#endif
