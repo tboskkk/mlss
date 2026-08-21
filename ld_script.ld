@@ -27,6 +27,8 @@ SECTIONS
         build/asm/text08000000_p4.o(.text);
         build/src/sub_801859C.o(.text);
         build/asm/text08000000_p5.o(.text);
+        build/src/sub_8018818.o(.text);
+        build/asm/text08000000_p7.o(.text);
         build/src/reset_game_80189C4.o(.text);
         build/src/nullsub_17.o(.text);
         build/asm/text08000000_p2.o(.text);
