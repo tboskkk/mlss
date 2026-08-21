@@ -50,6 +50,22 @@ import db  # noqa: E402
 import gitops  # noqa: E402
 
 
+# How many no-compiles in a row before we stop trusting them and go check
+# whether it's the TREE that's broken rather than the seeds. With a real
+# no-compile rate around 55%, 40 consecutive is astronomically unlikely by
+# chance; a broken tree produces it instantly.
+NOCOMPILE_TRIPWIRE = 40
+
+
+def _tree_builds() -> bool:
+    """Does the repo currently produce a byte-correct ROM?"""
+    r = gitops.run(["./container.sh", "make"])
+    if "mlss.gba: OK" not in r.stdout:
+        return False
+    ok, _detail = gitops.layout_ok()
+    return ok
+
+
 def score_one(name: str, body: str):
     """-> score (0 = byte-exact), or None if the seed doesn't compile.
 
@@ -88,7 +104,23 @@ def main() -> None:
     print(f"{len(rows)} unscored seed(s) in the tier2_ready queue"
           f"{' (dry run)' if args.dry_run else ''}\n")
 
+    # Refuse to start against a broken tree. asm-differ has to BUILD to
+    # produce a score, so if the tree doesn't build, every single seed
+    # scores as "doesn't compile" -- and this tool would then dutifully
+    # pull the entire queue out of the permuter and file it as garbage.
+    # That happened for real: a validator killed mid-finish_match left a
+    # deleted fragment behind, and the sweep mislabeled 1,291 functions in
+    # six minutes before anyone noticed.
+    with gitops.repo_lock(what="score_sweep startup check"):
+        if not _tree_builds():
+            raise SystemExit(
+                "REFUSING to sweep: the tree does not build, so every seed would "
+                "score as 'does not compile'.\nFix the build first "
+                "(./container.sh make, then tools/check_layout.py).")
+    print("tree builds -- starting\n")
+
     zero = nonzero = nocompile = skipped = 0
+    consecutive_nocompile = 0
     t0 = time.time()
 
     for i, row in enumerate(rows, 1):
@@ -112,6 +144,24 @@ def main() -> None:
 
         if score is None:
             nocompile += 1
+            consecutive_nocompile += 1
+            if consecutive_nocompile >= NOCOMPILE_TRIPWIRE:
+                # Don't guess -- go and look. If the tree really does build,
+                # these seeds are genuinely bad and we carry on; if it
+                # doesn't, every verdict since the breakage is worthless and
+                # continuing would just mislabel the rest of the queue.
+                print(f"  !! {consecutive_nocompile} no-compiles in a row -- checking the tree")
+                with gitops.repo_lock(what="score_sweep tripwire check"):
+                    healthy = _tree_builds()
+                if not healthy:
+                    conn.commit()
+                    raise SystemExit(
+                        f"STOPPING at {i}/{len(rows)}: the tree stopped building, so every "
+                        f"'does not compile' verdict since then is meaningless.\n"
+                        f"Fix the build, then re-run -- rows are only marked as they are "
+                        f"scored, so this picks up where it left off.")
+                print("  ...tree is fine, those seeds really don't compile")
+                consecutive_nocompile = 0
             if not args.dry_run:
                 with db.tx(conn):
                     db.set_state(conn, name, "needs_attempt", worker_id=None,
@@ -120,6 +170,7 @@ def main() -> None:
                                        "spending a slot to find out")
         elif score == 0:
             zero += 1
+            consecutive_nocompile = 0
             print(f"  [{i}/{len(rows)}] BYTE-EXACT: {name}")
             if not args.dry_run:
                 with db.tx(conn):
@@ -130,6 +181,7 @@ def main() -> None:
                 db.log_event(conn, name, "converged", "score_sweep: score=0")
         else:
             nonzero += 1
+            consecutive_nocompile = 0
             if not args.dry_run:
                 with db.tx(conn):
                     db.set_state(conn, name, "tier2_ready", worker_id=None,

@@ -376,6 +376,84 @@ def fragment_trailing_bytes(name: str) -> str | None:
     return "\n".join(data_lines).strip()
 
 
+def _owning_source_stem(name: str):
+    """Stem of the src/*.c that contains `name`.
+
+    find_guard_block() alone is not enough here: by the time finish_match()
+    runs, splice_candidate() has already REMOVED the guard (that is what
+    makes it a match), so the `asm/nonmatching/<name>.s` needle it searches
+    for is gone and it returns None. Fall back to looking for the function's
+    own definition."""
+    c_path, _ = find_guard_block(name)
+    if c_path is not None:
+        return c_path.stem
+    pattern = re.compile(rf"^[\w \*]*\b{re.escape(name)}\s*\(", re.MULTILINE)
+    for c_path in sorted(SRC_DIR.glob("*.c")):
+        try:
+            if pattern.search(c_path.read_text()):
+                return c_path.stem
+        except OSError:
+            continue
+    return None
+
+
+def object_size_matches(name: str) -> tuple:
+    """(ok, detail) -- does the candidate compile to the SAME NUMBER OF
+    BYTES as the retail code it replaces?
+
+    asm-differ compares instructions, and it will report a clean match for a
+    function whose instructions are right but whose LENGTH is wrong -- a
+    literal pool with a different number of entries is the usual cause.
+    Confirmed on sub_801ADC0: asm-differ said match, the build succeeded,
+    and the linked ROM came out 8 bytes short, shifting 6,727 symbols. 93
+    rows were sitting in needs_human from exactly this, each having cost a
+    full from-scratch build to discover.
+
+    The check is one `objdump -h` against expected/ -- the same frozen
+    good-build snapshot asm-differ -o already diffs against, so it is
+    guaranteed present and current. Comparing whole-object .text size
+    rather than a symbol size avoids depending on agbcc emitting `.size`
+    (it does for C, but not for the Luvdis fragments in the same object).
+
+    NOT a complete check, and deliberately so: GNU as rounds a section's
+    size up to 4, so a difference of 1-3 bytes is absorbed by padding and
+    slips through. Those still get caught by the ROM sha1 in finish_match.
+    This is a cheap filter for the common case, not a replacement for the
+    real one.
+    """
+    stem = _owning_source_stem(name)
+    if stem is None:
+        return True, f"couldn't tell which src/*.c owns {name} -- check skipped"
+    obj = f"build/src/{stem}.o"
+    if not (REPO / "expected" / obj).exists():
+        return True, f"no expected/{obj} to compare against -- check skipped"
+
+    r = run(["./container.sh", "make", obj])
+    if r.returncode != 0:
+        return False, f"candidate doesn't compile:\n{(r.stdout + r.stderr)[-500:]}"
+
+    def text_size(rel):
+        # REPO-RELATIVE path, always. container.sh mounts the repo at
+        # /workspace, so an absolute host path simply does not exist inside
+        # the container -- objdump prints nothing, the regex finds nothing,
+        # and the check silently reports "skipped" while looking like it
+        # ran. Cost me one full debug cycle.
+        out = run(["./container.sh", "arm-none-eabi-objdump", "-h", rel]).stdout
+        m = re.search(r"^\s*\d+\s+\.text\s+([0-9a-f]+)", out, re.MULTILINE)
+        return int(m.group(1), 16) if m else None
+
+    got = text_size(obj)
+    want = text_size(f"expected/{obj}")
+    if got is None or want is None:
+        return True, "couldn't read a .text size -- check skipped"
+    if got != want:
+        return False, (f"{stem}.o .text is 0x{got:X}, retail is 0x{want:X} "
+                       f"({got - want:+d} bytes). asm-differ compares instructions and "
+                       f"cannot see this; the ROM would shift. Usually a literal pool "
+                       f"with a different number of entries.")
+    return True, f"{stem}.o .text 0x{got:X}, unchanged"
+
+
 def finish_match(name: str) -> tuple[bool, str]:
     """The one non-negotiable check every match in this project requires:
     delete the now-unused fragment, rm -rf build/, make, confirm
@@ -396,6 +474,15 @@ def finish_match(name: str) -> tuple[bool, str]:
             f"break the ROM. This is usually a second, unlabeled function Luvdis "
             f"missed (see CLAUDE.md's trailing-data landmine). Split it out with its "
             f"own thumb_func_start first, then re-validate. Trailing content:\n{trailing}")
+    # Cheap length gate before the expensive part. asm-differ compares
+    # instructions and cannot see a function that assembles to a different
+    # NUMBER of bytes, so it happily reports a match that shifts the whole
+    # ROM. One objdump beats a four-minute from-scratch build for finding
+    # that out. See object_size_matches().
+    size_ok, size_detail = object_size_matches(name)
+    if not size_ok:
+        return False, f"length check failed before rebuilding: {size_detail}"
+
     frag = REPO / "asm" / "nonmatching" / f"{name}.s"
     if frag.exists():
         frag.unlink()
