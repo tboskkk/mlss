@@ -41,11 +41,27 @@ void sub_81615B4(void* p0, s32 p1)
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81615E4.s\"");
 #else
-#error "TODO: write sub_81615E4 to match asm/nonmatching/sub_81615E4.s, then delete this #error"
+s32 sub_8160E4C(s32);                           /* extern */
+
+void sub_81615E4(void) {
+    sub_8160E4C((*(s32 *)((s8 *)(*(void **)0x03001024) + (0x2C))));
+    sub_8160E4C((*(s32 *)((s8 *)(*(void **)0x03001024) + (0x30))));
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8161604.s\"");
 #else
-#error "TODO: write sub_8161604 to match asm/nonmatching/sub_8161604.s, then delete this #error"
+void sub_8161604(void *arg0, s32 arg1) {
+    void *temp_r2_11;
+
+    (*(s32 *)((s8 *)(arg0) + (4))) = 0x08CDD0A8;
+    temp_r2_11 = (*(void **)((s8 *)(arg0) + (0)));
+    if (temp_r2_11 != NULL) {
+        (*(s32 (**)(void *, s32))((s8 *)((*(void **)((s8 *)(temp_r2_11) + (0xC)))) + (0xC)))(temp_r2_11 + M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */), 3);
+    }
+    if (1 & arg1) {
+        free_heap_8018DA8(arg0);
+    }
+}
 #endif
