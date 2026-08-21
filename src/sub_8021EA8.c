@@ -36,3 +36,9 @@ asm_unified(".include \"asm/nonmatching/sub_8021FD4.s\"");
 #else
 #error "TODO: write sub_8021FD4 to match asm/nonmatching/sub_8021FD4.s, then delete this #error"
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/init_fldm_8021FF8.s\"");
+#else
+#error "TODO: write init_fldm_8021FF8 to match asm/nonmatching/init_fldm_8021FF8.s, then delete this #error"
+#endif
