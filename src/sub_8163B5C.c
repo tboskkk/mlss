@@ -14,5 +14,19 @@ void sub_8163B5C(void *arg0, s32 arg1) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8163B60.s\"");
 #else
-#error "TODO: write sub_8163B60 to match asm/nonmatching/sub_8163B60.s, then delete this #error"
+s32 sub_8021308();                              /* extern */
+
+void sub_8163B60(void *arg0, s32 arg1) {
+    (*(s32 *)((s8 *)(arg0) + (0xC))) = 0x08CDD0F8;
+    if ((*(s32 *)((s8 *)(arg0) + (0x10))) != 0) {
+        sub_8021308();
+    }
+    if ((*(s32 *)((s8 *)(arg0) + (0x14))) != 0) {
+        sub_8021308();
+    }
+    (*(s32 *)((s8 *)(arg0) + (0xC))) = 0x08CDD118;
+    if (1 & arg1) {
+        free_heap_8018DA8(arg0);
+    }
+}
 #endif
