@@ -53,5 +53,18 @@ void sub_80E19EC(u32* p0)
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80E1A2C.s\"");
 #else
-#error "TODO: write sub_80E1A2C to match asm/nonmatching/sub_80E1A2C.s, then delete this #error"
+void sub_80E1A2C(void) {
+    s32 temp_r3_34;
+    void *temp_r5_25;
+
+    (*(s32 (**)())((s8 *)(*(void **)0x03000FD8) + (0x260)))();
+    (*(u16 *)((s8 *)((void *)0x040000B0) + (0xA))) = (u16) (0xC5FF & (*(u16 *)((s8 *)((void *)0x040000B0) + (0xA))));
+    (*(u16 *)((s8 *)((void *)0x040000B0) + (0xA))) = (u16) (0x7FFF & (*(u16 *)((s8 *)((void *)0x040000B0) + (0xA))));
+    temp_r5_25 = *(void **)0x03000FD8;
+    temp_r3_34 = *(s32 *)0x03000FDC;
+    (*(s32 *)((s8 *)((void *)0x040000B0) + (0))) = (s32) (temp_r3_34 + ((((u32) ((*(u8 *)((s8 *)(temp_r5_25) + (0xB))) << 0x1A) >> 0x1F) * 0x280) + 0x3EF0));
+    (*(s32 *)((s8 *)((void *)0x040000B0) + (4))) = 0x04000040;
+    (*(s32 *)((s8 *)((void *)0x040000B0) + (8))) = 0xA6600001;
+    *(s32 *)0x04000040 = (*(s32 *)((s8 *)(((((u32) ((*(u8 *)((s8 *)(temp_r5_25) + (0xB))) << 0x1A) >> 0x1F) * 0x280) + temp_r3_34)) + (0x3EF0)));
+}
 #endif
