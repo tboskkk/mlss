@@ -10,3 +10,9 @@ asm_unified(".include \"asm/macros.inc\"");
 void sub_8108CBC(void *arg0) {
     (*(u16 *)((s8 *)(arg0) + (0x11E))) = (u16) (0xFFF & (*(u16 *)((s8 *)(arg0) + (0x11E))));
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8108CD0.s\"");
+#else
+#error "TODO: write sub_8108CD0 to match asm/nonmatching/sub_8108CD0.s, then delete this #error"
+#endif
