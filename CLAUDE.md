@@ -926,14 +926,61 @@ Replacement work: identify what that byte-addressed data actually is, and
 find the real sound code (first sound/DMA register literals are at
 `0x08017D30`, i.e. in already-extracted code that may just be unlabeled).
 
+**D. The translation-unit deadlock — the structural throughput
+blocker.** agbcc compiles a whole translation unit, so ONE undrafted
+`#error` sibling fails every function in that file, however correct their
+own C is. `split_func.py` appends each newly extracted function to the
+preceding `src/*.c`, so files accumulate placeholders as extraction
+proceeds — after a full extraction pass, **756 files held 5,205
+placeholders**, `src/sub_8171FF8.c` alone holding 500. Not one function in
+a poisoned file can be compiled or diffed.
+
+Both `tier_m2c` and `m2c_sweep` skip any function with a blocking sibling
+(`tier3.blocking_siblings()`), which is right in isolation and fatal in
+aggregate: it is why a `compile_errors.py` sample of 30 stalled functions
+found only 2 compiling, with most diagnostics pointing at OTHER functions'
+placeholders rather than at m2c's own output.
+
+`unblock_files.py` is the fix — drafts every placeholder in a file at once
+so the unit compiles as a unit. It was all-or-nothing per file, which does
+not survive contact with real files (one bad seed reverted every good seed
+beside it: 0 of the first 4 files succeeded). It now attributes each
+compiler diagnostic back to the guard block containing its line number,
+empties only those `#else` branches, and rebuilds. An empty `#else` is
+deliberate and safe: `NONMATCHING=1` never builds the shipped ROM, the
+tool compiles one object rather than linking, and asm-differ `-o` diffs
+per symbol — whereas a stub with a guessed signature could collide with a
+real prototype.
+
+**A dead-end class worth knowing about:** `tier_m2c._claim()` excludes
+every row it previously declined (`notes LIKE 'm2c:%'`) to stop an
+infinite re-claim loop. That was correct while tier3's LLM was the
+fallback — but tier3 is gone, so nothing claims those rows at all and they
+sit in `needs_attempt`/`stalled` forever. Measured after a full drain:
+**1,165 rows** (857 "doesn't compile", 190 "declined", 118 "blocked by a
+sibling"). `unblock_files.py` now moves rows out of `stalled` too, which is
+the only thing that puts them back in play. Any future tier that declines
+work must leave SOMETHING able to reclaim it.
+
 **Next levers, in rough order of value:**
 1. **More deterministic rules.** This is the whole thesis and it keeps
    paying: the arg-register rule alone covered 15% of the corpus and
    turned 15-minute permuter gambles into instant score-0 matches. Use
    `stall_patterns.py` (clusters stalls by normalized diff signature) and
-   `compile_errors.py` (clusters seed compile failures by cause).
-2. The 18 refused trailing regions (real unlabeled code, needs a human).
-3. The `ctx+0x80C` pointer trace to finish the collision-data chain.
+   `compile_errors.py` (clusters seed compile failures by cause) — but
+   note that `compile_errors.py` does NOT apply `blocking_siblings()`, so
+   on a poisoned tree it measures the deadlock above rather than real m2c
+   defects. Run `unblock_files.py` first or its output will mislead you.
+2. **The 93 "asm-differ said match but from-scratch build FAILED" rows.**
+   Reproduced one (`sub_801ADC0`): it compiles fine, but the linked ROM's
+   sha1 differs — so asm-differ and the real ROM genuinely disagree about
+   the same bytes. Not corruption fallout (they date from 12h-19h on
+   08-20; the ROM-shifting extractions landed at 20:25-20:45). Untriaged;
+   the obvious first check is whether `check_layout.py` flags a size
+   change, i.e. whether the compiled function is a different LENGTH than
+   the retail one rather than different content.
+3. The 18 refused trailing regions (real unlabeled code, needs a human).
+4. The `ctx+0x80C` pointer trace to finish the collision-data chain.
 
 ## Housekeeping still outstanding
 

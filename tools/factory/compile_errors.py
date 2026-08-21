@@ -85,6 +85,11 @@ def try_compile(name: str, body: str) -> tuple[bool, str]:
             return r.returncode == 0, r.stdout + r.stderr
         finally:
             gitops.run(["git", "checkout", "--", str(c_path.relative_to(gitops.REPO))])
+            # Never leave the NONMATCHING object behind: Make can't see
+            # flag changes, so the next plain `make` would link it into the
+            # ROM and report a failure that isn't real. See unblock_files'
+            # _drop_obj() for the observed case.
+            gitops.run(["rm", "-f", str(gitops.REPO / obj)])
 
 
 def main():

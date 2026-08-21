@@ -119,16 +119,32 @@ def unblock(c_path: Path, names: list[str], dry_run: bool) -> tuple[int, str]:
         body = m2c_bridge.generate(n)
         if body:
             seeds[n] = body
-    if not seeds:
-        return False, [], [], "m2c produced nothing for any placeholder in this file"
+
+    # Placeholders m2c declines outright still have to be dealt with. If
+    # their `#error` is left standing, the unit cannot compile no matter
+    # how good every other seed is -- and because an undrafted placeholder
+    # is not one of OUR candidates, _offenders() can't attribute the
+    # resulting diagnostic to anything and the whole file gets reverted.
+    # That silently defeated the tool on any file containing even one
+    # function outside m2c's coverage (caught live at [12/756]:
+    # panm_update.c failed with the tail of a `#error` message that was
+    # never ours to fix). Empty them up front, same as a seed that turns
+    # out not to compile.
+    undraftable = [n for n in names if n not in seeds]
     if dry_run:
-        return True, sorted(seeds), [], f"would draft {sorted(seeds)}"
+        return True, sorted(seeds), sorted(undraftable), (
+            f"would draft {sorted(seeds)}"
+            + (f", empty {sorted(undraftable)}" if undraftable else ""))
 
     with gitops.repo_lock(what=f"unblock {c_path.name}"):
         for n, body in seeds.items():
             if gitops.splice_into_else(n, body) is None:
                 gitops.revert_to_clean()
                 return False, [], [], f"couldn't splice {n}"
+        for n in undraftable:
+            if gitops.splice_into_else(n, OMITTED_BODY) is None:
+                gitops.revert_to_clean()
+                return False, [], [], f"couldn't splice empty branch for {n}"
 
         # Build ONLY this translation unit's object -- NOT a full `make`.
         # A full `make NONMATCHING=1` always fails at the `compare` step by
@@ -137,6 +153,22 @@ def unblock(c_path: Path, names: list[str], dry_run: bool) -> tuple[int, str]:
         # that compiled perfectly well. The question here is only "does
         # this unit compile", and that's exactly one object.
         obj = f"build/src/{c_path.stem}.o"
+
+        def _drop_obj():
+            """Delete the object built with NONMATCHING=1.
+
+            Leaving it behind silently poisons the next PLAIN `make`: Make
+            decides what to rebuild from mtimes alone and has no idea
+            -DNONMATCHING is not a file (CLAUDE.md's flag-staleness
+            landmine), so it links a NONMATCHING object -- one where every
+            `#else` branch was compiled instead of the retail `.include` --
+            straight into the ROM. Observed: a plain `make` right after a
+            15-file unblock run linked an object 900 bytes short and
+            reported a layout shift that a from-scratch build proved was
+            not real. Costs one object's recompile; buys never handing the
+            next caller a fake failure.
+            """
+            gitops.run(["rm", "-f", str(gitops.REPO / obj)])
 
         # All-or-nothing was the original design and it does not survive
         # contact with real files: one bad seed reverted every good seed
@@ -148,12 +180,13 @@ def unblock(c_path: Path, names: list[str], dry_run: bool) -> tuple[int, str]:
         # each round must actually stub something new or we stop, so this
         # can't spin.
         live = dict(seeds)
-        stubbed: set[str] = set()
+        stubbed: set[str] = set(undraftable)
         detail = ""
         for _round in range(MAX_STUB_ROUNDS):
             gitops.run(["rm", "-f", str(gitops.REPO / obj)])
             r = gitops.run(["./container.sh", "make", "NONMATCHING=1", obj])
             if r.returncode == 0:
+                _drop_obj()
                 break
             output = r.stdout + r.stderr
             detail = output.strip()[-200:]
@@ -162,6 +195,7 @@ def unblock(c_path: Path, names: list[str], dry_run: bool) -> tuple[int, str]:
                 # Nothing attributable to a drafted function -- the problem
                 # is elsewhere in the file (a pre-existing sibling, a
                 # header). Not ours to fix; leave the file exactly as found.
+                _drop_obj()
                 gitops.revert_to_clean()
                 return False, [], [], f"still doesn't compile (not attributable to a seed): {detail}"
             for n in bad:
@@ -169,6 +203,7 @@ def unblock(c_path: Path, names: list[str], dry_run: bool) -> tuple[int, str]:
                 live.pop(n, None)
                 stubbed.add(n)
         else:
+            _drop_obj()
             gitops.revert_to_clean()
             return False, [], [], f"still doesn't compile after {MAX_STUB_ROUNDS} rounds: {detail}"
 
@@ -181,9 +216,21 @@ def unblock(c_path: Path, names: list[str], dry_run: bool) -> tuple[int, str]:
         # the available win. Only revert when the file is nothing BUT
         # placeholders, where stubbing genuinely buys nothing.
         others = {fn for fn, _lo, _hi in _guard_spans(c_path.read_text())} - set(names)
-        if not live and not others:
+        _drop_obj()
+        if not live and not others and len(names) < 2:
+            # Nothing drafted, no in-progress sibling to unblock, and only
+            # ONE placeholder -- there is no deadlock here to break, so
+            # emptying it buys nothing. Leave the file untouched.
             gitops.revert_to_clean()
-            return False, [], [], "every seed failed and the file has no other functions to unblock"
+            return False, [], [], "the file's only placeholder produced no compiling seed"
+        # Two or more placeholders with nothing drafted IS worth keeping,
+        # even though the pipeline gains nothing today: those functions
+        # mutually block each other permanently, so a correct hand-written
+        # C for any ONE of them still would not compile while the others
+        # are `#error`. Emptying them converts a permanently deadlocked
+        # file into one where any single function can be drafted and
+        # diffed. The guard stays on every one, so nothing here can be
+        # mistaken for a match.
 
         note = (f" {len(stubbed)} left empty (seed didn't compile): "
                 f"{', '.join(sorted(stubbed))}." if stubbed else "")
