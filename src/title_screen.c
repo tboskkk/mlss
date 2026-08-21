@@ -1298,3 +1298,9 @@ u8 sub_8057568(void) {
     }
     return 1;
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80575C8.s\"");
+#else
+#error "TODO: write sub_80575C8 to match asm/nonmatching/sub_80575C8.s, then delete this #error"
+#endif
