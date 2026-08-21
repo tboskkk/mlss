@@ -77,6 +77,7 @@ groups:
   - {obj: asm/text0801A548_p5, section: text}
   - {obj: src/sub_801B820, section: text}
   - {obj: asm/text0801A548_p54, section: text}
+  - {obj: src/sub_801B870, section: text}
   - {obj: src/time_update, section: text}
   - {obj: asm/text0801A548_p50, section: text}
   - {obj: src/sub_801BC98, section: text}
