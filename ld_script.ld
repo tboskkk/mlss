@@ -1051,6 +1051,7 @@ SECTIONS
         build/asm/text08057568_p2.o(.text);
         build/src/sub_819B040.o(.text);
         build/asm/text08057568_p205.o(.text);
+        build/src/sub_819B0AC.o(.text);
         build/src/sub_819B0F8.o(.text);
         build/asm/text08057568_p77.o(.text);
         build/src/sub_819B19C.o(.text);

@@ -1063,6 +1063,7 @@ groups:
   - {obj: asm/text08057568_p2, section: text}
   - {obj: src/sub_819B040, section: text}
   - {obj: asm/text08057568_p205, section: text}
+  - {obj: src/sub_819B0AC, section: text}
   - {obj: src/sub_819B0F8, section: text}
   - {obj: asm/text08057568_p77, section: text}
   - {obj: src/sub_819B19C, section: text}
