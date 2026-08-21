@@ -26,3 +26,9 @@ void sub_8171F84(void *arg0) {
     sub_8163B60();
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8171FC0.s\"");
+#else
+#error "TODO: write sub_8171FC0 to match asm/nonmatching/sub_8171FC0.s, then delete this #error"
+#endif
