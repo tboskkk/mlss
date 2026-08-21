@@ -3,33 +3,6 @@
 	.syntax unified
 	.text
 
-	thumb_func_start sub_8060E4C
-sub_8060E4C:
-	push {r4, lr}
-	adds r4, r0, #0x0
-	adds r1, r4, #0x0
-	adds r1, #0xAC
-	ldrh r0, [r1, #0x00]
-	subs r0, #0x01
-	strh r0, [r1, #0x00]
-	lsls r0, r0, #0x10
-	cmp r0, #0x00
-	bgt _08060E70
-	adds r0, r4, #0x0
-	movs r1, #0x04
-	movs r2, #0x00
-	movs r3, #0x00
-	bl sub_8082E1C
-	ldr r0, _08060E78 @ =0x0808750D
-	str r0, [r4, #0x4C]
-_08060E70:
-	pop {r4}
-	pop {r0}
-	bx r0
-	.byte 0x00, 0x00
-_08060E78: .4byte sub_808750C
-	.byte 0x02, 0x1C, 0xAC, 0x32, 0x00, 0x21, 0x11, 0x80, 0x01, 0x49, 0xC1, 0x64, 0x70, 0x47, 0x00, 0x00
-	.byte 0xFD, 0x08, 0x06, 0x08
 	thumb_func_start sub_8060E90
 sub_8060E90:
 	push {r4, r5, r6, r7, lr}
