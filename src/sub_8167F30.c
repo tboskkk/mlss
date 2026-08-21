@@ -37,5 +37,10 @@ void sub_8167FF8(void *arg0) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8168294.s\"");
 #else
-#error "TODO: write sub_8168294 to match asm/nonmatching/sub_8168294.s, then delete this #error"
+s32 process_remove();                           /* extern */
+
+void sub_8168294(void *arg0) {
+    (*(s32 *)((s8 *)(arg0) + (0x18))) = 0x08CDD140;
+    process_remove();
+}
 #endif
