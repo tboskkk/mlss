@@ -29,3 +29,9 @@ u8 sub_8029070(u8 arg0) {
     return arg0;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8029080.s\"");
+#else
+#error "TODO: write sub_8029080 to match asm/nonmatching/sub_8029080.s, then delete this #error"
+#endif
