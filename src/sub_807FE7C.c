@@ -27,3 +27,9 @@ void sub_807FE7C(void *arg0) {
     (*(void **)((s8 *)(temp_r2_16) + (8))) = arg0;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_807FEB4.s\"");
+#else
+#error "TODO: write sub_807FEB4 to match asm/nonmatching/sub_807FEB4.s, then delete this #error"
+#endif
