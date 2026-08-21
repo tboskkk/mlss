@@ -18,3 +18,9 @@ void sub_810D4C4(void)
   new_var3 = 0x241;
   *((s16 *) (((s8 *) new_var4) + 0x18)) = new_var3;
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_810D4E0.s\"");
+#else
+#error "TODO: write sub_810D4E0 to match asm/nonmatching/sub_810D4E0.s, then delete this #error"
+#endif
