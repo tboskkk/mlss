@@ -243,8 +243,15 @@ def start(name: str) -> subprocess.Popen:
     pyname, args, _needs_llm = PROCESSES[name]
     LOG_DIR.mkdir(parents=True, exist_ok=True)
     log_f = open(LOG_DIR / f"{name}.log", "a")
+    # -u (unbuffered). Child stdout goes to a FILE, so Python block-buffers
+    # it at 4-8KB and the log lags arbitrarily far behind reality. That is
+    # not cosmetic: tier2.log stopped updating at 13:57 while tier2 was
+    # very much alive, so the one exception that explains a live incident
+    # (run_pool() crashing and leaving its containers behind) was sitting
+    # unflushed in a buffer during the entire investigation of it. A log
+    # you cannot read during the incident is not a log.
     proc = subprocess.Popen(
-        [sys.executable, str(FACTORY_DIR / pyname), *args],
+        [sys.executable, "-u", str(FACTORY_DIR / pyname), *args],
         cwd=REPO, stdout=log_f, stderr=subprocess.STDOUT,
     )
     log(f"started {name} (pid {proc.pid})")

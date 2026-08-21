@@ -788,7 +788,26 @@ def main():
             # firing during process teardown, which it does (exceptions
             # don't skip atexit), just calling it out since this is the one
             # process where "crashed" and "orphaned containers" are close.
-            print(f"[{time.strftime('%H:%M:%S')}] !! tier2 run_pool() failed, will retry next cycle: {e}")
+            print(f"[{time.strftime('%H:%M:%S')}] !! tier2 run_pool() failed, will retry next cycle: {e}",
+                  flush=True)
+            # CLEAN UP BEFORE RETRYING. `procs` is local to run_pool(), so
+            # the next call starts with an empty pool and refills to
+            # max_functions -- while the previous pool's containers are
+            # still running, owned only by module-level _active. Every
+            # exception here therefore ADDS up to max_functions concurrent
+            # searches instead of replacing them.
+            #
+            # Measured live: 20 permuter containers against a 12-slot pool,
+            # stable across three samples 20s apart, with no duplicate
+            # function names and none of them orphans -- 20 genuinely-owned
+            # searches. Load average 31 on 6 physical cores, individual
+            # permuters down to 31-52% CPU. That is not extra throughput,
+            # it is the same work done slower: every search in the pool
+            # gets a fraction of a core.
+            #
+            # _cleanup_all() kills the containers AND requeues their rows,
+            # so the retry starts from a real empty pool.
+            _cleanup_all()
             n = 0
         if args.loop is None:
             break
