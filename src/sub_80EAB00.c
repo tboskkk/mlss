@@ -48,23 +48,39 @@ block_9:
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/script_cmd_conditional_jump.s\"");
 #else
-#error "TODO: write script_cmd_conditional_jump to match asm/nonmatching/script_cmd_conditional_jump.s, then delete this #error"
+u8 script_test_condition(s32, u8, s32, s32);    /* extern */
+
+s32 script_cmd_conditional_jump(s32 arg0, s32 *arg1, void *arg2) {
+    if (script_test_condition(arg0, (*(u8 *)((s8 *)(arg2) + (0))), (*(s32 *)((s8 *)(arg2) + (4))), (*(s32 *)((s8 *)(arg2) + (8)))) == (*(s32 *)((s8 *)(arg2) + (0xC)))) {
+        *arg1 = (*(s32 *)((s8 *)(arg2) + (0x10)));
+    }
+    return 1;
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80EAB98.s\"");
 #else
-#error "TODO: write sub_80EAB98 to match asm/nonmatching/sub_80EAB98.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80EAC78.s\"");
 #else
-#error "TODO: write sub_80EAC78 to match asm/nonmatching/sub_80EAC78.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80EACDC.s\"");
 #else
-#error "TODO: write sub_80EACDC to match asm/nonmatching/sub_80EACDC.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
