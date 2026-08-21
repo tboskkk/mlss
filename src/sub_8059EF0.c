@@ -15,6 +15,12 @@ u32* sub_8059EF0(u32 param_1) {
 }
 #endif
 
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8059F00.s\"");
+#else
+#error "TODO: write sub_8059F00 to match asm/nonmatching/sub_8059F00.s, then delete this #error"
+#endif
+
 void sub_8059F24(void *arg0) {
     (*(s16 *)((s8 *)((void *)0x02000014) + (0))) = (s16) (0x1FF & (*(u16 *)((s8 *)(arg0) + (0x5A))));
     (*(s16 *)((s8 *)((void *)0x02000014) + (4))) = (s16) (0x1FF & (*(u16 *)((s8 *)(arg0) + (0x5C))));
