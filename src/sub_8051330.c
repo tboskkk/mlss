@@ -33,5 +33,17 @@ void sub_8051368(void *arg0) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_805139C.s\"");
 #else
-#error "TODO: write sub_805139C to match asm/nonmatching/sub_805139C.s, then delete this #error"
+s32 init_fobj_803FEB8();                        /* extern */
+
+void *sub_805139C(void *arg0) {
+    init_fobj_803FEB8();
+    (*(s32 *)((s8 *)(arg0) + (0x338))) = 0x08CDC108;
+    (*(u8 *)((s8 *)(arg0) + (0x20C))) = (u8) (-0x21 & (*(u8 *)((s8 *)(arg0) + (0x20C))) & ~0x40 & 0x7F);
+    (*(u8 *)((s8 *)(arg0) + (0x20D))) = (u8) (-2 & (*(u8 *)((s8 *)(arg0) + (0x20D))) & ~2 & ~8 & ~0x10 & ~0x40);
+    (*(u8 *)((s8 *)(arg0) + (0x20C))) = (s32) ((s32) (*(u8 *)((s8 *)(arg0) + (0x20C))) & 0xFFFC7FFF);
+    (*(u8 *)((s8 *)(arg0) + (0x20E))) = (u8) ((*(u8 *)((s8 *)(arg0) + (0x20E))) | 4);
+    (*(u8 *)((s8 *)(arg0) + (0x20F))) = (u8) (-2 & (*(u8 *)((s8 *)(arg0) + (0x20F))));
+    (*(s32 *)((s8 *)(arg0) + (0x214))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x214))) & 0xFFFE1FFF);
+    return arg0;
+}
 #endif
