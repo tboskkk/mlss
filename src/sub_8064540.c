@@ -26,7 +26,58 @@ u32 sub_8064540(u32* param_1) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8064558.s\"");
 #else
-#error "TODO: write sub_8064558 to match asm/nonmatching/sub_8064558.s, then delete this #error"
+s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
+s32 sub_80DF024(s32, s32, s32, s32, void *);    /* extern */
+extern s32 sub_8064D20;
+
+void sub_8064558(void *arg0) {
+    s32 var_r1_25;
+    s32 var_r1_54;
+    s32 var_r2_31;
+    s32 var_r2_60;
+    s32 var_r3_37;
+    s32 var_r3_66;
+
+    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+        if ((*(s32 *)((s8 *)(arg0) + (0x9C))) == 0) {
+            sub_8082E1C(arg0, 3, 0, 0);
+            var_r1_25 = (*(s32 *)((s8 *)(arg0) + (0x38)));
+            if (var_r1_25 < 0) {
+                var_r1_25 += 0xFF;
+            }
+            var_r2_31 = (*(s32 *)((s8 *)(arg0) + (0x3C)));
+            if (var_r2_31 < 0) {
+                var_r2_31 += 0xFF;
+            }
+            var_r3_37 = (*(s32 *)((s8 *)(arg0) + (0x40)));
+            if (var_r3_37 < 0) {
+                var_r3_37 += 0xFF;
+            }
+            sub_80DF024(0x1284, var_r1_25 >> 8, var_r2_31 >> 8, var_r3_37 >> 8, arg0);
+        } else {
+            sub_8082E1C(arg0, 4, 0, 0);
+            var_r1_54 = (*(s32 *)((s8 *)(arg0) + (0x38)));
+            if (var_r1_54 < 0) {
+                var_r1_54 += 0xFF;
+            }
+            var_r2_60 = (*(s32 *)((s8 *)(arg0) + (0x3C)));
+            if (var_r2_60 < 0) {
+                var_r2_60 += 0xFF;
+            }
+            var_r3_66 = (*(s32 *)((s8 *)(arg0) + (0x40)));
+            if (var_r3_66 < 0) {
+                var_r3_66 += 0xFF;
+            }
+            sub_80DF024(0x128D, var_r1_54 >> 8, var_r2_60 >> 8, var_r3_66 >> 8, arg0);
+        }
+        if ((*(s32 *)((s8 *)(arg0) + (0xA0))) == 0) {
+            play_sfx_80195B4(0x28, -1);
+        } else {
+            play_sfx_80195B4(0x28, -1);
+        }
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8064D20;
+    }
+}
 #endif
 
 #ifndef NONMATCHING
