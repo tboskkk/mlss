@@ -20,5 +20,12 @@ void sub_8082C20(s32 arg0, s32 *arg1, s32 *arg2, s32 *arg3) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8082C58.s\"");
 #else
-#error "TODO: write sub_8082C58 to match asm/nonmatching/sub_8082C58.s, then delete this #error"
+void sub_8082C58(s32 arg0, s32 *arg1, s32 *arg2, s32 *arg3) {
+    s32 temp_r4_10;
+
+    temp_r4_10 = *arg2;
+    *arg1 -= M2C_ERROR(/* unknown instruction: ldsh $r4, ($mem_loc_fictive_) */);
+    *arg2 = (temp_r4_10 - *arg3) - M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */);
+    *arg3 = 0x1F0 - temp_r4_10;
+}
 #endif
