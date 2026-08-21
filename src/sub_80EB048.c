@@ -16,3 +16,9 @@ s32 sub_80EB048(s32 arg0, s32 arg1, s32 *arg2)
   *((s8 *) (new_var + 0x32)) = (s8) new_var2;
   return 1;
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80EB05C.s\"");
+#else
+#error "TODO: write sub_80EB05C to match asm/nonmatching/sub_80EB05C.s, then delete this #error"
+#endif
