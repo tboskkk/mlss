@@ -3,16 +3,6 @@
 	.syntax unified
 	.text
 
-	thumb_func_start sub_815F27C
-sub_815F27C:
-	push {lr}
-	ldr r2, _0815F28C @ =0x08CDCD50
-	str r2, [r0, #0x30]
-	bl sub_815FB14
-	pop {r0}
-	bx r0
-	.byte 0x00, 0x00
-_0815F28C: .4byte 0x08CDCD50
 	thumb_func_start sub_815F290
 sub_815F290:
 	push {r4, r5, lr}
