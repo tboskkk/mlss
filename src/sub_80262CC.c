@@ -36,3 +36,9 @@ asm_unified(".include \"asm/nonmatching/make_field_objects_80267C0.s\"");
 #else
 #error "TODO: write make_field_objects_80267C0 to match asm/nonmatching/make_field_objects_80267C0.s, then delete this #error"
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8026C78.s\"");
+#else
+#error "TODO: write sub_8026C78 to match asm/nonmatching/sub_8026C78.s, then delete this #error"
+#endif
