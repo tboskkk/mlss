@@ -1022,6 +1022,8 @@ SECTIONS
         build/asm/text08057568_p498.o(.text);
         build/src/sub_8148CA4.o(.text);
         build/asm/text08057568_p335.o(.text);
+        build/src/sub_814B4C8.o(.text);
+        build/asm/text08057568_p499.o(.text);
         build/src/sub_814B7A4.o(.text);
         build/asm/text08057568_p348.o(.text);
         build/src/sub_814B848.o(.text);
