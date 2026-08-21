@@ -18,3 +18,9 @@ asm_unified(".include \"asm/nonmatching/sub_8021C24.s\"");
 #else
 #error "TODO: write sub_8021C24 to match asm/nonmatching/sub_8021C24.s, then delete this #error"
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sprite_heap_alloc.s\"");
+#else
+#error "TODO: write sprite_heap_alloc to match asm/nonmatching/sprite_heap_alloc.s, then delete this #error"
+#endif
