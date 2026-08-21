@@ -13,3 +13,9 @@ void sub_801B75C(void *arg0) {
     (*(s32 *)((s8 *)(arg0) + (8))) = 0;
     (*(s32 *)((s8 *)(arg0) + (0xC))) = 0;
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_801B768.s\"");
+#else
+#error "TODO: write sub_801B768 to match asm/nonmatching/sub_801B768.s, then delete this #error"
+#endif
