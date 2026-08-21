@@ -25,6 +25,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import re
 import subprocess
 import sys
 import time
@@ -46,6 +47,37 @@ def _ps() -> str:
         return ""
 
 
+def _running(ps: str, script: str) -> bool:
+    """Is tools/factory/<script>.py ACTUALLY running as a process?
+
+    Not `f"tools/factory/{script}.py" in ps`. That was the original check and
+    it reports a false positive for any shell whose command line merely
+    MENTIONS the path -- a `nohup ... python3 tools/factory/supervisor.py ...`
+    wrapper, a pgrep, a grep of the log. It lied for real: after a restart
+    command failed to fire, health.py reported "supervisor up but DEAD:
+    scanner, validator, tier1, tier_m2c, tier2" when there was no supervisor
+    at all, and the factory then sat idle for four hours.
+
+    A monitor that can report a dead thing as alive is worse than no
+    monitor, so require the process to be a PYTHON INVOCATION of that
+    script: the interpreter first, the script as an argument. A shell
+    wrapper fails that test because its argv[0] is bash.
+    """
+    needle = f"tools/factory/{script}.py"
+    for line in ps.splitlines():
+        if needle not in line:
+            continue
+        head = line.split(needle)[0]
+        # argv[0] must be a python interpreter, and nothing may sit between
+        # it and the script path except interpreter flags.
+        # Allow an absolute directory prefix on the script path
+        # (/usr/bin/python3 /home/.../tools/factory/scanner.py) but nothing
+        # else -- a bash wrapper fails because head starts with /bin/bash.
+        if re.match(r"^\S*python[0-9.]*\s+(-\S+\s+)*(\S*/)?$", head):
+            return True
+    return False
+
+
 def checks(conn) -> list[tuple[str, str, str]]:
     out: list[tuple[str, str, str]] = []
     ps = _ps()
@@ -54,8 +86,8 @@ def checks(conn) -> list[tuple[str, str, str]]:
     now = time.time()
 
     # --- workers alive ---------------------------------------------------
-    dead = [w for w in WORKERS if f"tools/factory/{w}.py" not in ps]
-    sup = "tools/factory/supervisor.py" in ps
+    dead = [w for w in WORKERS if not _running(ps, w)]
+    sup = _running(ps, "supervisor")
     if not sup and not dead:
         out.append(("workers", WARN, "all 5 running but no supervisor -- nothing will restart a crash"))
     elif dead and sup:
