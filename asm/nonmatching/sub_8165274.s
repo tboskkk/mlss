@@ -1,0 +1,93 @@
+	.syntax unified
+	.text
+
+	thumb_func_start sub_8165274
+sub_8165274:
+	push {r4, r5, r6, r7, lr}
+	mov r7, r10
+	mov r6, r9
+	mov r5, r8
+	push {r5, r6, r7}
+	add sp, #-0x028
+	str r0, [sp, #0x020]
+	lsls r1, r1, #0x10
+	lsrs r1, r1, #0x10
+	str r1, [sp, #0x024]
+	lsls r2, r2, #0x10
+	lsrs r2, r2, #0x10
+	mov r10, r2
+	lsls r3, r3, #0x10
+	lsrs r3, r3, #0x10
+	mov r9, r3
+	movs r0, #0x00
+	mov r8, r0
+	mov r7, sp
+_0816529A:
+	movs r0, #0x00
+	ldr r1, [sp, #0x024]
+	movs r2, #0x10
+	mov r3, r8
+	bl sub_8163E0C
+	adds r5, r0, #0x0
+	movs r0, #0x00
+	mov r1, r10
+	movs r2, #0x10
+	mov r3, r8
+	bl sub_8163E0C
+	adds r4, r0, #0x0
+	movs r0, #0x00
+	mov r1, r9
+	movs r2, #0x10
+	mov r3, r8
+	bl sub_8163E0C
+	lsls r4, r4, #0x05
+	orrs r4, r5
+	lsls r0, r0, #0x0A
+	orrs r0, r4
+	strh r0, [r7, #0x00]
+	mov r5, r8
+	adds r5, #0x01
+	movs r0, #0x00
+	ldr r1, [sp, #0x024]
+	movs r2, #0x10
+	adds r3, r5, #0x0
+	bl sub_8163E0C
+	adds r6, r0, #0x0
+	movs r0, #0x00
+	mov r1, r10
+	movs r2, #0x10
+	adds r3, r5, #0x0
+	bl sub_8163E0C
+	adds r4, r0, #0x0
+	movs r0, #0x00
+	mov r1, r9
+	movs r2, #0x10
+	adds r3, r5, #0x0
+	bl sub_8163E0C
+	lsls r4, r4, #0x05
+	orrs r4, r6
+	lsls r0, r0, #0x0A
+	orrs r0, r4
+	strh r0, [r7, #0x02]
+	adds r7, #0x04
+	movs r0, #0x02
+	add r8, r0
+	mov r0, r8
+	cmp r0, #0x0F
+	ble _0816529A
+	ldr r0, [sp, #0x020]
+	ldr r1, [r0, #0x18]
+	mov r0, sp
+	movs r2, #0x08
+	bl CpuFastSet
+	add sp, #0x028
+	pop {r3, r4, r5}
+	mov r8, r3
+	mov r9, r4
+	mov r10, r5
+	pop {r4, r5, r6, r7}
+	pop {r0}
+	bx r0
+	.byte 0x00, 0x00, 0x10, 0xB5, 0x12, 0x04, 0x12, 0x0C, 0x05, 0x4B, 0x05, 0x4C, 0x1B, 0x1B, 0x04, 0x6A
+	.byte 0xE4, 0x18, 0x40, 0x68, 0x75, 0xF0, 0x9B, 0xFB, 0x10, 0xBC, 0x01, 0xBC, 0x00, 0x47, 0x94, 0x27
+	.byte 0x00, 0x08, 0xA4, 0x22, 0x00, 0x08
