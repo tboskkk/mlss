@@ -10,34 +10,22 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_819AB78.s\"");
 #else
-void sub_819AB78(u32 p0)
-{
-    u8 r1;
-    u8 r2;
-    u8 r3;
-    u8 r4;
-    u8 r5;
-    u8 r6;
-    u8 *r5_ptr;
+void sub_819AB78(void *arg0) {
+    s32 temp_r4_16;
+    u32 temp_r3_13;
+    u8 temp_r0_22;
+    u8 var_r1_21;
 
-    r1 = *(u8*)((u8*)p0 + 0x12);
-    r2 = r1 & 3;
-    r1 = 0x80 << 17;
-    r1 <<= r2;
-    r3 = r1 >> 24;
-    r5_ptr = (u8*)0x04000081;
-    r2 = *r5_ptr;
-    r4 = r3 << 4;
-    r1 = r3 | r4;
-    r6 = r2 & ~r1;
-    r1 = r6;
-    r0 = *(u8*)((u8*)p0 + 0x0E);
-    if (r0 > 0x80)
-        r1 |= r3;
-    if (r0 < 0x7E)
-        r1 |= r4;
-    r0 = r1 << 24;
-    r1 = r0 >> 24;
-    *r5_ptr = r1;
+    temp_r3_13 = (u32) (0x01000000 << (3 & (*(u8 *)((s8 *)(arg0) + (0x12))))) >> 0x18;
+    temp_r4_16 = temp_r3_13 * 0x10;
+    var_r1_21 = *(u8 *)0x04000081 & ~(temp_r3_13 | temp_r4_16);
+    temp_r0_22 = (*(u8 *)((s8 *)(arg0) + (0xE)));
+    if ((u32) temp_r0_22 <= 0x80U) {
+        var_r1_21 |= temp_r3_13;
+    }
+    if ((u32) temp_r0_22 > 0x7EU) {
+        var_r1_21 |= temp_r4_16;
+    }
+    *(u8 *)0x04000081 = var_r1_21;
 }
 #endif
