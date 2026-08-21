@@ -928,6 +928,7 @@ SECTIONS
         build/asm/text08057568_p184.o(.text);
         build/src/sub_80FAD6C.o(.text);
         build/asm/text08057568_p470.o(.text);
+        build/src/sub_80FAEC4.o(.text);
         build/src/sub_80FAEEC.o(.text);
         build/asm/text08057568_p55.o(.text);
         build/src/get_field_object_type.o(.text);
