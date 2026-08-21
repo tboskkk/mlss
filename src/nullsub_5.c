@@ -16,5 +16,20 @@ void nullsub_6(void) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81DCDF4.s\"");
 #else
-#error "TODO: write sub_81DCDF4 to match asm/nonmatching/sub_81DCDF4.s, then delete this #error"
+s32 sub_81DD23C(s32);                               /* extern */
+
+s32 sub_81DCDF4(s32 *arg0, s32 arg1) {
+    s32 temp_r0_12;
+    s32 temp_r0_18;
+
+    *(s32 *)0x03001BD4 = 0;
+    temp_r0_12 = sub_81DD23C(arg1);
+    if (temp_r0_12 == -1) {
+        temp_r0_18 = *(s32 *)0x03001BD4;
+        if (temp_r0_18 != 0) {
+            *arg0 = temp_r0_18;
+        }
+    }
+    return temp_r0_12;
+}
 #endif
