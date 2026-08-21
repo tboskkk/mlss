@@ -161,6 +161,8 @@ SECTIONS
         build/asm/text0801A548_p77.o(.text);
         build/src/sub_803E9F0.o(.text);
         build/asm/text0801A548_p7.o(.text);
+        build/src/init_fobj_803FEB8.o(.text);
+        build/asm/text0801A548_p78.o(.text);
         build/src/sub_80401F0.o(.text);
         build/asm/text0801A548_p48.o(.text);
         build/src/sub_804034C.o(.text);
