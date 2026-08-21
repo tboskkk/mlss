@@ -25,3 +25,9 @@ void sub_8047EFC(void *arg0, u16 arg1, s16 arg2, s16 arg3, s32 arg4) {
     (*(s32 *)((s8 *)(arg0) + (0x250))) = -1;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8047F60.s\"");
+#else
+#error "TODO: write sub_8047F60 to match asm/nonmatching/sub_8047F60.s, then delete this #error"
+#endif
