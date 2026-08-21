@@ -216,3 +216,9 @@ s32 sub_80903A0(void *arg0) {
     return 1;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80903DC.s\"");
+#else
+#error "TODO: write sub_80903DC to match asm/nonmatching/sub_80903DC.s, then delete this #error"
+#endif

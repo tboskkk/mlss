@@ -1,14 +1,13 @@
-	.include "asm/macros.inc"
-
 	.syntax unified
 	.text
 
-	thumb_func_start sub_8090420
-sub_8090420:
-	ldr r1, _08090454 @ =0x084FE8A8
+	thumb_func_start sub_80903DC
+sub_80903DC:
+	ldr r1, _08090414 @ =0x084FE9A4
 	str r1, [r0, #0x6C]
-	ldr r1, _08090458 @ =0x03000FF4
+	ldr r1, _08090418 @ =0x03000FF4
 	ldr r3, [r1, #0x00]
+	adds r3, #0x3C
 	movs r1, #0x77
 	adds r1, r1, r0
 	mov r12, r1
@@ -27,10 +26,11 @@ sub_8090420:
 	adds r1, r1, r2
 	ldrh r2, [r3, #0x2A]
 	str r2, [r1, #0x00]
-	ldr r1, _0809045C @ =0x080904C5
+	ldr r1, _0809041C @ =0x08090461
 	str r1, [r0, #0x4C]
 	movs r0, #0x01
 	bx lr
-_08090454: .4byte 0x084FE8A8
-_08090458: .4byte 0x03000FF4
-_0809045C: .4byte sub_80904C4
+	.byte 0x00, 0x00
+_08090414: .4byte 0x084FE9A4
+_08090418: .4byte 0x03000FF4
+_0809041C: .4byte sub_8090460
