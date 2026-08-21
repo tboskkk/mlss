@@ -40,3 +40,9 @@ _0813B698:
     return;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_813B6A0.s\"");
+#else
+#error "TODO: write sub_813B6A0 to match asm/nonmatching/sub_813B6A0.s, then delete this #error"
+#endif
