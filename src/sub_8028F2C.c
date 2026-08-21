@@ -32,10 +32,20 @@ u32 sub_8028F40(u32 param_1) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/make_btl_8028F54.s\"");
 #else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
+s32 init_btl_process_80FC25C(void *, s32, s32, void *); /* extern */
+s32 process_disable(void *);                    /* extern */
+
+void make_btl_8028F54(void *arg0) {
+    (*(u16 *)((s8 *)(arg0) + (0x2AC))) = (u16) (*(u16 *)((s8 *)(arg0) + (0x2B4)));
+    (*(u16 *)((s8 *)(arg0) + (0x2B4))) = 0xFFFFU;
+    process_disable(arg0);
+    (*(s8 *)((s8 *)(arg0) + (0))) = 2;
+    *(s8 *)0x03000C24 = 1;
+    if (*(s32 *)0x03000C78 == 0) {
+        *(s32 *)0x03000C78 = 0x0800063C;
+    }
+    init_btl_process_80FC25C(alloc_Zero(0x1CU, 0U, (s8 *)0x081E267C, 0U), 8, 0x081E267C, arg0 + 0x2AC);
+}
 #endif
 
 #ifndef NONMATCHING

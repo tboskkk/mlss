@@ -42,197 +42,200 @@ asm_unified(".include \"asm/nonmatching/sub_8051EE0.s\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/optn_init.s\"");
 #else
-struct OPTNProcess* optn_init(struct OPTNProcess* optn, u8 priority, char* label, int a4) {
-    struct Process* odtr;
-    u16* cgdw;
-    u16* v10;
-    int v11;
+s32 process_add(struct OPTNProcess *, u8, s32); /* extern */
 
-    u16* v21;
-    int v22;
+struct OPTNProcess *optn_init(struct OPTNProcess *arg0, u8 arg1, s8 *arg2, s32 arg3) {
+    s32 spC;
+    s32 *temp_r0_322;
+    s32 temp_r0_341;
+    s32 var_r2_186;
+    s32 var_r3_357;
+    s32 var_r4_373;
+    s32 var_r6_162;
+    struct OPTNProcess *temp_r0_54;
+    struct Sprite *temp_r0_241;
+    u16 *temp_r0_352;
+    u16 *var_r2_356;
+    u16 *var_r2_372;
+    u16 *var_r3_371;
+    u16 temp_r1_381;
+    u16 var_r1_366;
+    u8 *temp_r0_336;
+    void *temp_r0_118;
+    void *temp_r0_466;
+    void *temp_r0_468;
+    void *temp_r0_470;
+    void *temp_r0_472;
+    void *temp_r0_474;
+    void *temp_r1_452;
+    void *temp_r1_456;
+    void *var_r0_184;
+    void *var_r1_185;
+    void *var_r2_161;
 
-    volatile int v31;
-
-    process_add(&optn->process, priority, label);
-    optn->process.definition = &stru_8CDC1F8;
-
-    (*(vu16*)(0x2000000 + 0x50)) = 191;
-    (*(vu16*)(0x2000000 + 0x54)) = 16;
-    (*(vu16*)(0x2000000 + 0x00)) = 0;
-
+    process_add(arg0, arg1);
+    arg0->process.definition = (struct ProcessDefinition *)0x08CDC1F8;
+    *(s16 *)0x02000050 = 0xBF;
+    *(s16 *)0x02000054 = 0x10;
+    *(s16 *)0x02000000 = 0;
     sub_8017E34();
-
-    gGameState.field_31 = 8;
-    optn->options_0 = a4;
-
+    *(s8 *)0x0300037D = 8;
+    (*(u8 *)((s8 *)(arg0) + (0x3C))) = (u8) ((-2 & (*(u8 *)((s8 *)(arg0) + (0x3C)))) | (arg3 & 1));
     sub_801A548();
-
-    odtr = (struct Process*)alloc_Zero(0x1C, 0, "ODTR", 0);
-    process_add(odtr, 8, "ODTR");
-    odtr->definition = &stru_8CDC208;
-    optn->odtr = odtr;
-    odtr->parentProcess = &optn->process;
-
-    optn->selection = 0;
-    optn->brightness = 16;
-    optn->winw = alloc_zero_8018DB4(2048, 1, "WINW", 0);
-    optn->options_4 =
-        gGameState.field_88A_4 | gGameState.field_88B_0 << 1 | dword_3000FFC->field_8_5 << 2;
-    optn->field_1D = 0;
-
-    dword_3001034(0, (void*)&optn->field_48, 8);
-    cgdw = alloc_zero_8018DB4(0x8000, 1, "CGDW", 0);
-    dword_3000C84(dword_83A0E94, cgdw);
-    CpuFastSet(cgdw, (void*)0x6000000, (sub_80198B0(dword_83A0E94) >> 2) & 0x1FFFFF);
-    dword_3000C84(dword_83A1F60, cgdw);
-    CpuFastSet(cgdw, (void*)0x6010000, (sub_80198B0(dword_83A1F60) >> 2) & 0x1FFFFF);
-
-    // Set background map.
-    CpuFastSet(dword_83A13A0, cgdw, 512);
-    v10 = &cgdw[192];
-    v11 = 3;
-    while (v11 != 0) {
-        u16* v13;
-        u16* v14;
-        int i;
-
-        // Corners.
-        v10[4] = 1;
-        v10[36] = 3;
-        v10[25] = 1025;
-        v10[57] = 1027;
-
-        // Top and bottom row.
-        v13 = &v10[37];
-        v14 = &v10[5];
-        i = 0;
-        while (i <= 19) {
-            v14[i + 0] = 2;  // Top
-            v13[i + 0] = 17; // Bottom
-            v14[i + 1] = 2;
-            v13[i + 1] = 17;
-            v14[i + 2] = 2;
-            v13[i + 2] = 17;
-            v14[i + 3] = 2;
-            v13[i + 3] = 17;
-            v14[i + 4] = 2;
-            v13[i + 4] = 17;
-            v14[i + 5] = 2;
-            v13[i + 5] = 17;
-            v14[i + 6] = 2;
-            v13[i + 6] = 17;
-            v14[i + 7] = 2;
-            v13[i + 7] = 17;
-            v14[i + 8] = 2;
-            v13[i + 8] = 17;
-            v14[i + 9] = 2;
-            v13[i + 9] = 17;
-            i += 10;
+    temp_r0_54 = alloc_Zero(0x1CU, 0U, (s8 *)0x081E26DC, 0U);
+    process_add(temp_r0_54, 8U, 0x081E26DC);
+    temp_r0_54->process.definition = (struct ProcessDefinition *)0x08CDC208;
+    arg0->odtr = &temp_r0_54->process;
+    temp_r0_54->process.parentProcess = &arg0->process;
+    arg0->selection = 0;
+    arg0->brightness = 0x10;
+    arg0->winw = alloc_zero_8018DB4(0x800U, 1U, (s8 *)0x081E26E4, 0U);
+    (*(u8 *)((s8 *)(arg0) + (0x3C))) = (u8) ((-0x71 & (*(u8 *)((s8 *)(arg0) + (0x3C)))) | (((((u32) (*(u8 *)0x03000BD7 << 0x1F) >> 0x1F) * 2) | ((u32) (*(u8 *)0x03000BD6 << 0x1B) >> 0x1F) | (((u32) ((*(u8 *)((s8 *)(*(void **)0x03000FFC) + (8))) << 0x1A) >> 0x1F) * 4)) * 0x10));
+    arg0->field_1D = 0;
+    *(s32 (**)(s32, u8 *, s32))0x03001034(0, arg0 + 0x48, 8);
+    temp_r0_118 = alloc_zero_8018DB4(0x8000U, 1U, (s8 *)0x081E26EC, 0U);
+    *(s32 (**)(s32, void *))0x03000C84(0x083A0E94, temp_r0_118);
+    CpuFastSet(temp_r0_118, (void *)0x06000000, (sub_80198B0((s32 *)0x083A0E94) >> 2) & 0x1FFFFF);
+    *(s32 (**)(s32, void *))0x03000C84(0x083A1F60, temp_r0_118);
+    CpuFastSet(temp_r0_118, (void *)0x06010000, (sub_80198B0((s32 *)0x083A1F60) >> 2) & 0x1FFFFF);
+    CpuFastSet((void *)0x083A13A0, temp_r0_118, 0x200U);
+    var_r2_161 = temp_r0_118 + 0x180;
+    var_r6_162 = 3;
+    do {
+        (*(s16 *)((s8 *)(var_r2_161) + (8))) = 1;
+        (*(s16 *)((s8 *)(var_r2_161) + (0x48))) = 3;
+        (*(s16 *)((s8 *)(var_r2_161) + (0x32))) = 0x401;
+        (*(s16 *)((s8 *)(var_r2_161) + (0x72))) = 0x403;
+        var_r6_162 -= 1;
+        var_r0_184 = var_r2_161 + 0x4A;
+        var_r1_185 = (var_r2_161 + 0x72) - 0x68;
+        var_r2_186 = 0x13;
+loop_2:
+        (*(s16 *)((s8 *)(var_r1_185) + (0))) = 2;
+        (*(s16 *)((s8 *)(var_r0_184) + (0))) = 0x11;
+        (*(s16 *)((s8 *)(var_r1_185) + (2))) = 2;
+        (*(s16 *)((s8 *)(var_r0_184) + (2))) = 0x11;
+        (*(s16 *)((s8 *)(var_r1_185) + (4))) = 2;
+        (*(s16 *)((s8 *)(var_r0_184) + (4))) = 0x11;
+        (*(s16 *)((s8 *)(var_r1_185) + (6))) = 2;
+        (*(s16 *)((s8 *)(var_r0_184) + (6))) = 0x11;
+        (*(s16 *)((s8 *)(var_r1_185) + (8))) = 2;
+        (*(s16 *)((s8 *)(var_r0_184) + (8))) = 0x11;
+        (*(s16 *)((s8 *)(var_r1_185) + (0xA))) = 2;
+        (*(s16 *)((s8 *)(var_r0_184) + (0xA))) = 0x11;
+        (*(s16 *)((s8 *)(var_r1_185) + (0xC))) = 2;
+        (*(s16 *)((s8 *)(var_r0_184) + (0xC))) = 0x11;
+        (*(s16 *)((s8 *)(var_r1_185) + (0xE))) = 2;
+        (*(s16 *)((s8 *)(var_r0_184) + (0xE))) = 0x11;
+        (*(s16 *)((s8 *)(var_r1_185) + (0x10))) = 2;
+        (*(s16 *)((s8 *)(var_r0_184) + (0x10))) = 0x11;
+        (*(s16 *)((s8 *)(var_r1_185) + (0x12))) = 2;
+        (*(s16 *)((s8 *)(var_r0_184) + (0x12))) = 0x11;
+        var_r0_184 += 0x14;
+        var_r1_185 += 0x14;
+        var_r2_186 -= 0xA;
+        if (var_r2_186 >= 0) {
+            goto loop_2;
         }
-
-        // Skip to next row.
-        v11--;
-        v10 = &v10[96];
+        var_r2_161 += 0xC0;
+    } while (var_r6_162 != 0);
+    CpuFastSet(temp_r0_118, (void *)0x0600D800, 0x200U);
+    if (temp_r0_118 != NULL) {
+        free_heap_8018D9C(temp_r0_118);
     }
-    CpuFastSet(cgdw, (void*)0x600D800, 512);
-    if (cgdw) {
-        free_heap_8018D9C(cgdw);
-    }
-
-    sub_8020994(0x3000, 8, 0, 0x80u);
-
-    optn->sprite = sub_8020DD0(5, 24581, 1, -1, -1, -1, -1);
-    sub_801E150(optn->sprite, 0, -1, 0, 0);
-    sprite_show_8020CBC(optn->sprite);
-    optn->sprite->xPosition = 40;
-    optn->sprite->yPosition = 55;
-
-    if (gGameState.field_888_1 == 0) {
-        CpuFastSet(off_83A2880, (void*)0x2000280, 16);
-        CpuFastSet(dword_83A1BA0, (void*)0x2000080, 120);
+    sub_8020994(0x3000, 8, 0, 0x80);
+    temp_r0_241 = sub_8020DD0(5, 0x6005, 1, -1, -1, -1, -1);
+    arg0->sprite = temp_r0_241;
+    sub_801E150(temp_r0_241, 0, -1, 0, var_r6_162);
+    sprite_show_8020CBC(arg0->sprite);
+    arg0->sprite->xPosition = 0x28;
+    arg0->sprite->yPosition = 0x37;
+    if (!(6 & *(u8 *)0x03000BD4)) {
+        CpuFastSet((void *)0x083A2880, (void *)0x02000280, 0x10U);
+        CpuFastSet((void *)0x083A1BA0, (void *)0x02000080, 0x78U);
     } else {
-        CpuFastSet(off_83A28C0, (void*)0x2000280, 16);
-        CpuFastSet(dword_83A1D80, (void*)0x2000080, 120);
+        CpuFastSet((void *)0x083A28C0, (void *)0x02000280, 0x10U);
+        CpuFastSet((void *)0x083A1D80, (void *)0x02000080, 0x78U);
     }
-
-    gGameState.field_0 = -1;
-    gGameState.field_2 = -1;
-
-    optn->bbwf = alloc_zero_8018DB4(sub_8198784 - sub_819941C, 0, "BBWF", 1);
-    sub_81994EC(optn->bbwf, off_851F9E8);
-    optn->bbwi = alloc_Zero(20, 0, "BBWI", 1);
-    optn->bwcw = alloc_zero_8018DB4(115231, 1, "BWCW", 1);
-    optn->field_28 = (u8*)((int)&optn->bwcw[31] & 0xFFFFFFE0);
-    optn->field_2C = &optn->field_28[57600];
-
-    optn->bwsw = alloc_zero_8018DB4(3840, 1, "BWSW", 1);
-    v21 = &optn->bwsw[192];
-    v22 = 0;
-    while (v22 < 3) {
-        u16 v23;
-        u16* v26;
-        u16* v27;
-        int j;
-
-        v23 = ((v22 << 6) + 128) | 0xE000;
-        v26 = &v21[36];
-        v27 = &v21[4];
-
-        for (j = 0; j < 21;) {
-            v27[0] = v23;
-            v26[0] = v23 + 32;
-            v23++;
-            v27[1] = v23;
-            v26[1] = v23 + 32;
-            v27 += 2;
-            v26 += 2;
-            j += 2;
-            v23++;
+    (*(s16 *)((s8 *)((void *)0x0300034C) + (0))) = 0xFFFF;
+    (*(s16 *)((s8 *)((void *)0x0300034C) + (2))) = -1;
+    temp_r0_322 = alloc_zero_8018DB4(0xC98U, 0U, (s8 *)0x081E26F4, 1U);
+    arg0->bbwf = temp_r0_322;
+    sub_81994EC(temp_r0_322, (void *)0x0851F9E8);
+    arg0->bbwi = alloc_Zero(0x14U, 0U, (s8 *)0x081E26FC, 1U);
+    temp_r0_336 = alloc_zero_8018DB4(0x1C21FU, 1U, (s8 *)0x081E2704, 1U);
+    arg0->bwcw = temp_r0_336;
+    temp_r0_341 = (s32) (temp_r0_336 + 0x1F) & ~0x1F;
+    arg0->field_28 = (u8 *) temp_r0_341;
+    arg0->field_2C = temp_r0_341 + 0xE100;
+    temp_r0_352 = alloc_zero_8018DB4(0xF00U, 1U, (s8 *)0x081E270C, 1U);
+    arg0->bwsw = temp_r0_352;
+    var_r2_356 = temp_r0_352 + 0x180;
+    var_r3_357 = 0;
+    do {
+        var_r1_366 = ((var_r3_357 << 6) + 0x80) | 0xFFFFE000;
+        var_r3_371 = var_r2_356 + 0x48;
+        var_r2_372 = var_r2_356 + 8;
+        var_r4_373 = 0x15;
+loop_11:
+        (*(u16 *)((s8 *)(var_r2_372) + (0))) = var_r1_366;
+        (*(u16 *)((s8 *)(var_r3_371) + (0))) = var_r1_366 + 0x20;
+        temp_r1_381 = var_r1_366 + 1;
+        (*(u16 *)((s8 *)(var_r2_372) + (2))) = temp_r1_381;
+        (*(s16 *)((s8 *)(var_r3_371) + (2))) = (s16) (temp_r1_381 + 0x20);
+        var_r3_371 += 4;
+        var_r2_372 += 4;
+        var_r4_373 -= 2;
+        var_r1_366 = temp_r1_381 + 1;
+        if (var_r4_373 >= 0) {
+            goto loop_11;
         }
-        v22++;
-        v21 = &v21[96];
-    }
-    CpuFastSet(optn->bwsw, (void*)0x600D000, 512);
-
-    v31 = 0;
-    CpuFastSet((void*)&v31, (void*)0x6004000, 0x1000008);
-    sub_8052B54(optn, 0);
-    dword_3001034(0, (void*)optn->field_2C, 57600);
-
-    sub_8052C50(optn, 1);
+        var_r3_357 += 1;
+        var_r2_356 += 0xC0;
+    } while (var_r3_357 <= 2);
+    CpuFastSet(temp_r0_352, (void *)0x0600D000, 0x200U);
+    spC = 0;
+    CpuFastSet(&spC, (void *)0x06004000, 0x01000008U);
+    sub_8052B54(arg0, 0);
+    *(u32 *)0x03001034(0, arg0->field_2C, 0xE100);
+    sub_8052C50(arg0, 1);
     sub_8017E34();
-    sub_8052C50(optn, 2);
+    sub_8052C50(arg0, 2);
     sub_8017E34();
-    sub_8052C50(optn, 3);
+    sub_8052C50(arg0, 3);
     sub_8017E34();
-    sub_8052C50(optn, 4);
+    sub_8052C50(arg0, 4);
     sub_8017E34();
-    sub_8052C50(optn, 5);
+    sub_8052C50(arg0, 5);
     sub_8017E34();
-    sub_8052C50(optn, 6);
+    sub_8052C50(arg0, 6);
     sub_8017E34();
-    sub_8052C50(optn, 7);
+    sub_8052C50(arg0, 7);
     sub_8017E34();
     sub_801A548();
-
-    (*(vu16*)(0x2000000 + 0x08)) = 0x1805;
-    (*(vu16*)(0x2000000 + 0x0A)) = 0x1901;
-    (*(vu16*)(0x2000000 + 0x0C)) = 0x1A03;
-    (*(vu16*)(0x2000000 + 0x0E)) = 0x1B03;
-    (*(vu16*)(0x2000000 + 0x10)) = 0;
-    (*(vu16*)(0x2000000 + 0x12)) = 0;
-    (*(vu16*)(0x2000000 + 0x14)) = 0;
-    (*(vu16*)(0x2000000 + 0x16)) = 0;
-    (*(vu16*)(0x2000000 + 0x18)) = 0;
-    (*(vu16*)(0x2000000 + 0x1A)) = 0;
-    (*(vu16*)(0x2000000 + 0x1C)) = 0;
-    (*(vu16*)(0x2000000 + 0x1E)) = 0;
-    (*(vu16*)(0x2000000 + 0x00)) = 0x1C40;
-
-    sub_8019308(0, 30, -1);
-    sub_80193B4(0, 0xFFu, 0x10u);
-
-    return optn;
+    (*(s16 *)((s8 *)((void *)0x02000008) + (0))) = 0x1805;
+    temp_r1_452 = (void *)0x02000008 + 2;
+    (*(s16 *)((s8 *)((void *)0x02000008) + (2))) = 0x1901;
+    temp_r1_456 = temp_r1_452 + 2;
+    (*(s16 *)((s8 *)(temp_r1_452) + (2))) = 0x1A03;
+    (*(s16 *)((s8 *)(temp_r1_456) + (2))) = 0x1B03;
+    (*(s16 *)((s8 *)((void *)0x02000010) + (0))) = 0;
+    temp_r0_466 = (void *)0x02000010 + 2;
+    (*(s16 *)((s8 *)((void *)0x02000010) + (2))) = 0;
+    temp_r0_468 = temp_r0_466 + 2;
+    (*(s16 *)((s8 *)(temp_r0_466) + (2))) = 0;
+    temp_r0_470 = temp_r0_468 + 2;
+    (*(s16 *)((s8 *)(temp_r0_468) + (2))) = 0;
+    temp_r0_472 = temp_r0_470 + 2;
+    (*(s16 *)((s8 *)(temp_r0_470) + (2))) = 0;
+    temp_r0_474 = temp_r0_472 + 2;
+    (*(s16 *)((s8 *)(temp_r0_472) + (2))) = 0;
+    (*(s16 *)((s8 *)(temp_r0_474) + (2))) = 0;
+    (*(s16 *)((s8 *)((temp_r0_474 + 2)) + (2))) = 0;
+    *((temp_r1_456 + 2) - 0xE) = 0x1C40;
+    sub_8019308(0, 0x1E, -1);
+    sub_80193B4(0, 0xFF, 0x10);
+    return arg0;
 }
 #endif
 

@@ -25,50 +25,35 @@ void sub_8018E24(void) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8018E88.s\"");
 #else
-void sub_8018E88(int type, int volume) {
-    int flags;
-    union GameStateU88C* p = (union GameStateU88C*)((u8*)&gGameState + 0x88C);
+void sub_8018E88(s32 arg0, s32 arg1) {
+    u8 temp_r5_15;
 
-    flags = p->field_88C;
-
-    if (type == p->bits.field_88C_1 && type == 1 && (flags & 6) == 2 &&
-        volume == p->wordBits.field_88C_3) {
-        goto end;
+    temp_r5_15 = *(u8 *)0x03000BD8;
+    if ((arg0 != ((u32) (temp_r5_15 << 0x1D) >> 0x1E)) || ((arg0 == 1) && ((6 & temp_r5_15) == 2) && (arg1 != ((u32) ((u16) *(u8 *)0x03000BD8 << 0x16) >> 0x19)))) {
+        (*(u16 *)((s8 *)((void *)0x040000BC) + (0xA))) = (u16) (0xC5FF & (*(u16 *)((s8 *)((void *)0x040000BC) + (0xA))));
+        (*(u16 *)((s8 *)((void *)0x040000BC) + (0xA))) = (u16) (0x7FFF & (*(u16 *)((s8 *)((void *)0x040000BC) + (0xA))));
+        (*(u16 *)((s8 *)((void *)0x040000C8) + (0xA))) = (u16) (0xC5FF & (*(u16 *)((s8 *)((void *)0x040000C8) + (0xA))));
+        (*(u16 *)((s8 *)((void *)0x040000C8) + (0xA))) = (u16) (0x7FFF & (*(u16 *)((s8 *)((void *)0x040000C8) + (0xA))));
+        if ((6 & temp_r5_15) == 2) {
+            *(s16 *)0x04000208 = 0;
+            *(u16 *)0x02000004 &= 0xFFDF;
+            (*(u16 *)((s8 *)((void *)0x04000200) + (0))) = (u16) (0xFFFB & (*(u16 *)((s8 *)((void *)0x04000200) + (0))));
+            (*(u16 *)((s8 *)((void *)0x04000200) + (2))) = (u16) ((*(u16 *)((s8 *)((void *)0x04000200) + (2))) | 4);
+            *(s16 *)0x04000208 = 1;
+        }
+        *(u8 *)0x03000BD8 = (-7 & temp_r5_15) | ((arg0 & 3) * 2);
+        if (arg0 == 1) {
+            sub_8018B78(3, sub_80196BC);
+            *(u32 *)0x04000208 = 0;
+            *(u32 *)0x02000004 = (u16) (0xFF & *(u32 *)0x02000004);
+            *(u32 *)0x02000004 = (u16) ((arg1 << 8) | 0x20 | *(u32 *)0x02000004);
+            (*(u16 *)((s8 *)((void *)0x04000200) + (0))) = (u16) ((*(u16 *)((s8 *)((void *)0x04000200) + (0))) | 4);
+            (*(u16 *)((s8 *)((void *)0x04000200) + (2))) = (u16) ((*(u16 *)((s8 *)((void *)0x04000200) + (2))) | 4);
+            *(u32 *)0x04000208 = (s16) arg0;
+            *(u8 *)0x03000BD8 = (s16) ((0xFFFFFC07 & (u16) *(u8 *)0x03000BD8) | ((arg1 & 0x7F) * 8));
+        }
     }
-
-    REG_DMA1CNT_H &= 0xC5FF;
-    REG_DMA1CNT_H &= 0x7FFF;
-    REG_DMA2CNT_H &= 0xC5FF;
-    REG_DMA2CNT_H &= 0x7FFF;
-
-    if ((flags & 6) == 2) {
-        REG_IME = 0;
-        word_2000004 &= 0xFFDF;
-        REG_IE &= 0xFFFB;
-        REG_IF |= 4;
-        REG_IME = 1;
-    }
-
-    p->field_88C = ((type & 3) << 1) | (flags & ~6);
-
-    if (type != 1) {
-        goto end;
-    }
-
-    sub_8018B78(3, sub_80196BC);
-
-    REG_IME = 0;
-    word_2000004 &= 0xFF;
-    word_2000004 |= (volume << 8) | 0x20;
-    REG_IE |= 4;
-    REG_IF |= 4;
-    REG_IME = type;
-
-    volume &= 0x7F;
-    p->field_88C_word = (p->field_88C_word & 0xFC07) | (volume << 3);
-
-end:
-    gGameState.u_88C.field_88C |= 1;
+    *(u32 *)0x03000BD8 = (u8) (*(u32 *)0x03000BD8 | 1);
 }
 #endif
 

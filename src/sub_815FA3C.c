@@ -14,10 +14,14 @@ u32 sub_815FA3C(u32* param_1) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_815FA40.s\"");
 #else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
+void sub_815FA40(struct Sprite **arg0) {
+    struct Sprite *temp_r0_7;
+
+    temp_r0_7 = *arg0;
+    if (temp_r0_7 != NULL) {
+        sprite_hide_8021F20(temp_r0_7);
+    }
+}
 #endif
 
 #ifndef NONMATCHING

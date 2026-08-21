@@ -217,36 +217,37 @@ asm_unified(".include \"asm/nonmatching/sub_8019F24.s\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_801A1D4.s\"");
 #else
-u8 sub_801A1D4(void* dest) {
-    s32 i;
-    struct struc_3000D0C_channel* channel;
-    s16 sum;
-    u32 zero;
-    u8 gotData;
+u8 sub_801A1D4(void *dest) {
+    s32 sp0;
+    s32 sp4;
+    s32 temp_r0_19;
+    s32 var_r5_25;
+    void *temp_r1_36;
+    void *temp_r1_87;
+    void *temp_r2_69;
+    void *temp_r4_60;
 
-    gotData = dword_3000D0C->field_180();
-    dword_3000D0C->field_3 = 0;
-
-    if (gotData) {
-        for (i = 0; i <= 3; i++) {
-            channel = &dword_3000D0C->field_2C[i];
-            sum = channel->field_0 + channel->field_2 + channel->field_4 + channel->field_6
-                + channel->field_8 + channel->field_A + channel->field_C + channel->field_E
-                + channel->field_10 + channel->field_12;
-
-            if (sum == -13) {
-                gotData = i * 16;
-                CpuSet(&channel->field_4, (u8*)dest + gotData, CPU_SET_32BIT | 4);
-                dword_3000D0C->field_3 |= 1 << i;
+    temp_r0_19 = (*(s32 (**)())((s8 *)(*(void **)0x03000D0C) + (0x180)))() << 0x18;
+    (*(u8 *)((s8 *)(*(void **)0x03000D0C) + (3))) = 0U;
+    if (temp_r0_19 != 0) {
+        var_r5_25 = 0;
+        do {
+            temp_r1_36 = (*(s32 *)((s8 *)(*(u32 *)0x03000D0C) + (0x2C))) + (var_r5_25 * 0x18);
+            temp_r4_60 = temp_r1_36 + 4;
+            if ((s16) ((*(u16 *)((s8 *)(temp_r1_36) + (0))) + (*(u16 *)((s8 *)(temp_r1_36) + (2))) + (*(u16 *)((s8 *)(temp_r1_36) + (4))) + (*(u16 *)((s8 *)(temp_r1_36) + (6))) + (*(u16 *)((s8 *)(temp_r1_36) + (8))) + (*(u16 *)((s8 *)(temp_r1_36) + (0xA))) + (*(u16 *)((s8 *)(temp_r1_36) + (0xC))) + (*(u16 *)((s8 *)(temp_r1_36) + (0xE))) + (*(u16 *)((s8 *)(temp_r1_36) + (0x10))) + (*(u16 *)((s8 *)(temp_r1_36) + (0x12)))) == -0xD) {
+                sp4 = 0;
+                CpuSet(temp_r4_60, (var_r5_25 * 0x10) + dest, 0x04000004U);
+                temp_r2_69 = *(u32 *)0x03000D0C;
+                (*(u8 *)((s8 *)(temp_r2_69) + (3))) = (u8) ((1 << var_r5_25) | (*(u8 *)((s8 *)(temp_r2_69) + (3))));
             }
-
-            zero = 0;
-            CpuSet(&zero, &channel->field_4, CPU_SET_32BIT | CPU_SET_SRC_FIXED | 4);
-        }
+            sp0 = 0;
+            CpuSet(&sp0, temp_r4_60, 0x05000004U);
+            var_r5_25 += 1;
+        } while (var_r5_25 <= 3);
     }
-
-    dword_3000D0C->field_2 |= dword_3000D0C->field_3;
-    return dword_3000D0C->field_3;
+    temp_r1_87 = *(u32 *)0x03000D0C;
+    (*(u8 *)((s8 *)(temp_r1_87) + (2))) = (u8) ((*(u8 *)((s8 *)(temp_r1_87) + (2))) | (*(u8 *)((s8 *)(temp_r1_87) + (3))));
+    return (*(u8 *)((s8 *)(*(u32 *)0x03000D0C) + (3)));
 }
 #endif
 
