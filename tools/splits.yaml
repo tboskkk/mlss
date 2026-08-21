@@ -428,6 +428,8 @@ groups:
   - {obj: src/sub_807F47C, section: text}
   - {obj: src/sub_807F4C4, section: text}
   - {obj: asm/text08057568_p224, section: text}
+  - {obj: src/sub_807F53C, section: text}
+  - {obj: asm/text08057568_p409, section: text}
   - {obj: src/sub_807F834, section: text}
   - {obj: asm/text08057568_p209, section: text}
   - {obj: src/sub_807FA50, section: text}
