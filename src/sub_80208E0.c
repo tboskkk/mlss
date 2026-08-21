@@ -34,3 +34,9 @@ asm_unified(".include \"asm/nonmatching/sub_8020A78.s\"");
 #else
 #error "TODO: write sub_8020A78 to match asm/nonmatching/sub_8020A78.s, then delete this #error"
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sprite_show_8020CBC.s\"");
+#else
+#error "TODO: write sprite_show_8020CBC to match asm/nonmatching/sprite_show_8020CBC.s, then delete this #error"
+#endif
