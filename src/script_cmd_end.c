@@ -15,3 +15,9 @@ s32 script_cmd_end(void *arg1)
   new_var = (s8 *) arg1;
   return 1;
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80EB248.s\"");
+#else
+#error "TODO: write sub_80EB248 to match asm/nonmatching/sub_80EB248.s, then delete this #error"
+#endif
