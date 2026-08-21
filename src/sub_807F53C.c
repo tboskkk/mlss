@@ -173,3 +173,9 @@ void sub_807F754(u8 arg0, u16 arg1, u16 arg2) {
     sub_81151E4((*(s32 *)((s8 *)(*(void **)0x03000FD8) + (0x248))), arg0, arg1, arg2, 0xFF, 0x6000 & *(u16 *)0x0300034C, 0, 0);
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_807F7BC.s\"");
+#else
+#error "TODO: write sub_807F7BC to match asm/nonmatching/sub_807F7BC.s, then delete this #error"
+#endif
