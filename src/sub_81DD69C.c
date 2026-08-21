@@ -21,11 +21,35 @@ u32* sub_81DD69C(u32* param_1) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81DD6B0.s\"");
 #else
-#error "TODO: write sub_81DD6B0 to match asm/nonmatching/sub_81DD6B0.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81DD710.s\"");
 #else
-#error "TODO: write sub_81DD710 to match asm/nonmatching/sub_81DD710.s, then delete this #error"
+void sub_81DD710(void *arg0, s32 arg1) {
+    void *var_r4_11;
+
+    (*(s32 *)((s8 *)(arg0) + (0xC))) = 0x08CDD0D0;
+    var_r4_11 = (*(void **)((s8 *)(arg0) + (0)));
+    if (var_r4_11 != NULL) {
+        do {
+            (*(s32 (**)(void *, s32))((s8 *)((*(void **)((s8 *)(var_r4_11) + (8)))) + (0xC)))(var_r4_11 + 8 + M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */), 2);
+            if (var_r4_11 != NULL) {
+                (*(void **)((s8 *)(var_r4_11) + (8))) = (void *)0x08CDD0B8;
+                free_heap_8018DA8(var_r4_11);
+            }
+            var_r4_11 = (*(void **)((s8 *)(var_r4_11) + (4)));
+        } while (var_r4_11 != NULL);
+    }
+    (*(s32 *)((s8 *)(arg0) + (4))) = 0;
+    (*(void **)((s8 *)(arg0) + (0))) = NULL;
+    (*(s32 *)((s8 *)(arg0) + (8))) = 0;
+    if (1 & arg1) {
+        free_heap_8018DA8(arg0);
+    }
+}
 #endif
