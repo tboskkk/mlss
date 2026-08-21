@@ -34,3 +34,9 @@ s32 sub_80EF2EC(s32 arg1, void *arg3) {
     return 1;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/bevs_update.s\"");
+#else
+#error "TODO: write bevs_update to match asm/nonmatching/bevs_update.s, then delete this #error"
+#endif
