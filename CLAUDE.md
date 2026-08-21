@@ -460,6 +460,33 @@ doesn't count toward headline progress numbers unless that changes.
   default for any function that was the *last* one extracted from its
   file — check the fragment's own tail for unexplained bytes after the
   function's real `bx lr`/`pop {..., pc}` first.
+- **Any tool that runs a NONMATCHING build MUST delete the objects it
+  produced.** Otherwise everything downstream that judges tree health with
+  a plain `make` is lying. This is the flag-staleness landmine below,
+  weaponised: Make decides what to rebuild from mtimes and cannot see that
+  `-DNONMATCHING` is not a file, so a NONMATCHING object left in `build/`
+  gets LINKED into the ROM by the next plain `make` — an object where every
+  `#else` branch was compiled instead of the retail `.include`.
+  Three tools had this bug at once; the worst was `asm_differ_score()`,
+  because scoring runs constantly. Observed against a completely clean git
+  tree:
+  ```
+  build/src/sub_81333D8.o: undefined reference to `sub_807BF34'
+  .text is 0xFFA070, expected 0x1000000 — 5,304 symbols at the wrong address
+  ```
+  The undefined reference is the giveaway: `sub_807BF34`'s definition only
+  exists inside a `#ifndef NONMATCHING` branch, so an object compiled the
+  other way physically cannot link against it. If you ever see an
+  undefined reference to a `sub_XXXXXXX` against a clean tree, this is why —
+  `rm -rf build/` fixes it, and the real question is which tool left the
+  object behind.
+  The damage is not just a scary message. Anything checking health with a
+  plain `make` reads it as a broken repo: `score_sweep` scored 50 seeds in
+  a row as "does not compile" (all false, and an earlier run mislabeled
+  **1,291 functions** this way), and `tier3.ensure_extracted()`'s
+  post-extraction check would `revert_to_clean()` a perfectly good
+  extraction. Fixed in `asm_differ_score`, `unblock_files.py` and
+  `compile_errors.py` — all three now delete on every exit path.
 - **`make` can report `mlss.gba: OK` against a genuinely broken tree —
   Make's dependency tracking has no idea assembler `.include`s exist.**
   This is the single most dangerous landmine in this project, because it
