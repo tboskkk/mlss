@@ -933,6 +933,7 @@ groups:
   - {obj: asm/text08057568_p469, section: text}
   - {obj: src/sub_80FA6BC, section: text}
   - {obj: asm/text08057568_p550, section: text}
+  - {obj: src/sub_80FA7C4, section: text}
   - {obj: src/sub_80FA7E4, section: text}
   - {obj: asm/text08057568_p218, section: text}
   - {obj: src/sub_80FACA4, section: text}
