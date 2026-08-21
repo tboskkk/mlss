@@ -95,6 +95,8 @@ groups:
   - {obj: asm/text0801A548_p53, section: text}
   - {obj: src/sub_80208E0, section: text}
   - {obj: asm/text0801A548_p12, section: text}
+  - {obj: src/sub_8021AC8, section: text}
+  - {obj: asm/text0801A548_p56, section: text}
   - {obj: src/sprite_heap_free, section: text}
   - {obj: src/sprite_heap_search, section: text}
   - {obj: src/sub_8021EA8, section: text}
