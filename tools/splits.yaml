@@ -1014,6 +1014,7 @@ groups:
   - {obj: asm/text08057568_p234, section: text}
   - {obj: src/sub_81066DC, section: text}
   - {obj: asm/text08057568_p473, section: text}
+  - {obj: src/sub_81067D4, section: text}
   - {obj: src/sub_8106840, section: text}
   - {obj: asm/text08057568_p556, section: text}
   - {obj: src/sub_8106994, section: text}
