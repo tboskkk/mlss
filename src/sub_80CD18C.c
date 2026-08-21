@@ -53,3 +53,9 @@ void sub_80CD18C(u32* p0) {
     *(u32*)((u8*)r6 + 0x4C) = (u32)sub_80CD200;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80CD200.s\"");
+#else
+#error "TODO: write sub_80CD200 to match asm/nonmatching/sub_80CD200.s, then delete this #error"
+#endif
