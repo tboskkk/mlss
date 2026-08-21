@@ -44,34 +44,42 @@ void sub_80401F0(void *arg0, s32 arg1, s32 arg2, u16 arg3) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80402C4.s\"");
 #else
-s32 sub_8047EB8(void *);                        /* extern */
-
-void sub_80402C4(void *arg0) {
-    s32 temp_r1_58;
-    u8 temp_r5_34;
-
-    if ((s32) (*(s32 *)((s8 *)(arg0) + (0x25C))) >= 0) {
-        (*(s32 *)((s8 *)(arg0) + (0x18))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x18))) + (*(s32 *)((s8 *)(arg0) + (0x258))));
-        (*(s32 *)((s8 *)(arg0) + (0x258))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x258))) - (*(s32 *)((s8 *)(arg0) + (0x248))));
-        temp_r5_34 = 0x20 & (*(u8 *)((s8 *)(arg0) + (0x20D)));
-        if (temp_r5_34 == 0) {
-            if ((s32) (*(s32 *)((s8 *)(arg0) + (0x18))) <= 0) {
-                sub_8047EB8(arg0);
-                (*(s32 *)((s8 *)(arg0) + (0x18))) = (s32) temp_r5_34;
-                return;
-            }
-            goto block_7;
-        }
-        if ((s32) ((*(s32 *)((s8 *)(arg0) + (0x14))) + (*(s32 *)((s8 *)(arg0) + (0x18)))) <= (s32) (*(s32 *)((s8 *)(arg0) + (0x24C)))) {
-            sub_8047EB8(arg0);
-            temp_r1_58 = (*(s32 *)((s8 *)(arg0) + (0x14)));
-            if ((s32) (temp_r1_58 + (*(s32 *)((s8 *)(arg0) + (0x18)))) < 0) {
-                (*(s32 *)((s8 *)(arg0) + (0x18))) = (s32) (0 - temp_r1_58);
-            }
-        } else {
-block_7:
-            (*(s32 *)((s8 *)(arg0) + (0x25C))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x25C))) + 1);
-        }
+void sub_80402C4(void *arg0)
+{
+  s32 temp_r1_58;
+  s8 *new_var;
+  u8 temp_r5_34;
+  new_var = ((s8 *) arg0) + 0x25C;
+  if (((s32) (*((s32 *) new_var))) >= 0)
+  {
+    *((s32 *) (((s8 *) arg0) + 0x18)) = (s32) ((*((s32 *) (((s8 *) arg0) + 0x18))) + (*((s32 *) (((s8 *) arg0) + 0x258))));
+    *((s32 *) (((s8 *) arg0) + 0x258)) = (s32) ((*((s32 *) (((s8 *) arg0) + 0x258))) - (*((s32 *) (((s8 *) arg0) + 0x248))));
+    temp_r5_34 = 0x20 & (*((u8 *) (0x20D + ((s8 *) arg0))));
+    if (temp_r5_34 == 0)
+    {
+      if (((s32) (*((s32 *) (((s8 *) arg0) + 0x18)))) <= 0)
+      {
+        sub_8047EB8(arg0);
+        *((s32 *) (((s8 *) arg0) + 0x18)) = (s32) temp_r5_34;
+        return;
+      }
+      goto block_7;
     }
+    if (((s32) ((*((s32 *) (((s8 *) arg0) + 0x14))) + (*((s32 *) (((s8 *) arg0) + 0x18))))) <= ((s32) (*((s32 *) (((s8 *) arg0) + 0x24C)))))
+    {
+      sub_8047EB8(arg0);
+      temp_r1_58 = *((s32 *) (((s8 *) arg0) + 0x14));
+      if (((s32) (temp_r1_58 + (*((s32 *) (((s8 *) arg0) + 0x18))))) < 0)
+      {
+        *((s32 *) (((s8 *) arg0) + 0x18)) = (s32) (0 - temp_r1_58);
+      }
+    }
+    else
+    {
+      block_7:
+      *((s32 *) new_var) = (s32) ((*((s32 *) new_var)) + 1);
+
+    }
+  }
 }
 #endif

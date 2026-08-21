@@ -329,12 +329,18 @@ asm_unified(".include \"asm/nonmatching/sub_806C020.s\"");
 #else
 s32 sub_806C020(void *arg0)
 {
+  int new_var2;
+  int new_var3;
+  s32 **new_var;
   s32 var_r0_8;
   ;
   if (sub_8086D80() == 0)
   {
-    *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_806B824;
-    var_r0_8 = 0;
+    new_var2 = 0x4C;
+    new_var3 = 0;
+    new_var = (s32 **) (((s8 *) arg0) + new_var2);
+    *new_var = &sub_806B824;
+    var_r0_8 = new_var3;
   }
   return var_r0_8;
 }
