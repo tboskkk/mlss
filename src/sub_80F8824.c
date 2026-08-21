@@ -54,3 +54,9 @@ asm_unified(".include \"asm/nonmatching/script_cmd_btl_return.s\"");
 #else
 #error "TODO: write script_cmd_btl_return to match asm/nonmatching/script_cmd_btl_return.s, then delete this #error"
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80F889C.s\"");
+#else
+#error "TODO: write sub_80F889C to match asm/nonmatching/sub_80F889C.s, then delete this #error"
+#endif
