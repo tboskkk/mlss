@@ -1,0 +1,93 @@
+	.syntax unified
+	.text
+
+	thumb_func_start sub_80BC2CC
+sub_80BC2CC:
+	push {r4, r5, r6, lr}
+	add sp, #-0x004
+	ldr r0, _080BC374 @ =0x03000FD8
+	ldr r0, [r0, #0x00]
+	ldr r5, [r0, #0x74]
+	adds r4, r5, #0x0
+	adds r4, #0x08
+	ldr r0, [r4, #0x08]
+	ldrb r1, [r0, #0x12]
+	movs r0, #0x08
+	ands r0, r1
+	cmp r0, #0x00
+	beq _080BC36C
+	movs r6, #0x01
+	negs r6, r6
+	movs r0, #0x53
+	adds r1, r6, #0x0
+	bl play_sfx_80195B4
+	adds r0, r5, #0x0
+	adds r0, #0x7E
+	ldrb r0, [r0, #0x00]
+	movs r1, #0x06
+	ands r1, r0
+	cmp r1, #0x02
+	beq _080BC304
+	cmp r1, #0x04
+	bne _080BC350
+_080BC304:
+	ldr r0, [r4, #0x38]
+	cmp r0, #0x00
+	bge _080BC30C
+	adds r0, #0xFF
+_080BC30C:
+	asrs r0, r0, #0x08
+	adds r1, r5, #0x0
+	adds r1, #0xCB
+	ldrb r1, [r1, #0x00]
+	lsls r1, r1, #0x18
+	asrs r1, r1, #0x18
+	adds r0, r0, r1
+	adds r1, r0, #0x0
+	subs r1, #0x20
+	ldr r2, [r4, #0x3C]
+	cmp r2, #0x00
+	bge _080BC326
+	adds r2, #0xFF
+_080BC326:
+	asrs r2, r2, #0x08
+	adds r0, r5, #0x0
+	adds r0, #0xCC
+	ldrb r0, [r0, #0x00]
+	lsls r0, r0, #0x18
+	asrs r0, r0, #0x18
+	adds r2, r2, r0
+	str r6, [sp, #0x000]
+	adds r0, r4, #0x0
+	movs r3, #0x00
+	bl sub_808843C
+	movs r1, #0x18
+	adds r0, r5, #0x0
+	adds r0, #0x9A
+	strh r1, [r0, #0x00]
+	movs r1, #0x80
+	lsls r1, r1, #0x03
+	adds r0, r4, #0x0
+	bl sub_8088164
+_080BC350:
+	adds r0, r4, #0x0
+	adds r0, #0x76
+	ldrb r0, [r0, #0x00]
+	movs r1, #0x06
+	ands r1, r0
+	cmp r1, #0x02
+	beq _080BC362
+	cmp r1, #0x04
+	bne _080BC36C
+_080BC362:
+	ldr r0, _080BC378 @ =0x080C0A09
+	str r0, [r4, #0x4C]
+	adds r0, r4, #0x0
+	bl sub_8088560
+_080BC36C:
+	add sp, #0x004
+	pop {r4, r5, r6}
+	pop {r0}
+	bx r0
+_080BC374: .4byte 0x03000FD8
+_080BC378: .4byte sub_80C0A08
