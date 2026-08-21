@@ -28,3 +28,9 @@ asm_unified(".include \"asm/nonmatching/sub_810CB04.s\"");
 #else
 #error "TODO: write sub_810CB04 to match asm/nonmatching/sub_810CB04.s, then delete this #error"
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_810CB84.s\"");
+#else
+#error "TODO: write sub_810CB84 to match asm/nonmatching/sub_810CB84.s, then delete this #error"
+#endif
