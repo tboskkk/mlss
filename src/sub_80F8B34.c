@@ -42,3 +42,9 @@ void sub_80F8B34(u32 r0, u16 r1, s16 r2)
     }
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80F8B84.s\"");
+#else
+#error "TODO: write sub_80F8B84 to match asm/nonmatching/sub_80F8B84.s, then delete this #error"
+#endif
