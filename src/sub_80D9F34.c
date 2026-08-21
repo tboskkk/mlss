@@ -86,24 +86,20 @@ void sub_80DA024(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80DA098.s\"");
-#else
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 extern s32 sub_80DA180;
-
-void sub_80DA098(void *arg0) {
-    u16 temp_r0_11;
-    void *temp_r2_25;
-
-    temp_r0_11 = (*(u16 *)((s8 *)(arg0) + (0xAC))) - 1;
-    (*(u16 *)((s8 *)(arg0) + (0xAC))) = temp_r0_11;
-    if ((s32) (temp_r0_11 << 0x10) < 0) {
-        play_sfx_80195B4(0x38, -1);
-        sub_8082E1C(arg0, 2, 0, 0);
-        temp_r2_25 = (*(void **)((s8 *)(arg0) + (8)));
-        (*(u8 *)((s8 *)(temp_r2_25) + (0x12))) = (u8) ((-7 & (*(u8 *)((s8 *)(temp_r2_25) + (0x12)))) | 2);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80DA180;
-    }
+void sub_80DA098(void *arg0)
+{
+  u16 temp_r0_11;
+  void *temp_r2_25;
+  temp_r0_11 = (*((u16 *) (((s8 *) arg0) + 0xAC))) - 1;
+  *((u16 *) (((s8 *) arg0) + 0xAC)) = (*((u16 *) (((s8 *) arg0) + 0xAC))) - 1;
+  if (((s32) ((temp_r0_11 << 8) << 8)) < 0)
+  {
+    play_sfx_80195B4(0x38, -1);
+    sub_8082E1C(arg0, 2, 0, 0);
+    temp_r2_25 = *((void **) (((s8 *) arg0) + 8));
+    *((u8 *) (((s8 *) temp_r2_25) + 0x12)) = (u8) (((-7) & (*(((s8 *) temp_r2_25) + 0x12))) | 2);
+    *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_80DA180;
+  }
 }
-#endif
