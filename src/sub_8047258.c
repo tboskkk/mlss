@@ -29,3 +29,9 @@ void sub_8047258(void *arg0, s32 arg1) {
     *var_r3_24 = var_r0_31 | var_r1_32;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80472D0.s\"");
+#else
+#error "TODO: write sub_80472D0 to match asm/nonmatching/sub_80472D0.s, then delete this #error"
+#endif
