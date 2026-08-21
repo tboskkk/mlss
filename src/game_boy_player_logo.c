@@ -3,6 +3,8 @@
 #include "process.h"
 #include "game_boy_player_logo.h"
 
+asm_unified(".include \"asm/macros.inc\"");
+
 struct GameBoyPlayerLogo* gbpl_init(struct GameBoyPlayerLogo* gbpl, u8 priority, char* label,
                                     void (*finishCallback)(void)) {
     process_add(&gbpl->process, priority, label);
@@ -82,3 +84,9 @@ void gbpl_update(struct GameBoyPlayerLogo* gbpl) {
         }
     }
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_801A548.s\"");
+#else
+#error "TODO: write sub_801A548 to match asm/nonmatching/sub_801A548.s, then delete this #error"
+#endif
