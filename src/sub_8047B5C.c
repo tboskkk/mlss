@@ -40,5 +40,20 @@ s32 sub_8047B78(void *arg0)
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8047B98.s\"");
 #else
-#error "TODO: write sub_8047B98 to match asm/nonmatching/sub_8047B98.s, then delete this #error"
+s32 sub_804761C(void *, s32);                   /* extern */
+
+void sub_8047B98(void *arg0, s32 arg1) {
+    u8 *var_r0_39;
+
+    (*(u8 *)((s8 *)(arg0) + (0x213))) = (u8) ((0x3F & (*(u8 *)((s8 *)(arg0) + (0x213)))) | (((u32) ((*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x294)))) + (0x12))) << 0x1D) >> 0x1E) << 6));
+    (*(u16 *)((s8 *)(arg0) + (0x212))) = (u16) ((0xFFFFFE7F & (*(u16 *)((s8 *)(arg0) + (0x212)))) | ((arg1 & 3) << 7));
+    if (arg1 == 1) {
+        var_r0_39 = (u8 *)0x083A0633;
+    } else {
+        var_r0_39 = (u8 *)0x083A061D;
+    }
+    (*(u8 **)((s8 *)(arg0) + (0x2B0))) = var_r0_39;
+    (*(u8 *)((s8 *)(arg0) + (0x2B4))) = (u8) *(*(u8 **)((s8 *)(arg0) + (0x2B0)));
+    sub_804761C(arg0, 0);
+}
 #endif
