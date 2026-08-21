@@ -125,3 +125,9 @@ void sub_8137E50(u32* param_1)
     u32 uVar111;
     u3
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8137FA4.s\"");
+#else
+#error "TODO: write sub_8137FA4 to match asm/nonmatching/sub_8137FA4.s, then delete this #error"
+#endif
