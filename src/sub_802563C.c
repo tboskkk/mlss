@@ -67,8 +67,75 @@ void sub_8025ACC(void *arg0) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8025C04.s\"");
 #else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
+u8 sub_8025C04(s32 arg0, s32 arg1) {
+    u16 *sp0;
+    u16 *sp4;
+    s32 sp8;
+    s32 temp_r1_111;
+    s32 temp_r1_24;
+    s32 temp_r1_34;
+    s32 temp_r1_92;
+    s32 temp_r7_32;
+    s32 var_r0_128;
+    s32 var_r0_72;
+    s32 var_r0_99;
+    s32 var_r1_69;
+    s32 var_r2_110;
+    s32 var_r5_33;
+    s32 var_r6_45;
+    u16 temp_r2_66;
+    u8 var_r8_18;
+    void *temp_r3_63;
+    void *temp_r4_16;
+
+    temp_r4_16 = *(arg0 + 0x28 + (arg1 * 4));
+    var_r8_18 = 0;
+    temp_r1_24 = (*(s32 *)((s8 *)(temp_r4_16) + (0xC))) - ((u16) (*(u16 *)((s8 *)(temp_r4_16) + (0x272))) >> 1);
+    temp_r7_32 = (*(s32 *)((s8 *)(temp_r4_16) + (0x10))) + M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */);
+    var_r5_33 = (*(s32 *)((s8 *)(temp_r4_16) + (0x14)));
+    temp_r1_34 = (*(s32 *)((s8 *)(temp_r4_16) + (0x18)));
+    if ((temp_r1_34 > 0) || ((temp_r1_34 < 0) && ((s32) (*(s32 *)((s8 *)(temp_r4_16) + (0x40))) < 0))) {
+        var_r5_33 += temp_r1_34;
+    }
+    var_r6_45 = 0;
+    sp8 = arg0 + 0x28;
+    sp0 = temp_r4_16 + 0x276;
+    sp4 = temp_r4_16 + 0x274;
+    do {
+        temp_r3_63 = *(sp8 + (var_r6_45 * 4));
+        temp_r2_66 = (*(u16 *)((s8 *)(temp_r3_63) + (0x272)));
+        var_r1_69 = (*(s32 *)((s8 *)(temp_r3_63) + (0xC))) - (temp_r2_66 >> 1);
+        if (var_r1_69 < temp_r1_24) {
+            var_r0_72 = var_r1_69 + temp_r2_66;
+            var_r1_69 = temp_r1_24;
+        } else {
+            var_r0_72 = (*(u16 *)((s8 *)(temp_r4_16) + (0x272))) + temp_r1_24;
+        }
+        if ((s32) (var_r0_72 - var_r1_69) > 0) {
+            temp_r1_92 = (*(s32 *)((s8 *)(temp_r3_63) + (0x10))) + M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */);
+            if (temp_r1_92 > temp_r7_32) {
+                var_r0_99 = temp_r7_32 - (temp_r1_92 - (*(u16 *)((s8 *)(temp_r3_63) + (0x276))));
+            } else {
+                var_r0_99 = temp_r1_92 - (temp_r7_32 - *sp0);
+            }
+            if (var_r0_99 > 0) {
+                var_r2_110 = (*(s32 *)((s8 *)(temp_r3_63) + (0x14)));
+                temp_r1_111 = (*(s32 *)((s8 *)(temp_r3_63) + (0x18)));
+                if ((temp_r1_111 > 0) || ((temp_r1_111 < 0) && ((s32) (*(s32 *)((s8 *)(temp_r3_63) + (0x40))) < 0))) {
+                    var_r2_110 += temp_r1_111;
+                }
+                if (var_r2_110 <= var_r5_33) {
+                    var_r0_128 = (var_r2_110 + (*(u16 *)((s8 *)(temp_r3_63) + (0x274)))) - var_r5_33;
+                } else {
+                    var_r0_128 = (var_r5_33 + *sp4) - var_r2_110;
+                }
+                if (var_r0_128 >= 0) {
+                    var_r8_18 |= 1 << var_r6_45;
+                }
+            }
+        }
+        var_r6_45 += 1;
+    } while (var_r6_45 <= 1);
+    return var_r8_18;
+}
 #endif

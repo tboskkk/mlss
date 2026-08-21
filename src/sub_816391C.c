@@ -40,12 +40,8 @@ void sub_8163978(s32 arg0, s32 arg4, u8 arg5) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_81639C4.s\"");
-#else
 s32 sub_816391C(s32, s32, s32);             /* extern */
 
 void sub_81639C4(s32 arg0, s32 arg1) {
     sub_816391C(arg0, 6, arg1);
 }
-#endif
