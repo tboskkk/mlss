@@ -50,3 +50,9 @@ asm_unified(".include \"asm/nonmatching/init_fobj_with_data_80FB128.s\"");
 #else
 #error "TODO: write init_fobj_with_data_80FB128 to match asm/nonmatching/init_fobj_with_data_80FB128.s, then delete this #error"
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80FB448.s\"");
+#else
+#error "TODO: write sub_80FB448 to match asm/nonmatching/sub_80FB448.s, then delete this #error"
+#endif
