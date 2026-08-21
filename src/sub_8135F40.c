@@ -44,5 +44,29 @@ void sub_8136110(void *arg0, s32 arg1) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81361E4.s\"");
 #else
-#error "TODO: write sub_81361E4 to match asm/nonmatching/sub_81361E4.s, then delete this #error"
+s32 sub_8136470(s32 *);                         /* extern */
+s32 sub_8136688(void *, s32 *);                 /* extern */
+
+void *sub_81361E4(void *arg0, void *arg1, void *arg2) {
+    s32 sp0;
+    s32 sp4;
+    s32 sp8;
+    s32 sp10;
+    s32 temp_r2_26;
+    s32 temp_r3_22;
+    s32 temp_r6_19;
+
+    sp10 = 0x08CDC480;
+    sub_8136470(&sp0);
+    temp_r6_19 = (*(s32 *)((s8 *)(arg1) + (0)));
+    temp_r3_22 = (*(s32 *)((s8 *)(arg1) + (4)));
+    temp_r2_26 = (*(s32 *)((s8 *)(arg1) + (8)));
+    sp0 = ((*(s32 *)((s8 *)(arg2) + (0))) * temp_r6_19) + ((*(s32 *)((s8 *)(arg2) + (0x10))) * temp_r3_22) + ((*(s32 *)((s8 *)(arg2) + (0x20))) * temp_r2_26) + (*(s32 *)((s8 *)(arg2) + (0x30)));
+    sp4 = ((*(s32 *)((s8 *)(arg2) + (4))) * temp_r6_19) + ((*(s32 *)((s8 *)(arg2) + (0x14))) * temp_r3_22) + ((*(s32 *)((s8 *)(arg2) + (0x24))) * temp_r2_26) + (*(s32 *)((s8 *)(arg2) + (0x34)));
+    sp8 = ((*(s32 *)((s8 *)(arg2) + (8))) * temp_r6_19) + ((*(s32 *)((s8 *)(arg2) + (0x18))) * temp_r3_22) + ((*(s32 *)((s8 *)(arg2) + (0x28))) * temp_r2_26) + (*(s32 *)((s8 *)(arg2) + (0x38)));
+    (*(s32 *)((s8 *)(arg0) + (0x10))) = 0x08CDC480;
+    sub_8136688(arg0, &sp0);
+    sp10 = 0x08CDC480;
+    return arg0;
+}
 #endif
