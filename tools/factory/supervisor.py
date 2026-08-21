@@ -137,15 +137,34 @@ def reap_stale_claims(stale_minutes: float) -> int:
     cutoff = time.time() - stale_minutes * 60
     n = 0
     with db.tx(conn):
+        # NOT just `worker_id IS NOT NULL`. tier2 deliberately sets
+        # "permuting" with worker_id=None -- it tracks which searches it
+        # owns in its own in-process `procs` dict, not in the DB -- so a
+        # tier2 that dies (or a machine that reboots) leaves those rows
+        # with no worker_id, in a state nothing ever claims FROM, and the
+        # worker_id filter made them invisible to this reaper forever.
+        # Found after a reboot: 178 rows stranded that way, 139 of them
+        # carrying real permuter progress (a recorded best_score) that
+        # would simply have been abandoned.
+        #
+        # Safe against reaping a LIVE search: tier2 only rewrites
+        # updated_at when a score improves, so a running search can look
+        # stale -- but only up to stall_seconds_for()'s ceiling of 900s
+        # (~15 min), after which tier2 transitions the row out of
+        # permuting itself. REAP_STALE_MINUTES is 45, a 3x margin. The
+        # worst case if that margin were ever wrong is a duplicated
+        # search, not a corrupted repo.
         rows = conn.execute(
-            "SELECT name, state FROM functions WHERE worker_id IS NOT NULL AND updated_at < ?",
+            "SELECT name, state FROM functions "
+            "WHERE (worker_id IS NOT NULL OR state IN ('permuting', 'validating')) "
+            "AND updated_at < ?",
             (cutoff,),
         ).fetchall()
         for row in rows:
             recovery_state = REAP_RECOVERY.get(row["state"], row["state"])
             db.set_state(conn, row["name"], recovery_state, worker_id=None,
-                         notes=f"reaped: stuck claim from state={row['state']}, "
-                                f"worker_id set but no live worker for >{stale_minutes:.0f} min")
+                         notes=f"reaped: stuck in state={row['state']} with no live "
+                                f"worker for >{stale_minutes:.0f} min")
             n += 1
     conn.close()
     return n
