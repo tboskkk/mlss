@@ -67,6 +67,28 @@ def diff_for(name: str, body: str) -> str | None:
             gitops.run(["git", "checkout", "--", str(c_path.relative_to(gitops.REPO))])
 
 
+BUILD_FAILED_RE = re.compile(
+    r'#error "TODO: write|\berror\b:|invalid operands|undeclared|'
+    r'Traceback \(most recent call last\)|make: \*\*\*')
+
+
+def diff_failed(diff: str) -> bool:
+    """True when there is no real diff to analyze -- the build broke, or
+    asm-differ itself errored, so nothing here describes a DECOMPILATION
+    defect.
+
+    Learned the hard way: without this, the miner happily clusters
+    COMPILER DIAGNOSTICS. agbcc's caret diagnostics are formatted
+    `   28 | #error "..."` / `      |  ^~~~~`, which contains the same
+    ` | ` that asm-differ uses as its changed-line marker -- so the first
+    run's three biggest "candidate rules" were really just three flavours
+    of build failure. That was still useful (it's what surfaced the
+    translation-unit deadlock that unblock_files.py now fixes), but it is
+    emphatically not what this tool is for.
+    """
+    return bool(BUILD_FAILED_RE.search(diff))
+
+
 def changed_lines(diff: str) -> list[str]:
     """Just the lines asm-differ marks as differing.
 
@@ -77,7 +99,13 @@ def changed_lines(diff: str) -> list[str]:
     """
     out = []
     for line in diff.splitlines():
-        if not line.strip():
+        stripped = line.strip()
+        if not stripped:
+            continue
+        # A real asm-differ row starts with an instruction offset; a
+        # compiler diagnostic doesn't. Requiring that shape keeps
+        # diagnostics out even if one slips past diff_failed().
+        if not re.match(r"^[0-9a-f]{1,8}:", stripped):
             continue
         # Marker column: '|' (changed), '>' (extra), '<' (missing).
         if re.search(r"\s[|<>]\s", line) or line.rstrip().endswith(("|", "<", ">")):
@@ -123,15 +151,25 @@ def main():
 
     groups: dict[str, list[tuple[str, int]]] = defaultdict(list)
     sampled = 0
+    no_seed = 0
+    build_broken: list[str] = []
     for r in rows:
         if sampled >= args.limit:
             break
         name = r["name"]
         body = m2c_bridge.generate(name)
         if not body:
+            no_seed += 1
             continue
         diff = diff_for(name, body)
         if not diff:
+            continue
+        # Counted and reported separately, never clustered: a function
+        # whose unit won't build tells us nothing about DECOMPILATION
+        # defects, and silently mixing these in is exactly how the first
+        # run produced three "rules" that were really build failures.
+        if diff_failed(diff):
+            build_broken.append(name)
             continue
         lines = changed_lines(diff)
         if not lines:
@@ -142,6 +180,14 @@ def main():
             print(f"  ...sampled {sampled}")
 
     conn.close()
+
+    if no_seed:
+        print(f"\n{no_seed} function(s) skipped: m2c produced no seed.")
+    if build_broken:
+        print(f"{len(build_broken)} function(s) skipped: their translation unit "
+              f"does not build, so there's no diff to analyze.")
+        print(f"  -> run `python3 tools/factory/unblock_files.py` for these; "
+              f"e.g. {', '.join(build_broken[:4])}")
 
     ranked = sorted(groups.items(), key=lambda kv: len(kv[1]), reverse=True)
     print(f"\n=== {sampled} stalled functions sampled, "
