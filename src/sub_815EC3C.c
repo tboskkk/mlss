@@ -17,3 +17,9 @@ u32 sub_815EC3C(u32 param_1) {
     *(u8*)(param_1 + 0x1A) = 0;
     return param_1;
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_815EC4C.s\"");
+#else
+#error "TODO: write sub_815EC4C to match asm/nonmatching/sub_815EC4C.s, then delete this #error"
+#endif
