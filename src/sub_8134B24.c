@@ -22,5 +22,23 @@ bool32 sub_8134B24(u16 *param_1)
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8134B38.s\"");
 #else
-#error "TODO: write sub_8134B38 to match asm/nonmatching/sub_8134B38.s, then delete this #error"
+s32 sub_8134AA8(void *);                        /* extern */
+
+void sub_8134B38(void *arg0, u16 arg1, u16 arg2) {
+    u16 temp_r2_11;
+    u16 var_r1_9;
+
+    var_r1_9 = arg1;
+    temp_r2_11 = arg2;
+    if ((u32) var_r1_9 > 3U) {
+        var_r1_9 = 3;
+    }
+    (*(u16 *)((s8 *)(arg0) + (0))) = var_r1_9;
+    (*(s16 *)((s8 *)(arg0) + (2))) = 0;
+    (*(u16 *)((s8 *)(arg0) + (4))) = temp_r2_11;
+    if (temp_r2_11 == 0) {
+        (*(u16 *)((s8 *)(arg0) + (4))) = 1U;
+        sub_8134AA8(arg0);
+    }
+}
 #endif
