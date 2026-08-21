@@ -23,3 +23,9 @@ void sub_80DEAC0(void *arg0) {
     (*(s32 *)((s8 *)(arg0) + (0x18))) = var_r0_14;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80DEAE0.s\"");
+#else
+#error "TODO: write sub_80DEAE0 to match asm/nonmatching/sub_80DEAE0.s, then delete this #error"
+#endif
