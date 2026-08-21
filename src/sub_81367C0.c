@@ -14,3 +14,9 @@ void *sub_81367C0(void *arg0, u8 arg1) {
     (*(s32 *)((s8 *)(arg0) + (0x18))) = 0x08CDC4A0;
     return arg0;
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_81367DC.s\"");
+#else
+#error "TODO: write sub_81367DC to match asm/nonmatching/sub_81367DC.s, then delete this #error"
+#endif
