@@ -1000,6 +1000,7 @@ groups:
   - {obj: asm/text08057568_p323, section: text}
   - {obj: src/sub_813B878, section: text}
   - {obj: asm/text08057568_p206, section: text}
+  - {obj: src/sub_813B920, section: text}
   - {obj: src/sub_813B9B4, section: text}
   - {obj: asm/text08057568_p345, section: text}
   - {obj: src/sub_813BB60, section: text}
