@@ -151,10 +151,46 @@ asm_unified(".include \"asm/nonmatching/sub_807DFE8.s\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_807E084.s\"");
 #else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
+s32 sub_807DDE4(void *, void *);                /* extern */
+s32 sub_807DFE8(void *, void *);                    /* extern */
+
+void sub_807E084(void) {
+    void *temp_r2_34;
+    void *temp_r2_77;
+    void *temp_r2_8;
+    void *temp_r4_23;
+    void *temp_r4_66;
+    void *temp_r6_19;
+    void *var_r5_15;
+
+    temp_r2_8 = *(void **)0x03000FD8;
+    (*(u8 *)((s8 *)(temp_r2_8) + (0xD))) = (u8) (-0xD & (*(u8 *)((s8 *)(temp_r2_8) + (0xD))));
+    var_r5_15 = (*(void **)((s8 *)(*(void **)0x03000FD8) + (0x54)));
+    if (var_r5_15 != NULL) {
+        do {
+            temp_r6_19 = (*(void **)((s8 *)(var_r5_15) + (0x34)));
+            temp_r4_23 = (*(void **)((s8 *)(*(u32 *)0x03000FD8) + (0x80)));
+            if ((temp_r4_23 != NULL) && ((6 & (*(u8 *)((s8 *)(temp_r4_23) + (0x7E)))) == 2)) {
+                temp_r2_34 = (*(void **)((s8 *)(temp_r4_23) + (0x38)));
+                if ((temp_r2_34 == NULL) || ((6 & (*(u8 *)((s8 *)(temp_r2_34) + (0x76)))) != 2)) {
+                    sub_807DDE4(var_r5_15, temp_r4_23 + 8);
+                } else if (sub_807DFE8(var_r5_15, temp_r2_34) == 0) {
+                    sub_807DDE4(var_r5_15, temp_r4_23 + 8);
+                }
+            }
+            temp_r4_66 = (*(void **)((s8 *)(*(u32 *)0x03000FD8) + (0x84)));
+            if ((temp_r4_66 != NULL) && ((6 & (*(u8 *)((s8 *)(temp_r4_66) + (0x7E)))) == 2)) {
+                temp_r2_77 = (*(void **)((s8 *)(temp_r4_66) + (0x38)));
+                if ((temp_r2_77 == NULL) || ((6 & (*(u8 *)((s8 *)(temp_r2_77) + (0x76)))) != 2)) {
+                    sub_807DDE4(var_r5_15, temp_r4_66 + 8);
+                } else if (sub_807DFE8(var_r5_15, temp_r2_77) == 0) {
+                    sub_807DDE4(var_r5_15, temp_r4_66 + 8);
+                }
+            }
+            var_r5_15 = temp_r6_19;
+        } while (var_r5_15 != NULL);
+    }
+}
 #endif
 
 #ifndef NONMATCHING

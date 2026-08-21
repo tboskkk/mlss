@@ -37,10 +37,105 @@ asm_unified(".include \"asm/nonmatching/sub_816C74C.s\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_816C834.s\"");
 #else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
+s32 sub_816B690(void *, s32);                   /* extern */
+s32 sub_816BAB4(void *);                        /* extern */
+s32 sub_816BD78(void *);                        /* extern */
+s32 sub_816BEC4(void *, void **, s32, void *, void *); /* extern */
+
+void sub_816C834(void *arg0) {
+    s32 temp_r0_16;
+    s32 temp_r0_43;
+    s32 temp_r0_73;
+    s32 temp_r0_99;
+    s32 temp_r2_113;
+    s32 temp_r2_87;
+    void *temp_r1_123;
+    void *temp_r1_141;
+    void *temp_r1_71;
+    void *temp_r1_97;
+    void *temp_r2_55;
+    void *temp_r6_15;
+    void *var_r4_10;
+
+    var_r4_10 = *(*(void ***)((s8 *)(arg0) + (0x1C)));
+    if (var_r4_10 == NULL) {
+
+    } else {
+loop_2:
+        temp_r6_15 = (*(void **)((s8 *)(var_r4_10) + (8)));
+        temp_r0_16 = (*(s32 *)((s8 *)(var_r4_10) + (0)));
+        switch (temp_r0_16) {                       /* irregular */
+        case 0:
+            sub_816BAB4(var_r4_10);
+            break;
+        case 2:
+            sub_816BD78(var_r4_10);
+            break;
+        case 6:
+            temp_r0_43 = sub_816BEC4(var_r4_10, (*(void ***)((s8 *)(arg0) + (0x1C))), (*(s32 *)((s8 *)(arg0) + (0x2C))), (*(void **)((s8 *)(arg0) + (0x30))), (*(void **)((s8 *)(arg0) + (0x34))));
+            if (temp_r0_43 == (s8) (*(u8 *)((s8 *)((void *)0x08218EB6) + (2)))) {
+                (*(s32 *)((s8 *)(arg0) + (0x64))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x64))) + 0x3C);
+                temp_r2_55 = (*(void **)((s8 *)((*(void **)((s8 *)(arg0) + (0x48)))) + (0x10)));
+                (*(u8 *)((s8 *)(temp_r2_55) + (0x12))) = (u8) ((*(u8 *)((s8 *)(temp_r2_55) + (0x12))) & ~0x10);
+            }
+            if (temp_r0_43 >= 0) {
+                if (temp_r0_43 > 0) {
+                    play_sfx_80195B4(0x2E, -1);
+                    temp_r1_71 = (*(void **)((s8 *)(arg0) + (0x38)));
+                    temp_r0_73 = (*(s32 *)((s8 *)(temp_r1_71) + (0x18))) + temp_r0_43;
+                    (*(s32 *)((s8 *)(temp_r1_71) + (0x18))) = temp_r0_73;
+                    if (temp_r0_73 < 0) {
+                        (*(s32 *)((s8 *)(temp_r1_71) + (0x18))) = 0;
+                    }
+                    if ((s32) (*(s32 *)((s8 *)(temp_r1_71) + (0x18))) > 0x3E7) {
+                        (*(s32 *)((s8 *)(temp_r1_71) + (0x18))) = 0x3E7;
+                    }
+                    temp_r2_87 = (*(s32 *)((s8 *)(temp_r1_71) + (0x18)));
+                    if ((s32) (*(s32 *)((s8 *)(temp_r1_71) + (0x34))) < temp_r2_87) {
+                        (*(s32 *)((s8 *)(temp_r1_71) + (0x34))) = temp_r2_87;
+                        (*(s32 *)((s8 *)(temp_r1_71) + (0x50))) = 1;
+                    }
+                }
+            } else {
+                temp_r1_97 = (*(void **)((s8 *)(arg0) + (0x38)));
+                temp_r0_99 = (*(s32 *)((s8 *)(temp_r1_97) + (0x18))) - temp_r0_43;
+                (*(s32 *)((s8 *)(temp_r1_97) + (0x18))) = temp_r0_99;
+                if (temp_r0_99 < 0) {
+                    (*(s32 *)((s8 *)(temp_r1_97) + (0x18))) = 0;
+                }
+                if ((s32) (*(s32 *)((s8 *)(temp_r1_97) + (0x18))) > 0x3E7) {
+                    (*(s32 *)((s8 *)(temp_r1_97) + (0x18))) = 0x3E7;
+                }
+                temp_r2_113 = (*(s32 *)((s8 *)(temp_r1_97) + (0x18)));
+                if ((s32) (*(s32 *)((s8 *)(temp_r1_97) + (0x34))) < temp_r2_113) {
+                    (*(s32 *)((s8 *)(temp_r1_97) + (0x34))) = temp_r2_113;
+                    (*(s32 *)((s8 *)(temp_r1_97) + (0x50))) = 1;
+                }
+                if ((*(s32 *)((s8 *)(arg0) + (0x60))) == 0) {
+                    temp_r1_123 = (*(void **)((s8 *)(arg0) + (0x30)));
+                    if ((*(s32 *)((s8 *)(temp_r1_123) + (0x78))) == 0) {
+                        (*(s32 *)((s8 *)(temp_r1_123) + (0x78))) = 3;
+                        (*(s32 *)((s8 *)(temp_r1_123) + (0x8C))) = (s32) ((*(s32 *)((s8 *)(temp_r1_123) + (0x8C))) + 0x10);
+                        play_sfx_80195B4(0x40, -1);
+                    }
+                } else {
+                    temp_r1_141 = (*(void **)((s8 *)(arg0) + (0x34)));
+                    if ((*(s32 *)((s8 *)(temp_r1_141) + (0x78))) == 0) {
+                        (*(s32 *)((s8 *)(temp_r1_141) + (0x78))) = 3;
+                        (*(s32 *)((s8 *)(temp_r1_141) + (0x8C))) = (s32) ((*(s32 *)((s8 *)(temp_r1_141) + (0x8C))) + 0x10);
+                        play_sfx_80195B4(0x40, -1);
+                    }
+                }
+            }
+            break;
+        }
+        var_r4_10 = temp_r6_15;
+        if (var_r4_10 != NULL) {
+            goto loop_2;
+        }
+    }
+    sub_816B690((*(void **)((s8 *)(arg0) + (0x38))), 0);
+}
 #endif
 
 #ifndef NONMATCHING
