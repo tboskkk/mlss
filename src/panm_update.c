@@ -10,17 +10,35 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/panm_update.s\"");
 #else
-#error "TODO: write panm_update to match asm/nonmatching/panm_update.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8116488.s\"");
 #else
-#error "TODO: write sub_8116488 to match asm/nonmatching/sub_8116488.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81165CC.s\"");
 #else
-#error "TODO: write sub_81165CC to match asm/nonmatching/sub_81165CC.s, then delete this #error"
+void sub_81165CC(void *arg0, s32 arg1) {
+    (*(u16 *)((s8 *)(arg0) + (0x34))) = (u16) (*(u16 *)((s8 *)(arg0) + (0x44)));
+    (*(u16 *)((s8 *)(arg0) + (0x44))) = 0U;
+    if (arg1 != 0) {
+        if (4 & (*(u8 *)((s8 *)(arg0) + (0x32)))) {
+            (*(s8 *)((s8 *)(arg0) + (0x48))) = 0xFF;
+            (*(u8 *)((s8 *)(arg0) + (0x32))) = 0U;
+            return;
+        }
+        (*(s8 *)((s8 *)(arg0) + (0x48))) = 1;
+        (*(u8 *)((s8 *)(arg0) + (0x32))) = 4U;
+    }
+}
 #endif
