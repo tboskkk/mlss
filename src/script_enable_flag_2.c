@@ -15,3 +15,9 @@ void script_enable_flag_2(void *arg2)
   *((u16 *) (new_var + 0xA0)) = (u16) new_var2;
   new_var = arg2;
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80F04F8.s\"");
+#else
+#error "TODO: write sub_80F04F8 to match asm/nonmatching/sub_80F04F8.s, then delete this #error"
+#endif
