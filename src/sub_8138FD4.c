@@ -102,3 +102,9 @@ u32 sub_8139030(u32 p0, s16 p1) {
     return 0;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8139070.s\"");
+#else
+#error "TODO: write sub_8139070 to match asm/nonmatching/sub_8139070.s, then delete this #error"
+#endif
