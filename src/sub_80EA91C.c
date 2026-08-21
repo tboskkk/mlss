@@ -53,13 +53,9 @@ s32 sub_80EA968(s32 arg0, s32 arg1, void *arg2, s32 arg3) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80EA9A8.s\"");
-#else
 s32 sub_801B0AC(u16);                           /* extern */
 
 s32 sub_80EA9A8(s32 arg0, s32 arg1, u16 *arg2) {
     sub_801B0AC(*arg2);
     return 1;
 }
-#endif
