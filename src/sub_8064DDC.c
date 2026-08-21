@@ -288,27 +288,28 @@ asm_unified(".include \"asm/nonmatching/sub_8065A9C.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8065AE4.s\"");
-#else
+s32 sub_807C298();                              /* extern */
+s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
+s32 sub_8087124();                                  /* extern */
+extern s32 sub_806589C;
 s32 sub_8065AE4(void *arg0)
 {
   s32 var_r0_8;
-  ;
-  if (sub_8087124() == 0)
+  var_r0_8 = sub_8087124();
+  if (var_r0_8 == 0)
   {
     if ((*((s32 *) (((s8 *) arg0) + 0x30))) != 0)
     {
       sub_807C298();
     }
     sub_8082E1C(arg0, 1, 0, 0);
-    *((s16 *) (((s8 *) arg0) + 0xAC)) = 8;
+    var_r0_8 = 0xAC;
+    *((s16 *) (((s8 *) arg0) + var_r0_8)) = 8;
     *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_806589C;
     var_r0_8 = 0;
   }
-  return var_r0_8;
+ do { return var_r0_8; } while (0);
 }
-#endif
 
 s32 sub_807C298(s32);                           /* extern */
 extern s32 sub_8065C5C;
