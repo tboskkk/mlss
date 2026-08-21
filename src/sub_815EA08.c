@@ -28,10 +28,54 @@ asm_unified(".include \"asm/nonmatching/sub_815EA18.s\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_815EA64.s\"");
 #else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
+void sub_815EA64(void *arg0) {
+    struct Sprite *temp_r0_14;
+    struct Sprite *temp_r0_19;
+    struct Sprite *temp_r0_24;
+    struct Sprite *temp_r0_29;
+    struct Sprite *temp_r0_34;
+    struct Sprite *temp_r0_39;
+    struct Sprite *temp_r0_44;
+    struct Sprite *temp_r0_49;
+    struct Sprite *temp_r0_9;
+
+    temp_r0_9 = (*(struct Sprite **)((s8 *)(arg0) + (4)));
+    if (temp_r0_9 != NULL) {
+        sprite_show_8020CBC(temp_r0_9);
+    }
+    temp_r0_14 = (*(struct Sprite **)((s8 *)((arg0 + 4)) + (4)));
+    if (temp_r0_14 != NULL) {
+        sprite_show_8020CBC(temp_r0_14);
+    }
+    temp_r0_19 = (*(struct Sprite **)((s8 *)(arg0) + (0xC)));
+    if (temp_r0_19 != NULL) {
+        sprite_show_8020CBC(temp_r0_19);
+    }
+    temp_r0_24 = (*(struct Sprite **)((s8 *)(arg0) + (0x10)));
+    if (temp_r0_24 != NULL) {
+        sprite_show_8020CBC(temp_r0_24);
+    }
+    temp_r0_29 = (*(struct Sprite **)((s8 *)(arg0) + (0x14)));
+    if (temp_r0_29 != NULL) {
+        sprite_show_8020CBC(temp_r0_29);
+    }
+    temp_r0_34 = (*(struct Sprite **)((s8 *)(arg0) + (0x18)));
+    if (temp_r0_34 != NULL) {
+        sprite_show_8020CBC(temp_r0_34);
+    }
+    temp_r0_39 = (*(struct Sprite **)((s8 *)(arg0) + (0x1C)));
+    if (temp_r0_39 != NULL) {
+        sprite_show_8020CBC(temp_r0_39);
+    }
+    temp_r0_44 = (*(struct Sprite **)((s8 *)(arg0) + (0x20)));
+    if (temp_r0_44 != NULL) {
+        sprite_show_8020CBC(temp_r0_44);
+    }
+    temp_r0_49 = (*(struct Sprite **)((s8 *)(arg0) + (0x24)));
+    if (temp_r0_49 != NULL) {
+        sprite_show_8020CBC(temp_r0_49);
+    }
+}
 #endif
 
 #ifndef NONMATCHING
