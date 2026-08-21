@@ -12,3 +12,9 @@ asm_unified(".include \"asm/nonmatching/start_battle_8027AC4.s\"");
 #else
 #error "TODO: write start_battle_8027AC4 to match asm/nonmatching/start_battle_8027AC4.s, then delete this #error"
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8027D64.s\"");
+#else
+#error "TODO: write sub_8027D64 to match asm/nonmatching/sub_8027D64.s, then delete this #error"
+#endif
