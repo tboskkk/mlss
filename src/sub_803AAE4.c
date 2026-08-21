@@ -10,7 +10,61 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_803AAE4.s\"");
 #else
-#error "TODO: write sub_803AAE4 to match asm/nonmatching/sub_803AAE4.s, then delete this #error"
+s32 sub_802C4D4(void *, s32, s32);              /* extern */
+s32 sub_8040804(void *, s32, s32, s32);         /* extern */
+s32 sub_8049000(void *, s32);                   /* extern */
+
+void sub_803AAE4(void *arg0) {
+    void *temp_r0_122;
+    void *temp_r1_41;
+    void *temp_r2_115;
+    void *temp_r2_130;
+    void *temp_r2_40;
+    void *temp_r2_55;
+    void *temp_r2_92;
+    void *temp_r3_91;
+    void *temp_r4_54;
+
+    sub_802C4D4(arg0, 1, 1);
+    *(*(s8 **)((s8 *)((*(void **)((s8 *)(arg0) + (0x200)))) + (0x368))) = 0x13;
+    *(*(s8 **)((s8 *)((*(void **)((s8 *)(arg0) + (0x204)))) + (0x368))) = 0x13;
+    (*(s16 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x200)))) + (4))) = 0xA1;
+    (*(s16 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x204)))) + (4))) = 0xA1;
+    temp_r2_40 = (*(void **)((s8 *)(arg0) + (0x204)));
+    temp_r1_41 = (*(void **)((s8 *)(arg0) + (0x200)));
+    (*(u8 *)((s8 *)(temp_r1_41) + (0x358))) = (u8) ((*(u8 *)((s8 *)(temp_r1_41) + (0x358))) | 8);
+    (*(u8 *)((s8 *)(temp_r2_40) + (0x358))) = (u8) ((*(u8 *)((s8 *)(temp_r2_40) + (0x358))) | 8);
+    temp_r4_54 = (*(void **)((s8 *)(arg0) + (0x204)));
+    temp_r2_55 = (*(void **)((s8 *)(arg0) + (0x200)));
+    (*(u8 *)((s8 *)(temp_r2_55) + (0x214))) = (u8) ((-8 & (*(u8 *)((s8 *)(temp_r2_55) + (0x214)))) | 1);
+    (*(u8 *)((s8 *)(temp_r4_54) + (0x214))) = (u8) ((-8 & (*(u8 *)((s8 *)(temp_r4_54) + (0x214)))) | 1);
+    sub_8049000((*(void **)((s8 *)(arg0) + (0x204))), 0x1037);
+    sub_8049000((*(void **)((s8 *)(arg0) + (0x200))), 0x104F);
+    sub_8040804((*(void **)((s8 *)(arg0) + (0x204))), 1, 1, -1);
+    sub_8040804((*(void **)((s8 *)(arg0) + (0x200))), 1, 2, -1);
+    temp_r3_91 = (*(void **)((s8 *)(arg0) + (0x204)));
+    temp_r2_92 = (*(void **)((s8 *)(arg0) + (0x200)));
+    (*(u8 *)((s8 *)(temp_r2_92) + (0x20D))) = (u8) (-9 & (*(u8 *)((s8 *)(temp_r2_92) + (0x20D))));
+    (*(u8 *)((s8 *)(temp_r3_91) + (0x20D))) = (u8) (-9 & (*(u8 *)((s8 *)(temp_r3_91) + (0x20D))));
+    (*(s16 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x200)))) + (0x242))) = 0x99;
+    (*(s16 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x200)))) + (0x244))) = 0;
+    temp_r2_115 = (*(void **)((s8 *)(arg0) + (0x200)));
+    temp_r0_122 = (*(void **)((s8 *)(arg0) + (0x204)));
+    (*(s32 *)((s8 *)(temp_r0_122) + (0x234))) = -1;
+    (*(s32 *)((s8 *)(temp_r0_122) + (0x230))) = -1;
+    (*(s32 *)((s8 *)(temp_r2_115) + (0x234))) = -1;
+    (*(s32 *)((s8 *)(temp_r2_115) + (0x230))) = -1;
+    temp_r2_130 = (*(void **)((s8 *)(arg0) + (0x204)));
+    (*(u8 *)((s8 *)(temp_r2_130) + (0x214))) = (s32) (((s32) (*(u8 *)((s8 *)(temp_r2_130) + (0x214))) & 0xFFFE1FFF) | 0x1C000);
+    (*(s16 *)((s8 *)(arg0) + (0x26E))) = 0;
+    (*(s32 *)((s8 *)(arg0) + (0x264))) = 0;
+    (*(s16 *)((s8 *)(arg0) + (0x268))) = 0;
+    (*(s8 *)((s8 *)(arg0) + (0x261))) = 0;
+    (*(u8 *)((s8 *)(arg0) + (0x26A))) = (u8) (-5 & (*(u8 *)((s8 *)(arg0) + (0x26A))));
+    (*(s32 *)((s8 *)(arg0) + (0x208))) = (s32) (((*(s32 *)((s8 *)(arg0) + (0x208))) & 0xFFFE7FFF) | 0x10000);
+    (*(u8 *)((s8 *)(arg0) + (0x246))) = (u8) ((*(u8 *)((s8 *)(arg0) + (0x246))) | 0x1C);
+    play_sfx_80195B4(0x59, -1);
+}
 #endif
 
 #ifndef NONMATCHING
