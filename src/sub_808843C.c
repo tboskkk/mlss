@@ -39,3 +39,9 @@ void sub_808843C(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
     }
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80884AC.s\"");
+#else
+#error "TODO: write sub_80884AC to match asm/nonmatching/sub_80884AC.s, then delete this #error"
+#endif
