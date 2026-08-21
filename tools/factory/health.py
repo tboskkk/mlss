@@ -34,6 +34,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import db  # noqa: E402
 import gitops
+import tier2
 
 REPO = gitops.REPO  # noqa: E402
 
@@ -174,19 +175,44 @@ def checks(conn) -> list[tuple[str, str, str]]:
     aborts = conn.execute("SELECT COUNT(*) FROM events WHERE kind='t2_ceiling_abort' AND ts>?",
                           (now - 3 * 3600,)).fetchone()[0]
     real = launches - aborts
-    if real >= 40 and converged == 0:
+    # Low yield has two completely different causes and they need different
+    # responses, so report which one this is rather than just the ratio.
+    # Measured payoff by attempt number, over the whole run: 176 functions
+    # matched on their FIRST search, 25 on their second, 0 on their third.
+    # So once the reachable pool has had a first pass, yield falls by
+    # design and a bare percentage reads like a regression when nothing is
+    # wrong. `first` below is how much of the current work is first
+    # attempts; if it is near zero the pool is exhausted, not broken, and
+    # the answer is better seeds (new m2c rules), never more compute.
+    # Scoped to the REACHABLE pool, i.e. seeds tier2 will actually claim.
+    # Counting every first-attempt seed instead would never report
+    # exhaustion, because ~1,970 seeds sit above SEED_SCORE_CEILING and are
+    # deliberately not searched -- they are not waiting for a slot, they are
+    # waiting for a better seed.
+    firsts = conn.execute(
+        "SELECT COUNT(*) FROM functions WHERE state='tier2_ready' "
+        "AND escalation_count = 0 AND (best_score IS NULL OR best_score < ?)",
+        (tier2.SEED_SCORE_CEILING,),
+    ).fetchone()[0]
+    exhausted = firsts == 0
+    if real >= 40 and converged == 0 and not exhausted:
         out.append(("search yield", FAIL,
-                    f"{real} real searches in 3h, ZERO converged -- the searches are "
-                    f"running, so suspect what happens to a win (tier2's promotion "
-                    f"path), not the seeds"))
-    elif real >= 25 and converged / real < 0.03:
+                    f"{real} real searches in 3h, ZERO converged, and {firsts} seeds "
+                    f"still on a FIRST attempt -- the searches are running, so suspect "
+                    f"what happens to a win (tier2's promotion path), not the seeds"))
+    elif real >= 25 and converged / real < 0.03 and not exhausted:
         out.append(("search yield", WARN,
                     f"{converged}/{real} converged in 3h ({100*converged/real:.1f}%) "
-                    f"vs a ~15% baseline -- check the promotion path before the seeds"))
+                    f"vs a ~15% baseline, with {firsts} first-attempt seeds left -- "
+                    f"check the promotion path before the seeds"))
     else:
         rate = f"{100*converged/real:.0f}%" if real else "--"
+        note = (" -- pool exhausted of first attempts, so low yield is EXPECTED "
+                "(176 matched on attempt 1, 25 on attempt 2, 0 on attempt 3); "
+                "the lever is better seeds, not more compute") if exhausted else ""
         out.append(("search yield", OK,
-                    f"{converged}/{real} converged in 3h ({rate}), {aborts} ceiling abort(s)"))
+                    f"{converged}/{real} converged in 3h ({rate}), "
+                    f"{aborts} ceiling abort(s){note}"))
 
     # --- inert rows ------------------------------------------------------
     # needs_human is claimed by NOTHING (tier2 says so in its own comment,
