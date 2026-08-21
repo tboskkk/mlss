@@ -60,6 +60,8 @@ Explicitly out of scope, mentioned only so it isn't confused for a next
 step of THIS project: a PS1 decomp is a separate interest of the
 maintainer's, unrelated to MLSS/GBA. If it happens, it's its own repo.
 
+## Building
+
     ./container.sh make
 
 That's it — the container is the entire toolchain (devkitARM + a pinned
@@ -776,45 +778,88 @@ undefined symbol reference from inside a standalone-assembled `.s` file —
 mechanically different from Phase 3's local-label-only renames, though
 confirmed working the same way.
 
-## Queued work (agreed, in priority order)
+## Throughput: what actually limits it (measured, not guessed)
 
-Three tracks, queued deliberately rather than picked up ad hoc. **A
-unblocks the other two**, so do it first unless there's a reason not to.
+Read this before trying to make the factory "faster" — the intuitive
+levers are the wrong ones.
 
-**A. Finish `split_trailing.py` — split out the hidden functions.**
-`--list`/`--dry-run` already work and the address derivation is verified;
-what's missing is the writer. It needs to: emit the new
-`asm/nonmatching/sub_XXXXXXX.s` with a real `thumb_func_start`, truncate
-the trailing bytes off the source fragment, insert a guard block into the
-SAME `src/*.c` **immediately after the source function's** (byte order in
-that file is link order — getting this wrong silently moves code), update
-`splits.yaml`, and verify with a from-scratch build that the ROM is still
-byte-identical before keeping any of it. Two known complications: some
-regions hold MORE than one function (436 bytes after `sub_80F1CF8`), and
-one of the 29 can't have its address derived and must stay manual. Payoff:
-unblocks the 77 fragments currently armed to fail `finish_match`, and adds
-~29 genuinely new functions.
+**It is not CPU-bound.** With 12 permuter slots running, load sat at ~6 on
+6 physical cores with the browser and editor also running; individual
+permuter processes idle at 30-45% CPU. Adding parallelism past ~12 does
+nothing, because there are only 6 real cores (0-5 and 6-11 are the same
+cores' SMT siblings — see `tier2.FARM_CPUSET`).
 
-**B. Chase the physics thread.** The function found after `sub_8158E18`
-(at `0x08158E70`) does a `lsls #16` / `asrs #8` 8.8 fixed-point conversion
-and writes fields at `+0x08` and `+0x44` plus a state byte at `+0x24` —
-almost certainly movement/velocity code, which is the maintainer's stated
-reason for the whole project. Worth tracing: what calls it, what struct
-those offsets belong to, and how it connects to the already-documented
-room-properties / solidity-grid pipeline (see the section above and
-`docs/formats/README.md`). Several of the other 28 hidden functions are
-likely in the same subsystem — another reason A comes first.
+**It is not extraction-bound.** Measured end to end: `split_func.py` 0.2s
++ incremental `make` 0.4s + `refresh_expected` 0.2s ≈ **0.7s per
+function**. Even 5,000 extractions is about an hour.
 
-**C. ~~Crack the m4a sound driver.~~ CLOSED — the premise was wrong.**
-Investigated, and the ~84KB region at `~0x08003000`-`0x08017A00` is not
-the m4a sound driver and probably isn't code; see the corrected Phase 3
-entry above for the three independent measurements. The work that
-*replaces* it: figure out what that 84KB of data actually is (start by
-cross-checking Phase 4's `find_compressed_blocks.py` output against the
-range), and separately find where the real sound code lives — the first
-sound/DMA register literals appear at `0x08017D30` onward, i.e. in the
-already-disassembled code right after this region, so it may already be
-extracted and simply unlabeled.
+**It is search-bound, and that is inherent.** decomp-permuter is a
+stochastic search. Measured over 24h: **1,780 launches → 278 converged, a
+15.6% hit rate** (20.6% over a good 6h window). Each search runs up to
+`stall_seconds_for(lines)` = `min(max(60, lines*6), 900)` seconds on one
+core. So the arithmetic is roughly 12 slots × ~4 searches/hour × ~15% ≈
+**7 matches/hour**, which is exactly what gets observed. ~85% of all that
+pinned CPU produces nothing, *by design*.
+
+**Therefore the only real lever is better seeds, not more compute.** Every
+deterministic rule converts a 15-minute gamble into an instant score-0
+match. The arg-register rule
+(`m2c_bridge.restore_omitted_leading_params`) alone covered 15% of the
+corpus and took functions that had stalled through *full* permuter
+searches straight to 0. That is why `stall_patterns.py` and
+`compile_errors.py` exist, and why "add cores" or "raise the timeout" are
+not the answer.
+
+## Monitoring
+
+- `python3 tools/factory/dashboard.py` — live view (match count, pipeline
+  funnel, throughput, worker liveness, recent matches). Refreshes every
+  5s; `--once` for a snapshot.
+- `python3 tools/factory/health.py` — asserts invariants and reports
+  **violations**, one line each. Use this to check "is it actually
+  working", not the dashboard. Notably it distinguishes the real
+  starvation failure (`tier2_ready=0` **and** permuter idle) from the
+  healthy case (`tier2_ready=0` because seeds are consumed as fast as
+  they're produced, `permuting` high).
+
+Both are strictly read-only — no repo lock, no builds, no writes — so
+they're safe to run against a live factory as often as you like.
+
+## Work status (updated as tracks close)
+
+**A. Split out hidden functions — DONE (partly).** `split_trailing.py`
+works end to end. 10 previously-unlabeled functions recovered from
+fragment tails, 0 failures, ROM byte-identical after each. **18 regions
+were REFUSED** because they don't end in a return — almost certainly
+multiple functions or code+data mixed (e.g. 436 bytes after
+`sub_80F1CF8`), and one address can't be derived at all. Those 18 (~2KB)
+still need a human; the tool declines rather than guessing.
+`gitops.finish_match()` now refuses to delete any fragment carrying real
+trailing data, so the remaining 77 can't silently corrupt the ROM.
+
+**B. Physics thread — DONE, and it paid off.** See
+`docs/formats/README.md`'s "SOLVED: the slope/height semantics" section:
+`get_surface_height_at_x` (was `sub_8160854`) resolves surface height in
+pixels, with byte 0 = signed tile height and byte 1's low nibble = slope
+type, dispatched through a 7-entry table (flat / two 45° / four 22.5°
+half-slopes). Confirms the long-open `b0`/`b1` hypothesis. **Still open:**
+proving `ctx+0x80C` resolves to the same 14 coldef arrays — that's a
+pointer trace, not a semantics question.
+
+**C. m4a sound driver — CLOSED, premise was wrong.** The 84KB region is
+not m4a and almost certainly isn't code; see the corrected Phase 3 entry.
+Replacement work: identify what that byte-addressed data actually is, and
+find the real sound code (first sound/DMA register literals are at
+`0x08017D30`, i.e. in already-extracted code that may just be unlabeled).
+
+**Next levers, in rough order of value:**
+1. **More deterministic rules.** This is the whole thesis and it keeps
+   paying: the arg-register rule alone covered 15% of the corpus and
+   turned 15-minute permuter gambles into instant score-0 matches. Use
+   `stall_patterns.py` (clusters stalls by normalized diff signature) and
+   `compile_errors.py` (clusters seed compile failures by cause).
+2. The 18 refused trailing regions (real unlabeled code, needs a human).
+3. The `ctx+0x80C` pointer trace to finish the collision-data chain.
 
 ## Housekeeping still outstanding
 
