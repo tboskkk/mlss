@@ -36,77 +36,131 @@ void sub_810B884(void *arg0) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_810B908.s\"");
 #else
-#error "TODO: write sub_810B908 to match asm/nonmatching/sub_810B908.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_810B99C.s\"");
 #else
-#error "TODO: write sub_810B99C to match asm/nonmatching/sub_810B99C.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_810BD88.s\"");
 #else
-#error "TODO: write sub_810BD88 to match asm/nonmatching/sub_810BD88.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_810BFFC.s\"");
 #else
-#error "TODO: write sub_810BFFC to match asm/nonmatching/sub_810BFFC.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_810C05C.s\"");
 #else
-#error "TODO: write sub_810C05C to match asm/nonmatching/sub_810C05C.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_810C0C8.s\"");
 #else
-#error "TODO: write sub_810C0C8 to match asm/nonmatching/sub_810C0C8.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_810C2B4.s\"");
 #else
-#error "TODO: write sub_810C2B4 to match asm/nonmatching/sub_810C2B4.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_810C398.s\"");
 #else
-#error "TODO: write sub_810C398 to match asm/nonmatching/sub_810C398.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_810C414.s\"");
 #else
-#error "TODO: write sub_810C414 to match asm/nonmatching/sub_810C414.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_810C950.s\"");
 #else
-#error "TODO: write sub_810C950 to match asm/nonmatching/sub_810C950.s, then delete this #error"
+s32 sub_807FB34(s32);                           /* extern */
+
+void sub_810C950(void) {
+    void *temp_r4_12;
+    void *temp_r4_29;
+
+    temp_r4_12 = (*(void **)((s8 *)(*(void **)0x03000FD8) + (0x284)));
+    if (temp_r4_12 != NULL) {
+        sub_807FB34((*(s32 *)((s8 *)(temp_r4_12) + (8))));
+        (*(void **)((s8 *)(*(void **)0x03000FD8) + (0x284))) = NULL;
+        (*(s32 *)((s8 *)(temp_r4_12) + (4))) = 0;
+    }
+    temp_r4_29 = (*(void **)((s8 *)(*(void **)0x03000FD8) + (0x288)));
+    if (temp_r4_29 != NULL) {
+        sub_807FB34((*(s32 *)((s8 *)(temp_r4_29) + (8))));
+        (*(void **)((s8 *)(*(void **)0x03000FD8) + (0x288))) = NULL;
+        (*(s32 *)((s8 *)(temp_r4_29) + (4))) = 0;
+    }
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_810C9A4.s\"");
 #else
-#error "TODO: write sub_810C9A4 to match asm/nonmatching/sub_810C9A4.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_810CA30.s\"");
 #else
-#error "TODO: write sub_810CA30 to match asm/nonmatching/sub_810CA30.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_810CA8C.s\"");
 #else
-#error "TODO: write sub_810CA8C to match asm/nonmatching/sub_810CA8C.s, then delete this #error"
+/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
+   the REST of this translation unit still builds and can be diffed under
+   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
+   still gets the verbatim retail bytes. */
 #endif
