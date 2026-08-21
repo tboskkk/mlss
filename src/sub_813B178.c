@@ -17,3 +17,9 @@ volatile unsigned short sub_813B178(void *p0, void *p1)
   r0 += r1;
   ((void (*)(s32)) (*((u32 *) (((u8 *) r4) + 0x00))))(r0);
 }
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_813B1A4.s\"");
+#else
+#error "TODO: write sub_813B1A4 to match asm/nonmatching/sub_813B1A4.s, then delete this #error"
+#endif
