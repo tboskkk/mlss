@@ -26,3 +26,9 @@ s32 sub_8150244(s8 arg0) {
     return 0x160;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8150270.s\"");
+#else
+#error "TODO: write sub_8150270 to match asm/nonmatching/sub_8150270.s, then delete this #error"
+#endif
