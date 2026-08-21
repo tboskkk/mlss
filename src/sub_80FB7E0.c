@@ -22,3 +22,9 @@ u32 sub_80FB7F0(u32 param_1) {
     return ((u32*)0x0851FA00)[(param_1 << 16) >> 14];
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80FB800.s\"");
+#else
+#error "TODO: write sub_80FB800 to match asm/nonmatching/sub_80FB800.s, then delete this #error"
+#endif
