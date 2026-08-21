@@ -21,6 +21,8 @@ SECTIONS
     .text :
     {
         build/asm/text08000000.o(.text);
+        build/src/sub_8017E34.o(.text);
+        build/asm/text08000000_p6.o(.text);
         build/src/sub_8018218.o(.text);
         build/asm/text08000000_p4.o(.text);
         build/src/sub_801859C.o(.text);

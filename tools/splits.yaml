@@ -33,6 +33,8 @@ groups:
 - name: code
   entries:
   - {obj: asm/text08000000, section: text}
+  - {obj: src/sub_8017E34, section: text}
+  - {obj: asm/text08000000_p6, section: text}
   - {obj: src/sub_8018218, section: text}
   - {obj: asm/text08000000_p4, section: text}
   - {obj: src/sub_801859C, section: text}
