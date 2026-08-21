@@ -17,3 +17,9 @@ s32 sub_803C508(void *arg0) {
     return 1;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_803C538.s\"");
+#else
+#error "TODO: write sub_803C538 to match asm/nonmatching/sub_803C538.s, then delete this #error"
+#endif
