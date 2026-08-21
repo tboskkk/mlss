@@ -107,5 +107,17 @@ asm_unified(".include \"asm/nonmatching/sub_80FC148.s\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80FC164.s\"");
 #else
-#error "TODO: write sub_80FC164 to match asm/nonmatching/sub_80FC164.s, then delete this #error"
+s32 sub_80FC164(void *arg0, s32 *arg1) {
+    u8 var_r1_14;
+
+    if ((s32) M2C_ERROR(/* unknown instruction: ldsb $r0, ($mem_loc_fictive_) */) >= 0) {
+        var_r1_14 = (*(u8 *)((s8 *)((arg1 + 0xC)) + (0xC)));
+    } else {
+        var_r1_14 = (u8) ((u32) ((*(u8 *)((s8 *)(arg0) + (0x208))) << 0x1D) >> 0x1F);
+    }
+    if (M2C_ERROR(/* unknown instruction: ldsb $r0, ($mem_loc_fictive_) */) != var_r1_14) {
+        return 0;
+    }
+    return 1;
+}
 #endif
