@@ -18,5 +18,9 @@ s32 sub_8150DEC(void *arg0) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8150DF0.s\"");
 #else
-#error "TODO: write sub_8150DF0 to match asm/nonmatching/sub_8150DF0.s, then delete this #error"
+void sub_8150DF0(void *arg0, s32 arg1) {
+    (*(u16 *)((s8 *)(arg0) + (0x2C))) = (u16) (4 | (*(u16 *)((s8 *)(arg0) + (0x2C))));
+    (*(s32 *)((s8 *)(arg0) + (0x38))) = arg1;
+    (*(s32 *)((s8 *)(arg0) + (0x3C))) = (s32) ((s32) (arg1 - (*(s32 *)((s8 *)(arg0) + (0x34)))) / 10);
+}
 #endif
