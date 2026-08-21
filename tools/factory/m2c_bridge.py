@@ -148,12 +148,67 @@ def expand_macros(c: str) -> str:
         c = c[:idx] + replacement + c[i + 1:]
 
 
+CONTEXT_DIR = gitops.REPO / ".claude" / "factory"
+CONTEXT_SRC = CONTEXT_DIR / "m2c_ctx_src.c"
+CONTEXT = CONTEXT_DIR / "m2c_ctx.c"
+
+
+def ensure_context():
+    """A preprocessed C context for m2c, or None if it can't be built.
+
+    Without this, m2c knows NOTHING: no struct layouts, no globals, and --
+    the expensive part -- no function signatures. So it guesses, emitting
+    `s32 foo();` for every callee and `s32 arg0` for every parameter, and
+    everything downstream type-errors against the real declarations. That
+    guessing is not a minor blemish; measured across 40 known-failing seeds
+    it IS the failure, accounting for essentially every top bucket:
+
+        11  void* dereference                      7  called object is not a function
+         8  pointer-from-integer assignment        7  undeclared identifier
+         8  invalid use of void expression         6  conflicting declaration
+         7  pointer-from-integer (arg/return)      6  call arity mismatch
+
+    all of which are one root cause wearing different hats.
+
+    With context, m2c uses the real thing -- alloc_heap_8018CEC comes out
+    `(u32 heapId, u32 size, s8 *tag)` with the actual parameter names
+    instead of `(s32 arg0, s32 arg1, void *arg2)`.
+
+    Deliberately NOT under build/: the validator does `rm -rf build/` before
+    every from-scratch check, which would delete the context (and m2c's
+    parse cache beside it) constantly. Regenerated only when a header is
+    newer than it, so the cpp call is amortised to nothing.
+    """
+    CONTEXT_DIR.mkdir(parents=True, exist_ok=True)
+    headers = list((gitops.REPO / "include").rglob("*.h"))
+    newest = max((h.stat().st_mtime for h in headers), default=0)
+    if CONTEXT.exists() and CONTEXT.stat().st_mtime >= newest:
+        return CONTEXT
+
+    CONTEXT_SRC.write_text('#include "global.h"\n#include "common.h"\n')
+    # Repo-RELATIVE paths: container.sh mounts the repo at /workspace, so an
+    # absolute host path does not exist inside the container.
+    rel_src = CONTEXT_SRC.relative_to(gitops.REPO)
+    rel_out = CONTEXT.relative_to(gitops.REPO)
+    r = gitops.run(["./container.sh",
+                    "arm-none-eabi-cpp", "-I", "tools/agbcc/include", "-nostdinc",
+                    "-undef", "-iquote", "include", "-Wno-trigraphs",
+                    str(rel_src), "-o", str(rel_out)])
+    if r.returncode != 0 or not CONTEXT.exists():
+        return None
+    return CONTEXT
+
+
 def run_m2c(name: str, extra_args: list[str] | None = None) -> str | None:
     frag = gitops.REPO / "asm" / "nonmatching" / f"{name}.s"
     if not frag.exists():
         return None
     cmd = [sys.executable, str(M2C_PY), "--target", "gba", "--valid-syntax",
-           "--deterministic-vars", *(extra_args or []), str(frag)]
+           "--deterministic-vars"]
+    ctx = ensure_context()
+    if ctx is not None:
+        cmd += ["--context", str(ctx)]
+    cmd += [*(extra_args or []), str(frag)]
     try:
         r = subprocess.run(cmd, capture_output=True, text=True, timeout=120,
                            cwd=str(gitops.REPO / "tools" / "m2c"))
