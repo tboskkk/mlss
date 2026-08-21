@@ -22,18 +22,15 @@ void sub_802973C(s32 arg0, void *arg1, s32 arg2, s8 arg3, s32 arg4, u8 arg5) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8029788.s\"");
-#else
 s32 sub_805C6B8(s32);                           /* extern */
-
-void sub_8029788(void *arg0) {
-    if (((s32) ((*(u16 *)((s8 *)(arg0) + (0xFC))) << 0x15) >> 0x1C) == 0) {
-        sub_805C6B8((*(s32 *)((s8 *)(arg0) + (0x304))));
-    }
-    (*(u16 *)((s8 *)(arg0) + (0xFC))) = (u16) ((*(u16 *)((s8 *)(arg0) + (0xFC))) | 0x780);
+void sub_8029788(void *arg0)
+{
+  if ((((s32) ((*((u16 *) (((s8 *) arg0) + 0xFC))) << 0x15)) >> 0x1C) == 0)
+  {
+    sub_805C6B8(*((s32 *) (((s8 *) arg0) + 0x304)));
+  }
+  *((u16 *) (((s8 *) arg0) + 0xFC)) = (u16) ((*((u16 *) (((s8 *) arg0) + 0xFC))) | 0x780);
 }
-#endif
 
 s32 sub_805BFF0(s32);
 void sub_80297B8(void *arg0)
