@@ -189,3 +189,9 @@ void sub_80F8A90(u32* p0, u32* p2)
     *(u16*)(r2) = (u16)r0;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/ybai_script_update_80F8ACC.s\"");
+#else
+#error "TODO: write ybai_script_update_80F8ACC to match asm/nonmatching/ybai_script_update_80F8ACC.s, then delete this #error"
+#endif
