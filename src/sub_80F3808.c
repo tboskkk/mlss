@@ -123,3 +123,9 @@ void sub_80F3808(u32* param_1, u32* param_2, u32* param_3)
     u32 uVar109;
     u32 uVar110;
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80F3884.s\"");
+#else
+#error "TODO: write sub_80F3884 to match asm/nonmatching/sub_80F3884.s, then delete this #error"
+#endif
