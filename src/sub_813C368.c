@@ -22,11 +22,37 @@ void sub_813C368(void *arg1) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_813C3C8.s\"");
 #else
-#error "TODO: write sub_813C3C8 to match asm/nonmatching/sub_813C3C8.s, then delete this #error"
+s32 sub_81387C8(void *, s32);                   /* extern */
+s32 sub_8139030(void *, s32);                   /* extern */
+extern s32 sub_8139420;
+extern s32 sub_813BF94;
+extern s32 sub_813C484;
+
+void sub_813C3C8(s32 arg0, void *arg1) {
+    sub_81387C8(arg1, 0);
+    sub_8139030(arg1, 0);
+    (*(s32 **)((s8 *)(arg1) + (0x198))) = &sub_813C484;
+    (*(s32 **)((s8 *)(arg1) + (0x1A0))) = &sub_8139420;
+    (*(s32 **)((s8 *)(arg1) + (0x1A4))) = &sub_813BF94;
+    (*(u8 *)((s8 *)(arg1) + (0x214))) = (u8) ((-8 & (*(u8 *)((s8 *)(arg1) + (0x214)))) | 3);
+}
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_813C420.s\"");
 #else
-#error "TODO: write sub_813C420 to match asm/nonmatching/sub_813C420.s, then delete this #error"
+s32 sub_81387C8(void *, s32);                   /* extern */
+s32 sub_8139030(void *, s32);                   /* extern */
+extern s32 sub_8139420;
+extern s32 sub_813C498;
+
+void sub_813C420(s32 arg0, void *arg1) {
+    (*(u8 *)((s8 *)(arg1) + (0x33E))) = (u8) ((*(u8 *)((s8 *)(arg1) + (0x33E))) | 0x10);
+    sub_81387C8(arg1, 0);
+    sub_8139030(arg1, 0);
+    (*(s32 **)((s8 *)(arg1) + (0x198))) = &sub_813C498;
+    (*(s32 **)((s8 *)(arg1) + (0x1A0))) = &sub_8139420;
+    (*(s32 **)((s8 *)(arg1) + (0x1A4))) = &sub_8139420;
+    (*(u8 *)((s8 *)(arg1) + (0x214))) = (u8) ((-8 & (*(u8 *)((s8 *)(arg1) + (0x214)))) | 3);
+}
 #endif
