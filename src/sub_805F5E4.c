@@ -22,7 +22,17 @@ void sub_805F5E4(void *arg0) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_805F604.s\"");
 #else
-#error "TODO: write sub_805F604 to match asm/nonmatching/sub_805F604.s, then delete this #error"
+s32 sub_8082B00();                                  /* extern */
+s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
+extern s32 sub_805F638;
+
+void sub_805F604(void *arg0) {
+    if (sub_8082B00() == 0) {
+        sub_8082E1C(arg0, 2, 0, 0);
+        play_sfx_80195B4(0x118, -1);
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_805F638;
+    }
+}
 #endif
 
 #ifndef NONMATCHING
