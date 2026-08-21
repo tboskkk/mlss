@@ -33,3 +33,9 @@ void sub_80F76FC(u16 r0, u16 r1, u16 r2, u16 r3)
     *(u8*)(r6 + 0x79) = (r1_3 & 0xDF) | ((r6 & 1) << 5);
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80F7770.s\"");
+#else
+#error "TODO: write sub_80F7770 to match asm/nonmatching/sub_80F7770.s, then delete this #error"
+#endif
