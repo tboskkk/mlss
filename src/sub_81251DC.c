@@ -39,3 +39,9 @@ asm_unified(".include \"asm/nonmatching/load_init_812538C.s\"");
 #else
 #error "TODO: write load_init_812538C to match asm/nonmatching/load_init_812538C.s, then delete this #error"
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8125464.s\"");
+#else
+#error "TODO: write sub_8125464 to match asm/nonmatching/sub_8125464.s, then delete this #error"
+#endif
