@@ -89,6 +89,8 @@ SECTIONS
         build/src/sprite_heap_search.o(.text);
         build/src/sub_8021EA8.o(.text);
         build/asm/text0801A548_p24.o(.text);
+        build/src/sub_802563C.o(.text);
+        build/asm/text0801A548_p57.o(.text);
         build/src/sub_8025D24.o(.text);
         build/asm/text0801A548_p46.o(.text);
         build/src/sub_8028E4C.o(.text);

@@ -101,6 +101,8 @@ groups:
   - {obj: src/sprite_heap_search, section: text}
   - {obj: src/sub_8021EA8, section: text}
   - {obj: asm/text0801A548_p24, section: text}
+  - {obj: src/sub_802563C, section: text}
+  - {obj: asm/text0801A548_p57, section: text}
   - {obj: src/sub_8025D24, section: text}
   - {obj: asm/text0801A548_p46, section: text}
   - {obj: src/sub_8028E4C, section: text}
