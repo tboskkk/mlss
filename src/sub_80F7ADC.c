@@ -46,3 +46,9 @@ void sub_80F7ADC(s16 arg0, s16 arg1, s16 arg2)
     *ptr0 = (u8)var0 + 0xC5;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80F7B1C.s\"");
+#else
+#error "TODO: write sub_80F7B1C to match asm/nonmatching/sub_80F7B1C.s, then delete this #error"
+#endif
