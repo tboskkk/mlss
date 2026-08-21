@@ -7,14 +7,6 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_816AFF0.s\"");
-#else
-u32* sub_816AFF0(u32* param_1) {
-    u32* puVar1;
-    
-    puVar1 = param_1 + 0x49;
-    *puVar1 = *puVar1 | 0x8;
-    return puVar1;
+void sub_816AFF0(void *arg0) {
+    (*(s32 *)((s8 *)(arg0) + (0x490))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x490))) | 8);
 }
-#endif
