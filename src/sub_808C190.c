@@ -8,6 +8,9 @@
 asm_unified(".include \"asm/macros.inc\"");
 
 
+
+int sub_8087540();
+
 int sub_807C298();
 
 u32 sub_808C190(u32* param_1) {

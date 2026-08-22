@@ -8,6 +8,9 @@
 asm_unified(".include \"asm/macros.inc\"");
 
 
+
+int sub_819B9E8();
+
 int sub_819BA00();
 
 void sub_8018E24(void) {

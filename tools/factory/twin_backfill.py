@@ -165,7 +165,14 @@ def matched_c(name: str) -> str | None:
     `progress.py` counts), so this is a plain brace-balanced extract of the
     definition from whichever src/*.c claimed it.
     """
-    pat = re.compile(rf"^[A-Za-z_][^;\n]*\b{re.escape(name)}\s*\(", re.M)
+    # Must be a DEFINITION -- the parameter list has to be followed by `{`,
+    # not `;`. Matching the name alone also matches a prototype line, and the
+    # brace scan then ran on past it and returned the NEXT function's body
+    # entirely: template sub_8047B78 yielded a body defining sub_803C5A4,
+    # which propagate() then could not rename (it renames the template's own
+    # name) and emitted as a candidate defining the wrong function.
+    pat = re.compile(
+        rf"^[A-Za-z_][\w \t\*]*?\b{re.escape(name)}\s*\([^;{{]*\)\s*\{{", re.M)
     for p in sorted((gitops.REPO / "src").rglob("*.c")):
         try:
             text = p.read_text(errors="ignore")
@@ -174,7 +181,7 @@ def matched_c(name: str) -> str | None:
         m = pat.search(text)
         if not m:
             continue
-        open_brace = text.find("{", m.start())
+        open_brace = text.rfind("{", m.start(), m.end())
         if open_brace < 0:
             continue
         depth = 0
@@ -252,7 +259,13 @@ def try_one(conn, target: str, tmpl: str, body: str, dry_run: bool) -> str:
             # for a reason unrelated to whether the C is right -- 18 of the
             # first 20 swept failed exactly this way. Declarations emit no
             # code, so this cannot change what the score means.
-            _, added = declare_missing.repair_in_place(stem, known_symbols())
+            # nonmatching=False: bytes_identical() gates on a PLAIN build, and
+            # the two modes do not see the same declarations (see
+            # declare_missing.compile_file). Repairing in the wrong mode
+            # reports the file fixed and then fails on a symbol whose only
+            # declaration lived inside a sibling's #else draft.
+            _, added = declare_missing.repair_in_place(
+                stem, known_symbols(), nonmatching=False)
             ok, detail = bytes_identical(target)
         finally:
             # A predicate must not leave its splice behind: gitops.commit()

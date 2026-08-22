@@ -102,19 +102,32 @@ def rom_symbols() -> set[str]:
     return syms
 
 
-def compile_file(stem: str) -> str:
-    """Compile one object under NONMATCHING=1. Returns '' on success.
+def compile_file(stem: str, nonmatching: bool = True) -> str:
+    """Compile one object. Returns '' on success.
+
+    `nonmatching` must match the mode the CALLER will ultimately judge in,
+    because the two modes do not see the same declarations. Under
+    NONMATCHING=1 every sibling's `#else` draft is compiled, so a declaration
+    written inside one of those drafts is in scope for the whole unit; in a
+    plain build those branches are replaced by their retail `.include` and
+    the declaration disappears with them. Measuring in one mode and building
+    in the other reports a file as repaired and then fails on a symbol the
+    repair never saw: `sub_8064E08` compiled clean under NONMATCHING=1 and
+    died on an implicit `sub_8082E1C` in the plain build that gated it.
 
     The object is removed first, without exception. Make decides what to
     rebuild from mtimes and cannot see that `-DNONMATCHING` is not a file, so
-    an object left over from a plain build is reported as up to date and the
-    compile silently does not happen -- which reads as "this file is fine".
+    an object left over from a build in the other mode is reported as up to
+    date and the compile silently does not happen -- which reads as "this
+    file is fine".
     """
     obj = gitops.REPO / "build" / "src" / f"{stem}.o"
     obj.unlink(missing_ok=True)
-    r = subprocess.run(["./container.sh", "make", "NONMATCHING=1",
-                        f"build/src/{stem}.o"],
-                       cwd=gitops.REPO, capture_output=True, text=True)
+    cmd = ["./container.sh", "make"]
+    if nonmatching:
+        cmd.append("NONMATCHING=1")
+    cmd.append(f"build/src/{stem}.o")
+    r = subprocess.run(cmd, cwd=gitops.REPO, capture_output=True, text=True)
     # A NONMATCHING object must never survive: the next plain `make` would
     # link it into the ROM, where every #else branch was compiled instead of
     # the retail .include (CLAUDE.md, "Any tool that runs a NONMATCHING build").
@@ -161,7 +174,8 @@ def insert_point(text: str) -> int:
     return pos
 
 
-def repair_in_place(stem: str, known: set[str]) -> tuple[str, list[str]]:
+def repair_in_place(stem: str, known: set[str],
+                    nonmatching: bool = True) -> tuple[str, list[str]]:
     """Add whatever declarations `stem` is missing, editing it in place.
 
     Returns (remaining compiler error or "", declarations added). Does NOT
@@ -175,7 +189,7 @@ def repair_in_place(stem: str, known: set[str]) -> tuple[str, list[str]]:
     then score.
     """
     path = SRC / f"{stem}.c"
-    err = compile_file(stem)
+    err = compile_file(stem, nonmatching)
     added: list[str] = []
     if not err:
         return "", added
@@ -199,7 +213,7 @@ def repair_in_place(stem: str, known: set[str]) -> tuple[str, list[str]]:
         block = "\n\n" + "\n".join(new) + "\n"
         path.write_text(text[:at] + block + text[at:])
         added += new
-        err = compile_file(stem)
+        err = compile_file(stem, nonmatching)
         if not err:
             break
 
