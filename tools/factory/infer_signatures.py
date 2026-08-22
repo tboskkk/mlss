@@ -205,6 +205,41 @@ def known_signatures() -> dict:
     return out
 
 
+def prototypes(min_sites: int = 8, min_conf: float = 0.8) -> dict:
+    """name -> prototype string, for callees confident enough to publish.
+
+    Defaults to the bar that measured 94.7% arity accuracy against known
+    signatures (>=8 call sites, >=0.8 agreement). Loosening to >=2 sites /
+    >=0.6 covers 682 callees instead of 161 but drops to 83.6%, and a seed
+    needs EVERY one of its callees right -- so which bar is correct is an
+    empirical question about end-to-end compile rate, not a matter of taste.
+    Both are reachable from here so it can be measured.
+
+    Return type is deliberately coarse: `s32` when r0 is consumed at the
+    call sites, `void` when it is not. Return inference is the weaker half
+    (62-67%), so when the sites disagree it emits s32 -- the harmless
+    direction, since ignoring a returned value is legal C while using a void
+    one is an error.
+    """
+    out = {}
+    for name, d in gather().items():
+        if not name.startswith("sub_"):
+            continue
+        arity, returns, conf = consensus(d)
+        if arity is None or d["sites"] < min_sites or conf < min_conf:
+            continue
+        args = ", ".join(["s32"] * arity) if arity else "void"
+        # ALWAYS s32, never void. The docstring above already argued this
+        # and the code did the opposite: return inference is the weak half
+        # (62-67%), and getting it wrong toward `void` is the HARMFUL
+        # direction -- ignoring a returned value is legal C, using a void
+        # one is a hard error. Measured directly: seeds failed on "void
+        # value not ignored as it ought to be" at lines calling functions
+        # this tool had declared void.
+        out[name] = f"s32 {name}({args});"
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--validate", action="store_true")

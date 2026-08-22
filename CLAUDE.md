@@ -1265,6 +1265,62 @@ the same seeds without `-Werror` — showed only **1 of 5** then compiled. The
 warning was a symptom sitting *above* the real error. Cluster on the fatal
 error, and confirm a cluster by acting on it, before believing a share.
 
+**H. Four things that did NOT work on the non-compiling pile, measured.**
+Recorded because each looked obviously right, and re-deriving them costs a
+night. Baseline throughout: a fixed 45-seed sample from the pile, 0 of which
+compile.
+
+1. **Matched-function signatures in m2c's `--context`** — no effect, 0/45
+   twice. The 2,255 failing seeds reference **2,793 distinct `sub_*`
+   callees** and only **2.3%** are matched. Section E's "revisit at 20-30%
+   matched" is if anything optimistic: a seed needs EVERY one of its callees
+   right, and at 9% callee coverage **0 of 49 sampled seeds** had all of
+   theirs known. Kept in the tree (it is correct and free) but it is not the
+   lever.
+2. **Inferring signatures from call sites** (`infer_signatures.py`). The ARM
+   EABI puts the first four arguments in r0-r3, and there are 20,123 call
+   sites, so arity and void-vs-value are readable without any match.
+   Validated at **83.6% arity accuracy** against the 349 known signatures
+   (94.7% at >=8 sites and >=0.8 agreement). End to end it made things
+   **worse**: 139 errors -> **164** across 20 seeds, introducing `too many
+   arguments` (11), `conflicting types` (9) and `previous declaration` (9).
+   At 84% per-callee accuracy the wrong signatures cost more than the right
+   ones gain. Not wired in. Two "improvements" also measured and reverted:
+   widening the scan to the ABI boundary (83.6% -> 70.6%) and
+   max-with-support aggregation (-> 64.1%).
+3. **`void value not ignored as it ought to be` is not a signature problem
+   at all** — and section G's clustering said it was, which was wrong. It is
+   30% of all errors and it is m2c **dereferencing an untyped pointer**:
+   `temp = *(temp_r1 + 0x58 + ...)`, where dereferencing `void *` yields
+   void so the assignment is illegal.
+4. **A typed-dereference cast rule** for (3) clears the error, and on one
+   seed took it to a clean compile. Across the sample it removed only ~7% of
+   errors and produced **0 additional compiles**, because seeds carry several
+   errors each. Worse, the obvious implementation is UNSAFE: a regex on
+   `= *(` also rewrites `*(u8 *)(p + 4)` into `*(s32 *)(u8 *)(p + 4)`,
+   silently turning a 1-byte load into a 4-byte one. Any version of this
+   needs a negative lookahead for an existing cast AND the byte-identical
+   object gate `werror_casts.apply()` already uses.
+
+**What this leaves, and it is the important part.** After the mechanically
+fixable errors are removed, what remains is dominated by m2c failing to
+recover the function at all:
+
+| remaining error | count |
+|---|---|
+| `X undeclared` — raw `r1`/`r2` left in the output | 17 |
+| `called object is not a function` | 11 |
+| `syntax error before X` | 6 |
+
+Those are not missing declarations or missing casts. They are m2c's ARM/Thumb
+backend not managing the function, and **no deterministic rule in this repo
+fixes them.** The honest conclusion is that automated throughput is near its
+ceiling with m2c as it stands: `werror_casts` (section G) is the one lever
+that did pay, adding 211 compiling seeds, and the reachable permuter pool has
+roughly 25 matches left in it. Going further means improving m2c's ARM
+backend upstream, or decompiling by hand — not another scheduling or seeding
+tweak.
+
 **Next levers, in rough order of value:**
 1. **More deterministic rules.** This is the whole thesis and it keeps
    paying: the arg-register rule alone covered 15% of the corpus and
