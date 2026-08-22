@@ -13,20 +13,13 @@ extern s32 sub_8114404;
 
 int sub_8082E1C();
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8113E44.s\"");
-#else
-s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
-extern s32 sub_8114404;
-
 void sub_8113E44(void *arg0) {
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
-        sub_8082E1C(arg0, 1, 0, 0);
+        sub_8082E1C(arg0, 0x01, 0, 0);
         (*(s16 *)((s8 *)(arg0) + (0xAC))) = 0x28;
         (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8114404;
     }
 }
-#endif
 
 void sub_8113E78(void *arg0) {
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {

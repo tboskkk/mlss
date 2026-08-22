@@ -14,20 +14,12 @@ extern s32 sub_805F6BC;
 int sub_8082B00();
 int sub_8082E1C();
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_805FF58.s\"");
-#else
-s32 sub_8082B00();                                  /* extern */
-s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
-extern s32 sub_805F6BC;
-
 void sub_805FF58(void *arg0) {
     if (sub_8082B00() == 0) {
-        sub_8082E1C(arg0, 2, 0, 0);
+        sub_8082E1C(arg0, 0x02, 0, 0);
         (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_805F6BC;
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_805FF80.s\"");
