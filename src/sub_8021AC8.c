@@ -108,17 +108,49 @@ loop_16:
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8021C24.s\"");
-#else
-/* Draft quarantined: it did not compile, and under agbcc a single bad
-   draft fails the WHOLE translation unit -- taking every sibling's compile
-   verdict, asm-differ score and permuter promotion down with it. Emptied by
-   tools/factory/quarantine_broken_drafts.py. The guard is intact, so the
-   real ROM still gets the verbatim retail bytes and progress.py still counts
-   this as unmatched; the candidate body is still in the state DB and m2c can
-   regenerate the seed. Write real C here to replace this comment. */
-#endif
+s32 sprite_heap_free(u32);                      /* extern */
+void sub_8021C24(void *arg0)
+{
+  u32 temp_r1_31;
+  void *temp_r0_18;
+  void *temp_r0_44;
+  u16 *new_var;
+  if (((*((u32 *) (((s8 *) arg0) + 0x48))) != 0) && (4 & (*((u8 *) (((s8 *) arg0) + 0x13)))))
+  {
+    temp_r0_18 = sub_8021A18(arg0, 0);
+    if (temp_r0_18 == ((void *) 0))
+    {
+      sprite_heap_free(*((u32 *) (((s8 *) arg0) + 0x48)));
+    }
+    else
+    {
+      *((u8 *) (((s8 *) temp_r0_18) + 0x13)) = (u8) ((*((u8 *) (((s8 *) temp_r0_18) + 0x13))) | 4);
+    }
+  }
+  temp_r1_31 = *((u32 *) (((s8 *) arg0) + 0x44));
+  if (temp_r1_31 != 0)
+  {
+    if ((temp_r1_31 <= 0x07FFFFFFU) && (8 & (*((u8 *) (((s8 *) arg0) + 0x13)))))
+    {
+      temp_r0_44 = sub_8021A18(arg0, 1);
+      if (temp_r0_44 == ((void *) 0))
+      {
+        sprite_heap_free(*((u32 *) (((s8 *) arg0) + 0x44)));
+        return;
+      }
+      *((u8 *) (((s8 *) temp_r0_44) + 0x13)) = (u8) ((*((u8 *) (((s8 *) temp_r0_44) + 0x13))) | 8);
+    }
+  }
+  else
+  {
+    temp_r1_31 = 8;
+    new_var = (u16 *) (((s8 *) ((void *) 0x0203FFB8)) + temp_r1_31);
+    if ((((*((u16 *) (((s8 *) arg0) + 0x2E))) + (*((u16 *) (((s8 *) arg0) + 0x30)))) == (*((u16 *) (((s8 *) ((void *) 0x0203FFB8)) + temp_r1_31)))) && (sub_8021A18(arg0, 3) == ((void *) 0)))
+    {
+      *new_var = (u16) ((*new_var) - (*((u16 *) (((s8 *) arg0) + 0x30))));
+    }
+  }
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sprite_heap_alloc.s\"");
