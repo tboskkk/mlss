@@ -8,6 +8,9 @@
 asm_unified(".include \"asm/macros.inc\"");
 
 
+
+int sub_80FC1F8();
+
 int bclr_init();
 int comp_init();
 

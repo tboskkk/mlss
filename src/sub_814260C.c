@@ -7,6 +7,9 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
+
+int sub_813B650();
+
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_814260C.s\"");
 #else

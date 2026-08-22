@@ -37,7 +37,7 @@ validator.py still has the final say. Nothing here bypasses a check.
 from __future__ import annotations
 
 import argparse
-import hashlib
+import functools
 import re
 import subprocess
 import sys
@@ -46,11 +46,80 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import db  # noqa: E402
+import declare_missing  # noqa: E402
 import gitops  # noqa: E402
 import twins  # noqa: E402
 
 LOCK_BREATH_S = 0.4  # repo_lock has no fairness; never hold it in a tight loop
 FRAG_DIR = gitops.REPO / "asm" / "nonmatching"
+
+
+def _text_image(rel_obj: str) -> str | None:
+    """The object's .text bytes plus its relocations, as a comparable string.
+
+    Deliberately NOT asm-differ. asm-differ is the right tool for an
+    in-progress function -- it gives a continuous score to iterate against --
+    but it is the wrong gate here, and using it cost a debugging cycle worth
+    recording.
+
+    `thumb_func_start` emits `.type %function` but no `.size`, so asm-differ
+    cannot tell where a function ends. It diffs from the function's start to
+    the end of the section on both sides. Under `NONMATCHING=1` every sibling
+    with an empty `#else` vanishes from the object, so the retail side
+    continues into functions the candidate side does not have, and the score
+    is dominated by phantom trailing content: `sub_8060DC4` scored 100,700
+    while being instruction-for-instruction IDENTICAL to retail.
+
+    With the guard REMOVED and a PLAIN build, both objects contain every
+    function, so the whole-section comparison is exact and unambiguous. Only
+    the candidate function changed, so identical `.text` means it matched.
+    Relocations are included because the code bytes for `bl target` and
+    `.word target` are placeholder zeroes in the object -- the symbol lives
+    only in the relocation, so bytes alone would call two different callees
+    identical.
+    """
+    dump = gitops.run(["./container.sh", "arm-none-eabi-objdump",
+                       "-s", "-j", ".text", rel_obj]).stdout
+    body = re.findall(r"^\s+[0-9a-f]+\s((?:[0-9a-f]{2,8}\s){1,4})", dump, re.M)
+    if not body:
+        return None
+    relocs = gitops.run(["./container.sh", "arm-none-eabi-objdump",
+                         "-r", "-j", ".text", rel_obj]).stdout
+    rel = "\n".join(sorted(l.strip() for l in relocs.splitlines()
+                           if re.match(r"^[0-9a-f]{8}\s", l.strip())))
+    return "".join(x.replace(" ", "") for x in body) + "\n#\n" + rel
+
+
+def bytes_identical(name: str) -> tuple[bool, str]:
+    """Does the spliced candidate build to byte-identical retail code?
+
+    Assumes the caller has already removed the guard (splice_candidate).
+    """
+    stem = gitops._owning_source_stem(name)
+    if stem is None:
+        return False, "no owning source file"
+    obj = f"build/src/{stem}.o"
+    if not (gitops.REPO / "expected" / obj).exists():
+        return False, "no expected/ object to compare against"
+    # Force the rebuild: Make cannot see that -DNONMATCHING is not a file, so
+    # an object left by an earlier NONMATCHING build is declared up to date
+    # and silently measured as if it were the real thing.
+    for stale in (gitops.REPO / obj, gitops.REPO / f"build/src/{stem}.s"):
+        stale.unlink(missing_ok=True)
+    r = gitops.run(["./container.sh", "make", obj])
+    if r.returncode != 0:
+        return False, "candidate does not compile"
+    got, want = _text_image(obj), _text_image(f"expected/{obj}")
+    if got is None or want is None:
+        return False, "could not read an object image"
+    return (got == want), ("byte-identical" if got == want else "bytes differ")
+
+
+@functools.lru_cache(maxsize=1)
+def known_symbols() -> frozenset[str]:
+    """Every symbol that really exists in the ROM. Scans all of asm/, so it is
+    far too slow to redo per candidate."""
+    return frozenset(declare_missing.rom_symbols())
 
 
 def matched_templates() -> dict[str, tuple[str, str]]:
@@ -171,9 +240,20 @@ def try_one(conn, target: str, tmpl: str, body: str, dry_run: bool) -> str:
         c_path = gitops.REPO / "src" / f"{stem}.c"
         pre = c_path.read_text()
         try:
-            if gitops.splice_into_else(target, body) is None:
+            # splice_CANDIDATE, not splice_into_else: this removes the guard
+            # entirely so a PLAIN build compiles the candidate, which is what
+            # the shipped ROM would do and what makes the object comparable
+            # to expected/ (see _text_image).
+            if gitops.splice_candidate(target, body) is None:
                 return "no guard block to splice into"
-            score = gitops.asm_differ_score(target)
+            # A propagated twin carries the TEMPLATE's callees, which the
+            # template's own source file declared and the target's does not.
+            # Without this the candidate is rejected as "does not compile"
+            # for a reason unrelated to whether the C is right -- 18 of the
+            # first 20 swept failed exactly this way. Declarations emit no
+            # code, so this cannot change what the score means.
+            _, added = declare_missing.repair_in_place(stem, known_symbols())
+            ok, detail = bytes_identical(target)
         finally:
             # A predicate must not leave its splice behind: gitops.commit()
             # stages all of FACTORY_PATHS, so an abandoned splice gets swept
@@ -181,12 +261,23 @@ def try_one(conn, target: str, tmpl: str, body: str, dry_run: bool) -> str:
             if c_path.read_text() != pre:
                 c_path.write_text(pre)
 
-    if score is None:
-        return "candidate does not compile"
-    if score != 0:
-        return f"score {score}, not a match"
+        if ok and not dry_run and added:
+            # The BODY is reverted above -- the validator re-splices it from
+            # candidate_body, and that is the gate that decides the match.
+            # The DECLARATIONS have to stay: without them the validator's
+            # from-scratch build fails on the very symbols this candidate
+            # needs, and a real match is thrown away. They emit no code.
+            text = c_path.read_text()
+            fresh = [d for d in added if d not in text]
+            if fresh:
+                at = declare_missing.insert_point(text)
+                c_path.write_text(text[:at] + "\n\n" + "\n".join(fresh) + "\n"
+                                  + text[at:])
+
+    if not ok:
+        return detail
     if dry_run:
-        return "WOULD PROMOTE (score 0)"
+        return "WOULD PROMOTE (byte-identical)"
 
     with db.tx(conn):
         db.set_state(conn, target, "validating", worker_id=None,

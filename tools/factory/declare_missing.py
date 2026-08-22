@@ -161,16 +161,24 @@ def insert_point(text: str) -> int:
     return pos
 
 
-def fix_file(stem: str, known: set[str], dry_run: bool) -> str:
-    path = SRC / f"{stem}.c"
-    if not path.is_file():
-        return "no such file"
-    original = path.read_text()
-    err = compile_file(stem)
-    if not err:
-        return "already compiles"
+def repair_in_place(stem: str, known: set[str]) -> tuple[str, list[str]]:
+    """Add whatever declarations `stem` is missing, editing it in place.
 
+    Returns (remaining compiler error or "", declarations added). Does NOT
+    revert on failure -- callers that need that own the snapshot.
+
+    Split out of fix_file() so twin_backfill.py can call it on an
+    ALREADY-SPLICED file. A propagated twin routinely brings callees that
+    were declared in the template's source file and are not declared in the
+    target's, so the candidate is rejected as "does not compile" for a reason
+    that has nothing to do with whether the C is right. Splice, then declare,
+    then score.
+    """
+    path = SRC / f"{stem}.c"
+    err = compile_file(stem)
     added: list[str] = []
+    if not err:
+        return "", added
     for _ in range(MAX_ROUNDS):
         missing = set(IMPLICIT_RE.findall(err)) | set(UNDECL_RE.findall(err))
         text = path.read_text()
@@ -195,6 +203,16 @@ def fix_file(stem: str, known: set[str], dry_run: bool) -> str:
         if not err:
             break
 
+    return err, added
+
+
+def fix_file(stem: str, known: set[str], dry_run: bool) -> str:
+    path = SRC / f"{stem}.c"
+    if not path.is_file():
+        return "no such file"
+    original = path.read_text()
+    err, added = repair_in_place(stem, known)
+
     if err:
         path.write_text(original)
         residue = set(IMPLICIT_RE.findall(err)) | set(UNDECL_RE.findall(err))
@@ -203,6 +221,8 @@ def fix_file(stem: str, known: set[str], dry_run: bool) -> str:
             return f"still broken, non-ROM symbols: {', '.join(unknown[:3])}"
         return "still broken (not a declaration problem)"
 
+    if not added:
+        return "already compiles"
     if dry_run:
         path.write_text(original)
         return f"WOULD FIX (+{len(added)} decls)"

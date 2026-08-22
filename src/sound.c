@@ -7,6 +7,9 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
+
+int sub_819BA00();
+
 void sub_8018E24(void) {
     u8 flags;
 

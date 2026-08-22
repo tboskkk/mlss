@@ -7,6 +7,9 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
+
+int sub_80515DC();
+
 void nullsub_18(void) {
 }
 
