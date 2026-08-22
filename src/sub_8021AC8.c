@@ -7,6 +7,9 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
+
+void * sub_8021A18();
+
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8021AC8.s\"");
 #else
