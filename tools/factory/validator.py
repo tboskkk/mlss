@@ -30,10 +30,40 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import db  # noqa: E402
-import gitops  # noqa: E402
+import gitops
+import rescore_seeds  # noqa: E402
 import twins  # noqa: E402
 
 WORKER_ID = "validator"
+
+
+def _matches_in_plain_build(name: str, body: str) -> bool:
+    """Byte-identity pre-check, measured against a PLAIN build.
+
+    gitops.asm_differ_matches() rebuilds with NONMATCHING=1 (diff_settings.py's
+    make_command). In that build every sibling whose `#else` is the empty "no C
+    attempt yet" placeholder DOES NOT EXIST, while expected/ holds all of them
+    -- and asm-differ -o diffs OBJECTS. So the score is dominated by functions
+    that merely FOLLOW this one in its file, and a finished, byte-identical
+    candidate scores in the thousands purely because of where it sits.
+
+    Measured on this exact path: `sub_80291C8` scores 0 in a plain build and
+    13,467 through the NONMATCHING one. It was rejected here and sent back to
+    tier2 to be searched again from nothing -- 179 times.
+
+    A false negative here is NOT harmless, whatever the old docstring said: the
+    winning body is discarded and the function is re-searched forever. A false
+    positive costs one from-scratch build, because finish_match() -- a full
+    rebuild plus the ROM sha1 -- is still the real gate and is untouched.
+    That asymmetry is why an unreadable verdict falls back to the legacy check
+    rather than rejecting: strictly more permissive than before, never less.
+    """
+    # assume_spliced: the caller has already removed the guard, so plain_score
+    # must not try to find one -- see CLAUDE.md N.4a.
+    score = rescore_seeds.plain_score(name, body, assume_spliced=True)
+    if score is not None:
+        return score == 0
+    return gitops.asm_differ_matches(name)
 
 
 def validate_one(conn) -> str | None:
@@ -144,7 +174,7 @@ def _validate_claimed(conn, row) -> str:
         db.log_event(conn, name, "error", "splice_candidate failed")
         return name
 
-    if not gitops.asm_differ_matches(name):
+    if not _matches_in_plain_build(name, body):
         gitops.revert_to_clean()
         # LOOP GUARD. Sending a rejected candidate back to tier2 is right
         # when tier2 might do something new with it -- but if tier2's

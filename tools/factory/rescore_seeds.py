@@ -66,7 +66,8 @@ def known() -> set[str]:
     return set(_known)
 
 
-def plain_score(name: str, body: str, keep_decls: bool = False) -> int | None:
+def plain_score(name: str, body: str, keep_decls: bool = False,
+                assume_spliced: bool = False) -> int | None:
     """asm-differ's score for `name` measured against a plain build.
 
     `keep_decls` retains the declarations the build needed. The candidate
@@ -83,7 +84,11 @@ def plain_score(name: str, body: str, keep_decls: bool = False) -> int | None:
     obj = gitops.REPO / "build" / "src" / f"{stem}.o"
     added: list[str] = []
     try:
-        if gitops.splice_candidate(name, body) is None:
+        # `assume_spliced` is for the validator, which has ALREADY removed the
+        # guard before it asks. Calling splice_candidate() again there finds no
+        # guard block and returns None -- the documented trap in CLAUDE.md N.4a
+        # -- which silently turns this into "no verdict".
+        if not assume_spliced and gitops.splice_candidate(name, body) is None:
             return None
         _, added = declare_missing.repair_in_place(stem, known(), nonmatching=False)
         for stale in (obj, gitops.REPO / "build" / "src" / f"{stem}.s"):
@@ -98,9 +103,14 @@ def plain_score(name: str, body: str, keep_decls: bool = False) -> int | None:
         m = SCORE_RE.search(r.stdout + r.stderr)
         return int(m.group(1)) if m else None
     finally:
-        c_path.write_text(pre)
+        # When the caller owns the splice (the validator), leave the tree as we
+        # found it -- spliced, with the declarations the plain build needed.
+        # Restoring `pre` there would undo the candidate finish_match() is
+        # about to build.
+        if not assume_spliced:
+            c_path.write_text(pre)
         obj.unlink(missing_ok=True)
-        if keep_decls and added:
+        if keep_decls and added and not assume_spliced:
             text = c_path.read_text()
             at = declare_missing.insert_point(text)
             # Header region only: a guard's #else often already carries the
