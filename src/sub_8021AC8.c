@@ -108,107 +108,23 @@ loop_16:
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8021C24.s\"");
 #else
-void sub_8021C24(void *arg0)
-{
-  s8 *new_var;
-  u32 temp_r1_31;
-  void *temp_r0_18;
-  void *new_var2;
-  void *temp_r0_44;
-  if (((*((u32 *) (((s8 *) arg0) + 0x48))) != 0) && (4 & (*((u8 *) (((s8 *) arg0) + 0x13)))))
-  {
-    temp_r0_18 = sub_8021A18(arg0, 0);
-    if (temp_r0_18 == ((void *) 0))
-    {
-      sprite_heap_free(*((u32 *) (((s8 *) arg0) + 0x48)));
-    }
-    else
-    {
-      *((u8 *) (((s8 *) temp_r0_18) + 0x13)) = (u8) ((*((u8 *) (((s8 *) temp_r0_18) + 0x13))) | 4);
-    }
-  }
-  new_var = (s8 *) arg0;
-  temp_r1_31 = *((u32 *) (new_var + 0x44));
-  if (temp_r1_31 != 0)
-  {
-    if ((temp_r1_31 <= 0x07FFFFFFU) && (8 & (*((u8 *) (new_var + 0x13)))))
-    {
-      temp_r0_44 = sub_8021A18(arg0, 1);
-      if (temp_r0_44 == ((void *) 0))
-      {
-        sprite_heap_free(*((u32 *) (new_var + 0x44)));
-        return;
-      }
-      *((u8 *) (((s8 *) temp_r0_44) + 0x13)) = (u8) ((*((u8 *) (((s8 *) temp_r0_44) + 0x13))) | 8);
-    }
-  }
-  else
-  {
-    new_var2 = (void *) 0x0203FFB8;
-    if ((((*((u16 *) (new_var + 0x2E))) + (*((u16 *) (new_var + 0x30)))) == (*((u16 *) (((s8 *) new_var2) + 8)))) && (sub_8021A18(arg0, 3) == ((void *) 0)))
-    {
-      *((u16 *) (((s8 *) new_var2) + 8)) = (u16) ((*((u16 *) (((s8 *) new_var2) + 8))) - (*((u16 *) (new_var + 0x30))));
-    }
-  }
-}
+/* Draft quarantined: it did not compile, and under agbcc a single bad
+   draft fails the WHOLE translation unit -- taking every sibling's compile
+   verdict, asm-differ score and permuter promotion down with it. Emptied by
+   tools/factory/quarantine_broken_drafts.py. The guard is intact, so the
+   real ROM still gets the verbatim retail bytes and progress.py still counts
+   this as unmatched; the candidate body is still in the state DB and m2c can
+   regenerate the seed. Write real C here to replace this comment. */
 #endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sprite_heap_alloc.s\"");
 #else
-s8 *sprite_heap_alloc(u8 arg0, s32 arg1, u8 arg2, u16 arg3) {
-    s32 *temp_r0_33;
-    s32 *temp_r2_31;
-    s32 *var_r1_14;
-    s32 temp_r2_21;
-    s32 temp_r4_19;
-    s8 *var_r0_57;
-    u8 temp_r3_22;
-
-    var_r1_14 = (*(s32 **)((s8 *)((void *)0x0203FFB8) + (0x2C)));
-    temp_r4_19 = ((arg1 + 0xF) & ~0xF) + 0x10;
-loop_1:
-    temp_r2_21 = (*(s32 *)((s8 *)(var_r1_14) + (8)));
-    temp_r3_22 = (*(u8 *)((s8 *)(var_r1_14) + (0xC)));
-    if ((temp_r3_22 == 0) && (temp_r2_21 >= temp_r4_19)) {
-        if ((u32) temp_r2_21 >= (u32) (temp_r4_19 + 0x10)) {
-            temp_r2_31 = var_r1_14 - temp_r4_19;
-            (*(s32 **)((s8 *)(temp_r2_31) + (0))) = var_r1_14;
-            temp_r0_33 = (*(s32 **)((s8 *)(var_r1_14) + (4)));
-            (*(s32 **)((s8 *)(temp_r2_31) + (4))) = temp_r0_33;
-            if (temp_r0_33 != NULL) {
-                *temp_r0_33 = temp_r2_31;
-            }
-            (*(s32 *)((s8 *)(temp_r2_31) + (8))) = (s32) ((*(s32 *)((s8 *)(var_r1_14) + (8))) - temp_r4_19);
-            (*(u8 *)((s8 *)(temp_r2_31) + (0xC))) = temp_r3_22;
-            (*(s32 **)((s8 *)(var_r1_14) + (4))) = temp_r2_31;
-            (*(s32 *)((s8 *)(var_r1_14) + (8))) = temp_r4_19;
-        } else {
-            (*(s32 *)((s8 *)(var_r1_14) + (8))) = temp_r2_21;
-        }
-        (*(u8 *)((s8 *)(var_r1_14) + (0xC))) = arg0;
-        (*(u8 *)((s8 *)(var_r1_14) + (0xD))) = arg2;
-        (*(u16 *)((s8 *)(var_r1_14) + (0xE))) = arg3;
-        var_r0_57 = var_r1_14 - ((*(s32 *)((s8 *)(var_r1_14) + (8))) - 0x10);
-        if (arg0 != 2) {
-            if ((s32) arg0 > 2) {
-                if (arg0 != 3) {
-                    return var_r0_57;
-                }
-                *var_r0_57 = 0;
-                return var_r0_57;
-            }
-            /* Duplicate return node #16. Try simplifying control flow for better match */
-            return var_r0_57;
-        }
-        *var_r0_57 = 0;
-        return var_r0_57;
-    }
-    var_r1_14 = (*(s32 **)((s8 *)(var_r1_14) + (4)));
-    if (var_r1_14 == NULL) {
-        var_r0_57 = NULL;
-        return var_r0_57;
-    }
-    goto loop_1;
-}
+/* Draft quarantined: it did not compile, and under agbcc a single bad
+   draft fails the WHOLE translation unit -- taking every sibling's compile
+   verdict, asm-differ score and permuter promotion down with it. Emptied by
+   tools/factory/quarantine_broken_drafts.py. The guard is intact, so the
+   real ROM still gets the verbatim retail bytes and progress.py still counts
+   this as unmatched; the candidate body is still in the state DB and m2c can
+   regenerate the seed. Write real C here to replace this comment. */
 #endif

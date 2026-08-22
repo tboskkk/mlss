@@ -197,62 +197,13 @@ asm_unified(".include \"asm/nonmatching/sub_8021574.s\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_802191C.s\"");
 #else
-u16 sub_802191C(s32 arg0) {
-    s32 temp_r0_39;
-    s32 temp_r2_28;
-    s32 temp_r7_32;
-    u16 temp_r0_17;
-    u16 temp_r2_50;
-    u16 temp_r2_75;
-    u16 temp_r2_97;
-    u16 var_r2_14;
-    u16 var_r5_33;
-    u8 var_r3_34;
-    void *var_r4_40;
-
-    var_r2_14 = 0;
-    temp_r0_17 = *(0x0203FFC4 + (arg0 * 2));
-    if (temp_r0_17 != 0xFFFF) {
-        temp_r2_28 = 0xF & ((u32) (temp_r0_17 << 0x10) >> 0x1A);
-        temp_r7_32 = 0x3FF & temp_r0_17;
-        var_r5_33 = 0;
-        var_r3_34 = (*(u8 *)((s8 *)((void *)0x0203FFB8) + (4)));
-        if ((s32) var_r3_34 <= 0xF) {
-            temp_r0_39 = var_r3_34 * 2;
-            var_r4_40 = temp_r0_39 + 0x0203FFC4;
-            if (((s32) var_r3_34 >= 0x10) || ((0x10 - var_r3_34) & 1)) {
-                temp_r2_50 = *(0x0203FFC4 + temp_r0_39);
-                if ((temp_r2_50 != 0xFFFF) && (temp_r2_28 == (((u32) (temp_r2_50 << 0x10) >> 0x1A) & 0xF)) && (temp_r7_32 == (0x3FF & temp_r2_50))) {
-                    *(0x0203FFC4 + temp_r0_39) = 0xFFFFU;
-                    var_r5_33 = 1 << var_r3_34;
-                }
-                var_r4_40 += 2;
-                var_r3_34 += 1;
-                if ((s32) var_r3_34 <= 0xF) {
-                    goto loop_9;
-                }
-            } else {
-                do {
-loop_9:
-                    temp_r2_75 = (*(u16 *)((s8 *)(var_r4_40) + (0)));
-                    if ((temp_r2_75 != 0xFFFF) && (temp_r2_28 == (((u32) (temp_r2_75 << 0x10) >> 0x1A) & 0xF)) && (temp_r7_32 == (0x3FF & temp_r2_75))) {
-                        (*(u16 *)((s8 *)(var_r4_40) + (0))) = 0xFFFFU;
-                        var_r5_33 |= 1 << var_r3_34;
-                    }
-                    temp_r2_97 = (*(u16 *)((s8 *)(var_r4_40) + (2)));
-                    if ((temp_r2_97 != 0xFFFF) && (temp_r2_28 == (((u32) (temp_r2_97 << 0x10) >> 0x1A) & 0xF)) && (temp_r7_32 == (0x3FF & temp_r2_97))) {
-                        (*(u16 *)((s8 *)(var_r4_40) + (2))) = 0xFFFFU;
-                        var_r5_33 |= 1 << (var_r3_34 + 1);
-                    }
-                    var_r4_40 += 4;
-                    var_r3_34 += 2;
-                } while ((s32) var_r3_34 <= 0xF);
-            }
-        }
-        var_r2_14 = var_r5_33;
-    }
-    return var_r2_14;
-}
+/* Draft quarantined: it did not compile, and under agbcc a single bad
+   draft fails the WHOLE translation unit -- taking every sibling's compile
+   verdict, asm-differ score and permuter promotion down with it. Emptied by
+   tools/factory/quarantine_broken_drafts.py. The guard is intact, so the
+   real ROM still gets the verbatim retail bytes and progress.py still counts
+   this as unmatched; the candidate body is still in the state DB and m2c can
+   regenerate the seed. Write real C here to replace this comment. */
 #endif
 
 #ifndef NONMATCHING
