@@ -23,17 +23,15 @@ void sub_805D9CC(void *arg0) {
     sub_8018218((*(void **)((s8 *)(arg0) + (0x94))), (void *)0x06000000, 0x3000U, 0x20, 0);
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_805DA04.s\"");
-#else
 s32 sub_805D914(void *, u16);                   /* extern */
-
-void sub_805DA04(void *arg0, u16 arg1) {
-    (*(s16 *)((s8 *)(arg0) + (0x1C))) = 0xFFFB;
-    (*(u16 *)((s8 *)(arg0) + (0x1E))) = arg1;
-    sub_805D914(arg0, (*(u16 *)((s8 *)(arg0) + (0x1E))));
+void sub_805DA04(void *arg0, u16 arg1)
+{
+  int new_var;
+  new_var = 0xFFFB;
+  *((s16 *) (((s8 *) arg0) + 0x1C)) = new_var;
+  *((u16 *) (((s8 *) arg0) + 0x1E)) = arg1;
+  sub_805D914(arg0, *((u16 *) (((s8 *) arg0) + 0x1E)));
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_805DA1C.s\"");
