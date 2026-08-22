@@ -159,15 +159,9 @@ void sub_8158954(void *arg0, s32 arg1) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8158988.s\"");
-#else
-s32 sub_815FAA4();                              /* extern */
-
 void sub_8158988(void) {
     sub_815FAA4();
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8158994.s\"");
@@ -192,15 +186,9 @@ void *sub_81589A8(void *arg0, u16 arg2) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_81589D0.s\"");
-#else
-s32 sub_815FAA4();                              /* extern */
-
 void sub_81589D0(void) {
     sub_815FAA4();
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81589DC.s\"");
