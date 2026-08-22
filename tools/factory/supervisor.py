@@ -73,6 +73,12 @@ PROCESSES = {
     "tier1":     ("tier1.py",     ["--loop", "30"],   False),
     "tier_m2c":  ("tier_m2c.py",  ["--loop", "10"],   False),
     "tier2":     ("tier2.py",     ["--loop", "20", "--stall-min", "15"], False),
+    # Supervised rather than run by hand, because the failure it catches is
+    # invisible to everything else here: the supervisor only restarts a
+    # process that DIED, and tier2 can stop working while staying alive,
+    # at 0% CPU, with a full permuting count and a dozen live containers.
+    # That has now cost two overnight runs. See watchdog.py.
+    "watchdog":  ("watchdog.py",  ["--interval", "60"], False),
 }
 
 

@@ -39,7 +39,7 @@ import tier2
 
 REPO = gitops.REPO  # noqa: E402
 
-WORKERS = ["scanner", "validator", "tier1", "tier_m2c", "tier2"]
+WORKERS = ["scanner", "validator", "tier1", "tier_m2c", "tier2", "watchdog"]
 OK, WARN, FAIL = "ok", "warn", "fail"
 
 
@@ -100,7 +100,7 @@ def checks(conn) -> list[tuple[str, str, str]]:
         out.append(("workers", WARN if len(dead) == len(WORKERS) else FAIL,
                     "factory stopped" if len(dead) == len(WORKERS) else f"dead: {', '.join(dead)}"))
     else:
-        out.append(("workers", OK, "5/5 running + supervisor"))
+        out.append(("workers", OK, f"{len(WORKERS)}/{len(WORKERS)} running + supervisor"))
 
     # --- the starvation shape -------------------------------------------
     ready, attempt = counts.get("tier2_ready", 0), counts.get("needs_attempt", 0)

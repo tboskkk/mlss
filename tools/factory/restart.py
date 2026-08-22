@@ -38,7 +38,7 @@ import time
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent.parent
-PROCS = ["supervisor", "scanner", "validator", "tier1", "tier_m2c", "tier2"]
+PROCS = ["supervisor", "scanner", "validator", "tier1", "tier_m2c", "tier2", "watchdog"]
 
 
 def factory_pids() -> dict:
