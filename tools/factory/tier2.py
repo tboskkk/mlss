@@ -659,11 +659,6 @@ def run_pool(jobs: int, stall_min: float, max_functions: int):
             break  # nothing running and nothing left to claim
 
         time.sleep(10)
-      except sqlite3.OperationalError as e:
-        print(f"[{time.strftime('%H:%M:%S')}] transient DB error ({e}) -- "
-              f"{len(procs)} search(es) left running, retrying", flush=True)
-        time.sleep(2)
-        continue
 
         for name in list(procs):
             info = procs[name]
@@ -804,6 +799,16 @@ def run_pool(jobs: int, stall_min: float, max_functions: int):
                 del procs[name]
                 _active.pop(name, None)
                 processed += 1
+      except sqlite3.OperationalError as e:
+        # Keep the pool alive. main() responds to ANY exception by calling
+        # _cleanup_all(), which kills all 12 containers and requeues their
+        # rows -- right for a real crash, disproportionate for a transient
+        # DB fault. `procs` survives this retry, so running searches are
+        # untouched.
+        print(f"[{time.strftime('%H:%M:%S')}] transient DB error ({e}) -- "
+              f"{len(procs)} search(es) left running, retrying", flush=True)
+        time.sleep(2)
+        continue
 
     return processed
 
