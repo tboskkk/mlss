@@ -18,10 +18,6 @@ void sub_80DA324(void *arg0) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80DA340.s\"");
-#else
-s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 s32 sub_8087540(void *);                        /* extern */
 
 void sub_80DA340(void *arg0) {
@@ -30,7 +26,6 @@ void sub_80DA340(void *arg0) {
         sub_8087540(arg0);
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80DA368.s\"");
