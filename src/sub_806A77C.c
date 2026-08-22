@@ -9,6 +9,9 @@ asm_unified(".include \"asm/macros.inc\"");
 
 
 
+
+void sub_806A908(void *arg0);
+
 s32 stop_sfx_80195A8();
 extern s32 sub_806A3F8;
 int sub_8082B00();
