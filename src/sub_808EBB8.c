@@ -8,8 +8,7 @@
 asm_unified(".include \"asm/macros.inc\"");
 
 
-int sub_808DD2C();
-
+s32 sub_808DD2C();
 void sub_808EBB8(void *arg0)
 {
   u16 temp_r1_34;

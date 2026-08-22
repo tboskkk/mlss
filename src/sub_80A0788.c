@@ -8,8 +8,7 @@
 asm_unified(".include \"asm/macros.inc\"");
 
 
-int sub_8082E1C();
-
+s32 sub_8082E1C();
 void sub_80A0788(void *arg0) {
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
         sub_8082E1C(arg0, 0, 0, 0);

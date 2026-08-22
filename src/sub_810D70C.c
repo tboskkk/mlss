@@ -9,10 +9,8 @@ asm_unified(".include \"asm/macros.inc\"");
 
 
 
-int sub_80883A0();
-
-int sub_8082E1C();
-
+s32 sub_80883A0();
+s32 sub_8082E1C();
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_810D70C.s\"");
 #else

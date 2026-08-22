@@ -11,7 +11,7 @@ asm_unified(".include \"asm/macros.inc\"");
 
 extern s32 sub_81100B0;
 
-int sub_8082E1C();
+s32 sub_8082E1C();
 int sub_80883A0();
 extern s32 sub_8110078;
 

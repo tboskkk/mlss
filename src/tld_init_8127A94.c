@@ -8,8 +8,7 @@
 asm_unified(".include \"asm/macros.inc\"");
 
 
-int sub_81151E4();
-
+s32 sub_81151E4();
 s32 process_add(void *, u8);                    /* extern */
 
 void *tld_init_8127A94(void *arg0, u8 arg1) {

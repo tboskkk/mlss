@@ -17,7 +17,7 @@ int sub_8139AA0();
 
 int sub_80FBD44();
 int sub_8137A4C();
-int sub_81382A8();
+s32 sub_81382A8();
 extern s32 sub_8139364;
 
 #ifndef NONMATCHING

@@ -11,14 +11,12 @@ asm_unified(".include \"asm/macros.inc\"");
 
 
 
-int stop_sfx_80195A8();
-
+s32 stop_sfx_80195A8();
 extern s32 sub_806FBD0;
 
 extern s32 sub_806EB18;
 
-int sub_8082E1C();
-
+s32 sub_8082E1C();
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8070DCC.s\"");
 #else

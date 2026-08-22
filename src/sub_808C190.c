@@ -11,14 +11,10 @@ asm_unified(".include \"asm/macros.inc\"");
 
 
 
-int sub_80873B8();
-
-int stop_sfx_80195A8();
-
-int sub_8087540();
-
-int sub_807C298();
-
+s32 sub_80873B8();
+s32 stop_sfx_80195A8();
+s32 sub_8087540();
+s32 sub_807C298();
 u32 sub_808C190(u32* param_1) {
     param_1[0x4C / 4] = 0x0808C4C9;
     return 1;

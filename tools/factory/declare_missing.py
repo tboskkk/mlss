@@ -143,10 +143,44 @@ def definition_prototype(text: str, sym: str) -> str | None:
 
 
 def declaration_for(text: str, sym: str) -> str | None:
-    """The declaration this file needs for `sym`, chosen by how it is used."""
+    """The declaration this file needs for `sym`.
+
+    Ordered best-informed first, because a K&R `int X();` is a LAST resort,
+    not a neutral one: it declares no parameters (so it cannot conflict with
+    any call's argument list, which is why it is safe on that axis) but it
+    does assert an `int` RETURN. Emitting it for a function that really
+    returns a pointer produces "assignment makes pointer from integer without
+    a cast", fatal under -Werror -- which is how it broke `sub_810CCC8`:
+    the header carried this placeholder while m2c's own, correct
+    `void *sub_807D2D0(s32 *, s32, s32);` sat inertly inside a `#else`.
+
+      1. a definition in this file            -- authoritative
+      2. the RETURN TYPE of a prototype already written anywhere in this
+         file, including inside a guard's `#else` where a plain build cannot
+         see it -- that is m2c's own declaration and it knows the return type
+      3. address-taken -> `extern s32 X;`
+      4. called -> `int X();`, the placeholder
+
+    Case 2 takes the return type and DISCARDS the parameter list, emitting
+    `void *X();` rather than `void *X(s32 *, s32, s32);`. m2c infers the
+    parameters per call site and different call sites in one file disagree:
+    hoisting the full prototype broke the build with "passing arg 1 of
+    sub_807C298 makes integer from pointer without a cast". That is section
+    H's signature-inference hazard, which measured strictly harmful. The
+    return type is the part that is actually needed here and the part that is
+    consistent; K&R empty parameters stay compatible with every call.
+    """
     proto = definition_prototype(text, sym)
     if proto:
         return proto
+    # A real prototype somewhere in the file (typically m2c's, inside a
+    # `#else`). Keep only its return type.
+    for m in re.finditer(
+            rf"^\s*(?:extern\s+)?([A-Za-z_][\w \t\*]*?)\b{re.escape(sym)}\s*\([^;{{]*\)\s*;",
+            text, re.M):
+        ret = " ".join(m.group(1).split())
+        if ret and ret != "int":
+            return f"{ret} {sym}();" if ret.endswith("*") else f"{ret} {sym}();"
     if re.search(rf"&\s*{re.escape(sym)}\b", text):
         return f"extern s32 {sym};"
     if re.search(rf"\b{re.escape(sym)}\s*\(", text):

@@ -8,10 +8,9 @@
 asm_unified(".include \"asm/macros.inc\"");
 
 
-int stop_sfx_80195A8();
-int sub_8082E1C();
-int sub_8087CE4();
-
+s32 stop_sfx_80195A8();
+s32 sub_8082E1C();
+s32 sub_8087CE4();
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81126BC.s\"");
 #else

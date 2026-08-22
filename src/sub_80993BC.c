@@ -18,7 +18,7 @@ extern s32 sub_809A808;
 
 extern s32 sub_809A120;
 
-int sub_8082E1C();
+s32 sub_8082E1C();
 extern s32 sub_809A09C;
 
 int sub_8087540();

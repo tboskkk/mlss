@@ -18,13 +18,11 @@ extern s32 sub_8065428;
 
 extern s32 sub_8064558;
 int sub_8082B00();
-int sub_8082E1C();
-
+s32 sub_8082E1C();
 extern s32 sub_8065384;
 int sub_8086D80();
 
-int sub_807C298();
-
+s32 sub_807C298();
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8064DDC.s\"");
 #else

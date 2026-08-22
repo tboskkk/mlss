@@ -13,8 +13,7 @@ extern s32 sub_8063568;
 int sub_8082B00();
 
 extern s32 sub_8063AD4;
-int sub_8082E1C();
-
+s32 sub_8082E1C();
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8063118.s\"");
 #else
