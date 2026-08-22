@@ -277,6 +277,46 @@ before adopting m2c. It works (translates straight-line + single-branch
 shapes, declines everything else) but m2c supersedes it — kept as a
 reference, not a thing to extend.
 
+## Local m2c patches (never upstream)
+
+`tools/m2c` is a submodule pinned to `matt-kempster/m2c`. This project keeps
+a small number of **local** changes to it, held as patches in
+`tools/m2c_patches/` and applied with `tools/m2c_patches/apply.sh`
+(idempotent). **Maintainer's decision: these are not contributed upstream
+and nothing is to be pushed to that repository.** That may change if the
+work proves out; until then, local only.
+
+Why patches rather than editing the submodule in place: a submodule is
+tracked by a commit SHA, not by content, so an edit to its working tree is
+invisible to this repo's history and is destroyed by `git submodule update`
+or a fresh clone. Keeping them as patch files puts them under version
+control *here* without entangling anything with upstream.
+
+Worth knowing, since it looks alarming the first time: after editing the
+submodule, `git status` in this repo shows `M tools/m2c`. That is "the
+submodule's working tree is dirty", NOT a staged change to the recorded
+commit — `git add tools/m2c` stages nothing while the submodule's HEAD is
+unchanged, `FACTORY_PATHS` does not include it, and with zero local commits
+in the submodule there is nothing that could be pushed to
+`matt-kempster/m2c` even by accident.
+
+**Run `tools/m2c_patches/apply.sh` after any `git submodule update`, or if
+m2c starts emitting `M2C_ERROR(/* unknown instruction: ... */)` for
+something it used to handle.**
+
+The first patch matters more than its size suggests: m2c did not recognise
+the legacy (pre-UAL) Thumb spellings `ldsb` / `ldsh`, though it already
+implements those instructions under the UAL names `ldrsb` / `ldrsh`. Our
+disassembly uses the old mnemonics, so m2c emitted
+`M2C_ERROR(/* unknown instruction: ldsh ... */)`. **1,943 of 5,431 seeds
+(36%)** carried an unknown-instruction error and three mnemonics accounted
+for all 8,208 occurrences: `ldsh` (7,568), `ldsb` (622), `swi` (18); 42.1%
+of the seeds that fail to compile were affected. Measured impact on the 32
+smallest affected seeds: 2 compile, 1 byte-exact. So it removes ONE of
+several errors from a third of the corpus and fully fixes the minority that
+had no other problem — real, and not the 36% unlock the headline number
+suggests.
+
 ## Matching tools
 
 **asm-differ** (`asm-differ` on PATH inside the container,

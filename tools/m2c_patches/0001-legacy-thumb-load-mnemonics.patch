@@ -1,0 +1,24 @@
+diff --git a/m2c/arch_arm.py b/m2c/arch_arm.py
+index 6a7d8e6..6466d52 100644
+--- a/m2c/arch_arm.py
++++ b/m2c/arch_arm.py
+@@ -131,6 +131,10 @@ SUFFIXABLE_INSTRUCTIONS: Set[str] = {
+     "ldrh",
+     "ldrsb",
+     "ldrsh",
++    # Legacy (pre-UAL) Thumb spellings of ldrsb/ldrsh. Same instructions,
++    # older mnemonics -- what a GBA-era disassembler emits.
++    "ldsb",
++    "ldsh",
+     "lsl",
+     "lsr",
+     "mla",
+@@ -1781,6 +1785,8 @@ class ArmArch(Arch):
+         "ldrsb": lambda a: handle_load(a, type=Type.s8()),
+         "ldrh": lambda a: handle_load(a, type=Type.u16()),
+         "ldrsh": lambda a: handle_load(a, type=Type.s16()),
++        "ldsb": lambda a: handle_load(a, type=Type.s8()),
++        "ldsh": lambda a: handle_load(a, type=Type.s16()),
+         "vldr": lambda a: handle_load(a, type=vreg_type(a.reg_ref(0))),
+         # Arithmetic
+         "smulbb": lambda a: BinaryOp.int(a.reg(1), "*", a.reg(2)),
