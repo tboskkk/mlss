@@ -95,15 +95,41 @@ asm_unified(".include \"asm/nonmatching/sub_80FD828.s\"");
    counts this as unmatched. Write the C here, replacing this comment. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80FD8BC.s\"");
-#else
-/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
-   compiles a whole translation unit at a time, so an #error here fails
-   every OTHER function in this file under NONMATCHING=1. Guard intact, so
-   the real ROM still gets the verbatim retail bytes and progress.py still
-   counts this as unmatched. Write the C here, replacing this comment. */
-#endif
+s32 sub_8082E1C(s32, s32, s32, s32);            /* extern */
+s32 sub_808842C(s32, s32, s32);                 /* extern */
+s32 sub_808843C(s32, s32, s32, s32, s32);       /* extern */
+s32 sub_8106F8C(void *);                        /* extern */
+s32 sub_810C950();                              /* extern */
+
+void sub_80FD8BC(void *arg0) {
+    s32 var_r2_34;
+    s32 var_r4_31;
+    s32 var_r5_33;
+    s32 var_r6_32;
+    void *temp_r2_18;
+
+    if (!(4 & (*(u8 *)((s8 *)(*(void **)0x03000FD8) + (0xB))))) {
+        sub_810C950();
+        temp_r2_18 = *(void **)0x03000FD8;
+        if (4 & (*(u8 *)((s8 *)(temp_r2_18) + (0x2C0)))) {
+            var_r4_31 = (*(s32 *)((s8 *)(temp_r2_18) + (0x80))) + 8;
+            var_r6_32 = 0x28;
+            var_r5_33 = 0x7C;
+            var_r2_34 = 0x2039;
+        } else {
+            var_r4_31 = (*(s32 *)((s8 *)(temp_r2_18) + (0x84))) + 8;
+            var_r6_32 = 0x36;
+            var_r5_33 = 0x5C;
+            var_r2_34 = 0x2068;
+        }
+        sub_8082E1C(var_r4_31, 3, var_r2_34, 0);
+        sub_808843C(var_r4_31, var_r6_32, var_r5_33, 0, 0x100);
+        sub_808842C(var_r4_31, 0x400, 0x20);
+        (*(s32 (**)(void *))((s8 *)(arg0) + (4))) = sub_8106F8C;
+        sub_8106F8C(arg0);
+        play_sfx_80195B4(0x2B, -1);
+    }
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80FD960.s\"");
