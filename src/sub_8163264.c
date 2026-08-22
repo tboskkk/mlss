@@ -19,9 +19,6 @@ void sub_8163264(void *arg0, s32 arg1, s32 arg2) {
     (*(s32 *)((s8 *)(arg0) + (0x24))) = 0;
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8163280.s\"");
-#else
 void sub_8163280(u32* param_1, u32 param_2)
 {
   u32* puVar1;
@@ -30,8 +27,8 @@ void sub_8163280(u32* param_1, u32 param_2)
   if ((param_2 & 1) != 0) {
     free_heap_8018DA8(puVar1);
   }
+  return;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8163298.s\"");
