@@ -50,8 +50,14 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import db  # noqa: E402
 
-LAUNCH_SILENCE_S = 1500      # 25 min; tier2's own ceiling is 900s
-CONTAINER_MAX_S = 1800       # 30 min; 2x the give-up ceiling
+# tier2's give-up rule is stall_seconds_for(lines, stall_min) =
+# min(max(60, lines*6), stall_min*60) -- a STAGNATION timeout measured from
+# the last score IMPROVEMENT, not from launch. A search that keeps improving
+# legitimately outlives any fixed age.
+STALL_MIN_MINUTES = 15.0
+OVERDUE_MARGIN_S = 600       # 10 min past tier2's own deadline before acting
+LAUNCH_SILENCE_S = 3600      # 60 min, and only alongside an overdue row
+ORPHAN_CONTAINER_S = 10800   # 3h: a container with no live DB row at all
 GRACE_AFTER_RESTART_S = 300  # let a fresh tier2 settle before judging it
 
 _AGE = re.compile(r"(?:(\d+)\s+(second|minute|hour|day))")
@@ -94,25 +100,80 @@ def permuter_containers() -> list[tuple[str, int]]:
     return rows
 
 
+def permuter_containers_named() -> list[tuple[str, int, str]]:
+    """(id, age_seconds, function_name)."""
+    try:
+        out = subprocess.run(
+            ["podman", "ps", "--no-trunc", "--format", "{{.ID}}|{{.RunningFor}}|{{.Command}}"],
+            capture_output=True, text=True, timeout=20).stdout
+    except Exception:
+        return []
+    rows = []
+    for line in out.splitlines():
+        parts = line.split("|", 2)
+        if len(parts) != 3:
+            continue
+        m = re.search(r"nonmatchings/(\S+)", parts[2])
+        if m:
+            rows.append((parts[0], _container_age_seconds(parts[1]), m.group(1)))
+    return rows
+
+
+def _budget_s(lines: int | None) -> float:
+    """tier2's own give-up budget for a function of this size."""
+    return min(max(60.0, (lines or 0) * 6.0), STALL_MIN_MINUTES * 60.0)
+
+
+def overdue_rows(conn) -> list[tuple[str, float, float]]:
+    """(name, idle_seconds, budget) for searches tier2 should have retired.
+
+    THE signal. A row is overdue only by tier2's OWN rule -- time since the
+    last score improvement exceeding that function's stall budget -- so a
+    search that is still improving can never be flagged however long it has
+    run. Raw container age cannot do this and must not be used for it: an
+    earlier version of this file killed the pool over a 31-minute container
+    when every live search was comfortably inside its budget, because
+    stall_seconds_for() measures stagnation from the last improvement, not
+    age from launch.
+    """
+    now = time.time()
+    out = []
+    for r in conn.execute(
+            "SELECT name, last_improved_at, lines FROM functions WHERE state='permuting'"):
+        budget = _budget_s(r["lines"])
+        idle = now - (r["last_improved_at"] or now)
+        if idle > budget + OVERDUE_MARGIN_S:
+            out.append((r["name"], idle, budget))
+    return out
+
+
 def diagnose(conn) -> str | None:
     """-> reason string if tier2 is wedged, else None."""
     now = time.time()
+    overdue = overdue_rows(conn)
+    if overdue:
+        worst = max(overdue, key=lambda t: t[1])
+        return (f"{len(overdue)} search(es) past tier2's own give-up deadline "
+                f"(worst: {worst[0]} idle {worst[1]/60:.0f} min against a "
+                f"{worst[2]/60:.0f} min budget) -- the monitoring loop is not "
+                f"retiring them")
+
     permuting = conn.execute(
         "SELECT COUNT(*) FROM functions WHERE state='permuting'").fetchone()[0]
     last_launch = conn.execute(
         "SELECT MAX(ts) FROM events WHERE kind='t2_launch'").fetchone()[0] or 0
     silence = now - last_launch
-
     if permuting > 0 and silence > LAUNCH_SILENCE_S:
         return (f"no t2_launch for {silence/60:.0f} min while {permuting} row(s) "
                 f"sit in permuting -- the pool is not retiring searches")
 
-    stale = [(cid, age) for cid, age in permuter_containers() if age > CONTAINER_MAX_S]
-    if stale:
-        oldest = max(a for _, a in stale)
-        return (f"{len(stale)} permuter container(s) older than "
-                f"{CONTAINER_MAX_S//60} min (oldest {oldest/60:.0f} min) -- "
-                f"kill_search() is not running")
+    live = {r["name"] for r in conn.execute(
+        "SELECT name FROM functions WHERE state='permuting'")}
+    orphans = [(cid, age, fn) for cid, age, fn in permuter_containers_named()
+               if age > ORPHAN_CONTAINER_S and fn not in live]
+    if orphans:
+        return (f"{len(orphans)} permuter container(s) over "
+                f"{ORPHAN_CONTAINER_S//3600}h with no live DB row -- orphaned")
     return None
 
 
