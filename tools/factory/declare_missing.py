@@ -230,12 +230,14 @@ def repair_in_place(stem: str, known: set[str],
     for _ in range(MAX_ROUNDS):
         missing = set(IMPLICIT_RE.findall(err)) | set(UNDECL_RE.findall(err))
         text = path.read_text()
-        already = set(re.findall(r"^\s*(?:extern\s+)?[\w \t\*]*?(\w+)\s*[;(]",
-                                 text, re.M))
         new = []
         for sym in sorted(missing):
-            if sym in already and f"{sym};" in text:
-                continue
+            # No whole-file "is it already declared" guard here. It scanned
+            # the entire text, so it matched CALL SITES and, worse, matched
+            # declarations further DOWN the file -- which cannot help a use
+            # above them; agbcc still reports the symbol undeclared. Both made
+            # this loop silently add nothing. The header-region check below is
+            # the correct and only guard.
             if sym not in known:
                 continue  # not a real ROM symbol -- a broken draft, not our job
             decl = declaration_for(text, sym)
