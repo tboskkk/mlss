@@ -24,21 +24,16 @@ extern s32 sub_8060694;
 extern s32 sub_80605CC;
 int sub_8082E1C();
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80604E0.s\"");
-#else
 extern s32 sub_808750C;
-
-void sub_80604E0(void *arg0) {
-    u16 temp_r0_11;
-
-    temp_r0_11 = (*(u16 *)((s8 *)(arg0) + (0xAC))) - 1;
-    (*(u16 *)((s8 *)(arg0) + (0xAC))) = temp_r0_11;
-    if ((s32) (temp_r0_11 << 0x10) <= 0) {
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_808750C;
-    }
+void sub_80604E0(void *arg0)
+{
+  u16 temp_r0_11;
+  *((u16 *) (((s8 *) arg0) + 0xAC)) = (temp_r0_11 = (*((u16 *) (((s8 *) arg0) + 0xAC))) - 1);
+  if (((s32) (temp_r0_11 << 0x10)) <= 0)
+  {
+    *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_808750C;
+  }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8060500.s\"");
