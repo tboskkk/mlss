@@ -291,7 +291,112 @@ def checks(conn) -> list[tuple[str, str, str]]:
     else:
         out.append(("stale objects", OK, "no NONMATCHING leftovers in build/src/"))
 
+    # A draft that cannot even PARSE poisons its whole translation unit, and
+    # the two shapes below are the ones no other tool can attribute: agbcc
+    # reports them at `end of input` or against an innocent later function,
+    # so unblock_files.py -- which blames the guard block containing the
+    # reported line -- blames the victim. They went unnoticed long enough to
+    # strand 68 functions across 12 files, 11 of which decomp-permuter had
+    # ALREADY solved and whose wins were being re-searched indefinitely
+    # (CLAUDE.md section M). Both are detectable statically, so this costs no
+    # build and no repo lock and is safe against a live factory.
+    try:
+        broken, conflicts = _static_poison_scan()
+        if broken or conflicts:
+            bits = []
+            if broken:
+                bits.append(f"{len(broken)} unbalanced draft(s) ({', '.join(broken[:3])})")
+            if conflicts:
+                bits.append(f"{len(conflicts)} decl/defn conflict(s) ({', '.join(conflicts[:3])})")
+            out.append(("poisoned units", WARN,
+                        "; ".join(bits) + " -- each fails its WHOLE object, so every "
+                        "sibling's compile verdict and permuter promotion is invalid. "
+                        "Fix: tools/factory/quarantine_broken_drafts.py"))
+        else:
+            out.append(("poisoned units", OK,
+                        "no unbalanced drafts or decl/defn conflicts in src/"))
+    except Exception as e:
+        out.append(("poisoned units", WARN, f"could not scan: {e}"))
+
     return out
+
+
+def _static_poison_scan():
+    """(files with an unbalanced #else draft, files whose prototype
+    contradicts its own definition). Pure text analysis -- no compiler."""
+    guard = re.compile(r'^#ifndef NONMATCHING\s*$')
+    decl_re = re.compile(r'^\s*((?:extern\s+)?[A-Za-z_][\w \t*]*?)\b(\w+)\s*\(([^;{]*)\)\s*;', re.M)
+    defn_re = re.compile(r'^\s*((?:static\s+)?[A-Za-z_][\w \t*]*?)\b(\w+)\s*\(([^;{]*)\)\s*\{', re.M)
+    skip = {"if", "while", "for", "switch", "return", "sizeof", "asm_unified"}
+
+    def strip_code(s):
+        s = re.sub(r'/\*.*?\*/', '', s, flags=re.S)
+        s = re.sub(r'//[^\n]*', '', s)
+        s = re.sub(r'"(\\.|[^"\\])*"', '""', s)
+        return re.sub(r"'(\\.|[^'\\])*'", "''", s)
+
+    def norm(x):
+        x = re.sub(r'\bextern\b|\bstatic\b', '', x)
+        return re.sub(r'\s*\*\s*', '*', re.sub(r'\s+', ' ', x).strip())
+
+    def norm_args(a):
+        a = re.sub(r'/\*.*?\*/', '', a, flags=re.S)
+        a = re.sub(r'\s+', ' ', a).strip()
+        if a in ('', 'void'):
+            return 'void'
+        parts = []
+        for q in a.split(','):
+            q = q.strip()
+            q = re.sub(r'\b\w+\s*$', '', q).strip() or q
+            parts.append(re.sub(r'\s*\*\s*', '*', re.sub(r'\s+', ' ', q)))
+        return ','.join(parts)
+
+    broken, conflicts = [], []
+    for p in sorted((REPO / "src").glob("*.c")):
+        text = p.read_text()
+        lines = text.splitlines()
+        i = 0
+        while i < len(lines):
+            if guard.match(lines[i]):
+                e = n = None
+                depth = 0
+                j = i + 1
+                while j < len(lines):
+                    s = lines[j].strip()
+                    if s.startswith("#if"):
+                        depth += 1
+                    elif s == "#else" and depth == 0 and e is None:
+                        e = j
+                    elif s == "#endif":
+                        if depth == 0:
+                            n = j
+                            break
+                        depth -= 1
+                    j += 1
+                if e is not None and n is not None:
+                    body = strip_code("\n".join(lines[e + 1:n]))
+                    if body.strip() and any(body.count(a) != body.count(b)
+                                            for a, b in ("{}", "()", "[]")):
+                        broken.append(p.name)
+                    i = n
+            i += 1
+        clean = re.sub(r'//[^\n]*', '', text)
+        decls = {}
+        for m in decl_re.finditer(clean):
+            if m.group(2) in skip:
+                continue
+            decls.setdefault(m.group(2), (norm(m.group(1)), norm_args(m.group(3)),
+                                          clean[:m.start()].count("\n") + 1))
+        for m in defn_re.finditer(clean):
+            nm = m.group(2)
+            if nm in skip or nm not in decls:
+                continue
+            drt, dar, dln = decls[nm]
+            if clean[:m.start()].count("\n") + 1 == dln:
+                continue
+            if drt != norm(m.group(1)) or dar != norm_args(m.group(3)):
+                conflicts.append(f"{p.name}:{nm}")
+    return sorted(set(broken)), sorted(set(conflicts))
 
 
 def main():
