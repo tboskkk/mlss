@@ -1746,7 +1746,95 @@ base is passed to a call; a monotonic ldr/str pair run between two bases).
 Same family, same approach: switch jump tables, inline memcpy,
 division-by-constant reciprocal multiply.
 
+**O. Jump tables: data-as-code, and the one class nothing had ever matched.**
+
+Measured repeatedly and it kept getting worse: **0 of 186 jump-table
+functions had EVER matched**, while the corpus went 8.2% -> 8.8% -> 13.5%.
+The gap widened at every re-check, which is the strongest negative signal in
+the dataset.
+
+The cause is not difficulty. Luvdis stops disassembling at `mov pc, rX`, so
+the jump table AND every case body are dumped as raw `.byte`. m2c saw a
+function that ends at the dispatch and failed with `Unable to determine jump
+table`; the case bodies were invisible to every tool in the repo.
+
+m2c's ARM backend **already supports** these
+(`flow_graph.arm_jtbl_for_ldr`), and m2c's own agbcc fixtures
+(`tests/end_to_end/switch/agbcc-o2.s`) use the identical inline layout this
+ROM has. It needs exactly one shape: the literal pool names a SYMBOL, and
+that symbol labels a run of `.4byte` case targets in `.text`.
+
+`tools/decode_jumptable.py` produces that shape. Result on the 95 fragments
+rewritten so far, **all of which m2c previously refused outright**: 79 now
+emit a real `switch()`, 20 of them completely clean. 13,069 instructions and
+999 switch cases recovered from raw bytes. `--all` reports every candidate,
+`--all --in-place` rewrites them, and it is idempotent.
+
+Four things had to be right, none of them guessable:
+
+  * **The label prefix must be `lbl_`.** It is in m2c's `re_local_label`, so
+    the table does not read as the start of a NEW function, and it is also in
+    flow_graph's jump-table prefix list. With `jtbl_` m2c split the function
+    in two and decompiled the table as its own function.
+  * **Disassemble as `armv4t`, not `arm`.** With plain `arm`, objdump happily
+    emits Thumb-2 and NEON (`vaddl.u q8, d15, d0`, `ldrsb.w`, `stc`) that an
+    ARM7TDMI cannot execute -- a reliable sign it is decoding DATA. Fixing
+    this alone took the verified count 53 -> 96.
+  * **Stop at the first non-Thumb-1 instruction** and leave the rest as raw
+    `.byte`. Raw runs frequently mix trailing data in with the code; decoding
+    conservatively took 96 -> 111 (later 95 under the stricter rule below).
+    Losing code costs a seed; mis-decoding data corrupts the fragment.
+  * **Do NOT rewrite objdump's `[pc, #N]` literal loads into symbolic form.**
+    Tried; it caused 23 new failures and fixed ~5. The rewrite preserves every
+    address exactly, so the offset objdump computed is still correct.
+
+**O.1 -- The verification was weaker than the gate it stood in for, which is
+this project's most repeated bug and I wrote a fresh instance of it.**
+
+Per function the tool assembles both versions and compares `.text` bytes with
+relocations resolved BY HAND -- necessary, because the original bakes
+addresses in as `.byte` constants while the rewrite uses real relocations, so
+comparing before resolution is meaningless. (Linking with `ld --defsym` does
+not work: those symbols look like ARM to the linker, which injects
+interworking veneers the real build never emits. Setting the Thumb bit does
+not help.)
+
+The hole: the resolver fell back to reading a `_0XXXXXXX` label's address out
+of its own NAME. So a case target living in ANOTHER fragment resolved fine
+here and passed byte-identity -- then failed to LINK. The from-scratch build
+caught it (`undefined reference to '_0819B7A8'`, x50). **16 functions were
+dropped for exactly this**, and the tool now refuses any table whose targets
+leave the fragment, up front.
+
+Two rules worth generalising: a verifier that can resolve something the real
+linker cannot is not a verifier; and `rm -rf build/ && make` remains the only
+check that sees cross-object problems at all.
+
+**O.2 -- Rewriting `asm/nonmatching/` does NOT re-open the affected rows.**
+`ruleset_version()` hashes `m2c_bridge.py`, the m2c source, and
+`include/**/*.h` -- deliberately, and correctly, for its own purpose. It does
+not hash the disassembly. So all 95 rewritten functions stayed stamped
+`m2c:<ruleset>: declined` and `tier_m2c._claim()` would have excluded them
+forever, exactly the dead-end class section D describes. They had to be
+requeued explicitly (notes/candidate_body/best_score cleared). **Any future
+tool that changes a fragment's CONTENT must requeue its rows, or the work is
+invisible to the pipeline.**
+
+**Still open here:** 94 candidates are refused rather than guessed at, mostly
+raw runs mixing trailing data, plus a handful whose literal pool is not a
+plain `.4byte 0xADDR`. And **this overturns section H's ceiling claim**: H
+concluded the residual `called object is not a function` / `syntax error`
+errors were m2c backend weakness with "no deterministic rule in this repo
+fixes them". For this class the rule existed and was cheap -- the errors were
+a symptom of feeding a decompiler data-as-code.
+
 **Next levers, in rough order of value:**
+0. **The other 94 jump-table candidates** (section O) - the tool refuses
+   them rather than guessing. The dominant cause is a raw run that mixes
+   trailing data into the code region; a smarter code/data boundary than
+   "stop at the first non-Thumb-1 instruction" would recover more. Also
+   worth checking whether the 79 newly-seeded switch functions actually
+   convert, before assuming they do.
 1. **More deterministic rules.** This is the whole thesis and it keeps
    paying: the arg-register rule alone covered 15% of the corpus and
    turned 15-minute permuter gambles into instant score-0 matches. Use

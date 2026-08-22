@@ -14,16 +14,16 @@ No retail ROM is needed to build. Everything comes from `asm/` and `src/` in thi
 
 <!-- progress:start -->
 
-![matched](https://img.shields.io/badge/matched-13.4%25-orange?style=for-the-badge&label=functions%20matched)
+![matched](https://img.shields.io/badge/matched-13.5%25-orange?style=for-the-badge&label=functions%20matched)
 
 ```
-######......................................  13.4%
+######......................................  13.5%
 ```
 
 | state | functions | share | meaning |
 |---|---:|---:|---|
-| **matched** | 803 | 13.4% | compiles byte-identical to retail |
-| **in progress** | 4,321 | 72.1% | extracted, a real C attempt exists |
+| **matched** | 809 | 13.5% | compiles byte-identical to retail |
+| **in progress** | 4,315 | 72.0% | extracted, a real C attempt exists |
 | **not started** | 850 | 14.2% | extracted, no attempt yet |
 | **not extracted** | 22 | 0.4% | still raw in `asm/*.s` |
 | | **5,996** | | **total (game proper)** |
