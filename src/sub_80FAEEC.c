@@ -7,13 +7,9 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80FAEEC.s\"");
-#else
 u8 sub_80FAEEC(void *arg0) {
     return (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x24)))) + (0x9A1)));
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80FAEFC.s\"");
