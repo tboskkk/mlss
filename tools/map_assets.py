@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Merge every asset-discovery pass into one coverage map of the ROM, and
-report what's still unclassified — the actual point of Phase 4: know what's
+report what's still unclassified - the actual point of Phase 4: know what's
 *left* before extracting more of it.
 
     ./container.sh tools/map_assets.py [--top N]
@@ -9,14 +9,14 @@ Two realms, handled differently:
 
 - **CODE realm** (`0x08000000`-`0x081DD790`): reuses `map_raw_regions.py`'s
   per-line address walk of every `asm/*.s` "code" group file. A raw byte run
-  here is Phase 3's territory (missed code vs. genuine inline data — see
+  here is Phase 3's territory (missed code vs. genuine inline data - see
   CLAUDE.md), not Phase 4's.
 - **RODATA realm** (`0x081DD790`-`0x08F50000`, ~14MB): the actual point of
   this tool. Merges, as real byte intervals:
     - `assets/manifest.json`'s 75 confirmed compressed blocks (exact sizes)
     - every candidate pointer table found by the same scan
       `find_pointer_tables.py` runs (`tools/cross_check_pointer_targets.py`'s
-      `find_tables()`, confirmed and unconfirmed alike — a run of 4+
+      `find_tables()`, confirmed and unconfirmed alike - a run of 4+
       consecutive plausible-address words is real *structure* worth marking
       even before it has a code cross-reference)
     - every candidate text region `find_text_strings.py` finds
@@ -28,14 +28,14 @@ Two realms, handled differently:
       falls in this realm, claimed for up to 4096 bytes toward its next
       named neighbor (a cheap but honest heuristic for "this address has a
       real name, so the byte range right around it probably isn't mystery
-      data" — NOT a real size, see the print at the end)
+      data" - NOT a real size, see the print at the end)
 
-  What's left after merging is unclassified — the more useful the map, the
+  What's left after merging is unclassified - the more useful the map, the
   more efficiently the actual next extraction target can be chosen instead
   of guessing.
 
 Writes `assets/rom_map.json` (gitignored, like every other `assets/`
-output — regenerate locally) with the full interval list for later tooling
+output - regenerate locally) with the full interval list for later tooling
 to consume; prints a human summary.
 """
 from __future__ import annotations
@@ -157,7 +157,7 @@ def main() -> None:
     args = ap.parse_args()
 
     if not BASEROM.exists():
-        raise SystemExit(f"{BASEROM} not found — this needs your own dumped retail ROM present.")
+        raise SystemExit(f"{BASEROM} not found - this needs your own dumped retail ROM present.")
     if not MANIFEST.exists():
         raise SystemExit(f"{MANIFEST} not found. Run ./container.sh tools/extract_assets.py first.")
     rom = BASEROM.read_bytes()

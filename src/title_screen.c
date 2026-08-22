@@ -5,7 +5,7 @@
 // Defines thumb_func_start & friends for every asm/nonmatching/*.s include
 // below. Explicit and file-scoped on purpose: it used to be implicit (only
 // the first include below carried its own ".include macros.inc", and later
-// ones relied on that one having already run in this translation unit) —
+// ones relied on that one having already run in this translation unit) -
 // fragile, since reordering or matching that first function would silently
 // break assembly of the rest. See CLAUDE.md "Landmines already hit".
 asm_unified(".include \"asm/macros.inc\"");

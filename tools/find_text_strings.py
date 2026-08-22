@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Find readable text/dialogue string runs in raw rodata — a new asset class,
+"""Find readable text/dialogue string runs in raw rodata - a new asset class,
 found by accident while cross-checking pointer table entries (see
 docs/formats/README.md): `0x08467D88` sits in Latin-1-ish Spanish dialogue
 text (`"...Recordad, nuestro reino \xff\x00est\xe1 en..."`, i.e. "Remember,
 our kingdom is in...") with `0xFF` used as a control-code prefix byte
-(followed by 1-2 opaque parameter bytes — line-break/wait/color/name-insert
+(followed by 1-2 opaque parameter bytes - line-break/wait/color/name-insert
 codes are the usual GBA-era guess, NOT decoded here, this tool only finds
 where the text lives).
 
@@ -148,7 +148,7 @@ def main() -> None:
     args = ap.parse_args()
 
     if not BASEROM.exists():
-        raise SystemExit(f"{BASEROM} not found — this needs your own dumped retail ROM present.")
+        raise SystemExit(f"{BASEROM} not found - this needs your own dumped retail ROM present.")
     rom = BASEROM.read_bytes()
     lo, hi = args.start - ROM_BASE, args.end - ROM_BASE
 

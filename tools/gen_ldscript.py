@@ -4,7 +4,7 @@
     ./container.sh tools/gen_ldscript.py
 
 ld_script.ld is a build artifact of this manifest now, not a hand-maintained
-file — run this after editing splits.yaml by hand (split_func.py calls it
+file - run this after editing splits.yaml by hand (split_func.py calls it
 for you automatically after every extraction).
 """
 import sys

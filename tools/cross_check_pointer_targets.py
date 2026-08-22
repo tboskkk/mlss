@@ -5,7 +5,7 @@ against the confirmed compressed-block address list.
 docs/formats/README.md flags this as the promising, not-yet-tried version
 of the pointer-table/compressed-block cross-check: `find_pointer_tables.py`
 already checked whether any table's *own start address* coincides with a
-compressed block's start (it doesn't, checked, genuinely empty) — but never
+compressed block's start (it doesn't, checked, genuinely empty) - but never
 checked the individual *values* a table's entries point to. A table of
 pointers to per-level/per-character compressed assets is a very ordinary
 GBA data layout, and if it's here, this is how it shows up: entry values
@@ -63,7 +63,7 @@ def main() -> None:
     args = ap.parse_args()
 
     if not BASEROM.exists():
-        raise SystemExit(f"{BASEROM} not found — this needs your own dumped retail ROM present.")
+        raise SystemExit(f"{BASEROM} not found - this needs your own dumped retail ROM present.")
     if not MANIFEST.exists():
         raise SystemExit(f"{MANIFEST} not found. Run ./container.sh tools/extract_assets.py first.")
 
@@ -89,7 +89,7 @@ def main() -> None:
               "compressed-block start address. Same negative result as the table-start check in "
               "find_pointer_tables.py, extended to entry level.")
     else:
-        print(f"{len(hits)} hit(s) — a table entry points exactly at a confirmed compressed block's start:\n")
+        print(f"{len(hits)} hit(s) - a table entry points exactly at a confirmed compressed block's start:\n")
         for table_start, entry_addr, idx, target, run in hits:
             hit = refs.get(table_start)
             conf = f"  <- table confirmed by {hit[0][0]}:_{hit[0][1]:08X}" if hit else "  (table unconfirmed by code so far)"

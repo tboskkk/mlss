@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
 """Disassemble a self-contained (leaf, no relocations) object file's .text
-into this project's asm style — real hex immediates, real address labels
-for branch targets, literal pools as `_0XXXXXXX: .4byte ...` — instead of
+into this project's asm style - real hex immediates, real address labels
+for branch targets, literal pools as `_0XXXXXXX: .4byte ...` - instead of
 objdump's own conventions (decimal immediates, function-relative offsets).
 
     ./container.sh tools/disasm_object.py <obj-file> <load-address>
 
 Emits one thumb_func_start block per ELF symbol objdump finds in the
-object — some archive members (_call_via_rX.o, libcfunc.o, ...) define
+object - some archive members (_call_via_rX.o, libcfunc.o, ...) define
 several small functions, not one. Prints to stdout; doesn't touch any
-project file itself — see tools/apply_library_matches.py for that.
+project file itself - see tools/apply_library_matches.py for that.
 
 Only handles what tools/find_library_code.py's matches actually need:
 Thumb code, branches within the object, and PC-relative loads of a plain
-numeric constant (not a symbol/address — those need real relocations,
+numeric constant (not a symbol/address - those need real relocations,
 which by construction a byte-exact match doesn't have; see
 find_library_code.py's docstring).
 """
@@ -89,12 +89,12 @@ def main() -> None:
             items.append(("insn", int(off, 16), mnem, operands or ""))
 
     if not items:
-        raise SystemExit("objdump produced nothing recognizable — is this really a .text-only object?")
+        raise SystemExit("objdump produced nothing recognizable - is this really a .text-only object?")
     if not symbols:
-        raise SystemExit("objdump found no symbols in this object — can't name anything")
+        raise SystemExit("objdump found no symbols in this object - can't name anything")
 
-    # Anything referenced *as an address* — a branch target, or a PC-
-    # relative load's literal-pool slot — needs a real label at that
+    # Anything referenced *as an address* - a branch target, or a PC-
+    # relative load's literal-pool slot - needs a real label at that
     # offset, or the referencing instruction has nothing to point at.
     label_targets = set()
     for item in items:
@@ -125,7 +125,7 @@ def main() -> None:
             continue
 
         _, _, mnem, operands = item
-        mnem = mnem.split(".")[0]  # drop .n/.w width suffixes — Luvdis-style doesn't use them
+        mnem = mnem.split(".")[0]  # drop .n/.w width suffixes - Luvdis-style doesn't use them
         operands = operands.strip()
 
         pm = PC_LOAD_RE.search(operands)
@@ -142,7 +142,7 @@ def main() -> None:
         print(f"\t{mnem} {operands}" if operands else f"\t{mnem}")
 
     # objdump elides repeated/padding bytes after the last real item as
-    # "..." — those bytes are still part of this object's .text (and, if
+    # "..." - those bytes are still part of this object's .text (and, if
     # this match came from find_library_code.py, still part of the retail
     # ROM at this address) even though they're not a real instruction.
     last = items[-1]

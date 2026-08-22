@@ -5,7 +5,7 @@ remaining in .text across asm/*.s, with exact addresses.
     ./container.sh tools/map_raw_regions.py [--min-size N]
 
 Luvdis (the original disassembler used on this project) emits `.byte`
-sequences wherever it couldn't identify code — either genuine data sitting
+sequences wherever it couldn't identify code - either genuine data sitting
 between functions, or code it never reached (a jump target it didn't trace,
 an ARM-mode routine, a function only called through a pointer table).
 Nothing downstream currently distinguishes those two cases; that's what
@@ -16,7 +16,7 @@ before this tool existed), as a starting point for classifying them.
 Reads asm/*.s directly and tracks address by decoding each line's size
 (thumb_func_start/arm_func_start switch mode and 4-byte-align, matching
 asm/macros.inc's actual .macro bodies) rather than trusting any prior
-build — this has to work even on files with zero real instructions yet.
+build - this has to work even on files with zero real instructions yet.
 """
 from __future__ import annotations
 
@@ -82,7 +82,7 @@ def scan_file(path: Path, base_addr: int, obj_name: str) -> list:
             continue
 
         if LABEL_RE.match(line):
-            # A plain label doesn't by itself mean disassembled code — Luvdis
+            # A plain label doesn't by itself mean disassembled code - Luvdis
             # labels data reference targets inside raw blobs too. Don't close
             # the run; just strip the label and keep scanning the rest of
             # the line (labels here are always alone on their line in this
@@ -100,7 +100,7 @@ def scan_file(path: Path, base_addr: int, obj_name: str) -> list:
         if wm:
             # Literal pools / jump tables inside already-disassembled code.
             # Never observed inside a genuine raw dump in this project (verified
-            # by spot-checking) — treat as closing any run, like an instruction.
+            # by spot-checking) - treat as closing any run, like an instruction.
             close_run(addr)
             addr += WORD_SIZES[wm.group(1)] * (wm.group(2).count(",") + 1)
             continue

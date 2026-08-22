@@ -250,10 +250,10 @@ def main():
                  f"Match {name}\n\nRegister-allocation search only (tools/permuter_farm.py) -- "
                  f"the semantic C attempt already existed and was correct; decomp-permuter found "
                  f"the retail-matching register/instruction ordering on its own, no LLM turn spent."])
-            print(f"  ✓ {name} matched and committed")
+            print(f"  [ok] {name} matched and committed")
             finished.append(name)
         else:
-            print(f"  ✗ {name}: score-0 candidate didn't survive full verification, reverting")
+            print(f"  [!!] {name}: score-0 candidate didn't survive full verification, reverting")
             revert_to_clean()
 
     print(f"\n{len(finished)}/{len(targets)} fully matched and committed: {finished}")

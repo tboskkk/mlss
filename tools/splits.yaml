@@ -1,7 +1,7 @@
 # Layout manifest for the MLSS ROM.
 #
 # This is the single source of truth for how the final .text output section
-# is assembled, in address order. ld_script.ld is GENERATED from this file —
+# is assembled, in address order. ld_script.ld is GENERATED from this file -
 # do not hand-edit ld_script.ld; edit this file (or let split_func.py edit
 # it) and run:
 #
@@ -22,7 +22,7 @@
 #
 # 'groups' are purely organizational (they reproduce the blank-line
 # groupings the original hand-written ld_script.ld already had) and have no
-# effect on codegen — they just keep `code`, `rodata`, and the embedded
+# effect on codegen - they just keep `code`, `rodata`, and the embedded
 # Mario Bros. ROM visually separate.
 #
 # tools/split_func.py maintains this file automatically when it extracts a

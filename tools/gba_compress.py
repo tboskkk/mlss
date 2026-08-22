@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Real GBA BIOS-compression codecs (LZ77, RLE) — shared by
+"""Real GBA BIOS-compression codecs (LZ77, RLE) - shared by
 tools/find_compressed_blocks.py (which only needs "does this decode
 cleanly") and tools/extract_assets.py (which needs the actual bytes).
 
@@ -11,7 +11,7 @@ from __future__ import annotations
 
 def decompress_lz77(data: bytes, off: int, max_size: int = 1 << 24):
     """Decode a GBA LZ77 block at data[off:]. Returns (compressed_bytes_
-    consumed, decompressed_bytes) on a clean decode, or None — out of
+    consumed, decompressed_bytes) on a clean decode, or None - out of
     bounds, an invalid (forward/self-past-start) back-reference, or a
     final size that doesn't match the header's claim all count as
     "not really LZ77 here", not an error."""
@@ -108,7 +108,7 @@ def decompress_any(data: bytes, off: int, max_size: int = 1 << 24):
 
 def scan(data: bytes, start: int, end: int, min_size: int = 32, max_size: int = 1 << 20):
     """Every confirmed LZ77/RLE block in data[start:end] (byte offsets, not
-    ROM addresses — callers add their own base). One shared scan loop for
+    ROM addresses - callers add their own base). One shared scan loop for
     find_compressed_blocks.py and extract_assets.py so they can't drift."""
     found = []
     off = start

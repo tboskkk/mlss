@@ -6,8 +6,8 @@ PNG preview for anything that looks like GBA tile graphics.
     ./container.sh tools/extract_assets.py [--start ADDR] [--end ADDR] [-o DIR]
 
 For each confirmed block, writes:
-  assets/raw/<addr>_<type>.bin        — the decompressed bytes, always
-  assets/png/<addr>_<w>x<h>[_synth].png  — only if size is 32-byte (tile)
+  assets/raw/<addr>_<type>.bin        - the decompressed bytes, always
+  assets/png/<addr>_<w>x<h>[_synth].png  - only if size is 32-byte (tile)
                                             aligned; see "Palette" below
 
 Also writes assets/manifest.json with every block's address, compression
@@ -16,7 +16,7 @@ type, sizes, and file paths.
 Tile rendering: GBA 4bpp tiles are 8x8 pixels, 32 bytes each, low nibble =
 left pixel of each byte pair. A block decompressing to a clean multiple of
 32 bytes is rendered as a grid of tiles (16 wide, or narrower if there
-are fewer than 16) — not necessarily the game's real on-screen layout
+are fewer than 16) - not necessarily the game's real on-screen layout
 (that needs a tilemap this tool doesn't have), just a raw content preview,
 same as any GBA tile viewer would show you before you know the layout.
 
@@ -24,10 +24,10 @@ Palette: real GBA palette entries are 16-bit BGR555 with the top bit
 always 0. This tool checks a few fixed offsets around each compressed
 block (512B and 32B before, and right after it ends) for 32 raw bytes
 that decode as 16 all-top-bit-clear colors, and uses the first one found.
-That's a real palette if found — filename has no "_synth" suffix. If none
+That's a real palette if found - filename has no "_synth" suffix. If none
 validates, falls back to a synthetic 16-color ramp so tile *structure* is
 still visible; those filenames are suffixed "_synth" and the colors mean
-nothing — don't mistake a synth-palette preview for the real in-game
+nothing - don't mistake a synth-palette preview for the real in-game
 colors.
 """
 from __future__ import annotations
@@ -95,7 +95,7 @@ def nibble_dominance(data: bytes) -> float:
     Cheap secondary signal for "is this actually tile graphics": real GBA
     tiles usually have a dominant background/transparent color, so a high
     share here is a decent prioritization hint on top of the 32-byte-size
-    heuristic alone — not proof by itself (see extract_assets.py's own
+    heuristic alone - not proof by itself (see extract_assets.py's own
     docstring on why the size heuristic has false positives)."""
     counts = [0] * 16
     for b in data:
@@ -137,7 +137,7 @@ def main() -> None:
     args = ap.parse_args()
 
     if not BASEROM.exists():
-        raise SystemExit(f"{BASEROM} not found — this needs your own dumped retail ROM present.")
+        raise SystemExit(f"{BASEROM} not found - this needs your own dumped retail ROM present.")
     rom = BASEROM.read_bytes()
 
     out_dir = splitlib.ROOT / args.out_dir
@@ -189,7 +189,7 @@ def main() -> None:
 
     by_dominance = sorted((e for e in manifest if "nibble_dominance" in e), key=lambda e: -e["nibble_dominance"])
     if by_dominance:
-        print("\nrendered candidates, most-likely-real-graphics first (by nibble_dominance — a hint, not proof; see docstring):")
+        print("\nrendered candidates, most-likely-real-graphics first (by nibble_dominance - a hint, not proof; see docstring):")
         for e in by_dominance:
             print(f"  {e['address']}  dominance={e['nibble_dominance']:.0%}  {e['png_file']}")
 

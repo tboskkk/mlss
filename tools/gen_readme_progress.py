@@ -56,7 +56,7 @@ def collect():
 
 def bar(fraction: float, width: int = BAR_WIDTH) -> str:
     filled = int(round(fraction * width))
-    return "█" * filled + "░" * (width - filled)
+    return "#" * filled + "." * (width - filled)
 
 
 def badge_colour(pct: float) -> str:
@@ -102,12 +102,12 @@ def render(s: dict) -> str:
     out += [
         f"| | **{s['total']:,}** | | **total (game proper)** |",
         "",
-        f"Plus **{s['mariobros']:,}** functions in `asm/mariobros.s` — a complete, "
+        f"Plus **{s['mariobros']:,}** functions in `asm/mariobros.s` - a complete, "
         "separate *Mario Bros.* minigame ROM embedded in the cartridge. Different "
         "game, different original developers, tracked apart and **not** counted "
         "toward the totals above.",
         "",
-        f"<sub>Counts are functions, not code bytes — regenerate with "
+        f"<sub>Counts are functions, not code bytes - regenerate with "
         f"`tools/gen_readme_progress.py`. Last updated {today}.</sub>",
         "",
         END,
@@ -143,7 +143,7 @@ def main() -> int:
         return 0
     README.write_text(new)
     s = collect()
-    print(f"README.md updated — {s['matched']:,}/{s['total']:,} matched "
+    print(f"README.md updated - {s['matched']:,}/{s['total']:,} matched "
           f"({100 * s['matched'] / (s['total'] or 1):.1f}%)")
     return 0
 

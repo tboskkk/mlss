@@ -2,7 +2,7 @@
  * still lives in an un-split asm/*.s blob or the not-yet-decompiled tail of
  * a src/*.c file. Once the code that owns an address gets its own real
  * label (decompiled, or just properly disassembled with a name), delete its
- * entry here — the linker will resolve it normally instead. */
+ * entry here - the linker will resolve it normally instead. */
 
 stru_203FFB8 = 0x0203FFB8;
 stru_203FFF8 = 0x0203FFF8;

@@ -14,7 +14,7 @@ Walks the two-level pointer chain documented in docs/formats/README.md
 
 Both table addresses and the chain itself were found by disassembly (five
 call sites for the room table, seventeen for the per-room solidity index
-table, one of which — sub_805A00C — walks the whole chain and copies the
+table, one of which - sub_805A00C - walks the whole chain and copies the
 result into a RAM working buffer). This tool is the ROM-data half of that
 finding: no emulation, no running code, just following the same pointers
 the retail game's own code follows.
@@ -144,7 +144,7 @@ def main() -> None:
     args = ap.parse_args()
 
     if not BASEROM.exists():
-        raise SystemExit(f"{BASEROM} not found — this needs your own dumped retail ROM present.")
+        raise SystemExit(f"{BASEROM} not found - this needs your own dumped retail ROM present.")
     rom = BASEROM.read_bytes()
 
     def u16(off):

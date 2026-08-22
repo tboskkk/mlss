@@ -11,9 +11,9 @@ cxxfilt>=0.3.0
 # decomp-permuter-agbcc (tools/permute.py); pynacl is only needed for the
 # distributed permuter@home mode, deliberately left out here.
 # pycparser 3.0 dropped the plyparser module decomp-permuter-agbcc imports
-# directly — pin to the 2.x series it was actually written against.
+# directly - pin to the 2.x series it was actually written against.
 pycparser>=2.21,<3.0
 toml>=0.10.2
 
-# tools/extract_assets.py — rendering decompressed GBA tile data to PNG
+# tools/extract_assets.py - rendering decompressed GBA tile data to PNG
 Pillow>=10.0

@@ -12,19 +12,19 @@ cmake-build-*
 
 # tools
 # NOTE: tools/*.py and tools/*.pl (splits generator, matching scripts, etc.)
-# are project infrastructure and MUST be tracked — do not blanket-ignore
+# are project infrastructure and MUST be tracked - do not blanket-ignore
 # *.py/*.pl here again. See CLAUDE.md ("Landmines already hit") for why
 # this comment exists.
 tools/agbcc
 tools/binutils
 
-# matching tools (asm-differ / decomp-permuter) — local working state,
+# matching tools (asm-differ / decomp-permuter) - local working state,
 # regenerated from the committed sources, not meant to be committed itself
 expected/
 nonmatchings/
 tools/permute-work/
 
-# per-machine tool state (worktrees, autopilot logs/notes/retry state) —
+# per-machine tool state (worktrees, autopilot logs/notes/retry state) -
 # was untracked-but-not-ignored before, which meant a stray file placed
 # here (e.g. a per-attempt notes scratch file) could get silently swept
 # into a qwen_pilot.sh WIP commit's `git add -A`. Genuinely local machine
@@ -94,7 +94,7 @@ __pycache__
 .libsig-tmp/
 .tmp-preview/
 
-# tools/extract_assets.py output — decompressed/rendered game data, derived
+# tools/extract_assets.py output - decompressed/rendered game data, derived
 # straight from the copyrighted ROM (like baserom.gba itself, never
 # committed) and fully regenerable by re-running the tool
 assets/

@@ -198,10 +198,10 @@ def main():
         if verify_and_finish(name, dest_path):
             run(["git", "add", "-A"])
             r = run(["git", "commit", "-m", f"Match {name}\n\nAuto-matched by tools/auto_trivial.py: retail body is a bare\n`bx lr`, name already flagged as a no-op stub by the original\ndisassembly pass. No LLM/permuter involvement needed or used."])
-            print(f"  ✓ {name} matched and committed")
+            print(f"  [ok] {name} matched and committed")
             matched.append(name)
         else:
-            print(f"  ✗ {name} not auto-matched")
+            print(f"  [!!] {name} not auto-matched")
 
     print(f"\n{len(matched)}/{len(candidates)} matched: {matched}")
 

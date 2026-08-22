@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# tools/qwen_supervisor.sh — keeps qwen_pilot.sh actually running unattended
+# tools/qwen_supervisor.sh - keeps qwen_pilot.sh actually running unattended
 # overnight, not just for one batch.
 #
 # qwen_pilot.sh on its own has two real gaps for genuine "walk away and
@@ -16,7 +16,7 @@
 #     ./tools/qwen_supervisor.sh [max_hours] [iterations_per_batch]
 #   (defaults: 10 hours, 6 iterations per batch)
 #
-# Logs to .claude/qwen-autopilot-logs/supervisor-<timestamp>.log — check
+# Logs to .claude/qwen-autopilot-logs/supervisor-<timestamp>.log - check
 # that in the morning for a full run history, or tools/progress.py for the
 # bottom line.
 set -uo pipefail

@@ -1,6 +1,6 @@
 # Building
 
-## Option A — container (recommended)
+## Option A - container (recommended)
 
 No host setup beyond `podman` or `docker`. This is what CI uses, so if it
 builds for CI it builds for you.
@@ -15,7 +15,7 @@ command, not just `make`:
     ./container.sh make clean
     ./container.sh bash          # interactive shell inside the toolchain
 
-## Option B — native
+## Option B - native
 
 Only tested on WSL2 and Linux. If you'd rather not install a 1990s compiler
 onto your host, use Option A instead.
@@ -41,14 +41,14 @@ Clone and build agbcc, then install it into this repo:
 ## Verifying the result
 
 `make` ends by hashing the built ROM against [rom.sha1](rom.sha1) and prints
-`mlss.gba: OK` on a match — that's the whole test suite for now, and it's
+`mlss.gba: OK` on a match - that's the whole test suite for now, and it's
 what CI checks on every push. No retail ROM needs to be checked in or
 supplied anywhere in this process; the build reproduces one entirely from
 the sources in `asm/` and `src/`.
 
 A legally-dumped `baserom.gba` (already gitignored) is still useful to keep
-in the repo root for reference tooling — `asmdiff.sh`, asset extraction,
-sanity-checking a region you just split — even though the build itself
+in the repo root for reference tooling - `asmdiff.sh`, asset extraction,
+sanity-checking a region you just split - even though the build itself
 never reads it.
 
 ## Notes

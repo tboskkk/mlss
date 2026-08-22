@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Extract one function from a raw asm blob into asm/nonmatching/, wire it
 into a src/*.c file via the project's NONMATCHING-include convention, and
-regenerate ld_script.ld — the whole "start decompiling this function" chore
+regenerate ld_script.ld - the whole "start decompiling this function" chore
 in one command.
 
     ./container.sh tools/split_func.py <symbol-or-hex-address> [--dest NAME] [--dry-run]
@@ -9,7 +9,7 @@ in one command.
 Examples:
 
     # heap.s is a small, self-contained, already-99%-disassembled file with
-    # no src/*.c claiming it yet — a clean first extraction:
+    # no src/*.c claiming it yet - a clean first extraction:
     ./container.sh tools/split_func.py init_heap --dest heap
 
     # once src/heap.c exists, later heap.s functions auto-append to it:
@@ -21,18 +21,18 @@ Examples:
 What it does, concretely:
   1. Resolves the symbol/address against mlss.map (so build first).
   2. Refuses unless it's the frontmost remaining function in its asm/*.s
-     file — see CLAUDE.md for why extraction is front-to-back only.
+     file - see CLAUDE.md for why extraction is front-to-back only.
   3. Cuts its lines (body + trailing literal pool) into
      asm/nonmatching/<name>.s. If the function's bytes would end on a
      non-word-aligned address, the extraction is extended through the
-     following function(s) until it doesn't — otherwise the object gets
+     following function(s) until it doesn't - otherwise the object gets
      padded and the whole ROM shifts (see the alignment note below).
   4. Adds a `#ifndef NONMATCHING / asm include / #else / empty` stub to the
      owning src/*.c file (creating it, with --dest, if this is the first
      function pulled from this blob).
   5. Updates tools/splits.yaml and regenerates ld_script.ld.
 
-It does not touch the C body — that's the actual decompilation work, still
+It does not touch the C body - that's the actual decompilation work, still
 yours. Always `make` and diff after running this.
 """
 from __future__ import annotations
@@ -79,7 +79,7 @@ def ensure_macros_bootstrap(text: str) -> str:
     backing on whichever nonmatching fragment happens to be listed first
     (that was the pre-existing convention in option_screens.c / title_screen.c
     and it silently breaks if fragments are reordered or the first one gets
-    promoted to matching C — see CLAUDE.md "Landmines already hit")."""
+    promoted to matching C - see CLAUDE.md "Landmines already hit")."""
     if "macros.inc" in text:
         return text
     bootstrap = 'asm_unified(".include \\"asm/macros.inc\\"");\n'
@@ -109,7 +109,7 @@ def main() -> None:
 
     if not sym.obj.startswith("asm/"):
         raise SystemExit(
-            f"{sym.name} (0x{sym.addr:08X}) is already claimed by {sym.obj} — nothing to extract."
+            f"{sym.name} (0x{sym.addr:08X}) is already claimed by {sym.obj} - nothing to extract."
         )
 
     source_path = splitlib.ROOT / f"{sym.obj_stem}.s"
@@ -143,7 +143,7 @@ def main() -> None:
     #     agbcc-generated .s (see the $(CC1) rule), so ANY src/*.c object is
     #     4-aligned at the end no matter what its fragments say.
     #
-    # So the fix is neither "drop the .align" nor "give it its own object" —
+    # So the fix is neither "drop the .align" nor "give it its own object" -
     # both were tried and measured, and the Makefile's trailing align defeats
     # them. The fix is to make the extraction end where the ROM already has a
     # word boundary: keep pulling in following functions until it does. This
@@ -153,7 +153,7 @@ def main() -> None:
     #
     # This shipped once and corrupted the ROM (see CLAUDE.md). It is
     # especially nasty in the factory, where the visible symptom is every
-    # subsequent match failing to validate — a needs_human/stalled spike that
+    # subsequent match failing to validate - a needs_human/stalled spike that
     # looks nothing like "one bad extraction".
     by_name = {s.name: s for s in symbols}
     blob_extent = splitlib.parse_object_extents().get(
@@ -178,7 +178,7 @@ def main() -> None:
                 f"word-aligned, and there is no following function in "
                 f"{source_path.name} to extend it through.\n"
                 f"Extracting it would pad the object and shift every symbol after it "
-                f"(see CLAUDE.md). Refusing — this one needs a human."
+                f"(see CLAUDE.md). Refusing - this one needs a human."
             )
         last += 1
         end_addr = end_addr_after(last)
@@ -188,7 +188,7 @@ def main() -> None:
               "     alignment-padding check was SKIPPED. Run tools/check_layout.py after\n"
               "     the next build.")
 
-    # Names of every function this extraction covers — normally just the one
+    # Names of every function this extraction covers - normally just the one
     # asked for, more only when the alignment walk above had to extend.
     extract_names = [_starts[j][0] for j in range(_idx, last + 1)]
     if last != _idx:
@@ -225,14 +225,14 @@ def main() -> None:
         # sit before this blob: each object contributes its .text exactly
         # once, at one point in the link order, so every function inside a
         # given src/*.c must be contiguous in the ROM. This function isn't
-        # adjacent to that file's existing contents — it's in the middle of
-        # a blob — so it needs its own object, placed exactly here, with the
+        # adjacent to that file's existing contents - it's in the middle of
+        # a blob - so it needs its own object, placed exactly here, with the
         # blob's tail following it.
         dest_obj = f"src/{args.dest}" if args.dest else f"src/{sym.name}"
         dest_path = splitlib.ROOT / f"{dest_obj}.c"
         if dest_path.exists() or manifest.locate(dest_obj, sym.section) is not None:
             raise SystemExit(
-                f"{dest_path} (or a splits.yaml entry for it) already exists — "
+                f"{dest_path} (or a splits.yaml entry for it) already exists - "
                 f"pass a different --dest NAME."
             )
         creating_new = True
@@ -240,7 +240,7 @@ def main() -> None:
         creating_new = True
         if not args.dest:
             raise SystemExit(
-                f"{sym.name} is the first function being pulled out of {sym.obj_stem}.s — "
+                f"{sym.name} is the first function being pulled out of {sym.obj_stem}.s - "
                 f"nothing claims that slot yet, so I need a name for the new file.\n"
                 f"Re-run with --dest NAME (creates src/NAME.c)."
             )
@@ -254,7 +254,7 @@ def main() -> None:
         if args.dest and f"src/{args.dest}" != dest_entry.obj:
             raise SystemExit(
                 f"{sym.name} continues {dest_entry.obj}.c (it's what's immediately before "
-                f"{sym.obj_stem} in splits.yaml) — drop --dest {args.dest!r}, or omit --dest."
+                f"{sym.obj_stem} in splits.yaml) - drop --dest {args.dest!r}, or omit --dest."
             )
         dest_obj = dest_entry.obj
         dest_path = dest_entry.source_path
@@ -262,7 +262,7 @@ def main() -> None:
     frag_paths = [splitlib.NONMATCHING_DIR / f"{n}.s" for n, _, _ in frag_spans]
     for p in frag_paths:
         if p.exists():
-            raise SystemExit(f"{p} already exists — refusing to overwrite.")
+            raise SystemExit(f"{p} already exists - refusing to overwrite.")
 
     stub = "".join(STUB_TEMPLATE.format(name=n) for n, _, _ in frag_spans)
 
@@ -286,7 +286,7 @@ def main() -> None:
     if last != _idx:
         carried = ", ".join(extract_names[1:])
         print(f"  -> ALIGNMENT: {sym.name} alone would end at "
-              f"0x{end_addr_after(_idx):08X}, which is not word-aligned — the object would be")
+              f"0x{end_addr_after(_idx):08X}, which is not word-aligned - the object would be")
         print(f"     padded and every symbol after it would shift. Extended the extraction "
               f"through {carried}")
         print(f"     so it ends at 0x{end_addr:08X} instead. Those functions are physically "

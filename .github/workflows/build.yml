@@ -2,7 +2,7 @@ name: Build
 
 # The whole point of this workflow: prove, on every push, that a clean
 # checkout still produces a byte-identical retail ROM. No baserom is needed
-# here — the ROM is rebuilt entirely from the checked-in asm/C sources and
+# here - the ROM is rebuilt entirely from the checked-in asm/C sources and
 # checked against the committed rom.sha1.
 
 on:

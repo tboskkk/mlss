@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Find pointer tables living inside the still-raw rodata blobs — runs of
+"""Find pointer tables living inside the still-raw rodata blobs - runs of
 consecutive 4-byte-aligned words that all decode to plausible ROM
 addresses. That's the strongest cheap signal for "real structure starts
 here" available before anything in rodata has been split: a genuine array
@@ -12,7 +12,7 @@ never does, for runs of more than 2-3 words.
 Also cross-references against code: a `.4byte` literal pool entry anywhere
 in the already-disassembled asm/*.s that matches a table's start address is
 strong secondary confirmation ("code actually loads a pointer to exactly
-this address") — reported inline where it lines up. Absence of a code
+this address") - reported inline where it lines up. Absence of a code
 reference doesn't mean a table isn't real; most of the ROM's code hasn't
 been disassembled yet either.
 """
@@ -62,7 +62,7 @@ def main() -> None:
     args = ap.parse_args()
 
     if not BASEROM.exists():
-        raise SystemExit(f"{BASEROM} not found — this needs your own dumped retail ROM present.")
+        raise SystemExit(f"{BASEROM} not found - this needs your own dumped retail ROM present.")
     rom = BASEROM.read_bytes()
 
     lo, hi = args.start - ROM_BASE, args.end - ROM_BASE
@@ -118,7 +118,7 @@ def main() -> None:
         report(run)
 
     print(
-        f"\n--- {len(unconfirmed)} unconfirmed: run-of-plausible-words heuristic only, no code reference (yet — "
+        f"\n--- {len(unconfirmed)} unconfirmed: run-of-plausible-words heuristic only, no code reference (yet - "
         f"most of the ROM isn't disassembled). Treat as leads, not conclusions: GBA graphics/compressed "
         f"data can coincidentally read as pointer-like over a handful of words. Regular/incrementing "
         f"values in the preview (below) are a tell that a hit here is compressed or tile data, not a "

@@ -3,13 +3,13 @@
 
 The problem this exists to solve
 -------------------------------
-Until this tool, "what's next" was answered by a heuristic — pick the
+Until this tool, "what's next" was answered by a heuristic - pick the
 smallest remaining asm/*.s file, take whatever function is at its front.
 That is not a plan, it's an ordering, and it demonstrably hands people
 unsolvable problems: every remaining function in option_screens.s calls
 sub_8199D78 / sub_8199D5C / sub_8199624, all three of which are still raw
 undecompiled assembly in text08057568.s. You cannot confidently derive a
-caller's parameter semantics when its callees are unknown — a local model
+caller's parameter semantics when its callees are unknown - a local model
 burned ~10 hours of autopilot on exactly those functions overnight, and a
 Claude session hit the same wall for the same reason and stopped.
 
@@ -22,7 +22,7 @@ What "tractable" actually means here
 A function is easy to match, roughly in this order of importance:
 
   1. It doesn't call anything (a leaf), or only calls functions already
-     matched — you can read its behavior end to end without guessing.
+     matched - you can read its behavior end to end without guessing.
   2. It's small. Fewer instructions, fewer chances for a register
      allocation quirk to hide in.
   3. It doesn't lean on r8-r11. High registers mean real register
@@ -31,7 +31,7 @@ A function is easy to match, roughly in this order of importance:
   4. It doesn't juggle a big stack frame, which usually means many locals
      and/or many outgoing args.
 
-Nothing here is novel decomp theory — it's the standard "do the leaves
+Nothing here is novel decomp theory - it's the standard "do the leaves
 first, work up the call graph" order that every successful decomp project
 converges on. It just wasn't written down or automated for this one.
 
@@ -40,7 +40,7 @@ The leverage idea
 The queue also reports, for each still-unmatched function, how many OTHER
 unmatched functions call it. Matching a function with high fan-in doesn't
 just score one function, it unblocks everything above it. That's what turns
-"this pile is impossible" into an actual ordering — and it's what tells you
+"this pile is impossible" into an actual ordering - and it's what tells you
 that a slightly harder function is worth doing FIRST because four easier
 ones are waiting behind it.
 
@@ -57,7 +57,7 @@ Caveat worth knowing: extraction is still front-to-back per file (see
 CLAUDE.md), so a highly tractable function sitting mid-file can't actually
 be pulled yet. The queue reports `extractable_now` per entry so callers can
 filter to what's genuinely actionable today, and `--blocked-by-order`
-surfaces how much good work that constraint is currently costing — which is
+surfaces how much good work that constraint is currently costing - which is
 the evidence needed to decide whether lifting it is worth the risk.
 """
 from __future__ import annotations
@@ -202,7 +202,7 @@ def _scan_asm_file(path: Path, funcs: dict):
 
 
 def _scan_fragments(funcs: dict):
-    """asm/nonmatching/*.s — already extracted, still guarded. Same shape as
+    """asm/nonmatching/*.s - already extracted, still guarded. Same shape as
     a raw function for dependency purposes: it isn't matched yet, so anyone
     calling it still can't read its real behavior from C."""
     frag_dir = ASM_DIR / "nonmatching"

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Scan the retail ROM for GBA BIOS-compressed data blocks (LZ77, RLE,
-Huffman — see GBATEK "BIOS Decompression Functions").
+Huffman - see GBATEK "BIOS Decompression Functions").
 
     ./container.sh tools/find_compressed_blocks.py [--start ADDR] [--end ADDR]
 
@@ -9,7 +9,7 @@ nibble is format-specific (0 for LZ77/RLE, a bit-width for Huffman), high
 nibble is the type (1=LZ77, 2=Huffman, 3=RLE); bytes 1-3 are the 24-bit
 decompressed size, little-endian. That header alone is a weak signal (1 in
 ~4096 random 4-byte windows would coincidentally look like *something*'s
-header) — LZ77 and RLE candidates here are only reported after actually
+header) - LZ77 and RLE candidates here are only reported after actually
 running them through tools/gba_compress.py's real decompressors and
 confirming a clean decode at exactly the claimed size, with no out-of-
 bounds or invalid back-references. That's about as strong as validation
@@ -18,7 +18,7 @@ tools/find_pointer_tables.py looks for separately). Huffman candidates are
 header-only (no decoder here yet) and noted as lower-confidence.
 
 To actually get the decompressed bytes onto disk (not just a size in this
-report), see tools/extract_assets.py — it uses the same gba_compress.py
+report), see tools/extract_assets.py - it uses the same gba_compress.py
 codecs.
 
 Defaults to scanning both rodata blobs' address range; pass --start/--end
@@ -38,7 +38,7 @@ BASEROM = splitlib.ROOT / "baserom.gba"
 ROM_BASE = 0x08000000
 
 # asm/rodata081DD790.s through the end of asm/rodata081E2764.s, i.e. all of
-# rodata — see tools/splits.yaml's "rodata" group.
+# rodata - see tools/splits.yaml's "rodata" group.
 DEFAULT_START = 0x081DD790
 DEFAULT_END = 0x08F50000  # asm/mariobros.s picks up from here; see CLAUDE.md
 
@@ -62,15 +62,15 @@ def main() -> None:
     ap.add_argument("--max-size", type=int, default=1 << 20, help="reject candidates claiming a bigger decompressed size than this (default 1MB)")
     ap.add_argument("--min-size", type=int, default=32,
                      help="hide LZ77/RLE matches decompressing to fewer than this many bytes (default 32) "
-                          "— a clean decode of a handful of bytes isn't strong evidence on its own; "
+                          "- a clean decode of a handful of bytes isn't strong evidence on its own; "
                           "GBA compressed data is essentially never used for anything that tiny anyway")
     ap.add_argument("--show-huffman-candidates", action="store_true",
-                     help="also list Huffman header-pattern hits (unvalidated — no tree decoder here yet, "
+                     help="also list Huffman header-pattern hits (unvalidated - no tree decoder here yet, "
                           "expect this to be mostly noise; off by default for exactly that reason")
     args = ap.parse_args()
 
     if not BASEROM.exists():
-        raise SystemExit(f"{BASEROM} not found — this needs your own dumped retail ROM present.")
+        raise SystemExit(f"{BASEROM} not found - this needs your own dumped retail ROM present.")
     rom = BASEROM.read_bytes()
 
     lo, hi = args.start - ROM_BASE, args.end - ROM_BASE
@@ -82,7 +82,7 @@ def main() -> None:
     huffman = []
     if args.show_huffman_candidates:
         # Not worth excluding bytes already covered by a confirmed LZ77/RLE
-        # hit here — this output is already caveated as noisy and off by
+        # hit here - this output is already caveated as noisy and off by
         # default; a byte coincidentally looking like *both* is rare enough
         # not to bother with the interval bookkeeping.
         for off in range(lo, hi):
@@ -98,7 +98,7 @@ def main() -> None:
     print(f"\n{len(confirmed)} confirmed (fully decompressed and verified, >= {args.min_size}B), "
           f"{hidden} smaller matches hidden (--min-size 0 to show), "
           f"{len(huffman)} Huffman header-only candidates"
-          + ("" if args.show_huffman_candidates else " (hidden — pass --show-huffman-candidates)")
+          + ("" if args.show_huffman_candidates else " (hidden - pass --show-huffman-candidates)")
           + f", scanned 0x{args.start:08X}-0x{args.end:08X}")
 
 

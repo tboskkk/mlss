@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Rename a symbol everywhere in asm/, src/, and include/ — a whole-word,
+"""Rename a symbol everywhere in asm/, src/, and include/ - a whole-word,
 whole-project find/replace with a collision check first.
 
     ./container.sh tools/rename_symbol.py <old_name> <new_name> [--dry-run]
@@ -8,7 +8,7 @@ This is a pure text rename: it doesn't know what the symbol *is* (a
 function, a struct, a #define), it just replaces every whole-word
 occurrence. That's almost always safe for this project's naming (auto-
 generated sub_XXXXXXX / dword_XXXXXXX / _0XXXXXXX names, or a fresh real
-name nothing else could plausibly collide with) — check the dry run if
+name nothing else could plausibly collide with) - check the dry run if
 you're renaming something more common.
 """
 from __future__ import annotations

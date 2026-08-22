@@ -4,18 +4,18 @@
     ./container.sh tools/progress.py
 
 Classifies every function currently reachable from src/*.c into:
-  matched      — a plain C function, no NONMATCHING guard at all (the
+  matched      - a plain C function, no NONMATCHING guard at all (the
                  guard gets deleted once a function is confirmed to
-                 compile byte-identical — see CLAUDE.md)
-  in_progress  — has a #ifndef NONMATCHING / #else / C attempt / #endif
+                 compile byte-identical - see CLAUDE.md)
+  in_progress  - has a #ifndef NONMATCHING / #else / C attempt / #endif
                  block: extracted and someone's written a real attempt
-  not_started  — extracted (asm/nonmatching/<name>.s exists) but still
+  not_started  - extracted (asm/nonmatching/<name>.s exists) but still
                  just the #error placeholder, or no #else at all
 
 Plus whatever hasn't been split out of the big asm/*.s blobs yet, counted
 straight from thumb_func_start/arm_func_start/non_word_aligned_* directives.
 
-This is a static source count, not a byte-diff — "matched" here means
+This is a static source count, not a byte-diff - "matched" here means
 "the guard was removed", which is this project's own signal that someone
 already confirmed it with asm-differ. It does not re-verify that itself;
 run asm-differ for that.
@@ -90,7 +90,7 @@ def classify_c_file(path: Path):
 def count_raw_asm_functions():
     """Functions still sitting in un-split asm/*.s blobs (per splitlib's own
     front-to-back rule, every one of these is still fully unclaimed).
-    Returns (game_proper_total, mariobros_total, per_file) — the embedded
+    Returns (game_proper_total, mariobros_total, per_file) - the embedded
     Mario Bros. minigame ROM is counted separately, not folded into "game
     proper" progress. It's a whole different (much smaller) game bundled in
     the same cartridge; see CLAUDE.md for why it's tracked apart."""
@@ -135,7 +135,7 @@ def main() -> None:
     print(f"{'not extracted':14}{raw_total:>8}   {pct(raw_total)}   (still raw in asm/*.s)")
     print(f"{'-' * 14}{'-' * 8}")
     print(f"{'total':14}{grand_total:>8}")
-    print(f"\n{'mariobros.s':14}{mariobros_total:>8}   tracked separately — embedded minigame, not part of the total above")
+    print(f"\n{'mariobros.s':14}{mariobros_total:>8}   tracked separately - embedded minigame, not part of the total above")
 
     if raw_per_file:
         print("\nraw functions remaining, by file (front of each is the next one split_func.py will take):")

@@ -45,7 +45,7 @@ void sub_8019628(int);
 void sub_8022554(struct Process*, int);
 void sub_8123340(void);
 
-// New struct for this subsystem — shares the "process_add + definition
+// New struct for this subsystem - shares the "process_add + definition
 // table" idiom with COMPProcess/OPTNProcess/MarioBrosScoreVisual, and
 // (field_0x28/field_0x2C in particular) the "BBWF decompressed data +
 // BBWI text-render-context" pattern from optn_init, but is not literally
@@ -55,7 +55,7 @@ struct OpeningProcess {
 };
 
 /**
- * NOT CONFIRMED MATCHING — a best-effort structural translation, not a
+ * NOT CONFIRMED MATCHING - a best-effort structural translation, not a
  * byte-verified decompilation. The overall shape (field offsets, call
  * arguments, control flow) is traced from the raw disassembly with
  * reasonable confidence by cross-referencing optn_init/comp_init/
@@ -325,7 +325,7 @@ struct OpeningProcess* sub_8054378(struct OpeningProcess* self_, u8 priority, ch
  * and is also high confidence. The "still counting down" shared tail
  * reached by both case 3 and case 4 before their countdown hits zero
  * (a single physical block the compiler tail-merged, reached by two
- * different branches) is a lower-confidence guess — the "16 - counter"
+ * different branches) is a lower-confidence guess - the "16 - counter"
  * computation is clear from the bytes, but which hardware register it
  * writes to, and the very last few instructions of case 4's completion
  * path (looks like a BgAffineSrcData/BgAffineDstData field copy) were
@@ -399,7 +399,7 @@ void sub_8054D70(struct OpeningProcess* self_) {
                 }
 
                 if (S_36 != oldSel) {
-                    /* TODO: not fully resolved — writes something derived
+                    /* TODO: not fully resolved - writes something derived
                      * from (S_36 * 128) added to S_20, via sub_8018218
                      * (sub_8018218-style buffer fill?). */
                     sub_8018218((void*)((u8*)S_20 + S_36 * 128), (void*)0, 0, 128, 32);
@@ -410,7 +410,7 @@ void sub_8054D70(struct OpeningProcess* self_) {
         case 3:
             S_1C--;
             if (S_1C != 0) {
-                /* Shared "still fading" tail with case 4 — TODO: confirm
+                /* Shared "still fading" tail with case 4 - TODO: confirm
                  * exact destination register, and whether anything else
                  * happens before returning without the sub_8021F7C() call
                  * below. */
@@ -441,7 +441,7 @@ void sub_8054D70(struct OpeningProcess* self_) {
              * clear, dword_3000D40 bit set, dword_3001034(...) call,
              * sub_81DAA74/sub_80FC198/sub_812335C calls, a compressed-
              * size-via-label-subtraction alloc/decompress) not fully
-             * traced by hand — see raw asm/nonmatching/sub_8054D70.s. */
+             * traced by hand - see raw asm/nonmatching/sub_8054D70.s. */
             return;
 
         case 4:
@@ -504,14 +504,14 @@ void* sub_8122098(u8, u8);
 
 /**
  * NOT CONFIRMED MATCHING. A helper for the OpeningProcess subsystem's
- * companion ("opdr"-style) process — self is that companion, a bare
+ * companion ("opdr"-style) process - self is that companion, a bare
  * struct Process (opdr->parentProcess, set up in sub_8054378, points
  * back to the OpeningProcess). Traced instruction-by-instruction from a
  * raw objdump; the `(dword_3001038 + (&loc_X - &loc_Y))(args)` calls
  * mirror the exact idiom title_screen.c's open_update already uses for
  * the same dword_3001038/loc_8198220/loc_819832C trio, which is what
  * gives this one higher confidence than sub_8054378/sub_8054D70 despite
- * being unverified — but it has not been run through asm-differ.
+ * being unverified - but it has not been run through asm-differ.
  */
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_805516C.s\"");

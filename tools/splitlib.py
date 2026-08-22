@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Shared helpers for MLSS split/decomp tooling.
 
-Not a CLI itself — imported by gen_ldscript.py, split_func.py, progress.py.
+Not a CLI itself - imported by gen_ldscript.py, split_func.py, progress.py.
 Needs PyYAML, which lives in the project container (see tools/requirements.txt);
 run these tools via ./container.sh rather than the bare host interpreter.
 """
@@ -28,7 +28,7 @@ NONMATCHING_DIR = ROOT / "asm" / "nonmatching"
 # with _HEADER_LINE_RES below (which *recognizes* this shape); this constant
 # is for *writing* a new blob, e.g. the tail half produced by a mid-file
 # split. Each blob is assembled as its own translation unit, so each needs
-# its own macros.inc include — that's unrelated to (and safe from) the
+# its own macros.inc include - that's unrelated to (and safe from) the
 # "one macros.inc per src/*.c" landmine in CLAUDE.md, which is about
 # multiple fragments included into a single C file.
 BLOB_HEADER = '\t.include "asm/macros.inc"\n\n\t.syntax unified\n\t.text\n\n'
@@ -46,14 +46,14 @@ ROM_TEXT_SIZE = 0x01000000
 # Luvdis names every function it couldn't identify after its own address, so
 # the symbol name IS a checkable assertion about where it must link. That
 # makes a whole-ROM layout shift diagnosable in one pass over mlss.map
-# instead of by bisecting builds — see verify_layout().
+# instead of by bisecting builds - see verify_layout().
 _SELF_ADDRESSED_SYMBOL_RE = re.compile(r"^(?:sub|nullsub)_0?([0-9A-Fa-f]{7,8})$")
 
 MANIFEST_HEADER = '''\
 # Layout manifest for the MLSS ROM.
 #
 # This is the single source of truth for how the final .text output section
-# is assembled, in address order. ld_script.ld is GENERATED from this file —
+# is assembled, in address order. ld_script.ld is GENERATED from this file -
 # do not hand-edit ld_script.ld; edit this file (or let split_func.py edit
 # it) and run:
 #
@@ -74,7 +74,7 @@ MANIFEST_HEADER = '''\
 #
 # 'groups' are purely organizational (they reproduce the blank-line
 # groupings the original hand-written ld_script.ld already had) and have no
-# effect on codegen — they just keep `code`, `rodata`, and the embedded
+# effect on codegen - they just keep `code`, `rodata`, and the embedded
 # Mario Bros. ROM visually separate.
 #
 # tools/split_func.py maintains this file automatically when it extracts a
@@ -115,7 +115,7 @@ class Entry:
     def object_rel(self) -> str:
         """Path as it appears inside ld_script.ld AND on the linker command
         line (both root-relative, since the Makefile links from the project
-        root, not from build/) — e.g. 'build/asm/heap.o'."""
+        root, not from build/) - e.g. 'build/asm/heap.o'."""
         return f"build/{self.obj}.o"
 
     @property
@@ -268,7 +268,7 @@ class MapSymbol:
 def parse_map(path: Path = MAP_FILE) -> list:
     symbols, _, _ = _parse_map_full(path)
     if not symbols:
-        raise SystemExit(f"parsed 0 symbols from {path} — map format may have changed")
+        raise SystemExit(f"parsed 0 symbols from {path} - map format may have changed")
     return symbols
 
 
@@ -281,7 +281,7 @@ def parse_object_bases(path: Path = MAP_FILE) -> dict:
 
 def parse_object_extents(path: Path = MAP_FILE) -> dict:
     """{(obj_path, section): (base_address, size)} for every object
-    contribution — the same rows parse_object_bases() reads, keeping the
+    contribution - the same rows parse_object_bases() reads, keeping the
     size instead of throwing it away.
 
     The size matters because it is not always the number of bytes the
@@ -308,7 +308,7 @@ def file_base_address(entry: "Entry", path: Path = MAP_FILE) -> int:
     """Base address of one splits.yaml entry's contribution, per the map
     file. Returns None if this build doesn't happen to link that object
     (shouldn't happen for anything actually in splits.yaml, but fail soft
-    here — callers can decide how loud to be)."""
+    here - callers can decide how loud to be)."""
     return parse_object_bases(path).get((entry.object_rel, entry.section))
 
 
@@ -330,7 +330,7 @@ def _parse_map_full(path: Path):
         if m:
             cur_obj, section_dot = m.group(1), m.group(2)
             # The map file's object paths carry a "build/" prefix (the
-            # Makefile links from the repo root — see CLAUDE.md "Landmines"),
+            # Makefile links from the repo root - see CLAUDE.md "Landmines"),
             # but MapSymbol.obj is meant to match Entry.obj / splits.yaml
             # conventions, which never do. Strip it here so obj_stem lines up
             # with real asm/*.s and src/*.c paths for every downstream user
@@ -402,7 +402,7 @@ _HEADER_LINE_RES = [
 def _header_end(lines) -> Optional[int]:
     """Line index right after the fixed 5-line file header (.include
     macros.inc / blank / .syntax unified / .text / blank) every asm/*.s
-    blob starts with — or None if the first lines don't match it (leaves
+    blob starts with - or None if the first lines don't match it (leaves
     callers free to fall back to the old, conservative behavior rather than
     guess on a format this hasn't seen)."""
     if len(lines) < len(_HEADER_LINE_RES):
@@ -419,7 +419,7 @@ def next_blob_part_name(stem: str, manifest: "Manifest") -> str:
 
     Splits can nest (extract from a blob, then extract from the tail it
     produced), so this always counts from the ORIGINAL base name rather than
-    appending another suffix to an already-suffixed name — otherwise you'd
+    appending another suffix to an already-suffixed name - otherwise you'd
     get asm/text08057568_p2_p2_p3-style pileups after a few extractions.
     """
     base = re.sub(r"_p\d+$", "", stem)
@@ -435,7 +435,7 @@ def extract_function_lines(path: Path, name: str, allow_midfile: bool = False):
 
     end_index is exclusive. By default raises SystemExit if `name` isn't the
     first remaining function-start directive in the file. Pass
-    allow_midfile=True to permit extracting from anywhere in the blob — the
+    allow_midfile=True to permit extracting from anywhere in the blob - the
     caller is then responsible for splitting the blob into before/after
     objects and placing them correctly in the manifest, since the bytes
     before and after this function must keep their exact ROM positions
@@ -457,23 +457,23 @@ def extract_function_lines(path: Path, name: str, allow_midfile: bool = False):
         raise SystemExit(
             f"{name!r} is not the first remaining function in {path.name}.\n"
             f"split_func.py only extracts front-to-back within a file (see CLAUDE.md for why).\n"
-            f"Extract {earlier[0]!r} first — it's currently first in this file."
+            f"Extract {earlier[0]!r} first - it's currently first in this file."
         )
 
     # Luvdis sometimes left a run of raw, never-labeled .byte data (real
     # code or data it didn't recognize as a function) sitting between the
-    # file header and the first labeled function — CLAUDE.md's own Phase 3
+    # file header and the first labeled function - CLAUDE.md's own Phase 3
     # notes flag this as common. That data has to stay immediately before
     # this function in the final byte order. If it's left behind in
     # `remaining`, it silently ends up placed *after* wherever this
-    # extraction's new destination file lands instead — a real, previously
+    # extraction's new destination file lands instead - a real, previously
     # unnoticed extraction bug (found via a fresh pilot agent hitting it on
     # text08019CA4.s; also present verbatim in text080542C4.s). Detect it
     # and fold it into this extraction instead of leaving it behind.
     #
     # ONLY valid for a front-most extraction. In mid-file mode everything
     # between the header and this function is earlier *functions*, which
-    # stay in the before-part and keep their own ROM positions — folding
+    # stay in the before-part and keep their own ROM positions - folding
     # them in here would silently swallow every preceding function into
     # this one extraction and wreck the layout.
     if not allow_midfile:
@@ -492,12 +492,12 @@ def extract_function_lines(path: Path, name: str, allow_midfile: bool = False):
 
 def next_content_address(sym: "MapSymbol", source_path: Path, symbols: list):
     """ROM address of the first byte AFTER an extraction of `sym` from
-    `source_path` — i.e. exactly where the extracted object's .text has to
+    `source_path` - i.e. exactly where the extracted object's .text has to
     end for the rest of the ROM to stay put.
 
     Returns None when it can't be derived (an unlabeled successor, a symbol
     missing from the map). Callers should treat None as "couldn't check",
-    not as "safe" — the whole point of this is that the failure mode it
+    not as "safe" - the whole point of this is that the failure mode it
     guards against is silent.
     """
     _lines, starts = function_starts(source_path)
@@ -522,7 +522,7 @@ def alignment_padding_hazard(end_addr) -> bool:
     """True when an object ending at `end_addr` will be silently padded.
 
     GNU as rounds a section's size up to the section's own alignment, and
-    `thumb_func_start` expands to `.align 2, 0` — so a fragment whose bytes
+    `thumb_func_start` expands to `.align 2, 0` - so a fragment whose bytes
     stop at a 2-mod-4 address becomes a 4-aligned object two bytes too
     long, sliding every symbol after it. Confirmed directly: 0x2BE bytes of
     content under `thumb_func_start` assemble to a .text of size 0x2C0,
@@ -541,12 +541,12 @@ def verify_layout(path: Path = MAP_FILE) -> list:
 
       1. The .text OUTPUT section must be exactly ROM_TEXT_SIZE at
          ROM_TEXT_BASE. A shift shows up here as a size of 0x01000008 or
-         similar — that alone says "something grew" without saying where.
+         similar - that alone says "something grew" without saying where.
 
       2. Every self-addressed symbol (`sub_XXXXXXX`, named by Luvdis after
          its own ROM address) must link at that address. The FIRST symbol
          that doesn't is where the shift starts, and the object contribution
-         covering it is the culprit — which is the actual diagnosis, and it
+         covering it is the culprit - which is the actual diagnosis, and it
          costs one pass over the map instead of a bisect over rebuilds.
     """
     symbols, extents, outputs = _parse_map_full(path)
@@ -554,7 +554,7 @@ def verify_layout(path: Path = MAP_FILE) -> list:
 
     text = outputs.get(".text")
     if text is None:
-        problems.append("no .text output section found in the map — did the link change shape?")
+        problems.append("no .text output section found in the map - did the link change shape?")
     else:
         addr, size = text
         if addr != ROM_TEXT_BASE or size != ROM_TEXT_SIZE:
@@ -587,7 +587,7 @@ def verify_layout(path: Path = MAP_FILE) -> list:
             (obj, _sec), (base, size) = culprit
             problems.append(
                 f"  -> the contribution immediately before it is {obj} "
-                f"(0x{base:08X}, size 0x{size:X}, ends 0x{base + size:08X}) — that is "
+                f"(0x{base:08X}, size 0x{size:X}, ends 0x{base + size:08X}) - that is "
                 f"where the extra bytes came from"
             )
 
@@ -596,7 +596,7 @@ def verify_layout(path: Path = MAP_FILE) -> list:
 
 def _preceding_contribution(extents: dict, addr: int):
     """The .text object contribution that ends closest to (but at or before)
-    `addr` — i.e. whoever pushed the symbol at `addr` off its mark."""
+    `addr` - i.e. whoever pushed the symbol at `addr` off its mark."""
     best = None
     for key, (base, size) in extents.items():
         if key[1] != "text" or base >= addr:

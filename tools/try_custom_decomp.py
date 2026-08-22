@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """EXPERIMENTAL: try the custom LZ-style decompressor found via web research
-into the community Yoshi Magic editor's `Sprite Viewer.vb` (`decomp()` sub) —
+into the community Yoshi Magic editor's `Sprite Viewer.vb` (`decomp()` sub) -
 NOT a GBA BIOS format (LZ77/RLE/Huffman), a game-specific scheme
 `gba_compress.py` doesn't implement. Ported here to test the hypothesis
 (docs/formats/README.md's "Full ROM asset map" section) that this project's
@@ -121,7 +121,7 @@ def main() -> None:
     args = ap.parse_args()
 
     if not BASEROM.exists():
-        raise SystemExit(f"{BASEROM} not found — this needs your own dumped retail ROM present.")
+        raise SystemExit(f"{BASEROM} not found - this needs your own dumped retail ROM present.")
     rom = BASEROM.read_bytes()
     lo, hi = args.start - ROM_BASE, args.end - ROM_BASE
 

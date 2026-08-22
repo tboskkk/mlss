@@ -186,7 +186,7 @@ def main():
             return
         os.system("clear" if os.name != "nt" else "cls")
         print(frame)
-        print(f"\n{DIM}  refreshing every {args.interval:g}s — Ctrl-C to exit{R}")
+        print(f"\n{DIM}  refreshing every {args.interval:g}s - Ctrl-C to exit{R}")
         try:
             time.sleep(args.interval)
         except KeyboardInterrupt:

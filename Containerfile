@@ -3,18 +3,18 @@
 # Bundles devkitARM (ARM binutils + arm-none-eabi-gcc, used only for
 # assembling/linking) with a from-source build of agbcc (the actual
 # 1990s-vintage compiler that must be used to match the retail ROM's
-# codegen). Building this image is the *entire* toolchain install —
+# codegen). Building this image is the *entire* toolchain install -
 # no host setup, no sudo, no "works on my machine".
 #
 # Usage:
 #   podman build -t mlss-toolchain -f Containerfile .
 #   podman run --rm -v "$PWD":/workspace:Z mlss-toolchain make
 #
-# (swap `podman` for `docker` anywhere above — both work identically)
+# (swap `podman` for `docker` anywhere above - both work identically)
 FROM docker.io/devkitpro/devkitarm:latest
 
 # devkitARM's cross toolchain (arm-none-eabi-*) isn't on PATH in the base
-# image — only devkitPro's generic tools/bin is. asm-differ, decomp-permuter,
+# image - only devkitPro's generic tools/bin is. asm-differ, decomp-permuter,
 # and our own tools/ scripts all shell out to objdump/as/nm by bare name.
 ENV PATH="${DEVKITARM}/bin:${PATH}"
 
@@ -28,7 +28,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Pinned to the exact commit this project is verified to build a matching
-# ROM against (see INSTALL.md). Bump deliberately, not casually — a newer
+# ROM against (see INSTALL.md). Bump deliberately, not casually - a newer
 # agbcc can silently change codegen and break byte-identical matches.
 ARG AGBCC_REPO=https://github.com/jiangzhengwenjz/agbcc
 ARG AGBCC_REF=59b966ed1b8f371856dcf99f1546c2fe89c678ca

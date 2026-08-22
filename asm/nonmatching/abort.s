@@ -18,5 +18,5 @@ abort:
 	bx lr
 	.byte 0x00, 0x00
 _081DC7E8: .4byte 0x00020022
-	@ isatty/alarm below are real functions too (see tools/find_library_code.py) —
+	@ isatty/alarm below are real functions too (see tools/find_library_code.py) -
 	@ Luvdis just never recognized these 2-4 byte stubs as code on their own.

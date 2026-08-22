@@ -5,7 +5,7 @@
     tools/decomp-permuter/permuter.py -j <printed directory>
 
 Finds the function's `#else` branch (the C attempt guarded by
-`#ifndef NONMATCHING`, written by split_func.py or by hand — see
+`#ifndef NONMATCHING`, written by split_func.py or by hand - see
 CLAUDE.md) in its owning src/*.c file, isolates it into a standalone .c
 with the same includes as the parent file, assembles
 asm/nonmatching/<name>.s to get the "expected" .o, and hands both to
@@ -13,7 +13,7 @@ decomp-permuter's import.py.
 
 Requires: the function has already been through split_func.py (so
 asm/nonmatching/<name>.s exists) AND has a real #else C attempt already
-written (not still the #error placeholder) — the permuter improves an
+written (not still the #error placeholder) - the permuter improves an
 existing attempt, it doesn't write one from scratch.
 """
 from __future__ import annotations
@@ -38,7 +38,7 @@ def resolve_local_includes(c_path: Path, include_lines: list) -> list:
     title_screen.c's own title_screen.h) to absolute paths.
 
     cpp's quote-include rule is "search the including file's own directory
-    first" — that's how these resolve for the real src/*.c file, but
+    first" - that's how these resolve for the real src/*.c file, but
     import.py copies the isolated function into tools/permute-work/, a
     different directory, where that same-directory lookup no longer finds
     them (import.py's cpp invocation only adds -iquote include, not -iquote
@@ -73,16 +73,16 @@ def find_stub_block(name: str):
         except StopIteration:
             raise SystemExit(
                 f"found the include for {name!r} in {c_path.relative_to(splitlib.ROOT)} but no "
-                f"#else/#endif around it — nothing to permute yet."
+                f"#else/#endif around it - nothing to permute yet."
             )
         body = "".join(lines[else_idx + 1 : endif_idx])
         if "#error" in body:
             raise SystemExit(
                 f"{name} in {c_path.relative_to(splitlib.ROOT)} is still the split_func.py "
-                f"#error placeholder — write a real C attempt before permuting."
+                f"#error placeholder - write a real C attempt before permuting."
             )
         return c_path, "".join(include_lines), body
-    raise SystemExit(f"no src/*.c references asm/nonmatching/{name}.s — run split_func.py {name} first.")
+    raise SystemExit(f"no src/*.c references asm/nonmatching/{name}.s - run split_func.py {name} first.")
 
 
 def main() -> None:
@@ -93,23 +93,23 @@ def main() -> None:
 
     frag_path = splitlib.NONMATCHING_DIR / f"{name}.s"
     if not frag_path.exists():
-        raise SystemExit(f"{frag_path} doesn't exist — run split_func.py {name} first.")
+        raise SystemExit(f"{frag_path} doesn't exist - run split_func.py {name} first.")
 
     if not PERMUTER_DIR.exists() or not any(PERMUTER_DIR.iterdir()):
         raise SystemExit(
-            f"{PERMUTER_DIR} is empty — it's a git submodule.\n"
+            f"{PERMUTER_DIR} is empty - it's a git submodule.\n"
             f"Run: git submodule update --init tools/decomp-permuter"
         )
 
     c_path, includes, body = find_stub_block(name)
 
     # import.py's own cpp pass hardcodes -I tools/agbcc/include -iquote include
-    # (see its import_c_file()) — i.e. it assumes it's run with the project
+    # (see its import_c_file()) - i.e. it assumes it's run with the project
     # root as cwd, and that root's standard layout. So: real paths under the
     # project tree, not an off-tree tempdir, and cwd=ROOT below.
     WORKDIRS.mkdir(parents=True, exist_ok=True)
 
-    # frag_path deliberately has no .include "asm/macros.inc" of its own —
+    # frag_path deliberately has no .include "asm/macros.inc" of its own -
     # split_func.py centralizes that in the owning .c file instead (see
     # CLAUDE.md "Landmines already hit"). Standalone assembly needs it back.
     expected_asm = WORKDIRS / f"{name}.expected.s"
@@ -127,7 +127,7 @@ def main() -> None:
 
     out_dir = splitlib.ROOT / "nonmatchings" / name
     if out_dir.exists():
-        raise SystemExit(f"{out_dir} already exists — remove it first if you want to redo import.")
+        raise SystemExit(f"{out_dir} already exists - remove it first if you want to redo import.")
 
     import_py = PERMUTER_DIR / "import.py"
     result = subprocess.run(

@@ -2,7 +2,7 @@
 
 A work-in-progress **matching decompilation** of *Mario & Luigi: Superstar Saga* (USA, Game Boy Advance).
 
-*Matching* is the strict form: the C in this repository compiles — with the original toolchain, `agbcc` — to bytes **identical** to the retail cartridge. Not a reimplementation, not a port, not "close enough". The build reproduces the ROM exactly or it fails.
+*Matching* is the strict form: the C in this repository compiles - with the original toolchain, `agbcc` - to bytes **identical** to the retail cartridge. Not a reimplementation, not a port, not "close enough". The build reproduces the ROM exactly or it fails.
 
 ```
 mlss.gba   sha1: 7c303cdde5061ee329296948060b875cb50ba410
@@ -17,20 +17,20 @@ No retail ROM is needed to build. Everything comes from `asm/` and `src/` in thi
 ![matched](https://img.shields.io/badge/matched-12.3%25-orange?style=for-the-badge&label=functions%20matched)
 
 ```
-█████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  12.3%
+#####.......................................  12.3%
 ```
 
 | state | functions | share | meaning |
 |---|---:|---:|---|
-| **matched** | 737 | 12.3% | compiles byte-identical to retail |
-| **in progress** | 4,387 | 73.2% | extracted, a real C attempt exists |
+| **matched** | 736 | 12.3% | compiles byte-identical to retail |
+| **in progress** | 4,388 | 73.2% | extracted, a real C attempt exists |
 | **not started** | 850 | 14.2% | extracted, no attempt yet |
 | **not extracted** | 22 | 0.4% | still raw in `asm/*.s` |
 | | **5,996** | | **total (game proper)** |
 
-Plus **923** functions in `asm/mariobros.s` — a complete, separate *Mario Bros.* minigame ROM embedded in the cartridge. Different game, different original developers, tracked apart and **not** counted toward the totals above.
+Plus **923** functions in `asm/mariobros.s` - a complete, separate *Mario Bros.* minigame ROM embedded in the cartridge. Different game, different original developers, tracked apart and **not** counted toward the totals above.
 
-<sub>Counts are functions, not code bytes — regenerate with `tools/gen_readme_progress.py`. Last updated 2026-08-22.</sub>
+<sub>Counts are functions, not code bytes - regenerate with `tools/gen_readme_progress.py`. Last updated 2026-08-22.</sub>
 
 <!-- progress:end -->
 
@@ -40,7 +40,7 @@ Plus **923** functions in `asm/mariobros.s` — a complete, separate *Mario Bros
 ./container.sh make
 ```
 
-That's it — the container carries the whole toolchain (devkitARM plus a pinned from-source build of `agbcc`). The build ends by hashing the result against `rom.sha1` and must print `mlss.gba: OK`.
+That's it - the container carries the whole toolchain (devkitARM plus a pinned from-source build of `agbcc`). The build ends by hashing the result against `rom.sha1` and must print `mlss.gba: OK`.
 
 Prefer a native toolchain? See [INSTALL.md](INSTALL.md). `./container.sh <anything>` runs that command inside the toolchain (`./container.sh bash` for a shell).
 
@@ -56,7 +56,7 @@ void name(void) { /* the C attempt */ }
 #endif
 ```
 
-The default build splices in the original assembly. `make NONMATCHING=1` compiles the C instead, so it can be diffed. When a function is *confirmed* byte-identical the whole guard is deleted — that deletion is this project's signal that something is truly matched, and it's what the progress counts above measure.
+The default build splices in the original assembly. `make NONMATCHING=1` compiles the C instead, so it can be diffed. When a function is *confirmed* byte-identical the whole guard is deleted - that deletion is this project's signal that something is truly matched, and it's what the progress counts above measure.
 
 Full workflow, tooling, and a long list of landmines already stepped on: **[CLAUDE.md](CLAUDE.md)**. Read it before your first change; it front-loads a lot of "why is it built this way".
 
@@ -64,17 +64,17 @@ Full workflow, tooling, and a long list of landmines already stepped on: **[CLAU
 
 Good first steps:
 
-- `tools/progress.py` — where things stand, and what's next in each file.
-- `tools/split_func.py <function>` — pulls one function out of a raw asm blob and wires up the guard for you. See `--help`.
+- `tools/progress.py` - where things stand, and what's next in each file.
+- `tools/split_func.py <function>` - pulls one function out of a raw asm blob and wires up the guard for you. See `--help`.
 - `asm-differ` and [decomp-permuter](https://github.com/WhenGryphonsFly/decomp-permuter-agbcc) are configured and ready (`git submodule update --init`); see `diff_settings.py` and `permuter_settings.toml`.
 - Pick anything from `tools/progress.py`'s "not started" list, or the front of a small file.
 
 Digging into the parts nobody has mapped yet:
 
-- `tools/map_raw_regions.py` — every still-raw byte run, with exact addresses.
-- `tools/find_library_code.py` — byte-matches compiled libgcc/libc against the ROM to identify library routines.
-- `tools/find_compressed_blocks.py`, `tools/find_pointer_tables.py` — locating compressed assets and pointer tables.
-- `tools/dynamic-analysis/` — a headless GBA emulator wired to this build's DWARF, for proving at runtime what a field or function actually does.
+- `tools/map_raw_regions.py` - every still-raw byte run, with exact addresses.
+- `tools/find_library_code.py` - byte-matches compiled libgcc/libc against the ROM to identify library routines.
+- `tools/find_compressed_blocks.py`, `tools/find_pointer_tables.py` - locating compressed assets and pointer tables.
+- `tools/dynamic-analysis/` - a headless GBA emulator wired to this build's DWARF, for proving at runtime what a field or function actually does.
 
 Findings so far, including the room/collision data pipeline and the slope-physics decode, are written up in [docs/formats/README.md](docs/formats/README.md).
 
@@ -84,6 +84,6 @@ Findings so far, including the room/collision data pipeline and the slope-physic
 
 ## Credits
 
-Original decompilation work by **jellees** ([upstream](https://github.com/jellees/mlss)) — contact on [Discord](https://discord.com/users/164348894702993408). This fork continues it with an automated pipeline on top.
+Original decompilation work by **jellees** ([upstream](https://github.com/jellees/mlss)) - contact on [Discord](https://discord.com/users/164348894702993408). This fork continues it with an automated pipeline on top.
 
-*Mario & Luigi: Superstar Saga* is © Nintendo / AlphaDream. This project contains no copyrighted game data — only the code needed to rebuild it from a cartridge you own.
+*Mario & Luigi: Superstar Saga* is © Nintendo / AlphaDream. This project contains no copyrighted game data - only the code needed to rebuild it from a cartridge you own.

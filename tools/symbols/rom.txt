@@ -1,6 +1,6 @@
 /* ROM (0x08000000-0x08FFFFFF): same deal as ewram.txt, sorted by address.
  * This is the region that will grow fastest as more of the ROM gets
- * disassembled — every reference into an as-yet-unreached raw .byte blob
+ * disassembled - every reference into an as-yet-unreached raw .byte blob
  * needs an entry here until that blob gets a real label. */
 
 sub_800063C = 0x0800063C;
@@ -52,7 +52,7 @@ word_83A7574 = 0x083A7574;
 word_83A75B8 = 0x083A75B8;
 word_83A75C8 = 0x083A75C8;
 
-/* Room properties / solidity-collision pipeline — see
+/* Room properties / solidity-collision pipeline - see
  * docs/formats/README.md#room-properties-and-the-soliditycollision-pipeline
  * for the full derivation. All four confirmed by live call sites in
  * text08057568.s, not guessed from address proximity alone. */

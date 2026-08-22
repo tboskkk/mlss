@@ -498,7 +498,7 @@
 
 #define REG_WAITCNT     (*(vu16 *)REG_ADDR_WAITCNT)
 
-// BIOS interrupt-check flags mirror (not a hardware I/O register — a fixed
+// BIOS interrupt-check flags mirror (not a hardware I/O register - a fixed
 // IWRAM address the SWI BIOS routines IntrWait/VBlankIntrWait poll/clear;
 // same address+purpose as pret projects' INTR_CHECK).
 #define INTR_CHECK      (*(vu16 *)0x03007FF8)

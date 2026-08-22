@@ -1,8 +1,8 @@
-# Config for decomp-permuter-agbcc (tools/decomp-permuter, a submodule —
+# Config for decomp-permuter-agbcc (tools/decomp-permuter, a submodule -
 # see tools/permute.py for the wrapper that's actually meant to be run).
 #
 # compiler_command mirrors this project's own Makefile rule for src/*.c
-# (agbcc -> as) exactly, flag for flag, rather than a generic example —
+# (agbcc -> as) exactly, flag for flag, rather than a generic example -
 # CFLAGS/ASFLAGS here must stay in sync with Makefile if those ever change.
 compiler_type = "gcc"
 compiler_command = "tools/agbcc/bin/agbcc -O2 -mthumb-interwork -fno-common -Wimplicit -Wparentheses -Werror -g -ffix-debug-line -o /dev/stdout | arm-none-eabi-as -mcpu=arm7tdmi -I include"

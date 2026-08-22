@@ -1,6 +1,6 @@
 #!/bin/sh
 # Thin wrapper around the toolchain container. Builds the image once (cheap
-# after the first run — layers cache), then runs whatever command you pass
+# after the first run - layers cache), then runs whatever command you pass
 # inside it, with the repo mounted at /workspace.
 #
 #   ./container.sh              # == make
@@ -56,7 +56,7 @@ fi
 #
 # podman's own --cpuset-cpus goes through the cgroup `cpuset` controller,
 # which isn't delegated to this user's rootless cgroup slice here
-# ("controller `cpuset` is not available" — a real environment limit, not
+# ("controller `cpuset` is not available" - a real environment limit, not
 # a typo) so that flag hard-fails on this box. `taskset` sidesteps it
 # entirely: it calls sched_setaffinity() directly on the process, no
 # cgroup involved, so it works the same rootless or not. Applied INSIDE

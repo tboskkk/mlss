@@ -6,7 +6,7 @@
 @ Standard 192-byte GBA cartridge header (GBATEK "GBA Cartridge Header").
 @ Written by tools/gbafix (see its Header struct + good_header template) as
 @ the very last build step, from the Makefile's TITLE/GAME_CODE/MAKER_CODE/
-@ REVISION variables — this isn't reverse-engineered, it's this project's
+@ REVISION variables - this isn't reverse-engineered, it's this project's
 @ own known-fixed output, labeled instead of left as an opaque .byte dump.
 _08000000:
 RomHeader:

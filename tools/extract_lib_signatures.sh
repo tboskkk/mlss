@@ -1,7 +1,7 @@
 #!/bin/sh
 # Extracts .text bytes from every object in our pinned agbcc's libgcc.a and
 # libc.a into .libsig-tmp/{gcc,libc}/*.textbin, for tools/find_library_code.py
-# to search the retail ROM against. Gitignored, cheap to regenerate — not
+# to search the retail ROM against. Gitignored, cheap to regenerate - not
 # meant to be committed.
 #
 #   ./container.sh tools/extract_lib_signatures.sh
@@ -9,7 +9,7 @@ set -e
 cd "$(dirname "$0")/.."
 
 if [ ! -f tools/agbcc/lib/libgcc.a ]; then
-    echo "tools/agbcc/lib/libgcc.a not found — build first (./container.sh make)." >&2
+    echo "tools/agbcc/lib/libgcc.a not found - build first (./container.sh make)." >&2
     exit 1
 fi
 

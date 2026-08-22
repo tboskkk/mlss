@@ -6,13 +6,13 @@ holds them.
 
     ./container.sh tools/apply_library_matches.py [--min-size N] [--dry-run]
 
-Splices at individual-byte granularity, not line granularity — a match's
+Splices at individual-byte granularity, not line granularity - a match's
 start or end can (and does, in practice) fall in the middle of one of
 Luvdis's 16-bytes-per-line .byte dumps. Whatever bytes on the boundary
 lines aren't part of the match are kept as their own new .byte line(s), so
 nothing outside the matched range is touched.
 
-Always rebuild and confirm `mlss.gba: OK` after running this — it's the
+Always rebuild and confirm `mlss.gba: OK` after running this - it's the
 only real proof a splice was done correctly, not just "didn't crash".
 """
 from __future__ import annotations
@@ -99,7 +99,7 @@ def main() -> None:
     sigs = load_signatures(args.min_size)
     manifest = splitlib.load_manifest()
 
-    # (start, name, size, sig_path) — re-derive matches rather than importing
+    # (start, name, size, sig_path) - re-derive matches rather than importing
     # find_library_code's CLI output; also lets us know which .textbin/.o
     # produced each hit, since disasm_object.py needs the .o.
     hits = []

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# tools/qwen_pilot.sh — drives the local Qwen3-Coder agent through this
+# tools/qwen_pilot.sh - drives the local Qwen3-Coder agent through this
 # project's decomp workflow continuously and mostly unattended.
 #
 # Usage:

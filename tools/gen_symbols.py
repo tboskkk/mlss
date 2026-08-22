@@ -6,13 +6,13 @@
 Why this is split up: symbols.txt is where you manually pin the address of
 anything referenced from decompiled code that still lives inside an
 un-split asm blob (the linker can't resolve it normally because there's no
-real symbol there yet — see CLAUDE.md). One flat file was fine at 48
+real symbol there yet - see CLAUDE.md). One flat file was fine at 48
 entries; it will not be fine once every subsystem is adding to it. Splitting
 by memory region (which is also, not coincidentally, the thing that
 determines an address's *meaning* on the GBA) keeps merge conflicts and
 review diffs scoped to whoever's actually touching that region.
 
-No YAML needed here — each region file is already in the exact
+No YAML needed here - each region file is already in the exact
 `name = 0xADDRESS;` syntax the linker's --just-symbols wants, so this is a
 concatenation, not a format conversion.
 """

@@ -6,14 +6,14 @@ runtime routines inside the retail ROM's still-undissected regions.
 
 The original developers' C code almost certainly called things like integer
 division, memcpy, or long-long arithmetic, which their compiler would have
-pulled straight out of libgcc/libc — the exact same routines our pinned
+pulled straight out of libgcc/libc - the exact same routines our pinned
 agbcc build produces (see Containerfile for the pin), since GBA-era
 homebrew/retail toolchains in this family rarely touched compiler-rt code
 between versions. Where that holds, the bytes should match exactly with no
 reversing needed at all: label it and move on.
 
 Caveat: this only finds self-contained (leaf) routines. A library function
-that calls another (has relocations) won't byte-match in isolation — the
+that calls another (has relocations) won't byte-match in isolation - the
 callee's address gets patched in at link time, so identical source can
 still produce different final bytes depending on link order. Division,
 shifts, and long-long arithmetic primitives are almost always leaf
@@ -22,7 +22,7 @@ not evidence a routine isn't present, only that this quick technique
 couldn't confirm it.
 
 Requires ./tools/extract_lib_signatures.sh to have been run first (produces
-.libsig-tmp/{gcc,libc}/*.textbin — gitignored, regenerate anytime).
+.libsig-tmp/{gcc,libc}/*.textbin - gitignored, regenerate anytime).
 """
 from __future__ import annotations
 
@@ -57,14 +57,14 @@ def main() -> None:
     args = ap.parse_args()
 
     if not BASEROM.exists():
-        raise SystemExit(f"{BASEROM} not found — this needs your own dumped retail ROM present.")
+        raise SystemExit(f"{BASEROM} not found - this needs your own dumped retail ROM present.")
     if not SIG_DIR.exists():
         raise SystemExit(f"{SIG_DIR} not found. Run tools/extract_lib_signatures.sh first.")
 
     rom = BASEROM.read_bytes()
     sigs = load_signatures(args.min_size)
     if not sigs:
-        raise SystemExit("no library signatures loaded — did extract_lib_signatures.sh actually produce .textbin files?")
+        raise SystemExit("no library signatures loaded - did extract_lib_signatures.sh actually produce .textbin files?")
 
     hits = []
     for name, data in sigs:

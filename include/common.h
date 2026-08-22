@@ -129,7 +129,7 @@ struct struc_3000D0C_channel {
 // progress) and referenced once in still-raw asm/text08000000.s. Only the
 // fields sub_801A1D4/sub_801A2A0 actually touch are known; field_180 (a
 // zero-arg polling callback, "is there new link data?") implies the
-// struct is much bigger than what's mapped here — pad1 exists purely to
+// struct is much bigger than what's mapped here - pad1 exists purely to
 // get field_180 to the right offset, not because its contents are known.
 struct struc_3000D0C {
     u8 field_0;
@@ -349,7 +349,7 @@ extern struct struc_203FFF8 stru_203FFF8;
 extern vu16 word_2000004;
 
 // The buffer open_init_8055A00 allocates into dword_3000DA0 (340 bytes,
-// tag "ORST") — only the fields open_8056224 actually touches are known
+// tag "ORST") - only the fields open_8056224 actually touches are known
 // so far; extend as more of its consumers get decompiled.
 struct struc_3000DA0 {
     s8 field_0[5];

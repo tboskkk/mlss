@@ -68,7 +68,7 @@ CRITICAL THUMB IDIOMS -- the most frequent sources of error:
 
 2. LITERAL POOLS NAME SYMBOLS. A trailing `_08068164: .4byte sub_808750C`
    means the loaded constant IS that symbol -- write the NAME, never the
-   raw address. A set low bit (…0D vs …0C) is just the Thumb flag; it is
+   raw address. A set low bit (...0D vs ...0C) is just the Thumb flag; it is
    still that function. These are usually function pointers stored into a
    struct field.
 

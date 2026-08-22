@@ -34,7 +34,7 @@ CPPFLAGS 		:= -I tools/agbcc/include -nostdinc -undef -iquote include -Wno-trigr
 # `make NONMATCHING=1`: compiles the #else branch of every
 # `#ifndef NONMATCHING / asm include / #else / C attempt / #endif` block
 # (see CLAUDE.md) instead of splicing in the verbatim retail bytes. The
-# resulting ROM will NOT match retail — that's expected, this build exists
+# resulting ROM will NOT match retail - that's expected, this build exists
 # to test-compile and diff in-progress C, not to ship. Plain `make` (no
 # NONMATCHING) is what has to keep producing a byte-identical ROM.
 # Goes to CPPFLAGS, not CFLAGS: agbcc (CC1) only ever sees the already-
