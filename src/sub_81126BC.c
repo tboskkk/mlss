@@ -11,10 +11,6 @@ asm_unified(".include \"asm/macros.inc\"");
 s32 stop_sfx_80195A8();
 s32 sub_8082E1C();
 s32 sub_8087CE4();
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_81126BC.s\"");
-#else
-s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 extern s32 sub_8111234;
 
 void sub_81126BC(void *arg0) {
@@ -22,7 +18,6 @@ void sub_81126BC(void *arg0) {
     (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8111234;
     play_sfx_80195B4(0x86, -1);
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81126E4.s\"");
