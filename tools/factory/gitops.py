@@ -10,6 +10,7 @@ anywhere.
 from __future__ import annotations
 
 import fcntl
+import functools
 import re
 import shutil
 import subprocess
@@ -369,6 +370,111 @@ def asm_differ_score(name: str) -> int | None:
 ISO_DIR = REPO / ".claude" / "factory" / "iso"
 
 
+@functools.lru_cache(maxsize=1)
+def rom_symbols() -> frozenset[str]:
+    """Every symbol that genuinely exists in the ROM: functions labelled in
+    asm/, plus the hand-maintained symbol tables."""
+    syms: set[str] = set()
+    for p in (REPO / "asm").rglob("*.s"):
+        try:
+            syms |= set(re.findall(r"(?:thumb|arm)_func_start\s+(\S+)",
+                                   p.read_text(errors="ignore")))
+        except OSError:
+            pass
+    for p in (REPO / "tools" / "symbols").glob("*.txt"):
+        try:
+            syms |= set(re.findall(r"^\s*(\w+)\s*=",
+                                   p.read_text(errors="ignore"), re.M))
+        except OSError:
+            pass
+    # Functions already MATCHED no longer have a thumb_func_start anywhere in
+    # asm/ -- step 7 of the workflow deletes their fragment -- so scanning
+    # asm/ alone loses them exactly as they become most useful to callers.
+    for p in SRC_DIR.rglob("*.c"):
+        try:
+            syms |= set(re.findall(r"^[A-Za-z_][\w \t\*]*?(\w+)\s*\([^;]*\)\s*\{",
+                                   p.read_text(errors="ignore"), re.M))
+        except OSError:
+            pass
+    return frozenset(syms)
+
+
+def _file_scope(body: str) -> str:
+    """`body` with every brace-delimited region removed.
+
+    Declarations live at file scope; CALLS live inside function bodies. Without
+    this, a naive "is it already declared here" scan matches the call site
+    `sub_8082E1C(arg0, 4, 0, 0);` and concludes the callee needs no
+    declaration -- which is precisely backwards, and made this whole helper
+    silently emit nothing.
+    """
+    out, depth = [], 0
+    for ch in body:
+        if ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth = max(0, depth - 1)
+        elif depth == 0:
+            out.append(ch)
+    return "".join(out)
+
+
+@functools.lru_cache(maxsize=1)
+def _header_declared() -> frozenset[str]:
+    try:
+        text = (REPO / "include" / "common.h").read_text()
+    except OSError:
+        return frozenset()
+    return frozenset(re.findall(r"\b(\w+)\s*\(", text)
+                     + re.findall(r"\b(\w+)\s*;", text))
+
+
+def rom_symbol_declarations(body: str) -> str:
+    """Declarations for the ROM symbols `body` references but nothing declares.
+
+    WHY THIS EXISTS. Without it, compiles_in_isolation() rejects C that is
+    KNOWN CORRECT. Control test: the committed, byte-exact, ROM-reproducing C
+    of three already-matched functions (sub_8060464, sub_8132DE4,
+    sub_809D24C) all returned False -- because agbcc runs `-Wimplicit
+    -Werror` and their callees (`sub_8082E1C`) and address-taken handlers
+    (`&sub_80605A4`) are declared in their real source FILE, not in
+    common.h. So the check was measuring "does this body happen to reference
+    only header-declared symbols", not "is this body compilable".
+
+    That matters well beyond this one predicate: CLAUDE.md section I's whole
+    finding -- "613 seeds compile perfectly well alone", "16.7% of the pile"
+    -- was measured with this function, so those are UNDERCOUNTS, and seeds
+    the permuter could have searched were declined.
+
+    Adding the declarations is not stacking the deck. They emit no code, the
+    permuter's isolated copy can be given exactly the same ones, and
+    declare_missing.py supplies them in the real source file -- so a pass
+    here really does correspond to a pass in the real build.
+
+    Shape is chosen from how the BODY uses the symbol, which is unambiguous;
+    both wrong answers are themselves fatal (`X(...)` against a data
+    declaration is "called object is not a function"; `&X` against a
+    function declaration is a pointer type error). Deliberately not
+    signature inference, which measured worse -- a K&R `int X();` declares
+    no parameters and so cannot conflict with any call's argument list.
+    """
+    known, declared = rom_symbols(), _header_declared()
+    # Symbols the body itself already declares or defines -- scanned at FILE
+    # SCOPE only, so a call inside a function body is not mistaken for a
+    # declaration of the thing being called.
+    local = set(re.findall(r"(\w+)\s*[;(]", _file_scope(body)))
+    out = []
+    for sym in sorted(set(re.findall(r"\b(\w+)\b", body)) & known):
+        if sym in declared or sym in local:
+            continue
+        if re.search(rf"&\s*{re.escape(sym)}\b", body):
+            out.append(f"extern s32 {sym};")
+        elif re.search(rf"\b{re.escape(sym)}\s*\(", body):
+            out.append(f"int {sym}();")
+    return ("/* ROM symbols this body references */\n" + "\n".join(out) + "\n\n"
+            if out else "")
+
+
 def compiles_in_isolation(name: str, body: str) -> bool:
     """Does this candidate compile ALONE, with no siblings in scope?
 
@@ -401,7 +507,8 @@ def compiles_in_isolation(name: str, body: str) -> bool:
     src = ISO_DIR / f"{name}.c"
     pre = ISO_DIR / f"{name}.i"
     try:
-        src.write_text('#include "global.h"\n#include "common.h"\n\n' + body + "\n")
+        src.write_text('#include "global.h"\n#include "common.h"\n\n'
+                       + rom_symbol_declarations(body) + body + "\n")
         rel_src = src.relative_to(REPO).as_posix()
         rel_pre = pre.relative_to(REPO).as_posix()
         # ONE container invocation, not two. Measured: this check ran at
