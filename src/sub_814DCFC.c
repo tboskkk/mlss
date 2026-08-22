@@ -7,9 +7,6 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_814DCFC.s\"");
-#else
 s32 sub_814DB34();                              /* extern */
 extern s32 sub_814D838;
 
@@ -17,7 +14,6 @@ void sub_814DCFC(s32 arg0, s32 arg1, s32 **arg2) {
     sub_814DB34();
     *arg2 = &sub_814D838;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_814DD14.s\"");
