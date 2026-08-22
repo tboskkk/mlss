@@ -606,14 +606,11 @@ void sub_8176F90(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     sub_80DEEA8(arg0, arg1, arg2, 0, &sub_81725A4, 0x2080, 3, 0, 2, arg3, arg3, 0x08504790, 2);
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8176FCC.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+extern s32 sub_81723C0;
+
+void sub_8176FCC(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    sub_80DEEA8(arg0, arg1, arg2, 0, &sub_81723C0, 0x2080, 2, 0, 2, arg3, arg3, 0x08504788, 2);
+}
 
 s32 sub_80DEEA8(s32, s32, s32, s32, s32 *, s32, s32, s32, s32, s32, s32, s32, s32); /* extern */
 extern s32 sub_81721DC;
