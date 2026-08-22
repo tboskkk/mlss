@@ -10,60 +10,11 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80E99E0.s\"");
 #else
-void sub_80E99E0(s32 arg0)
-{
-    s32 r1;
-    u32 *r0_ptr;
-    u32 r2;
-    
-    r1 = arg0;
-    if (r1 > 0x1CB7)
-    {
-        if (r1 > 0x1CD7)
-        {
-            if (r1 > 0x1D17)
-            {
-                r0 = 0;
-            }
-            else
-            {
-                r2 = 0xFFFFE328;
-                r0 = r1 + r2;
-                r0 <<= 16;
-                r1 = r0 >> 15;
-                r0_ptr = (u32*)0x03000FC0;
-                r0 = *r0_ptr;
-                r0 += 0xE5 << 2;
-                r0 += r1;
-                r0 = *(u16*)r0;
-            }
-        }
-        else
-        {
-            r2 = 0xFFFFE470;
-            r0 = r1 + r2;
-            r0 <<= 16;
-            r1 = r0 >> 16;
-            r0_ptr = (u32*)0x03000FC0;
-            r0 = *r0_ptr;
-            r2 = 0x414;
-            r0 += r2;
-            r0 += r1;
-            r0 = *(u8*)r0;
-        }
-    }
-    else
-    {
-        r2 = 0xFFFFE470;
-        r0 = r1 + r2;
-        r0 <<= 16;
-        r1 = r0 >> 16;
-        r0_ptr = (u32*)0x03000FC0;
-        r0 = *r0_ptr;
-        r2 = 0x414;
-        r0 += r2;
-        r0 += r1;
-        r0 = *(u8*)r0;
-    }
-}
+/* Draft quarantined: it did not compile, and under agbcc a single bad
+   draft fails the WHOLE translation unit -- taking every sibling's compile
+   verdict, asm-differ score and permuter promotion down with it. Emptied by
+   tools/factory/quarantine_broken_drafts.py. The guard is intact, so the
+   real ROM still gets the verbatim retail bytes and progress.py still counts
+   this as unmatched; the candidate body is still in the state DB and m2c can
+   regenerate the seed. Write real C here to replace this comment. */
 #endif

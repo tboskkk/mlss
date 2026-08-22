@@ -10,26 +10,11 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_804FC30.s\"");
 #else
-void sub_804FC30(u8* param_1)
-{
-  u32* puVar1;
-  u8* puVar2;
-  u8* puVar3;
-  u32 uVar4;
-  
-  puVar1 = (u32*)((u8*)param_1 + 0x25C);
-  if (*puVar1 == -1) {
-    puVar2 = (u8*)((u8*)param_1 + 0x2B5);
-    if ((*(u8*)puVar2 & 7) == 0) {
-      puVar3 = (u8*)0x83A0A38;
-      uVar4 = *(u8*)((u8*)param_1 + 2) >> 5;
-      uVar4 = uVar4 << 2;
-      uVar4 = uVar4 + ((u32)*(u8*)((u8*)param_1 + 0x26) << 0x1C) >> 0x1E;
-      puVar3 = (u8*)((u8*)puVar3 + uVar4);
-      uVar4 = *(u8*)puVar3 & 3;
-      uVar4 = uVar4 << 4;
-      *(u8*)((u8*)param_1 + 0x353) = *(u8*)((u8*)param_1 + 0x353) & 0x31 | uVar4;
-    }
-  }
-}
+/* Draft quarantined: it did not compile, and under agbcc a single bad
+   draft fails the WHOLE translation unit -- taking every sibling's compile
+   verdict, asm-differ score and permuter promotion down with it. Emptied by
+   tools/factory/quarantine_broken_drafts.py. The guard is intact, so the
+   real ROM still gets the verbatim retail bytes and progress.py still counts
+   this as unmatched; the candidate body is still in the state DB and m2c can
+   regenerate the seed. Write real C here to replace this comment. */
 #endif
