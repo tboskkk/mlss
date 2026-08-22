@@ -9,11 +9,6 @@ asm_unified(".include \"asm/macros.inc\"");
 
 
 s32 sub_8082E1C();
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_809B3DC.s\"");
-#else
-s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
-
 void sub_809B3DC(void *arg0) {
     s32 temp_r0_25;
     void *temp_r1_8;
@@ -32,7 +27,6 @@ block_3:
         }
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_809B410.s\"");
