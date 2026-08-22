@@ -470,10 +470,30 @@ def fragment_trailing_bytes(name: str) -> str | None:
     if not frag.exists():
         return None
     text = frag.read_text()
-    # Everything after the last literal-pool definition (or, failing that,
-    # after the last real instruction) is "trailing".
+    # Everything after the last literal-pool definition -- or, when the
+    # function has no literal pool at all, after its last real instruction
+    # -- is "trailing".
+    #
+    # The fallback is not hypothetical, and its absence was a live hole:
+    # `tail = ""` when pool_ends was empty meant this returned None, i.e.
+    # "safe to delete", UNCONDITIONALLY for any fragment without a literal
+    # pool. Measured across all 5,637 fragments: 745 have no pool, 101 of
+    # those end in non-zero .byte data, and 78 of those were sitting in
+    # tier2_ready -- one (sub_801B5A0) carrying 325 non-zero bytes. Any of
+    # them matching would have had its fragment deleted, those bytes lost,
+    # the from-scratch build fail, and the row filed under needs_human as a
+    # "real anomaly" -- a correct match thrown away with a misleading note.
     pool_ends = [m.end() for m in re.finditer(r"^_\w+:\s*\.4byte.*$", text, re.MULTILINE)]
-    tail = text[pool_ends[-1]:] if pool_ends else ""
+    if pool_ends:
+        tail = text[pool_ends[-1]:]
+    else:
+        lines = text.splitlines()
+        last_insn = -1
+        for i, ln in enumerate(lines):
+            stripped = ln.strip()
+            if stripped and not stripped.startswith((".byte", "@")):
+                last_insn = i
+        tail = "\n".join(lines[last_insn + 1:])
     if not tail.strip():
         return None
     data_lines = [ln for ln in tail.splitlines() if TRAILING_DATA_RE.match(ln)]

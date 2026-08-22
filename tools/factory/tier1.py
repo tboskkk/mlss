@@ -118,7 +118,26 @@ def process_one(conn) -> str | None:
                 # Refresh expected/ right after extraction -- CLAUDE.md landmine:
                 # a stale expected/ has the wrong object for a just-moved symbol,
                 # and asm-differ silently diffs against nothing/wrong content.
-                gitops.run(["./container.sh", "make"])
+                # CHECK the build before freezing it as the baseline.
+                # This used to discard make's exit code and refresh
+                # expected/ unconditionally -- the same bug CLAUDE.md
+                # records as fixed in tier3.ensure_extracted(), which tier1
+                # never got. A bad extraction would then be frozen as
+                # "known good" for every subsequent asm-differ -o
+                # comparison, so one broken split would silently corrupt
+                # every verdict after it. layout_ok() is checked too,
+                # because an extraction can build fine and still shift the
+                # ROM (the alignment-padding landmine).
+                build = gitops.run(["./container.sh", "make"])
+                if "mlss.gba: OK" not in build.stdout or not gitops.layout_ok():
+                    gitops.revert_to_clean()
+                    with db.tx(conn):
+                        db.set_state(conn, name, "needs_attempt", worker_id=None,
+                                     notes="tier1: extraction built badly or shifted "
+                                           "the ROM layout -- reverted rather than "
+                                           "freezing it into expected/")
+                    db.log_event(conn, name, "error", "tier1 extraction failed the build/layout check")
+                    return name
                 gitops.refresh_expected()
                 # Commit the extraction itself, separately from any eventual
                 # match, and while STILL HOLDING the lock so it's atomic
