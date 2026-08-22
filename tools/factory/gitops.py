@@ -240,11 +240,58 @@ def splice_candidate(name: str, body: str) -> Path | None:
     if c_path is None:
         return None
     text = c_path.read_text()
-    new_text = text.replace(block, body.strip() + "\n", 1)
+    new_text = text.replace(block, _dedupe_decls(text, block, body).strip() + "\n", 1)
     if new_text == text:
         return None
     c_path.write_text(new_text)
     return c_path
+
+
+_DECL_RE = re.compile(
+    r"^\s*(?:extern\s+)?[A-Za-z_][\w \t\*]*?\b(\w+)\s*(?:\([^;]*\))?\s*;.*$")
+
+
+def _dedupe_decls(text: str, block: str, body: str) -> str:
+    """Drop declarations from `body` for symbols the destination file already
+    declares at file scope.
+
+    m2c emits its own declarations above each generated function, so two
+    candidates landing in the SAME file routinely declare one symbol two
+    different ways -- one calls it (`s32 sub_8079C70();`), the other takes its
+    address (`extern s32 sub_8079C70;`). Splicing both is a hard
+    `X redeclared as different kind of symbol`, and because it only appears
+    once BOTH have been spliced it survives per-candidate checks and kills the
+    batch: seen live failing a 16-candidate validation batch, then an 8, on
+    `sub_8079C70` in src/sub_80796B8.c.
+
+    Conservative on purpose: only lines before the body's first `{` are
+    considered (that is where m2c puts them), the symbol must already be
+    declared at file scope OUTSIDE the block being replaced, and anything
+    that does not parse cleanly as a declaration is left alone.
+    """
+    rest = text.replace(block, "", 1)
+    # file-scope declarations already present elsewhere in the file
+    depth, scope = 0, []
+    for ch in rest:
+        if ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth = max(0, depth - 1)
+        elif depth == 0:
+            scope.append(ch)
+    existing = set(re.findall(r"(\w+)\s*[;(]", "".join(scope)))
+
+    head_end = body.find("{")
+    if head_end < 0:
+        return body
+    kept, dropped = [], False
+    for line in body[:head_end].splitlines(keepends=True):
+        m = _DECL_RE.match(line)
+        if m and m.group(1) in existing:
+            dropped = True
+            continue
+        kept.append(line)
+    return ("".join(kept) + body[head_end:]) if dropped else body
 
 
 ANSI_RE = re.compile(r"\x1b\[[0-9;]*m")
