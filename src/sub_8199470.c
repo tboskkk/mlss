@@ -15,15 +15,11 @@ u32 sub_8199470(u32 param_1)
   return *((u8 *) param_1);
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8199480.s\"");
-#else
 s32 sub_81DA690(s16, s16);                          /* extern */
 
 u32 sub_8199480(s16 arg0, s16 arg1) {
     return (u32) (sub_81DA690(arg0, arg1) << 0x10) >> 0x18;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8199498.s\"");

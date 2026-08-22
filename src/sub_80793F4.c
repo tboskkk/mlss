@@ -84,11 +84,6 @@ s32 sub_8079484(void *arg0, s32 arg1) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80794FC.s\"");
-#else
-s32 sub_807C298(void *);                        /* extern */
-
 void sub_80794FC(void *arg0) {
     s32 temp_r0_16;
     s32 var_r1_23;
@@ -114,7 +109,6 @@ void sub_80794FC(void *arg0) {
         sub_807C298(arg0);
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_807953C.s\"");

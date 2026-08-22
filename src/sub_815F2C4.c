@@ -117,9 +117,6 @@ void sub_815F474(void *arg0, s32 arg1) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_815F530.s\"");
-#else
 s32 get_surface_height_at_x(s32, s32);              /* extern */
 s32 sub_815FACC(void *);                        /* extern */
 
@@ -140,7 +137,6 @@ void sub_815F530(void *arg0, s32 arg1) {
     }
     sub_815FACC(arg0);
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_815F56C.s\"");

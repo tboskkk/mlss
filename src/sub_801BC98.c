@@ -25,9 +25,6 @@ asm_unified(".include \"asm/nonmatching/time_init.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_801BD30.s\"");
-#else
 s32 sub_801BC98(s32, s32);                      /* extern */
 
 void sub_801BD30(void) {
@@ -39,7 +36,6 @@ void sub_801BD30(void) {
         *(s32 *)0x03000D44 = 0;
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_801BD50.s\"");

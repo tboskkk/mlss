@@ -15,14 +15,22 @@ s32 sub_8150EFC(s32 arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8150F60.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+s32 sub_8021308();                              /* extern */
+
+void sub_8150F60(void *arg0, s32 arg1) {
+    void *temp_r0_14;
+
+    if ((*(s32 *)((s8 *)(arg0) + (0x28))) != 0) {
+        sub_8021308();
+    }
+    temp_r0_14 = (*(void **)((s8 *)(arg0) + (0)));
+    if (temp_r0_14 != NULL) {
+        free_heap_8018D9C(temp_r0_14);
+    }
+    if (1 & arg1) {
+        free_heap_8018DA8(arg0);
+    }
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8150F90.s\"");

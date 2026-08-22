@@ -25,23 +25,31 @@ asm_unified(".include \"asm/nonmatching/sub_8090B1C.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8090B80.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+s32 sub_8090BC8(void *);                        /* extern */
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8090BA4.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+void sub_8090B80(void *arg0) {
+    s32 temp_r0_11;
+
+    temp_r0_11 = (*(s32 *)((s8 *)(arg0) + (0x9C))) - 1;
+    (*(s32 *)((s8 *)(arg0) + (0x9C))) = temp_r0_11;
+    if (temp_r0_11 <= 0) {
+        (*(s8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x20))) = 0x10;
+        sub_8090BC8(arg0);
+    }
+}
+
+s32 sub_8090C2C(void *);                        /* extern */
+
+void sub_8090BA4(void *arg0) {
+    s32 temp_r0_11;
+
+    temp_r0_11 = (*(s32 *)((s8 *)(arg0) + (0x9C))) - 1;
+    (*(s32 *)((s8 *)(arg0) + (0x9C))) = temp_r0_11;
+    if (temp_r0_11 <= 0) {
+        (*(s8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x20))) = 0x10;
+        sub_8090C2C(arg0);
+    }
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8090BC8.s\"");

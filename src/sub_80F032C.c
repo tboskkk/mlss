@@ -7,9 +7,6 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80F032C.s\"");
-#else
 s32 sub_80E6FB8(s32, s32);                      /* extern */
 s32 sub_80E7118(s32, s32);                      /* extern */
 
@@ -17,7 +14,6 @@ void sub_80F032C(void) {
     sub_80E6FB8(*(s32 *)0x03000FCC, 4);
     sub_80E7118(*(s32 *)0x03000FCC, 0x10);
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80F034C.s\"");

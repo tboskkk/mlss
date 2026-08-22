@@ -45,9 +45,6 @@ block_9:
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/script_cmd_conditional_jump.s\"");
-#else
 u8 script_test_condition(s32, u8, s32, s32);    /* extern */
 
 s32 script_cmd_conditional_jump(s32 arg0, s32 *arg1, void *arg2) {
@@ -56,7 +53,6 @@ s32 script_cmd_conditional_jump(s32 arg0, s32 *arg1, void *arg2) {
     }
     return 1;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80EAB98.s\"");

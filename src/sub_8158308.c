@@ -15,9 +15,6 @@ s32 sub_8158308(s32 arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8158310.s\"");
-#else
 s32 sub_8158258(void *);                        /* extern */
 
 void sub_8158310(void *arg0, s16 arg1) {
@@ -31,11 +28,7 @@ void sub_8158310(void *arg0, s16 arg1) {
     }
     sub_8158258(arg0);
 }
-#endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8158330.s\"");
-#else
 s32 sub_8021308();                              /* extern */
 
 void sub_8158330(void *arg0, s32 arg1) {
@@ -52,7 +45,6 @@ void sub_8158330(void *arg0, s32 arg1) {
         free_heap_8018DA8(arg0);
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8158368.s\"");
