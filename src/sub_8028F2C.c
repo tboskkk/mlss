@@ -7,15 +7,9 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8028F2C.s\"");
-#else
-u8 sub_8028F2C(u8 param_1) {
-    u8 *ptr = (u8*)((uintptr_t)param_1 + 0x12D);
-    *ptr |= 0x20;
-    return param_1;
+void sub_8028F2C(void *arg0) {
+    (*(u8 *)((s8 *)(arg0) + (0x12D))) = (u8) ((*(u8 *)((s8 *)(arg0) + (0x12D))) | 0x20);
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8028F40.s\"");

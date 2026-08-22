@@ -134,25 +134,17 @@ void sub_807F680(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_807F6D0.s\"");
-#else
 s32 sub_8116610(s32);                           /* extern */
 
 void sub_807F6D0(void) {
     sub_8116610((*(s32 *)((s8 *)(*(void **)0x03000FD8) + (0x248))));
 }
-#endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_807F6EC.s\"");
-#else
 s32 sub_81165CC(s32, s32);                      /* extern */
 
 void sub_807F6EC(s32 arg0) {
     sub_81165CC((*(s32 *)((s8 *)(*(void **)0x03000FD8) + (0x248))), arg0);
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_807F708.s\"");

@@ -206,9 +206,6 @@ void sub_8087318(void *arg0, s32 arg1, s32 arg2) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8087360.s\"");
-#else
 s32 sub_80970B8(s32);                           /* extern */
 s32 sub_8097F30(s32);                           /* extern */
 
@@ -222,11 +219,7 @@ void sub_8087360(void) {
     }
     sub_80970B8((*(s32 *)((s8 *)(temp_r2_8) + (0x7C))) + 8);
 }
-#endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_808738C.s\"");
-#else
 s32 sub_807B7A8();                              /* extern */
 s32 sub_807FE40(void *);                        /* extern */
 
@@ -239,7 +232,6 @@ void sub_808738C(void *arg0) {
         }
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80873B8.s\"");

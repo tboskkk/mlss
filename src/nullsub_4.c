@@ -10,9 +10,6 @@ asm_unified(".include \"asm/macros.inc\"");
 void nullsub_4(void) {
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8081E74.s\"");
-#else
 s32 sub_8082AAC(s32);                           /* extern */
 
 void sub_8081E74(void) {
@@ -22,7 +19,6 @@ void sub_8081E74(void) {
     sub_8082AAC(0x2075);
     sub_8082AAC(0x2089);
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8081EAC.s\"");

@@ -18,15 +18,11 @@ s32 sub_803C508(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_803C538.s\"");
-#else
 s32 sub_802FAE4(s32, s32, s32);         /* extern */
 
 void sub_803C538(s32 arg0, s32 arg1) {
     sub_802FAE4(arg0, arg1, 1);
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_803C544.s\"");

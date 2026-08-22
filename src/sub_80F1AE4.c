@@ -7,14 +7,10 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80F1AE4.s\"");
-#else
-u32 sub_80F1AE4(u32* param1, u32* param2) {
-    *param2 = *param1;
+s32 sub_80F1AE4(s32 arg0, s32 *arg1, s32 *arg2) {
+    *arg1 = *arg2;
     return 1;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80F1AEC.s\"");
