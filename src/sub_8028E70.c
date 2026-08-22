@@ -7,19 +7,21 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8028E70.s\"");
-#else
-u32 sub_8028E70(u32 param_1) {
-    u8 temp;
-    temp = *(u8*)(param_1 + 0xF9);
-    temp &= 3;
-    if (temp == 0) {
-        temp = 1;
-    }
-    return temp;
+s32 sub_8028E70(void *arg0)
+{
+  s32 temp_r0_10;
+  int new_var;
+  unsigned long long var_r1_11;
+  temp_r0_10 = 3 & (*((u8 *) (((s8 *) arg0) + 0xF9)));
+  var_r1_11 = temp_r0_10;
+  new_var = 1;
+  if (temp_r0_10 != 0)
+  {
+    var_r1_11 = new_var;
+  }
+  return var_r1_11;
+ if (1) { } if (1) { } if (new_var) { }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/get_fobj_screen_pos.s\"");
