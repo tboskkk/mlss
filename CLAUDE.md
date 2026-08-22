@@ -1524,6 +1524,158 @@ candidate is at fault. Three of three sampled "the candidate does not match"
 verdicts turned out to be files that could not parse or type-check on their
 own.
 
+**N. THE CORPUS IS ONE PROBLEM, NOT ~5,600 PROBLEMS -- and every factory
+component is a `for function in queue:` loop.**
+
+This section is the answer to "what would a frontier LLM do that the factory
+does not", asked directly and answered by doing it. The result was **361 ->
+491 matched (6.03% -> 8.2%) in one session, +130 functions, with the factory
+STOPPED and zero permuter time.** Not one of those matches came from writing
+better C for a single function. Every one came from looking ACROSS functions,
+which nothing in the pipeline does: m2c decompiles one function,
+decomp-permuter searches one function, the validator validates one function.
+`twins.py` is the only cross-function component and it only fires reactively.
+
+**N.1 -- Four measurement bugs, each silently discarding correct work.**
+Sections F, I and M each found one of these; there were four more. The
+pattern is now overwhelming and deserves to be stated as a law: *in this
+project, when throughput disagrees with effort, suspect the instrument before
+the code.* Every one of these presented as "the candidate is wrong".
+
+  * **`ruleset_version()` was blind to local m2c patches, by construction.**
+    It hashed `git rev-parse HEAD:tools/m2c` -- the RECORDED submodule SHA.
+    This project's m2c changes are applied to the submodule's WORKING TREE
+    and deliberately never committed (see "Local m2c patches"), so that SHA
+    never moves. `tier_m2c._claim()` excludes rows stamped with the current
+    ruleset, so **section J's ldsh/ldsb patch -- the biggest deterministic
+    win this project has had, 36% of the corpus -- re-opened ZERO rows.**
+    Proven, not inferred: 766 `needs_attempt` rows still stored bodies
+    containing `M2C_ERROR(/* unknown instruction: ldsh */)`; regenerating
+    three of them produced 0 errors each. Now hashes the decompiler's source
+    CONTENT. **1,832 rows became claimable again the moment it landed.**
+    Any future "hash the pinned revision" check has this same hole.
+  * **asm-differ is the wrong gate for a whole-function candidate.**
+    `thumb_func_start` emits `.type %function` but no `.size`, so asm-differ
+    cannot tell where a function ends and diffs to the end of the section on
+    both sides. Under `NONMATCHING=1` every sibling with an empty `#else`
+    vanishes from the object, so the retail side runs on into functions the
+    candidate side does not have and the score is dominated by phantom
+    trailing content. **`sub_8060DC4` scored 100,700 while being
+    instruction-for-instruction IDENTICAL to retail.** Gate instead on the
+    object's `.text` bytes PLUS relocations, with the guard removed and a
+    PLAIN build, so both objects hold every function
+    (`twin_backfill._text_image`). Relocations are not optional: `bl target`
+    and `.word target` are placeholder zeroes in the object, so bytes alone
+    call two different callees identical.
+  * **A repair measured in one build mode, gated in the other.** Under
+    `NONMATCHING=1` every sibling's `#else` draft compiles, so a declaration
+    inside one of those drafts is in scope for the whole unit; in a plain
+    build those branches become their retail `.include` and the declaration
+    goes with them. `sub_8064E08` compiled clean under `NONMATCHING=1` and
+    died on an implicit `sub_8082E1C` in the plain build that gated it.
+  * **`expected/` was a day stale**, which is the already-documented failure
+    -- it just is not enough to know about it. Refresh it as a reflex before
+    trusting any score.
+
+**N.2 -- `git checkout --` as a revert DESTROYS uncommitted work, and this
+bit twice in one session.** `rescue_isolated_zeros.py` and
+`gitops.revert_to_clean()` both restore files by checking them out of HEAD.
+Any tool holding uncommitted improvements in the working tree loses them --
+and then re-reports the candidate as "does not compile" for exactly the
+reason the wiped repair had just fixed, which reads as a code problem. Two
+rules follow: a predicate that splices must restore from a **byte snapshot it
+took itself**, not from git; and anything a later gate depends on must be
+**committed before that gate runs**.
+
+**N.3 -- Retroactive twin propagation: +130 matches, no search.**
+`validator.propagate_to_twins()` is REACTIVE -- it fires when a match lands,
+against twins unmatched at that instant. Extraction is continuous, so any
+function extracted after template X matched never received X's propagation
+and never would. Nothing re-ran the sweep.
+
+`tools/factory/twin_backfill.py` sweeps every already-matched function
+against the whole current pool. Matched functions' fragments are deleted by
+step 7 of the workflow, so their assembly is recovered from git history (the
+deleting commit's parent still has it). Measured: **236 unmatched functions
+were shape-identical to an already-matched one**, 200 propagated cleanly, and
+130 validated byte-exact. It is idempotent and compounding -- re-run it after
+any batch of matches. It scores candidates immediately rather than seeding
+`tier2_ready`, because a twin substitution with a provably consistent
+constant map is not a guess that needs a 15-minute stochastic search.
+
+Note `twins.py`'s docstring is badly out of date: it claims "86 unmatched in
+31 groups". Among unmatched functions alone it is now **1,639 in 431 groups
+(29.2% of the pool)**, and the DEDUPLICATION exploit its own docstring
+describes as #1 is still not wired into tier2's claim logic -- one 63-member
+shape group currently gets 63 separate permuter searches.
+
+**N.4 -- Most "does not compile" is a MISSING DECLARATION, not bad C, and
+the fix is choosing the right KIND of declaration.**
+`tools/factory/declare_missing.py`. Of the 99 files owning a twin candidate,
+16 failed to compile untouched, on 19 `X undeclared` plus 13 `implicit
+declaration of function X` -- references that are correct, to targets nobody
+ever declared. Usual origin: section F's splice bug cutting m2c's callee
+prototypes off the top of a candidate.
+
+The classification is the whole trick, and both wrong answers are fatal:
+
+    used as `X(...)`  -> `int X();`        ; declaring it data gives
+                                             "called object is not a function"
+                                             -- section G's largest class, 24.4%
+    used as `&X`      -> `extern s32 X;`   ; declaring it a function makes `&X`
+                                             a function pointer and the
+                                             assignment a type error
+
+**This is why section H's conclusion needs qualifying rather than
+overturning.** H measured *signature inference* at 83.6% arity accuracy and
+found it made things strictly worse (139 errors -> 164), and that stands. But
+"is this symbol a function or data" is a DIFFERENT fact: it is 100% knowable
+from the disassembly for all 6,558 thumb symbols, and choosing it from how
+the file actually uses the symbol is unambiguous. A K&R `int X();` declares
+no parameters, so it can never conflict with a call's argument list -- it
+asserts only the part we are certain of. **Propagate the facts you know
+exactly; do not propagate the ones you can only estimate.**
+
+Watch the scoping detail that cost a full cycle: a guard's `#else` branch
+often already carries the extern m2c emitted above the body, but
+`splice_candidate` DELETES the guard and takes that declaration with it. A
+whole-file substring check sees it, skips the file-scope insert, and the
+validator then fails on precisely that symbol. Check the header region only;
+a repeated identical `extern s32 X;` at file scope is legal C.
+
+**N.5 -- The measured shape of what remains, which reframes the plateau.**
+Of the seeds still queued when this started: **1,543 scored 20,000+**, a band
+whose own measured conversion rate in this repo is **0.0%**, and **1,612 did
+not compile**. That is ~3,155 functions -- 56% of the remainder -- that the
+permuter cannot reach at any iteration count. The dashboard's "N days at this
+rate" projection silently assumes they are reachable; they are not.
+
+And the type model is the biggest untouched lever. Across the 5,613 unmatched
+fragments, offsets accessed off the first argument: **+0x00 in 1,359
+functions (24.2%), +0x4C in 1,254 (22.3%), +0x08 in 1,229 (21.9%)**. That is
+one dominant struct whose `+0x4C` is a handler function pointer, it is
+defined NOWHERE, and every function re-derives
+`(*(s32 **)((s8 *)(arg0) + (0x4C)))` from scratch as `void *`. Co-occurrence
+with +0x4C cleanly separates it from other structs (with: 0x8, 0x10, 0x14,
+0x18, 0x28, 0x2C, 0x30, 0x38, 0x3C, 0x40, 0x50, 0x58, 0x68, 0x6C; without:
+0x0, 0x2, 0x4, 0x12, 0x70, 0x74, 0x78), and access widths majority-vote at
+high confidence (+0x12 -> u8, 95% over 393 samples; +0x4C -> u32, 100% over
+1,165). Section H's "context does not help" was measured on function
+signatures at 2.3% callee coverage; **one struct definition improves 1,254
+functions at once, and has never been tried.**
+
+**N.6 -- Compiler idioms are recognisable, and m2c does not recognise them.**
+`sub_8135084` is filed under section H's "m2c could not recover the function,
+no deterministic rule fixes them". It is not raw register garbage: m2c
+declares `sp44` and then references `sp48, sp4C … sp7C`, because it failed to
+see that `sp+0x44` is a 0x44-byte STACK STRUCT and that 16 consecutive
+ldr/str pairs copying `sp+0x44…0x80` into `arg0+0x00…0x3C` are one
+agbcc-expanded **struct assignment** -- one C statement, 32 instructions.
+That class is detectable statically (a contiguous run of stack slots whose
+base is passed to a call; a monotonic ldr/str pair run between two bases).
+Same family, same approach: switch jump tables, inline memcpy,
+division-by-constant reciprocal multiply.
+
 **Next levers, in rough order of value:**
 1. **More deterministic rules.** This is the whole thesis and it keeps
    paying: the arg-register rule alone covered 15% of the corpus and
