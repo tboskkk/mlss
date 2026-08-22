@@ -171,14 +171,20 @@ asm_unified(".include \"asm/nonmatching/sub_8066DA4.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8066E0C.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+extern s32 sub_8066E5C;
+
+void sub_8066E0C(void *arg0) {
+    if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
+        if ((*(s32 *)((s8 *)(arg0) + (0x9C))) == 0) {
+            sub_8082E1C(arg0, 4, 0, 0);
+        } else {
+            sub_8082E1C(arg0, 5, 0, 0);
+        }
+        (*(s16 *)((s8 *)(arg0) + (0xAC))) = 4;
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8066E5C;
+        play_sfx_80195B4(0xD5, -1);
+    }
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8066E5C.s\"");
