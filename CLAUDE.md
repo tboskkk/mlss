@@ -1361,6 +1361,78 @@ roughly 25 matches left in it. Going further means improving m2c's ARM
 backend upstream, or decompiling by hand — not another scheduling or seeding
 tweak.
 
+**I. THE BIG ONE: every "does not compile" verdict was measured in a
+poisoned translation unit.**
+
+agbcc compiles a whole translation unit, and `split_func.py` appends every
+newly extracted function to an existing `src/*.c` — so one file holds dozens
+of unproven `#else` drafts, and any single broken one fails the object.
+Every compile verdict this project ever recorded was taken that way, in the
+shared tree. An unknown share of them were never about the function being
+judged at all.
+
+Measured: **613 seeds compile perfectly well alone.** On a random 30 of the
+pile it is 16.7%; smallest-first it is much higher (18 of the first 25).
+
+They are not merely mislabelled, they are USABLE — decomp-permuter works on
+an isolated copy too (`ensure_isolated` → `permute.py` builds
+`nonmatchings/<name>/` with its own single-function `.c`), so the search can
+match them however broken their real file is. **We were declining seeds the
+permuter could have matched.**
+
+    tier2_ready         3,038 -> 3,667
+    needs_attempt       2,384 -> 1,787
+    first-attempt seeds   132 -> 533     <- this is the one that matters
+
+That last line is the difference between plateau and not: the pool had run
+out of first attempts, which is what drove throughput toward zero, and
+**176 of the first 201 matches came from attempt 1**.
+
+`gitops.compiles_in_isolation()` is the check, `tier_m2c` consults it before
+declining, and `reclaim_sibling_blocked.py` was the one-time catch-up.
+Found by chasing the largest remaining error class, "`r1' undeclared", and
+discovering it was not in the function under test at all — it was line 34 of
+a *sibling's* draft. The independent review named this as its central
+finding and it had not been followed up.
+
+**J. m2c did not know two Thumb mnemonics, and it cost 36% of the corpus.**
+`M2C_ERROR(/* unknown instruction: ldsh ... */)`. m2c already implements
+that instruction under its UAL name `ldrsh`; our disassembly uses the
+pre-UAL spelling. A two-line alias. Enumerating every `M2C_ERROR` variant
+across all 5,431 seeds showed three mnemonics accounted for all 8,208
+occurrences: `ldsh` (7,568), `ldsb` (622), `swi` (18) — and nothing else of
+consequence. See "Local m2c patches" above; the long tail really is small.
+
+**Read m2c's error text before theorising.** Both of this session's real
+wins came from that, and every theory-first attempt (section H) failed.
+
+**K. Where the time actually goes — two plausible answers, both wrong.**
+The reclaim sweep ran at 7 rows/min with the factory live and **11/min with
+the machine idle at load 3.7**, so contention was not the cost; and
+`container.sh` returns in **0.096s** because it reuses a warm container, so
+process startup was not it either. The cost is **m2c itself**, ~5s per
+function — CPU-bound and embarrassingly parallel. Six workers: 11/min →
+**328/min**. Measure the bottleneck; do not reason about it.
+
+A corollary worth acting on, and the maintainer's idea: **the two kinds of
+work want the machine at different times.** Seed repair is m2c-bound and
+parallelises ~30x; search is permuter-bound with 12 fixed slots and near-zero
+marginal value once first attempts run out. Run continuously they throttle
+each other, and repair is what *creates* the work search needs. Alternating
+phases beats running both.
+
+**L. The "LLMs lose to m2c" finding is narrower than it reads.** Every
+variant in that 5-way benchmark was a LOCAL 32B model on a CPU-only box
+(Qwen2.5-Coder-32B, DeepSeek-R1-Distill-32B). It says nothing about frontier
+models — and the Klonoa: Empire of Dreams GBA decomp reached **51%** with
+Claude Code as its primary decompiler, using purpose-built tools (asmlift,
+Transmuter, gba-kit; see also `macabeus/mizuchi`, an ARMv4T/agbcc pipeline
+integrating Claude, m2c, decomp-permuter and objdiff). **We are not the only
+serious GBA matching decomp** — worth knowing before building more tooling
+from scratch. The reason not to take that route here is COST (the
+maintainer is on a Pro plan; ~5,600 functions is not viable), not
+capability. Keep those two reasons separate so the record stays honest.
+
 **Next levers, in rough order of value:**
 1. **More deterministic rules.** This is the whole thesis and it keeps
    paying: the arg-register rule alone covered 15% of the corpus and
