@@ -268,9 +268,16 @@ def try_one(conn, target: str, tmpl: str, body: str, dry_run: bool) -> str:
             # from-scratch build fails on the very symbols this candidate
             # needs, and a real match is thrown away. They emit no code.
             text = c_path.read_text()
-            fresh = [d for d in added if d not in text]
+            at = declare_missing.insert_point(text)
+            # Check the HEADER REGION only, not the whole file. A guard's
+            # `#else` branch frequently already carries the declaration (m2c
+            # emits it above the body it generated), but splice_candidate
+            # DELETES the guard, taking that declaration with it -- so a
+            # whole-file substring check sees it, skips the insert, and the
+            # validator then fails on the very symbol this was meant to fix.
+            # A repeated identical `extern s32 X;` at file scope is legal C.
+            fresh = [d for d in added if d not in text[:at]]
             if fresh:
-                at = declare_missing.insert_point(text)
                 c_path.write_text(text[:at] + "\n\n" + "\n".join(fresh) + "\n"
                                   + text[at:])
 

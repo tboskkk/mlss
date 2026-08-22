@@ -8,6 +8,9 @@
 asm_unified(".include \"asm/macros.inc\"");
 
 
+
+extern s32 sub_8114404;
+
 int sub_8082E1C();
 
 #ifndef NONMATCHING

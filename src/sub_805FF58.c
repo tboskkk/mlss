@@ -8,6 +8,9 @@
 asm_unified(".include \"asm/macros.inc\"");
 
 
+
+extern s32 sub_805F6BC;
+
 int sub_8082B00();
 int sub_8082E1C();
 
