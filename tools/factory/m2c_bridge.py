@@ -241,7 +241,8 @@ def ensure_context():
     # definition is authoritative -- it compiled and reproduced the ROM
     # byte-for-byte, so it cannot conflict with a header without the build
     # already being broken.
-    if sigs:
+    # NOT appended any more -- measured harmful. See matched_signatures().
+    if False:  # pragma: no cover
         with CONTEXT.open("a") as f:
             f.write("\n/* signatures of already-matched functions */\n")
             f.write(sigs)
@@ -274,6 +275,24 @@ _DEF_RE = re.compile(r"^([A-Za-z_][\w \t\*]*?)\b(\w+)\s*\(([^;{]*?)\)\s*\{",
 
 def matched_signatures() -> str:
     """Prototypes for every already-matched function, from the real source.
+
+    NO LONGER FED TO m2c -- kept because infer_signatures.py uses it as
+    ground truth for validating call-site inference.
+
+    Measured on a fixed 20-seed sample, counting compiler errors (the metric
+    that shows incremental change, unlike compile/fail):
+
+        matched signatures in --context + declarations restored   107 errors
+        signatures in --context only                              103
+        NEITHER                                                   100   <- best
+
+    So the whole path costs +7 errors. It was originally kept on the grounds
+    that it was "correct and free"; it is neither. The reason it backfires:
+    at 349 matched of 5,986, the signatures cover ~2% of the callees these
+    seeds reference, while every one that IS published risks conflicting
+    with a project header (`conflicting types`, `previous declaration` --
+    both tripled in the measurement). A tiny benefit against a per-signature
+    risk is a losing trade until coverage is far higher.
 
     A matched function has had its `#ifndef NONMATCHING` guard removed --
     that is what "matched" MEANS here -- so its definition in src/*.c is
@@ -457,7 +476,8 @@ def generate(name: str) -> str | None:
         kept.append(line)
 
     c = "\n".join(kept)
-    c = restore_context_declarations(c, known)
+    # restore_context_declarations() is NOT called any more -- measured
+    # harmful. See its docstring.
     try:
         c = expand_macros(c)
     except ValueError:
