@@ -56,28 +56,31 @@ asm_unified(".include \"asm/nonmatching/sub_80F7B1C.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80F7BB4.s\"");
-#else
-s32 sub_80F7BB4(void *arg0, void *arg1, s32 *arg2) {
-    s32 temp_r3_17;
-    u32 temp_r0_31;
-    u32 var_r2_9;
-    void *var_r1_11;
+s32 sub_80F7BB4(void *arg0, void *arg1, s32 *arg2)
+{
+  s8 *new_var;
+  s32 temp_r3_17;
+  unsigned short new_var2;
+  u32 temp_r0_31;
+  u32 var_r2_9;
+  void *var_r1_11;
+  var_r2_9 = 0;
+  var_r1_11 = *(*((void ***) (((s8 *) arg0) + 0x28)));
+  loop_1:
+  if (((*((u8 *) (((s8 *) var_r1_11) + 0xF))) != 0) && (((temp_r3_17, (*((u8 *) (((s8 *) var_r1_11) + 0xC))) == (*arg2))) || ((*arg2) == 0x3F)))
+  {
+    new_var = (s8 *) arg1;
+    *((s32 *) (new_var + 0)) = (s32) (*((s32 *) (new_var + 0x14)));
+    return 0;
+  }
 
-    var_r2_9 = 0;
-    var_r1_11 = *(*(void ***)((s8 *)(arg0) + (0x28)));
-loop_1:
-    if (((*(u8 *)((s8 *)(var_r1_11) + (0xF))) != 0) && ((temp_r3_17 = *arg2, ((*(u8 *)((s8 *)(var_r1_11) + (0xC))) == temp_r3_17)) || (temp_r3_17 == 0x3F))) {
-        (*(s32 *)((s8 *)(arg1) + (0))) = (s32) (*(s32 *)((s8 *)(arg1) + (0x14)));
-        return 0;
-    }
-    temp_r0_31 = (var_r2_9 << 0x10) + 0x10000;
-    var_r1_11 += 0x10;
-    var_r2_9 = temp_r0_31 >> 0x10;
-    if ((s32) ((s32) temp_r0_31 >> 0x10) > 3) {
-        return 1;
-    }
-    goto loop_1;
+  temp_r0_31 = (var_r2_9 << 0x10) + 0x10000;
+  var_r1_11 += 0x10;
+  new_var2 = temp_r0_31 >> 0x10;
+  var_r2_9 = new_var2;
+  if (((s32) (((s32) temp_r0_31) >> 0x10)) > 3)
+  {
+    return 1;
+  }
+  goto loop_1;
 }
-#endif
