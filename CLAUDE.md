@@ -1828,6 +1828,61 @@ errors were m2c backend weakness with "no deterministic rule in this repo
 fixes them". For this class the rule existed and was cheap -- the errors were
 a symptom of feeding a decompiler data-as-code.
 
+**P. The VALIDATOR's own pre-check was scored the broken way too, and it was
+throwing away finished matches by the hundred.**
+
+Section N.4a found that `best_score` measured object layout rather than code
+quality, and fixed the QUEUE that was ranked by it. The same broken
+measurement was still sitting on the PROMOTION path, where it does not
+mis-rank work, it destroys it.
+
+`validator.validate_one()` splices the candidate, removes the guard, then asks
+`gitops.asm_differ_matches()` whether the result is byte-identical. That helper
+rebuilds with `NONMATCHING=1` (diff_settings.py's `make_command`), where every
+sibling still on the empty "no C attempt yet" placeholder DOES NOT EXIST while
+`expected/` holds all of them - and asm-differ `-o` diffs OBJECTS. So the
+verdict was dominated by whatever happens to follow the function in its file.
+
+Measured directly, same candidate, same file:
+
+    sub_80291C8    plain build 0    NONMATCHING build 13,467
+
+Rejected, and sent back to `tier2_ready` to be searched again from nothing.
+The events table says that happened **179 times** for `sub_80291C8` and **172**
+for `sub_8029804` - the two functions CLAUDE.md already cites under Phase 4 as
+"solved-and-discarded". They were not hard. The gate was wrong.
+
+End to end on the first ten functions holding a permuter win on disk, counted
+at the TERMINAL state rather than at promotion: **1 of 10 matched before,
+10 of 10 after.**
+
+The fix is `validator._matches_in_plain_build()`, which scores through
+`rescore_seeds.plain_score()`. `finish_match()` - a from-scratch build plus the
+ROM sha1 - is untouched and remains the real gate, so the change is strictly
+more permissive and can never commit anything unearned. An unreadable verdict
+still falls back to the legacy check.
+
+**Two traps to know, both of which caught me:**
+
+  * **`plain_score()` needs `assume_spliced=True` from the validator.** The
+    validator has ALREADY removed the guard, so plain_score's own
+    `splice_candidate()` finds nothing, returns None, and the helper silently
+    degrades to exactly the check it was replacing. My first attempt at this
+    fix therefore changed nothing - all ten functions were rejected a second
+    time - and it looked like the diagnosis was wrong rather than the wiring.
+    N.4a documents this exact `find_guard_block()`-returns-None-after-splice
+    behaviour; reading it did not stop me reproducing it.
+  * **`rescue_isolated_zeros.winning_source()` falls back to `base.c`.** That
+    is right for `affected()`, where an event already said the base scored 0.
+    In a blind sweep it matches every function that merely has an m2c SEED on
+    disk - 2,413 of them - and replays it as though a search had endorsed it.
+    `--all-on-disk` requires a real `output-*/score.txt` of 0, which is 281.
+
+**The general lesson, now four times over (F, I, M, N, and this):** when
+throughput disagrees with effort in this project, suspect the instrument
+before the code. And note where this one lived - not in the search, not in the
+seeds, but in the check that decides whether finished work counts.
+
 **Next levers, in rough order of value:**
 0. **The other 94 jump-table candidates** (section O) - the tool refuses
    them rather than guessing. The dominant cause is a raw run that mixes
@@ -1843,6 +1898,12 @@ a symptom of feeding a decompiler data-as-code.
    note that `compile_errors.py` does NOT apply `blocking_siblings()`, so
    on a poisoned tree it measures the deadlock above rather than real m2c
    defects. Run `unblock_files.py` first or its output will mislead you.
+1b. **Re-run `rescue_isolated_zeros.py --all-on-disk`** after any batch of
+   permuter wins. With section P's fix it is the cheapest matches available:
+   no search, one build per function, and the backlog GREW from 164 to 303
+   while the old gate was discarding them. Also worth re-checking whether
+   `needs_human` rows filed as "wasn't byte-identical" were victims of the
+   same broken gate rather than real anomalies.
 2. **The "asm-differ said match but from-scratch build FAILED" rows**
    (16 currently in `needs_human`; ~30 more isolated by `batch_validate`
    as "the ROM does not reproduce with this candidate").
