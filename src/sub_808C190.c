@@ -117,10 +117,6 @@ void sub_808C308(void *arg0) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_808C324.s\"");
-#else
-s32 sub_80873B8(void *, s32, s32);              /* extern */
 extern s32 sub_808B2D4;
 
 void sub_808C324(void *arg0) {
@@ -128,7 +124,6 @@ void sub_808C324(void *arg0) {
     sub_80873B8(arg0, 2, 0xC);
     (*(s32 **)((s8 *)(arg0) + (0x50))) = &sub_808B2D4;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_808C348.s\"");
