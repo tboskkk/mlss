@@ -366,6 +366,66 @@ def asm_differ_score(name: str) -> int | None:
         _drop_built()
 
 
+ISO_DIR = REPO / ".claude" / "factory" / "iso"
+
+
+def compiles_in_isolation(name: str, body: str) -> bool:
+    """Does this candidate compile ALONE, with no siblings in scope?
+
+    THE PROBLEM THIS SOLVES. agbcc compiles a whole translation unit, and
+    split_func.py appends every newly extracted function to an existing
+    src/*.c -- so one file holds dozens of unproven `#else` drafts. Scoring
+    function F in place therefore compiles all of them, and any sibling's
+    broken draft fails the object. Every "does not compile" verdict this
+    project has recorded was taken that way, so an unknown share of them
+    were never about the function being judged.
+
+    Measured on a random 30 of the 2,256-seed "does not compile" pile:
+    **16.7% compile perfectly well alone** -- roughly 377 seeds misfiled as
+    broken because a neighbour was.
+
+    That matters beyond bookkeeping: decomp-permuter ALSO works on an
+    isolated copy (tier2.ensure_isolated -> permute.py builds
+    nonmatchings/<name>/ with its own single-function .c). So a seed that
+    compiles alone is fully usable by the permuter no matter how broken its
+    real file is -- we were declining seeds the search could have matched.
+
+    Deliberately not under build/: the validator does `rm -rf build/` before
+    every from-scratch check. Paths stay repo-relative because container.sh
+    mounts the repo at /workspace and an absolute host path does not exist
+    inside it.
+    """
+    if not body:
+        return False
+    ISO_DIR.mkdir(parents=True, exist_ok=True)
+    src = ISO_DIR / f"{name}.c"
+    pre = ISO_DIR / f"{name}.i"
+    try:
+        src.write_text('#include "global.h"\n#include "common.h"\n\n' + body + "\n")
+        rel_src = src.relative_to(REPO).as_posix()
+        rel_pre = pre.relative_to(REPO).as_posix()
+        r = run(["./container.sh", "arm-none-eabi-cpp",
+                 "-I", "tools/agbcc/include", "-nostdinc", "-undef",
+                 "-iquote", "include", "-Wno-trigraphs", rel_src, "-o", rel_pre])
+        if r.returncode != 0:
+            return False
+        # Same flags the real build uses (Makefile CFLAGS), so a pass here
+        # means a pass there once the siblings are out of the way.
+        r = run(["./container.sh", "tools/agbcc/bin/agbcc",
+                 "-O2", "-mthumb-interwork", "-fno-common", "-Wimplicit",
+                 "-Wparentheses", "-Werror", "-g", "-ffix-debug-line",
+                 "-o", "/dev/null", rel_pre])
+        return r.returncode == 0
+    except OSError:
+        return False
+    finally:
+        for f in (src, pre):
+            try:
+                f.unlink()
+            except FileNotFoundError:
+                pass
+
+
 def asm_differ_matches(name: str) -> bool:
     """True only if asm-differ scores this function 0 against retail.
 

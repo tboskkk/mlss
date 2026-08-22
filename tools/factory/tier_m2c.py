@@ -197,10 +197,34 @@ def process_one(conn, no_score: bool = False) -> str | None:
                                 str(c_path.relative_to(gitops.REPO))])
 
     if score is None:
+        # "Doesn't compile" here means the whole TRANSLATION UNIT failed,
+        # and split_func.py appends every extraction to an existing src/*.c
+        # -- so the file holds dozens of unproven `#else` drafts and any one
+        # of them fails the object. Measured on a random 30 of this pile:
+        # 16.7% compile perfectly well alone, i.e. ~377 seeds were filed as
+        # broken because a NEIGHBOUR was.
+        #
+        # Such a seed is fully usable: decomp-permuter works on an isolated
+        # copy too (ensure_isolated -> permute.py builds
+        # nonmatchings/<name>/ with its own single-function .c), so the
+        # search can match it however broken its real file is. Declining it
+        # threw away work the permuter could have done.
+        if gitops.compiles_in_isolation(name, body):
+            with db.tx(conn):
+                db.set_state(conn, name, "tier2_ready", worker_id=None,
+                             candidate_body=body, candidate_source="m2c",
+                             notes="m2c seed: compiles in ISOLATION but not in its "
+                                   "shared translation unit (a sibling's draft is "
+                                   "broken) -- the permuter works in isolation, so "
+                                   "this is searchable")
+            db.log_event(conn, name, "seeded", "compiles in isolation")
+            print(f"      -> {name}: blocked by a sibling, not itself -- seeded anyway")
+            return name
         with db.tx(conn):
             db.set_state(conn, name, row["state"], worker_id=None,
-                         notes=_declined("produced output but it doesn't compile"))
-        db.log_event(conn, name, "m2c_declined", "output does not compile")
+                         notes=_declined("produced output but it doesn't compile "
+                                         "(checked in isolation too)"))
+        db.log_event(conn, name, "m2c_declined", "output does not compile, even alone")
         return name
 
     new_state = "validating" if score == 0 else "tier2_ready"
