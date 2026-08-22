@@ -10,130 +10,15 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/get_field_object_type.s\"");
 #else
-void get_field_object_type(s16 a0, u8 a1)
-{
-    s16 v0 = a0;
-    u8 v1 = a1;
-    u32 v2;
-    u32 v3;
-    u32 v4;
-    u32 v5;
-    u32 v6;
-    u32 v7;
-    u32 v8;
-    u32 v9;
-    u32 v10;
-    u32 v11;
-    u32 v12;
-    u32 v13;
-    u32 v14;
-    u32 v15;
-    u32 v16;
-    u32 v17;
-    u32 v18;
-    u32 v19;
-    u32 v20;
-    u32 v21;
-    u32 v22;
-    u32 v23;
-    u32 v24;
-    u32 v25;
-    u32 v26;
-    u32 v27;
-    u32 v28;
-    u32 v29;
-    u32 v30;
-    u32 v31;
-    u32 v32;
-    u32 v33;
-    u32 v34;
-    u32 v35;
-    u32 v36;
-    u32 v37;
-    u32 v38;
-    u32 v39;
-    u32 v40;
-    u32 v41;
-    u32 v42;
-    u32 v43;
-    u32 v44;
-    u32 v45;
-    u32 v46;
-    u32 v47;
-    u32 v48;
-    u32 v49;
-    u32 v50;
-    u32 v51;
-    u32 v52;
-    u32 v53;
-    u32 v54;
-    u32 v55;
-    u32 v56;
-    u32 v57;
-    u32 v58;
-    u32 v59;
-    u32 v60;
-    u32 v61;
-    u32 v62;
-    u32 v63;
-    u32 v64;
-    u32 v65;
-    u32 v66;
-    u32 v67;
-    u32 v68;
-    u32 v69;
-    u32 v70;
-    u32 v71;
-    u32 v72;
-    u32 v73;
-    u32 v74;
-    u32 v75;
-    u32 v76;
-    u32 v77;
-    u32 v78;
-    u32 v79;
-    u32 v80;
-    u32 v81;
-    u32 v82;
-    u32 v83;
-    u32 v84;
-    u32 v85;
-    u32 v86;
-    u32 v87;
-    u32 v88;
-    u32 v89;
-    u32 v90;
-    u32 v91;
-    u32 v92;
-    u32 v93;
-    u32 v94;
-    u32 v95;
-    u32 v96;
-    u32 v97;
-    u32 v98;
-    u32 v99;
-    u32 v100;
-    u32 v101;
-    u32 v102;
-    u32 v103;
-    u32 v104;
-    u32 v105;
-    u32 v106;
-    u32 v107;
-    u32 v108;
-    u32 v109;
-    u32 v110;
-    u32 v111;
-    u32 v112;
-    u32 v113;
-    u32 v114;
-    u32 v115;
-    u32 v116;
-    u32 v117;
-    u32 v118;
-    u32 v119;
-    u32 v120;
-    u32 v121;
-    u32 v122;
-    u32 v
+/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
+   compiles a whole translation unit at a time, so an #error here fails
+   every OTHER function in this file under NONMATCHING=1. Guard intact, so
+   the real ROM still gets the verbatim retail bytes and progress.py still
+   counts this as unmatched. Write the C here, replacing this comment.
+
+   The previous draft here was TRUNCATED mid-expression -- an unbalanced
+   brace, which swallows the rest of the translation unit and makes agbcc
+   report the failure at 'end of input' or against some innocent later
+   function. That mis-attribution is why unblock_files.py could never
+   clear it: it blames the guard block containing the reported line. */
 #endif

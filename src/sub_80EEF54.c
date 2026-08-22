@@ -10,50 +10,17 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80EEF54.s\"");
 #else
-void sub_80EEF54(u32* p0, u32* p1, u32* p2)
-{
-    u32* r5;
-    u32* r3;
-    u32* r4;
-    u32 r0;
-    
-    r5 = p0;
-    r3 = p1;
-    r4 = p2;
-    r0 = *(u32*)((u8*)r4 + 0x04);
-    if (r0 <= 4)
-    {
-        r0 <<= 2;
-        r0 += (u32)0x080EEF74;
-        r0 = *(u32*)r0;
-        ((void(*)())r0)();
-    }
-    else
-    {
-        *(u32*)((u8*)r5 + 0x00) = *(u32*)((u8*)r3 + 0x00);
-        *(u32*)((u8*)r5 + 0x04) = *(u32*)((u8*)r3 + 0x04);
-        *(u32*)((u8*)r5 + 0x08) = *(u32*)((u8*)r3 + 0x08);
-        *(u32*)((u8*)r5 + 0x0C) = *(u32*)((u8*)r3 + 0x0C);
-        *(u32*)((u8*)r5 + 0x10) = *(u32*)((u8*)r3 + 0x10);
-        *(u32*)((u8*)r5 + 0x14) = *(u32*)((u8*)r3 + 0x14);
-        *(u32*)((u8*)r5 + 0x18) = *(u32*)((u8*)r3 + 0x18);
-        *(u32*)((u8*)r5 + 0x1C) = *(u32*)((u8*)r3 + 0x1C);
-        *(u32*)((u8*)r5 + 0x20) = *(u32*)((u8*)r3 + 0x20);
-        *(u32*)((u8*)r5 + 0x24) = *(u32*)((u8*)r3 + 0x24);
-        *(u32*)((u8*)r5 + 0x28) = *(u32*)((u8*)r3 + 0x28);
-        *(u32*)((u8*)r5 + 0x2C) = *(u32*)((u8*)r3 + 0x2C);
-        *(u32*)((u8*)r5 + 0x30) = *(u32*)((u8*)r3 + 0x30);
-        *(u32*)((u8*)r5 + 0x34) = *(u32*)((u8*)r3 + 0x34);
-        *(u32*)((u8*)r5 + 0x38) = *(u32*)((u8*)r3 + 0x38);
-        *(u32*)((u8*)r5 + 0x3C) = *(u32*)((u8*)r3 + 0x3C);
-        *(u32*)((u8*)r5 + 0x40) = *(u32*)((u8*)r3 + 0x40);
-        *(u32*)((u8*)r5 + 0x44) = *(u32*)((u8*)r3 + 0x44);
-        *(u32*)((u8*)r5 + 0x48) = *(u32*)((u8*)r3 + 0x48);
-        *(u32*)((u8*)r5 + 0x4C) = *(u32*)((u8*)r3 + 0x4C);
-        *(u32*)((u8*)r5 + 0x50) = *(u32*)((u8*)r3 + 0x50);
-        *(u32*)((u8*)r5 + 0x54) = *(u32*)((u8*)r3 + 0x54);
-        *(u32*)((u8*)r5 + 0x58) = *(u32*)((u8*)r3 + 0x58);
-        *(u32*)((u8*)r5 + 0x5C) = *(u32*)((u8*)
+/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
+   compiles a whole translation unit at a time, so an #error here fails
+   every OTHER function in this file under NONMATCHING=1. Guard intact, so
+   the real ROM still gets the verbatim retail bytes and progress.py still
+   counts this as unmatched. Write the C here, replacing this comment.
+
+   The previous draft here was TRUNCATED mid-expression -- an unbalanced
+   brace, which swallows the rest of the translation unit and makes agbcc
+   report the failure at 'end of input' or against some innocent later
+   function. That mis-attribution is why unblock_files.py could never
+   clear it: it blames the guard block containing the reported line. */
 #endif
 
 #ifndef NONMATCHING

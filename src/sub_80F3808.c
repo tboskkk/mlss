@@ -10,118 +10,17 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80F3808.s\"");
 #else
-void sub_80F3808(u32* param_1, u32* param_2, u32* param_3)
-{
-    u32 *puVar1;
-    u32 *puVar2;
-    u32 *puVar3;
-    u32 uVar4;
-    s32 iVar5;
-    u8 uVar6;
-    u8 uVar7;
-    u8 uVar8;
-    u8 uVar9;
-    u8 uVar10;
-    u32 uVar11;
-    u32 uVar12;
-    u32 uVar13;
-    u32 uVar14;
-    u32 uVar15;
-    u32 uVar16;
-    u32 uVar17;
-    u32 uVar18;
-    u32 uVar19;
-    u32 uVar20;
-    u32 uVar21;
-    u32 uVar22;
-    u32 uVar23;
-    u32 uVar24;
-    u32 uVar25;
-    u32 uVar26;
-    u32 uVar27;
-    u32 uVar28;
-    u32 uVar29;
-    u32 uVar30;
-    u32 uVar31;
-    u32 uVar32;
-    u32 uVar33;
-    u32 uVar34;
-    u32 uVar35;
-    u32 uVar36;
-    u32 uVar37;
-    u32 uVar38;
-    u32 uVar39;
-    u32 uVar40;
-    u32 uVar41;
-    u32 uVar42;
-    u32 uVar43;
-    u32 uVar44;
-    u32 uVar45;
-    u32 uVar46;
-    u32 uVar47;
-    u32 uVar48;
-    u32 uVar49;
-    u32 uVar50;
-    u32 uVar51;
-    u32 uVar52;
-    u32 uVar53;
-    u32 uVar54;
-    u32 uVar55;
-    u32 uVar56;
-    u32 uVar57;
-    u32 uVar58;
-    u32 uVar59;
-    u32 uVar60;
-    u32 uVar61;
-    u32 uVar62;
-    u32 uVar63;
-    u32 uVar64;
-    u32 uVar65;
-    u32 uVar66;
-    u32 uVar67;
-    u32 uVar68;
-    u32 uVar69;
-    u32 uVar70;
-    u32 uVar71;
-    u32 uVar72;
-    u32 uVar73;
-    u32 uVar74;
-    u32 uVar75;
-    u32 uVar76;
-    u32 uVar77;
-    u32 uVar78;
-    u32 uVar79;
-    u32 uVar80;
-    u32 uVar81;
-    u32 uVar82;
-    u32 uVar83;
-    u32 uVar84;
-    u32 uVar85;
-    u32 uVar86;
-    u32 uVar87;
-    u32 uVar88;
-    u32 uVar89;
-    u32 uVar90;
-    u32 uVar91;
-    u32 uVar92;
-    u32 uVar93;
-    u32 uVar94;
-    u32 uVar95;
-    u32 uVar96;
-    u32 uVar97;
-    u32 uVar98;
-    u32 uVar99;
-    u32 uVar100;
-    u32 uVar101;
-    u32 uVar102;
-    u32 uVar103;
-    u32 uVar104;
-    u32 uVar105;
-    u32 uVar106;
-    u32 uVar107;
-    u32 uVar108;
-    u32 uVar109;
-    u32 uVar110;
+/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
+   compiles a whole translation unit at a time, so an #error here fails
+   every OTHER function in this file under NONMATCHING=1. Guard intact, so
+   the real ROM still gets the verbatim retail bytes and progress.py still
+   counts this as unmatched. Write the C here, replacing this comment.
+
+   The previous draft here was TRUNCATED mid-expression -- an unbalanced
+   brace, which swallows the rest of the translation unit and makes agbcc
+   report the failure at 'end of input' or against some innocent later
+   function. That mis-attribution is why unblock_files.py could never
+   clear it: it blames the guard block containing the reported line. */
 #endif
 
 #ifndef NONMATCHING
