@@ -33,15 +33,37 @@ asm_unified(".include \"asm/nonmatching/sub_80FD244.s\"");
    counts this as unmatched. Write the C here, replacing this comment. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80FD39C.s\"");
-#else
-/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
-   compiles a whole translation unit at a time, so an #error here fails
-   every OTHER function in this file under NONMATCHING=1. Guard intact, so
-   the real ROM still gets the verbatim retail bytes and progress.py still
-   counts this as unmatched. Write the C here, replacing this comment. */
-#endif
+s32 sub_807D77C(void *);                        /* extern */
+s32 sub_80813A0();                              /* extern */
+s32 sub_810DEB8(void *);                        /* extern */
+extern s32 sub_80FD44C;
+extern s32 sub_80FDA34;
+extern s32 sub_81070B8;
+
+void sub_80FD39C(void *arg0) {
+    s32 *var_r0_45;
+    void *temp_r3_9;
+    void *temp_r4_10;
+    void *temp_r4_70;
+
+    temp_r3_9 = *(void **)0x03000FD8;
+    temp_r4_10 = (*(void **)((s8 *)(temp_r3_9) + (0x7C)));
+    if (((s32) (*(s16 *)((s8 *)(temp_r4_10) + (0xEC))) < 0) && (0x80 & (*(u8 *)((s8 *)(temp_r3_9) + (0xC)))) && !(((*(u16 *)((s8 *)((*(void **)((s8 *)(temp_r3_9) + (0x80)))) + (0x11E))) | (*(u16 *)((s8 *)((*(void **)((s8 *)((temp_r3_9 + 0x80)) + (4)))) + (0x11E)))) & 0x100)) {
+        (*(s32 **)((s8 *)(*(void **)0x03000FDC) + (0x8E58))) = (s32 *) (*(s32 **)((s8 *)(arg0) + (4)));
+        var_r0_45 = &sub_80FDA34;
+    } else {
+        sub_80813A0();
+        if ((3 & (*(u16 *)((s8 *)(temp_r4_10) + (0x11E)))) && ((7 & (*(u8 *)((s8 *)(temp_r4_10) + (0x120)))) != 1)) {
+            temp_r4_70 = temp_r4_10 + 8;
+            sub_810DEB8(temp_r4_70);
+            sub_807D77C(temp_r4_70);
+            var_r0_45 = &sub_81070B8;
+        } else {
+            var_r0_45 = &sub_80FD44C;
+        }
+    }
+    (*(s32 **)((s8 *)(arg0) + (4))) = var_r0_45;
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80FD44C.s\"");
