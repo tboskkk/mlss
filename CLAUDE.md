@@ -56,10 +56,6 @@ realistically hand to that effort is a completed, byte-exact decompiled
 codebase to build the runtime layer against, plus whatever's learned here
 about matching-decomp tooling for agbcc/Thumb specifically.
 
-Explicitly out of scope, mentioned only so it isn't confused for a next
-step of THIS project: a PS1 decomp is a separate interest of the
-maintainer's, unrelated to MLSS/GBA. If it happens, it's its own repo.
-
 ## Building
 
     ./container.sh make
