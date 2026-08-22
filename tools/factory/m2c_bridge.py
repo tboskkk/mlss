@@ -117,6 +117,26 @@ def ruleset_version() -> str:
         h.update(rev.encode())
     except Exception:
         pass
+    # The recorded submodule SHA above is NOT sufficient on its own, and
+    # relying on it alone was a silent, measured failure. This project keeps
+    # its m2c changes as patches applied to the submodule's WORKING TREE and
+    # deliberately never commits them (see CLAUDE.md, "Local m2c patches"),
+    # so `HEAD:tools/m2c` never moves when a patch lands. The ldsh/ldsb
+    # patch -- the single biggest deterministic win this project has had,
+    # affecting 36% of the corpus -- therefore re-opened ZERO parked rows:
+    # every function it fixed stayed excluded by _claim() behind a ruleset
+    # stamp that could not change. 766 rows were still storing
+    # `M2C_ERROR(/* unknown instruction: ldsh ... */)` bodies long after the
+    # patch made those errors impossible.
+    #
+    # Hash the decompiler's actual source content instead, so a working-tree
+    # patch moves the ruleset exactly like a submodule bump would.
+    try:
+        for src in sorted((gitops.REPO / "tools" / "m2c" / "m2c").rglob("*.py")):
+            h.update(src.relative_to(gitops.REPO).as_posix().encode())
+            h.update(src.read_bytes())
+    except Exception:
+        pass
     try:
         for hdr in sorted((gitops.REPO / "include").rglob("*.h")):
             h.update(hdr.relative_to(gitops.REPO).as_posix().encode())

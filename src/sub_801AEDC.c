@@ -7,6 +7,10 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
+
+int bclr_init();
+int comp_init();
+
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_801AEDC.s\"");
 #else
