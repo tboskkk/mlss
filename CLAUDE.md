@@ -1433,6 +1433,70 @@ from scratch. The reason not to take that route here is COST (the
 maintainer is on a Pro plan; ~5,600 functions is not viable), not
 capability. Keep those two reasons separate so the record stays honest.
 
+**M. The plateau was partly a MEASUREMENT failure, again -- this time on
+the promotion path, where it destroys finished work rather than mislabelling
+it.**
+
+Section I found that every "does not compile" verdict had been measured in a
+translation unit full of OTHER functions' broken drafts. The same poisoning
+also defeats the step AFTER a search succeeds, and that is strictly worse: a
+mislabelled seed is still on the queue, but a rejected promotion is a
+finished match thrown in the bin.
+
+The shape of it. decomp-permuter searches an isolated copy and reaches score
+0. tier2 splices the winner into the real `src/*.c` and re-scores. That
+rebuild is `NONMATCHING=1`, which compiles EVERY `#else` in the file -- so
+one bad sibling fails the object, no prefix variant can help, and tier2
+logs "no declaration prefix made it match in its real source file" and
+returns the row to `tier2_ready` to be searched again from nothing. Forever.
+
+Measured when found: **191 functions** had a permuter score-0 sitting unused
+on disk -- 146 back in `tier2_ready`, 25 `stalled`, 20 `needs_human`. Wins
+from *four minutes* before the check were already in the pile, so this was
+live, not a backlog. That is section F's disease with a different vector,
+and it is why `search yield` read 2.4% against a ~15% baseline.
+
+**Three distinct causes, and the first two are invisible to every existing
+tool:**
+
+1. **Truncated drafts (12 files, 68 functions trapped).** A draft cut off
+   mid-expression -- `src/sub_8063118.c` ended a line as
+   `r0 = *(u32*)((u8*)r0 +` followed by `#endif`. An unbalanced brace
+   swallows the rest of the unit, so agbcc reports `syntax error at end of
+   input`, or a syntax error against whichever innocent function follows.
+   **That mis-attribution is why nothing caught it:** `unblock_files.py`
+   blames the guard block containing the reported line, which here is the
+   VICTIM. In 11 of the 12 the culprit was the file's FIRST function -- the
+   signature of a truncated write from the retired LLM tier. Detectable
+   statically by counting delimiters per `#else` body; no compiler needed.
+2. **A prototype contradicting its own definition (4 files).** An earlier
+   draft carries m2c's caller-side guess (`void *sprite_heap_alloc(s32, s32,
+   u32, u16);`) and a later block defines it from its own disassembly
+   (`s8 *sprite_heap_alloc(u8, s32, u8, u16);`). `conflicting types for X`,
+   fatal under `-Werror`, whole unit dead. The definition is the
+   better-informed signature, so the declaration is what moves. Also static
+   -- 4 pairs across ~700 files, found with a regex and no builds.
+3. **Ordinary non-compiling drafts**, which is the bulk, and what
+   `tools/factory/quarantine_broken_drafts.py` now handles: compile under
+   `NONMATCHING=1`, attribute each diagnostic to its guard block, empty only
+   those drafts, repeat up to 4 rounds, and revert the file whole if it
+   still fails. `unblock_files.py` does NOT cover this -- it drafts `#error`
+   placeholders, and that convention was replaced by an empty `#else`, which
+   is already harmless. The remaining case is the opposite: a draft that
+   exists and is wrong.
+
+**Sequencing matters and I got it wrong first.** Running
+`rescue_isolated_zeros.py` before the files compiled produced 1 promotion in
+25 minutes, because it cannot score a candidate in a file that will not
+build -- it was being defeated by the exact bug it was there to clean up
+after. Unblock first, rescue second.
+
+**A cheap check worth keeping:** if a permuter win will not reproduce in its
+real file, compile that file with NO splice at all before believing the
+candidate is at fault. Three of three sampled "the candidate does not match"
+verdicts turned out to be files that could not parse or type-check on their
+own.
+
 **Next levers, in rough order of value:**
 1. **More deterministic rules.** This is the whole thesis and it keeps
    paying: the arg-register rule alone covered 15% of the corpus and
