@@ -174,17 +174,11 @@ void sub_807438C(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80743AC.s\"");
-#else
-s32 sub_807C298(void *);                        /* extern */
-
 void sub_80743AC(void *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
         sub_807C298(arg0);
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80743C4.s\"");

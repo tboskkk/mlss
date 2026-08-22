@@ -142,15 +142,9 @@ void stop_all_sfx_801959C(void) {
     sub_819BA00();
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/stop_sfx_80195A8.s\"");
-#else
-s32 sub_819B9E8();                              /* extern */
-
 void stop_sfx_80195A8(void) {
     sub_819B9E8();
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/play_sfx_80195B4.s\"");
