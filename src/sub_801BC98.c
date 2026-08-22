@@ -37,14 +37,16 @@ void sub_801BD30(void) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_801BD50.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+s32 process_disable();                          /* extern */
+s32 time_init(void *, u8, s32);                     /* extern */
+void sub_801BD50(unsigned int arg0)
+{
+  if ((*((s32 *) 0x03000D44)) == 0)
+  {
+    *((s32 *) 0x03000D44) = time_init(alloc_Zero(0x2CU, 0U, (s8 *) 0x081E23C8, 0U), arg0, 0x081E23C8);
+    process_disable();
+  }
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_801BD88.s\"");
