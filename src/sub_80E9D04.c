@@ -7,16 +7,12 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80E9D04.s\"");
-#else
 s32 free_heap_memory_8018C68(s32);              /* extern */
 
 void sub_80E9D04(void) {
     free_heap_memory_8018C68(*(s32 *)0x03000FC0);
     *(s32 *)0x03000FC0 = 0;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80E9D1C.s\"");
