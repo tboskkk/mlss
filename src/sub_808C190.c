@@ -100,11 +100,6 @@ block_6:
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_808C2E0.s\"");
-#else
-s32 stop_sfx_80195A8(s32);                      /* extern */
-
 void sub_808C2E0(void *arg0) {
     s32 temp_r5_9;
 
@@ -115,7 +110,6 @@ void sub_808C2E0(void *arg0) {
         (*(s32 *)((s8 *)(arg0) + (0x4C))) = 0x0808C601;
     }
 }
-#endif
 
 void sub_808C308(void *arg0) {
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
