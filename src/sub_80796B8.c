@@ -399,9 +399,6 @@ asm_unified(".include \"asm/nonmatching/wipe_update.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_807A658.s\"");
-#else
 s32 free_heap_memory_8018C68();                 /* extern */
 s32 process_remove(void *, s32);                /* extern */
 s32 sub_80E4FC8();                              /* extern */
@@ -422,7 +419,6 @@ void sub_807A658(void *arg0, s32 arg1) {
     }
     process_remove(arg0, arg1);
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_807A698.s\"");

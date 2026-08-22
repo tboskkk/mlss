@@ -41,14 +41,11 @@ void sub_812F550(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_812F5A4.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+s32 sub_812A9A0(void *, s32, s32, s32, s32, s32); /* extern */
+
+void sub_812F5A4(s32 arg0, s32 arg1) {
+    sub_812A9A0(alloc_Zero(0xC8U, 0U, (s8 *)0x08211B20, 0U), 8, 0x08211B20, arg0, arg1, -2);
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_812F5D8.s\"");
