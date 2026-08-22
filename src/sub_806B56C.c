@@ -25,10 +25,6 @@ u32 sub_806B56C(u32* param_1) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_806B584.s\"");
-#else
-s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 extern s32 sub_806AA18;
 
 void sub_806B584(void *arg0) {
@@ -36,7 +32,6 @@ void sub_806B584(void *arg0) {
     (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_806AA18;
     (*(s16 *)((s8 *)(arg0) + (0xAC))) = 0;
 }
-#endif
 
 extern s32 sub_806B5F8;
 
