@@ -328,27 +328,18 @@ void sub_806BFD4(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_806C020.s\"");
-#else
 s32 sub_806C020(void *arg0)
 {
-  int new_var2;
-  int new_var3;
-  s32 **new_var;
   s32 var_r0_8;
-  ;
-  if (sub_8086D80() == 0)
+  var_r0_8 = sub_8086D80();
+  if (var_r0_8 == 0)
   {
-    new_var2 = 0x4C;
-    new_var3 = 0;
-    new_var = (s32 **) (((s8 *) arg0) + new_var2);
-    *new_var = &sub_806B824;
-    var_r0_8 = new_var3;
+    var_r0_8 = 0x4C;
+    *((s32 **) (arg0 + var_r0_8)) = &sub_806B824;
+    var_r0_8 = 0;
   }
   return var_r0_8;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_806C03C.s\"");

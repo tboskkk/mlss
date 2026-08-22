@@ -135,15 +135,9 @@ u32 sub_8019588(void) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/stop_all_sfx_801959C.s\"");
-#else
-s32 sub_819BA00();                              /* extern */
-
 void stop_all_sfx_801959C(void) {
     sub_819BA00();
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/stop_sfx_80195A8.s\"");

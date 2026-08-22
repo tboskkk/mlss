@@ -39,15 +39,9 @@ u32 sub_801AEDC(void) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_801AF50.s\"");
-#else
-s32 sub_80FC1F8();                              /* extern */
-
 void sub_801AF50(void) {
     sub_80FC1F8();
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/make_fldm_801AF5C.s\"");
