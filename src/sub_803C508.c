@@ -24,24 +24,24 @@ void sub_803C538(s32 arg0, s32 arg1) {
     sub_802FAE4(arg0, arg1, 1);
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_803C544.s\"");
-#else
 u8 sub_80E98C0(s32, s32, s32);                      /* extern */
-
-u32 sub_803C544(void) {
-    u8 temp_r0_33;
-
-    if ((sub_80E98C0(*(s32 *)0x03000FC0 + 0x38C, 0, 0x205) << 0x18) == 0) {
-        if ((sub_80E98C0(*(s32 *)0x03000FC0 + 0x38C, 0, 0x204) << 0x18) == 0) {
-            temp_r0_33 = sub_80E98C0(*(s32 *)0x03000FC0 + 0x38C, 0, 0x203);
-            return (u32) ((0 - temp_r0_33) | temp_r0_33) >> 0x1F;
-        }
-        return 2U;
+u32 sub_803C544(void)
+{
+  u8 temp_r0_33;
+  int new_var;
+  if ((sub_80E98C0((*((s32 *) 0x03000FC0)) + 0x38C, 0, 0x205) << 0x18) == 0)
+  {
+    new_var = (*((s32 *) 0x03000FC0)) + 0x38C;
+    if ((sub_80E98C0(new_var, 0, 0x204) << 0x18) == 0)
+    {
+      temp_r0_33 = sub_80E98C0((*((s32 *) 0x03000FC0)) + 0x38C, 0, 0x203);
+      new_var = ((u32) ((0 - temp_r0_33) | temp_r0_33)) >> 0x1F;
+      return new_var;
     }
-    return 3U;
+    return 2U;
+  }
+  return 3U;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_803C5A4.s\"");
