@@ -10,7 +10,7 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8021AC8.s\"");
 #else
-void *sprite_heap_alloc(s32, s32, u32, u16);        /* extern */
+s8 *sprite_heap_alloc(u8, s32, u8, u16);        /* extern */
 s32 sub_80208E0(void *);                        /* extern */
 void *sub_8021A18(void *, s32);                     /* extern */
 

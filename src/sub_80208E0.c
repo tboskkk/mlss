@@ -56,7 +56,7 @@ asm_unified(".include \"asm/nonmatching/sprite_show_8020CBC.s\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8020D40.s\"");
 #else
-s32 sub_8021A18(void *, s32);                       /* extern */
+void *sub_8021A18(void *, s32);                       /* extern */
 
 void sub_8020D40(void *arg0) {
     u16 *var_r3_21;
@@ -122,7 +122,7 @@ asm_unified(".include \"asm/nonmatching/sub_80210A8.s\"");
 asm_unified(".include \"asm/nonmatching/sub_8021308.s\"");
 #else
 s32 sprite_heap_free(void *);                   /* extern */
-s32 sub_8021A18(void *, s32);                       /* extern */
+void *sub_8021A18(void *, s32);                       /* extern */
 s32 sub_8021C24(void *);                        /* extern */
 
 void sub_8021308(void *arg0) {
