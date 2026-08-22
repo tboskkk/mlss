@@ -214,9 +214,24 @@ def repair_in_place(stem: str, known: set[str],
             # First declaration wins; if that shape is wrong for the other
             # use, this reports "still broken" honestly instead of emitting
             # a conflict.
+            # Look only at the HEADER REGION -- the text before the insertion
+            # point -- and at file scope within it. Two traps, both hit:
+            #
+            #  * Searching the whole text matches the CALL SITE
+            #    (`    sub_8021308(arg0);` satisfies the same pattern), so
+            #    every callee looks already-declared and nothing is ever
+            #    added. That silently reduced this tool to a no-op.
+            #  * Even at file scope, a declaration LATER in the file does not
+            #    help a use ABOVE it -- agbcc still reports an implicit
+            #    declaration. Only a declaration already in the header region
+            #    makes adding another one redundant.
+            #
+            # Conflicting shapes between two spliced bodies are handled where
+            # they arise, in gitops._dedupe_decls at splice time.
+            header = gitops._file_scope(text[:insert_point(text)])
             if decl and not re.search(
                     rf"^\s*(?:extern\s+)?[\w \t\*]*\b{re.escape(sym)}\s*[;(]",
-                    text, re.M):
+                    header, re.M):
                 new.append(decl)
         if not new:
             break

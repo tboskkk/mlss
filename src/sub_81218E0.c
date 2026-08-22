@@ -7,6 +7,9 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
+
+int sub_81151E4();
+
 u32 sub_81218E0(void) {
     return 0;
 }

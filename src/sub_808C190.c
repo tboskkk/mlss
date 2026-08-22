@@ -9,6 +9,12 @@ asm_unified(".include \"asm/macros.inc\"");
 
 
 
+
+
+int sub_80873B8();
+
+int stop_sfx_80195A8();
+
 int sub_8087540();
 
 int sub_807C298();
