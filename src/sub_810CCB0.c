@@ -17,10 +17,6 @@ void sub_810CCB0(void) {
     (*(s16 *)((s8 *)(sub_807D2D0(&sub_810B680, 0x86, 0)) + (0x14))) = 0;
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_810CCC8.s\"");
-#else
-void *sub_807D2D0(s32 *, s32, s32);             /* extern */
 extern s32 sub_810D5F4;
 extern s32 sub_810D624;
 
@@ -31,7 +27,6 @@ void sub_810CCC8(void) {
     (*(s16 *)((s8 *)(temp_r0_10) + (0x14))) = 0;
     (*(void **)((s8 *)(sub_807D2D0(&sub_810D5F4, 0x18, 0)) + (8))) = temp_r0_10;
 }
-#endif
 
 void sub_810CCF4(void) {
     void *temp_r1_12;

@@ -34,17 +34,11 @@ s32 sub_8127AB0(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8127ADC.s\"");
-#else
-s32 sub_81151E4(s32, s32, u16, s32, s32, s32, s32, s32); /* extern */
-
 void sub_8127ADC(void *arg0, u16 arg1) {
     sub_81151E4((*(s32 *)((s8 *)(arg0) + (0x15C))), 4, arg1, 0x10, 0xFFFF, 0xFFFF, 0, 0);
     sub_80193B4(0, 0, 0x10);
     (*(s8 *)((s8 *)(arg0) + (0xEF))) = 1;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8127B20.s\"");
