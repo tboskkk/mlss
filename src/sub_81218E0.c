@@ -48,16 +48,10 @@ s32 sub_81219C4(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_81219EC.s\"");
-#else
-s32 sub_81151E4(s32, s32, s32, s32, s32, s32, s32, s32); /* extern */
-
 void sub_81219EC(void *arg0) {
     sub_81151E4((*(s32 *)((s8 *)(arg0) + (0x20))), 4, 0, 8, 0xFFFF, 0xFFFF, 0, 0);
     (*(s8 *)((s8 *)(arg0) + (0x156))) = 1;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8121A20.s\"");
