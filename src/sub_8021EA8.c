@@ -86,14 +86,22 @@ void sub_8021F7C(void) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8021FD4.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+s32 sub_80208F4();                              /* extern */
+void sub_8021FD4(void);
+s32 sub_80208F4();
+void sub_8021FD4(void)
+{
+  void *temp_r0_8;
+  int new_var;
+  new_var = 0x0203FFB8;
+  temp_r0_8 = *((void **) (((s8 *) ((void *) new_var)) + 0x3C));
+  if (temp_r0_8 != ((void *) 0))
+  {
+    free_heap_8018D9C(temp_r0_8);
+  }
+  sub_80208F4();
+  *((s32 *) 0x03000D74) = 0;
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/init_fldm_8021FF8.s\"");
