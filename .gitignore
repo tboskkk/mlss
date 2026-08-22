@@ -100,3 +100,8 @@ __pycache__
 assets/
 
 CLAUDE.md
+
+# Node deps for tools/dynamic-analysis (the gba-kit headless emulator used
+# for runtime/DWARF experiments). Regenerable with `bun install` in that
+# directory; package.json + bun.lock ARE committed so the version is pinned.
+node_modules/

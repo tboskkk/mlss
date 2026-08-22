@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@gba-kit/gba-node": "^0.6.0"
+  }
+}
