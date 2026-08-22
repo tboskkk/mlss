@@ -35,15 +35,13 @@ void sub_80604E0(void *arg0)
   }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8060500.s\"");
-#else
 void sub_8060500(void *arg0)
 {
-  u16 temp_r0_17;
+  int temp_r0_17;
   if (8 & (*((u8 *) (((s8 *) (*((void **) (((s8 *) arg0) + 8)))) + 0x12))))
   {
-    *((u16 *) (((s8 *) arg0) + 0xAC)) = (temp_r0_17 = (*((u16 *) (((s8 *) arg0) + 0xAC))) - 1);
+    temp_r0_17 = (*((u16 *) (((s8 *) arg0) + 0xAC))) - 1;
+    *((u16 *) (((s8 *) arg0) + 0xAC)) = temp_r0_17;
     if (((s32) (temp_r0_17 << 0x10)) < 0)
     {
       sub_8082E1C(arg0, 0xD, 0, 0);
@@ -52,7 +50,6 @@ void sub_8060500(void *arg0)
     }
   }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8060544.s\"");
