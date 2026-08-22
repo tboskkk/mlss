@@ -1015,9 +1015,36 @@ trailing data, so the remaining 77 can't silently corrupt the ROM.
 `get_surface_height_at_x` (was `sub_8160854`) resolves surface height in
 pixels, with byte 0 = signed tile height and byte 1's low nibble = slope
 type, dispatched through a 7-entry table (flat / two 45° / four 22.5°
-half-slopes). Confirms the long-open `b0`/`b1` hypothesis. **Still open:**
-proving `ctx+0x80C` resolves to the same 14 coldef arrays — that's a
-pointer trace, not a semantics question.
+half-slopes). Confirms the long-open `b0`/`b1` hypothesis.
+
+**The `ctx+0x80C` pointer trace is now DONE too, and the answer is
+NEGATIVE — worth knowing before re-chasing it.** `ctx+0x80C` is *not* the
+coldef arrays; the two are parallel mechanisms that merely share a 4-byte
+record shape. Only four game-proper functions besides the reader touch
+offset `0x80C`, and together they give the lifecycle: `sub_8160EC4` inits
+both `ctx+0x804`/`0x80C` to 0, `sub_8160C64` fills, `sub_8160E6C` frees via
+`free_heap_8018D9C`. It is a **heap array of one 4-byte record per tile
+column**, `*(u16*)(ctx+0x820)` entries long, filled by `sub_81606C8(ctx,
+column)` — which scans that column of the **BG tilemap** (`ctx+0x808`, u16
+entries, `id = entry & 0x3FF`) downward through 32 rows and returns
+`b0 = the row a marker tile was found at` (height in tiles) and
+`b1 & 0xF = slope type`, defaulting to height 0x20 / flat if nothing
+matches. That re-derives both field meanings from the WRITE side.
+
+Best part, and a genuine cross-check: the slope variant is taken from the
+tile's **horizontal-flip bit** (`0x400`, bit 10 of a GBA text-BG map entry).
+hflip set/clear selects 4/5 and 3/6 — exactly the mirrored pairs in the
+decoded table (the two 22.5° lower halves, and the two upper halves). The
+level author mirrors a tile in the editor and the physics reads the same
+flag the renderer does.
+
+**Still open on this thread:** what consumes the coldef path
+(`col_set_ptr_table` → `load_col_set_to_dest` / `get_coldef_ptr_by_xz`) —
+it is live code, just not what feeds `get_surface_height_at_x`. Also note
+`src/load_col_set_to_dest.c`'s unproven `#else` draft has its copy
+direction backwards (the asm copies 256 entries OUT of
+`col_set_ptr_table[solidind]` INTO `*(u32*)(dest+0xA0)`) and cannot match
+as written.
 
 **C. m4a sound driver — CLOSED, premise was wrong.** The 84KB region is
 not m4a and almost certainly isn't code; see the corrected Phase 3 entry.

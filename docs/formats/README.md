@@ -734,6 +734,75 @@ type. Confirming `ctx+0x80C` is the coldef array (rather than a parallel
 per-row structure) is the remaining step, and it's a pointer trace, not a
 semantics question.
 
+### RESOLVED: `ctx+0x80C` is NOT the coldef array — it is a per-column cache built from BG tilemap tile IDs
+
+The pointer trace above was done, and the answer is a **negative** one, which
+is worth recording precisely so nobody spends a session re-chasing the
+connection. `ctx+0x80C` and the `col_set_ptr_table` coldef arrays are two
+**parallel, unrelated** mechanisms that happen to share a 4-byte record
+shape.
+
+Only four game-proper functions besides `get_surface_height_at_x` reference
+offset `0x80C` (found by grepping the literal `0x0000080C`; the other 15 hits
+are inside `mariobros.s` and out of scope). Together they give the whole
+lifecycle:
+
+| function | role |
+|---|---|
+| `sub_8160EC4(ctx)` | init — stores 0 to both `ctx+0x804` and `ctx+0x80C` |
+| `sub_815FB88` | allocation path |
+| `sub_8160C64(ctx)` | **fill** — `for i in 0..*(u16*)(ctx+0x820): ((u32*)*(ctx+0x80C))[i] = sub_81606C8(ctx, i)` |
+| `sub_8160E6C(ctx)` | teardown — `free_heap_8018D9C` on both pointers, then nulls them |
+
+So `ctx+0x80C` is a **heap-allocated array of one 4-byte record per tile
+column**, exactly `*(u16*)(ctx+0x820)` entries long — the same value
+`get_surface_height_at_x` takes its `%` against. Not a 256-entry coldef
+array, and not indexed by a solidity-grid byte.
+
+**Where the records actually come from.** `sub_81606C8(ctx, column)` scans
+that column of the **background tilemap** downward and returns the record:
+
+```
+for row in 0..0x1F:                       // 32 rows, top to bottom
+    entry = *(u16*)( *(u32*)(ctx+0x808) + (row * *(u16*)(ctx+0x820) + column) * 2 )
+    id    = entry & 0x3FF                 // standard GBA text-BG map entry
+    switch (id) { 0xA3, 0xA6, 0xB2, 0xC4, 0xCF, 0x1A6, ... }
+        // on a match:
+        rec.b1 = (rec.b1 & 0xF0) | slope_type
+        rec.b0 = row                      // <- height, in TILES
+        return rec
+// nothing found in 32 rows:
+rec.b1 &= 0xF0                            // type 0 = flat
+rec.b0 = 0x20                             // floor at the bottom
+```
+
+`ctx+0x808` is therefore a pointer to a u16 tilemap and `ctx+0x820` its row
+width in tiles. This independently re-derives the two fields
+`get_surface_height_at_x` decodes: **`b0` is the row index at which a
+surface tile was found**, i.e. height in tiles, and **`b1`'s low nibble is
+the slope type** — confirmed from the write side, not inferred from the
+read side.
+
+**The slope variant comes from the tile's HORIZONTAL FLIP bit.** The
+function keeps `0x400` in `r7` and tests it against the raw map entry —
+bit 10 of a GBA text-mode BG map entry is hflip. For one marker tile,
+hflip set yields type **4** and clear yields type **5**; for another, set
+yields **3** and clear yields **6**. Against the decoded table above those
+are exactly the mirrored pairs — 4/5 the two 22.5° *lower* halves
+(descending vs ascending) and 3/6 the two *upper* halves. A level author
+draws one slope tile and mirrors it in the map editor; the physics reads
+the same flag the renderer does. That is a strong cross-check on the table,
+arrived at from the opposite end of the pipeline.
+
+**What this leaves open.** The coldef path (`col_set_ptr_table` →
+`load_col_set_to_dest` / `get_coldef_ptr_by_xz`) is real, live code and is
+*still* unexplained in terms of what consumes it — it is simply not what
+feeds `get_surface_height_at_x`. Note also that `load_col_set_to_dest`
+copies all 256 entries (8 words per unrolled iteration until `r4 > 0xFF`)
+**out of** `col_set_ptr_table[solidind]` **into** `*(u32*)(dest+0xA0)`; the
+current unproven `#else` draft in `src/load_col_set_to_dest.c` has that
+copy backwards and will not match as written.
+
 ### `sub_80E9C4C` traced by hand — result: generic engine flag/counter storage, not physics data
 
 Register-level trace (not decompiled, just read by hand — three functions,
