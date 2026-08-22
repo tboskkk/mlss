@@ -1643,6 +1643,80 @@ whole-file substring check sees it, skips the file-scope insert, and the
 validator then fails on precisely that symbol. Check the header region only;
 a repeated identical `extern s32 X;` at file scope is legal C.
 
+**N.4a -- THE BIG ONE: `best_score` was measuring OBJECT LAYOUT, not code
+quality, and it drove the entire work queue.**
+
+Bigger than everything else in this section. `gitops.asm_differ_score()`
+splices into the guard's `#else` and lets asm-differ rebuild with
+`NONMATCHING=1` (diff_settings.py's `make_command`). In that build every
+sibling whose `#else` is the empty "no C attempt yet" placeholder DOES NOT
+EXIST, while `expected/` holds all of them -- and asm-differ `-o` diffs the
+OBJECTS, not the function. Measured: **869 diff lines for one 24-line
+function**, almost all of them target-only rows for functions the candidate
+side was never going to contain.
+
+So the score is largely a function of HOW MANY FUNCTIONS FOLLOW THIS ONE IN
+ITS FILE. Across all 3,251 scored `tier2_ready` rows:
+
+| position in object | n | median score | %>=20000 |
+|---|---|---|---|
+| LAST (nothing follows) | 433 | **1,200** | 0.9% |
+| 1-2 functions after | 597 | 5,250 | 13.1% |
+| 3-10 after | 975 | 16,050 | 46.4% |
+| >10 after | 1,246 | **91,130** | 77.3% |
+
+Same code quality, 76x the score, purely from position.
+
+**Everything built on that number is therefore wrong.** `tier2`'s
+`SEED_SCORE_CEILING` (5000) and its closest-first ordering rank the queue by
+an artifact, systematically starving functions that sit early in a big file
+no matter how close their C is. And section F's conversion table -- "227
+seeds above 20,000 have been searched and none has ever matched", the
+measurement that justified the ceiling -- is measuring POSITION, not
+difficulty. The band does not convert because it never gets a slot.
+
+**The fix is one line of build mode.** Remove the guard
+(`splice_candidate`) and build PLAIN, so both objects contain every function
+and the trailing functions are identical retail bytes on both sides.
+`tools/factory/rescore_seeds.py` does this. Results, all validated through
+the ordinary from-scratch ROM sha1 gate:
+
+    first function tried            stored  84,310  ->  plain      10
+    30 highest-stored seeds         30/30 scored lower, 28 scored exactly 0
+    first 40 promoted               38 validated, 0 rejected
+
+Those 38 were finished matches sitting in `tier2_ready` with scores around
+155,000, in the band this file said never converts.
+
+**What to do about it permanently:** `asm_differ_score()` itself should score
+this way, or `diff_settings.py`'s `make_command` should stop forcing
+`NONMATCHING=1` for scoring. Until then any decision keyed on `best_score`
+(claim order, ceilings, "is this seed worth a slot", conversion statistics)
+is keyed on noise. Note `-s/--stop-at-ret` does NOT fix it -- tried, no
+change, because the problem is object-level diffing, not function bounds.
+
+**N.4b -- `compiles_in_isolation()` rejected known-good C.**
+Control: the committed, byte-exact, ROM-reproducing C of `sub_8060464`,
+`sub_8132DE4` and `sub_809D24C` all returned False. It compiles
+`global.h + common.h + body` under `-Wimplicit -Werror`, and their callees
+and address-taken handlers are declared in their real source FILE, not in a
+header. So it was measuring "does this body reference only header-declared
+symbols". Fixed by synthesising the missing ROM-symbol declarations
+(`gitops.rom_symbol_declarations`).
+
+Scope it honestly, because it is narrower than it first looks: A/B over 40
+seeds showed **no change on m2c output** (15/40 both ways), because m2c emits
+its own callee declarations. It only matters for bodies that do NOT carry
+their own -- committed C, twin candidates, and **permuter output after
+`trim_source()`**, which is exactly section F's bug. Section I's "16.7%"
+therefore stands for m2c seeds.
+
+Also worth keeping: that A/B reconciled a confusing result. A random sample
+across all of `needs_attempt` compiled 0/40, while smallest-first compiled
+15/40 (38%) -- matching section I's "18 of the first 25". Random sampling
+over this pile is dominated by large functions; always say which sampling a
+number came from.
+
 **N.5 -- The measured shape of what remains, which reframes the plateau.**
 Of the seeds still queued when this started: **1,543 scored 20,000+**, a band
 whose own measured conversion rate in this repo is **0.0%**, and **1,612 did

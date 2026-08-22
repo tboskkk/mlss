@@ -205,7 +205,18 @@ def repair_in_place(stem: str, known: set[str],
             if sym not in known:
                 continue  # not a real ROM symbol -- a broken draft, not our job
             decl = declaration_for(text, sym)
-            if decl and decl not in text:
+            # Skip if this symbol is ALREADY declared at file scope in any
+            # shape. An exact-string check is not enough: two candidates in
+            # one file can need the same symbol differently -- one calls it
+            # (`int X();`), the other takes its address (`extern s32 X;`) --
+            # and emitting both is a hard `X redeclared as different kind of
+            # symbol`, which failed a whole 16-candidate validation batch.
+            # First declaration wins; if that shape is wrong for the other
+            # use, this reports "still broken" honestly instead of emitting
+            # a conflict.
+            if decl and not re.search(
+                    rf"^\s*(?:extern\s+)?[\w \t\*]*\b{re.escape(sym)}\s*[;(]",
+                    text, re.M):
                 new.append(decl)
         if not new:
             break
