@@ -10,15 +10,9 @@ asm_unified(".include \"asm/macros.inc\"");
 
 int sub_807C298();
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80D2D28.s\"");
-#else
-s32 sub_807C298();                              /* extern */
-
 void sub_80D2D28(void) {
     sub_807C298();
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80D2D34.s\"");

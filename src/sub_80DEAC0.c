@@ -111,15 +111,9 @@ void sub_80DEC44(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80DEC60.s\"");
-#else
-s32 sub_807C298();                              /* extern */
-
 void sub_80DEC60(void) {
     sub_807C298();
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80DEC6C.s\"");

@@ -10,17 +10,11 @@ asm_unified(".include \"asm/macros.inc\"");
 
 int sub_8087540();
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80DAF30.s\"");
-#else
-s32 sub_8087540(void *);                        /* extern */
-
 void sub_80DAF30(void *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
         sub_8087540(arg0);
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80DAF48.s\"");
@@ -31,17 +25,11 @@ asm_unified(".include \"asm/nonmatching/sub_80DAF48.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80DAF6C.s\"");
-#else
-s32 sub_8087540(void *);                        /* extern */
-
 void sub_80DAF6C(void *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
         sub_8087540(arg0);
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80DAF84.s\"");

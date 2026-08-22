@@ -10,29 +10,17 @@ asm_unified(".include \"asm/macros.inc\"");
 
 int sub_807C298();
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_809B738.s\"");
-#else
-s32 sub_807C298(void *);                        /* extern */
-
 void sub_809B738(void *arg0) {
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
         sub_807C298(arg0);
     }
 }
-#endif
-
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_809B754.s\"");
-#else
-s32 sub_807C298(void *);                        /* extern */
 
 void sub_809B754(void *arg0) {
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
         sub_807C298(arg0);
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_809B770.s\"");
