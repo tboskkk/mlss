@@ -195,7 +195,15 @@ def checks(conn) -> list[tuple[str, str, str]]:
         "AND escalation_count = 0 AND (best_score IS NULL OR best_score < ?)",
         (tier2.SEED_SCORE_CEILING,),
     ).fetchone()[0]
-    exhausted = firsts == 0
+    # Proportional, not `firsts == 0`. A binary test cries wolf: 132
+    # first-attempt seeds against a 3,040-seed pool is effectively
+    # exhausted, but the strict form read it as "work remains, so suspect
+    # the plumbing" and warned about a pipeline that was provably fine (131
+    # score updates, 15 stalls and a match in the same window). A check that
+    # warns when nothing is wrong gets ignored, and then it is not a check.
+    pool = conn.execute(
+        "SELECT COUNT(*) FROM functions WHERE state='tier2_ready'").fetchone()[0]
+    exhausted = firsts == 0 or (pool and firsts / pool < 0.10)
     if real >= 40 and converged == 0 and not exhausted:
         out.append(("search yield", FAIL,
                     f"{real} real searches in 3h, ZERO converged, and {firsts} seeds "
@@ -204,7 +212,8 @@ def checks(conn) -> list[tuple[str, str, str]]:
     elif real >= 25 and converged / real < 0.03 and not exhausted:
         out.append(("search yield", WARN,
                     f"{converged}/{real} converged in 3h ({100*converged/real:.1f}%) "
-                    f"vs a ~15% baseline, with {firsts} first-attempt seeds left -- "
+                    f"vs a ~15% baseline, with {firsts} first-attempt seeds left of "
+                    f"{pool} -- "
                     f"check the promotion path before the seeds"))
     else:
         rate = f"{100*converged/real:.0f}%" if real else "--"
