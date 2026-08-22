@@ -64,11 +64,6 @@ void sub_8070F64(void *arg0) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8070F98.s\"");
-#else
-s32 stop_sfx_80195A8(s32);                      /* extern */
-s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 extern s32 sub_806F90C;
 
 void sub_8070F98(void *arg0) {
@@ -79,7 +74,6 @@ void sub_8070F98(void *arg0) {
         (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_806F90C;
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8070FD0.s\"");
