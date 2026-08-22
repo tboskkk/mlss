@@ -13,15 +13,9 @@ void sub_80D2D28(void) {
     sub_807C298();
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80D2D34.s\"");
-#else
-s32 sub_807C298(s32);                           /* extern */
-
 void sub_80D2D34(void) {
     sub_807C298((*(s32 *)((s8 *)((*(void **)((s8 *)(*(void **)0x03000FD8) + (0x70)))) + (0x38))));
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80D2D4C.s\"");
