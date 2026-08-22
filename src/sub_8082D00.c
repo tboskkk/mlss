@@ -7,11 +7,7 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8082D00.s\"");
-#else
 void sub_8082D00(void *arg0, s32 arg1, s32 arg2) {
     (*(u16 *)((s8 *)(arg0) + (0x778))) = (u16) ((*(u16 *)((s8 *)(arg0) + (0x778))) + arg1);
     (*(u16 *)((s8 *)(arg0) + (0x77A))) = (u16) ((*(u16 *)((s8 *)(arg0) + (0x77A))) + arg2);
 }
-#endif
