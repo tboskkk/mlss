@@ -23,15 +23,44 @@ asm_unified(".include \"asm/nonmatching/sub_8063118.s\"");
    clear it: it blames the guard block containing the reported line. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8063248.s\"");
-#else
-/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
-   compiles a whole translation unit at a time, so an #error here fails
-   every OTHER function in this file under NONMATCHING=1. Guard intact, so
-   the real ROM still gets the verbatim retail bytes and progress.py still
-   counts this as unmatched. Write the C here, replacing this comment. */
-#endif
+u8 sub_801B1C8(void *, s32, s32);                   /* extern */
+s32 sub_807C298(void *);                        /* extern */
+s32 sub_807FC08(s32 *, s32 *, s32 *, s32);      /* extern */
+
+void sub_8063248(void *arg0) {
+    s32 sp0;
+    s32 sp4;
+    s32 sp8;
+    s32 temp_r2_22;
+    s32 var_r0_20;
+    s32 var_r0_30;
+    s32 var_r0_37;
+
+    if (sub_801B1C8(*(void **)0x03000E18, 0x03000E40, 0x03000E44) == 1) {
+        var_r0_20 = *(s32 *)0x03000E40;
+        (*(s32 *)((s8 *)(arg0) + (0x10))) = var_r0_20;
+        temp_r2_22 = *(s32 *)0x03000E44;
+        (*(s32 *)((s8 *)(arg0) + (0x14))) = temp_r2_22;
+        if (var_r0_20 < 0) {
+            var_r0_20 += 0xFF;
+        }
+        sp0 = var_r0_20 >> 8;
+        var_r0_30 = temp_r2_22;
+        if (var_r0_30 < 0) {
+            var_r0_30 += 0xFF;
+        }
+        sp4 = var_r0_30 >> 8;
+        var_r0_37 = (*(s32 *)((s8 *)(arg0) + (0x18)));
+        if (var_r0_37 < 0) {
+            var_r0_37 += 0xFF;
+        }
+        sp8 = var_r0_37 >> 8;
+        sub_807FC08(&sp0, &sp4, &sp8, 0);
+        return;
+    }
+    free_heap_8018DA8(*(void **)0x03000E18);
+    sub_807C298(arg0);
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80632C0.s\"");
