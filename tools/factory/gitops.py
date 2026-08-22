@@ -404,18 +404,23 @@ def compiles_in_isolation(name: str, body: str) -> bool:
         src.write_text('#include "global.h"\n#include "common.h"\n\n' + body + "\n")
         rel_src = src.relative_to(REPO).as_posix()
         rel_pre = pre.relative_to(REPO).as_posix()
-        r = run(["./container.sh", "arm-none-eabi-cpp",
-                 "-I", "tools/agbcc/include", "-nostdinc", "-undef",
-                 "-iquote", "include", "-Wno-trigraphs", rel_src, "-o", rel_pre])
-        if r.returncode != 0:
-            return False
-        # Same flags the real build uses (Makefile CFLAGS), so a pass here
-        # means a pass there once the siblings are out of the way.
-        r = run(["./container.sh", "tools/agbcc/bin/agbcc",
-                 "-O2", "-mthumb-interwork", "-fno-common", "-Wimplicit",
-                 "-Wparentheses", "-Werror", "-g", "-ffix-debug-line",
-                 "-o", "/dev/null", rel_pre])
-        return r.returncode == 0
+        # ONE container invocation, not two. Measured: this check ran at
+        # 11 rows/min with the machine otherwise IDLE (load 3.7) and 7/min
+        # with the full factory running -- so it was never CPU-bound, it was
+        # paying podman's ~2.5s startup twice per function. Chaining cpp and
+        # agbcc inside a single shell halves that, and it is the whole cost
+        # of the check.
+        #
+        # Flags are the real Makefile CFLAGS, so a pass here means a pass in
+        # the real build once the siblings are out of the way.
+        script = (
+            f"arm-none-eabi-cpp -I tools/agbcc/include -nostdinc -undef "
+            f"-iquote include -Wno-trigraphs {rel_src} -o {rel_pre} && "
+            f"tools/agbcc/bin/agbcc -O2 -mthumb-interwork -fno-common "
+            f"-Wimplicit -Wparentheses -Werror -g -ffix-debug-line "
+            f"-o /dev/null {rel_pre}"
+        )
+        return run(["./container.sh", "bash", "-c", script]).returncode == 0
     except OSError:
         return False
     finally:
