@@ -32,20 +32,25 @@ block_5:
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80291C8.s\"");
-#else
 s32 sub_8116610(s32);                           /* extern */
-
-void sub_80291C8(void *arg0) {
-    u32 temp_r0_11;
-
-    temp_r0_11 = (u32) ((*(u8 *)((s8 *)(arg0) + (0xFC))) << 0x19) >> 0x1C;
-    if (((s32) temp_r0_11 <= 2) && ((s32) temp_r0_11 >= 1)) {
-        sub_8116610((*(s32 *)((s8 *)(arg0) + (0x314))));
-    }
+void sub_80291C8(void *arg0)
+{
+  long new_var3;
+  s8 *new_var2;
+  s8 *new_var;
+  u32 temp_r0_11;
+  temp_r0_11 = ((u32) ((*((u8 *) (((s8 *) arg0) + 0xFC))) << 0x19)) >> ((short) 0x1C);
+  new_var2 = (s8 *) arg0;
+  new_var3 = 1;
+  if (new_var3)
+  {
+  }
+  ;
+  if ((((s32) temp_r0_11) <= 2) && (((s32) temp_r0_11) >= new_var3))
+  {
+    sub_8116610(*((s32 *) (new_var2 + 0x314)));
+  }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80291EC.s\"");
