@@ -20,15 +20,11 @@ s32 sub_812F510(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_812F528.s\"");
-#else
 s32 sub_81151E4(s32, s32, s32, s32, s32, s32, s32, s32); /* extern */
 
 void sub_812F528(void *arg0) {
     sub_81151E4((*(s32 *)((s8 *)(arg0) + (0x20))), 4, 0, 8, 0xFFFF, 0xFFFF, 0, 0);
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_812F550.s\"");

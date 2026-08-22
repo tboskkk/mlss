@@ -627,14 +627,12 @@ asm_unified(".include \"asm/nonmatching/sub_8176FCC.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8177004.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+s32 sub_80DEEA8(s32, s32, s32, s32, s32 *, s32, s32, s32, s32, s32, s32, s32, s32); /* extern */
+extern s32 sub_81721DC;
+
+void sub_8177004(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    sub_80DEEA8(arg0, arg1, arg2, 0, &sub_81721DC, 0x2080, 1, 0, 2, arg3, arg3, 0x08504780, 2);
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8177040.s\"");
@@ -5173,14 +5171,12 @@ void sub_818D820(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     sub_80DEEA8(arg0, arg1, arg2, 0x10, &sub_8178038, 0x4172, 0, 0, 6, arg3, arg3, 0x08504970, 6);
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_818D85C.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+s32 sub_80DEEA8(s32, s32, s32, s32, s32 *, s32, s32, s32, s32, s32, s32, s32, s32); /* extern */
+extern s32 sub_8177DCC;
+
+void sub_818D85C(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    sub_80DEEA8(arg0, arg1, arg2, 0x25, &sub_8177DCC, 0x4165, 0, 0, 6, arg3, arg3, 0x0850495C, 5);
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_818D898.s\"");
