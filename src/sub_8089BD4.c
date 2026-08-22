@@ -38,26 +38,24 @@ void sub_8089C00(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8089C88.s\"");
-#else
 s32 sub_808552C(void *, void *, void *, s32, s32, s32, s32, s32, s32, s32); /* extern */
 extern s32 sub_80895D8;
-
-void sub_8089C88(void *arg0) {
-    s32 temp_r6_29;
-    void *temp_r1_12;
-
-    temp_r1_12 = (*(void **)((s8 *)((*(void **)((s8 *)(arg0) + (0x2C)))) + (0x28)));
-    (*(s32 *)((s8 *)(arg0) + (0x84))) = (s32) ((*(s32 *)((s8 *)(temp_r1_12) + (0xD8))) + 0x3000);
-    (*(s32 *)((s8 *)(arg0) + (0x88))) = (s32) (*(s32 *)((s8 *)(temp_r1_12) + (0xDC)));
-    temp_r6_29 = (*(s32 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x28)))) + (0xE0)));
-    (*(s32 *)((s8 *)(arg0) + (0x8C))) = temp_r6_29;
-    (*(s32 *)((s8 *)(arg0) + (0x94))) = sub_808552C(arg0 + 0xAE, arg0 + 0x8C + 0x24, arg0 + 0xB2, (*(s32 *)((s8 *)(arg0) + (0x84))) - (*(s32 *)((s8 *)(arg0) + (0x38))), (*(s32 *)((s8 *)(arg0) + (0x88))) - (*(s32 *)((s8 *)(arg0) + (0x3C))), temp_r6_29 - (*(s32 *)((s8 *)(arg0) + (0x40))), 0x400, 0x400, 0x100, 0);
-    play_sfx_80195B4(0x8D, -1);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80895D8;
+void sub_8089C88(void *arg0)
+{
+  s32 temp_r6_29;
+  void *temp_r1_12;
+  s32 *new_var2;
+  s8 *new_var;
+  new_var = ((s8 *) (*((void **) (((s8 *) arg0) + 0x2C)))) + 0x28;
+  new_var2 = (s32 *) (((s8 *) arg0) + 0x84);
+  temp_r1_12 = *((void **) new_var);
+  *((s32 *) (((s8 *) arg0) + 0x84)) = (s32) ((*((s32 *) (((s8 *) temp_r1_12) + 0xD8))) + 0x3000);
+  *((s32 *) (((s8 *) arg0) + 0x88)) = (s32) (*((s32 *) (((s8 *) temp_r1_12) + 0xDC)));
+  *((s32 *) (((s8 *) arg0) + 0x8C)) = (temp_r6_29 = *((s32 *) (((s8 *) (*((void **) (((s8 *) arg0) + 0x28)))) + 0xE0)));
+  *((s32 *) (((s8 *) arg0) + 0x94)) = sub_808552C(arg0 + 0xAE, (arg0 + 0x8C) + 0x24, arg0 + 0xB2, (*new_var2) - (*((s32 *) (((s8 *) arg0) + 0x38))), (*((s32 *) (((s8 *) arg0) + 0x88))) - (*((s32 *) (((s8 *) arg0) + 0x3C))), temp_r6_29 - (*((s32 *) (((s8 *) arg0) + 0x40))), 0x400, 0x400, 0x100, 0);
+  play_sfx_80195B4(0x8D, -1);
+  *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_80895D8;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8089D10.s\"");
