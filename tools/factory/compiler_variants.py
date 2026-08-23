@@ -110,8 +110,33 @@ def pick(conn, args) -> list:
         (args.min_score, args.limit)).fetchall()
 
 
-def stage(rows, work: Path, ctx: Path) -> list[str]:
-    """Write one .frag.s and one .body.c per function into the scratch dir."""
+class StagingError(RuntimeError):
+    """A row could not be staged. Raised rather than skipped -- see stage()."""
+
+
+def stage(rows, work: Path, ctx: Path, frag_owner: dict | None = None,
+          strict: bool = True) -> list[str]:
+    """Write one .frag.s and one .body.c per row into the scratch dir.
+
+    `frag_owner` maps a row name to the FUNCTION whose retail fragment it
+    should be measured against. That is what makes variant rows possible: a
+    tool comparing several rewrites of `sub_X` stages them as `sub_X__u8`,
+    `sub_X__u16` and so on, none of which has a fragment of its own, and each
+    declares `sub_X` as its owner. Every staged row then gets its own
+    `<row>.frag.s`, so callers compare `<row>.agbcc.bin` against
+    `<row>.retail.bin` uniformly and never have to reason about which name the
+    retail side is under.
+
+    `strict` decides what happens when a row cannot be staged. It defaults to
+    RAISING, because silently skipping is what this function used to do and it
+    caused the same failure four separate times -- in extern_lever (29 of 30
+    "does not compile"), in fix_bare_deref (twice), and again when comparing
+    against a retail image that was never produced. Every one presented as
+    "these candidates are bad" rather than "this harness dropped them", which
+    is the directional failure mode CLAUDE.md T.15 is about. A tool that cannot
+    stage its input should stop, not report a verdict on data it never had.
+    """
+    frag_owner = frag_owner or {}
     # Strip cpp line markers. m2c's context is preprocessed by a MODERN cpp,
     # which emits `# 0 "<command-line>"`; agbcc is GCC 2.95 and rejects it
     # ("syntax error before `/'"), silently producing a partial .s and a
@@ -120,10 +145,12 @@ def stage(rows, work: Path, ctx: Path) -> list[str]:
     text = ctx.read_text()
     text = "\n".join(l for l in text.splitlines() if not l.startswith("# "))
     (work / "ctx.i").write_text(text + "\n")
-    staged = []
+    staged, missing = [], []
     for r in rows:
-        frag = REPO / "asm" / "nonmatching" / f"{r['name']}.s"
+        owner = frag_owner.get(r["name"], r["name"])
+        frag = REPO / "asm" / "nonmatching" / f"{owner}.s"
         if not frag.exists():
+            missing.append(f"{r['name']} (fragment {owner}.s)")
             continue
         body = frag.read_text()
         if ".include" not in body:
@@ -166,6 +193,11 @@ def stage(rows, work: Path, ctx: Path) -> list[str]:
         (work / f"{r['name']}.body.c").write_text(
             '#include "global.h"\n#include "common.h"\n' + (decls or "") + body)
         staged.append(r["name"])
+    if missing and strict:
+        raise StagingError(
+            f"{len(missing)} of {len(rows)} row(s) have no retail fragment and "
+            f"were not staged, e.g. {', '.join(missing[:3])}. Pass frag_owner "
+            f"for variant rows, or strict=False to accept the loss.")
     return staged
 
 

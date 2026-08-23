@@ -186,24 +186,14 @@ def main() -> int:
             staged_rows.append(Row(name=r["name"] + "__EXT", candidate_body=newbody))
             allsyms[r["name"] + "__EXT"] = syms
 
-        # Stage the ORIGINALS through cv.stage (it needs a real fragment on
-        # disk), then write each __EXT twin by hand: it reuses its original's
-        # retail fragment and carries the minted body. Letting cv.stage try the
-        # twins silently dropped them -- no asm/nonmatching/<name>__EXT.s
-        # exists, so it skipped them and never wrote their .body.c, and every
-        # twin then reported "does not compile". That is a broken instrument
-        # reporting a verdict, which is exactly what this tool exists to avoid.
-        originals = [x for x in staged_rows if not x["name"].endswith("__EXT")]
-        cv.stage(originals, work, ctx)
-        for r, newbody, _s in pairs:
-            src = work / f"{r['name']}.frag.s"
-            if not src.exists():
-                continue
-            shutil.copy(src, work / f"{r['name']}__EXT.frag.s")
-            (work / f"{r['name']}__EXT.body.c").write_text(newbody)
-        staged = [n for n in
-                  [x["name"] for x in staged_rows]
-                  if (work / f"{n}.frag.s").exists() and (work / f"{n}.body.c").exists()]
+        # Each __EXT twin is measured against its original's retail fragment;
+        # frag_owner says so, and stage() raises rather than dropping a row it
+        # cannot stage. An earlier hand-rolled version of this silently wrote
+        # no body.c for any twin, and the tool reported 29 of 30 "does not
+        # compile" -- a verdict on data it never had.
+        staged = cv.stage(staged_rows, work, ctx,
+                          frag_owner={r["name"] + "__EXT": r["name"]
+                                      for r, _b, _s in pairs})
         (work / "names.txt").write_text("\n".join(staged) + "\n")
         (work / "variants.txt").write_text("agbcc agbcc \n")
         print(f"comparing {len(pairs)} function(s), stored body vs minted-extern rewrite")

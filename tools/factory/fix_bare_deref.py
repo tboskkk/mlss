@@ -126,27 +126,13 @@ def main() -> int:
                 staged_rows.append(Row(name=tag, candidate_body=variant(body, span, w)))
                 owner[tag] = (name, w)
 
-        # Stage the ORIGINALS through cv.stage -- it needs a real fragment on
-        # disk -- then write each variant by hand. cv.stage skips any row with
-        # no asm/nonmatching/<name>.s, and a `sub_X__u8` tag has none, so
-        # letting it stage the variants silently produced no body.c for any of
-        # them and the whole run measured nothing.
-        real = [Row(name=n, candidate_body=b) for n, b, _ in targets]
-        cv.stage(real, work, ctx)
-        names = []
-        for tag, (name, _w) in owner.items():
-            src = work / f"{name}.frag.s"
-            if not src.exists():
-                continue
-            shutil.copy(src, work / f"{tag}.frag.s")
-            body = next(r["candidate_body"] for r in staged_rows if r["name"] == tag)
-            try:
-                decls = gitops.rom_symbol_declarations(body) or ""
-            except Exception:
-                decls = ""
-            (work / f"{tag}.body.c").write_text(
-                '#include "global.h"\n#include "common.h"\n' + decls + body)
-            names.append(tag)
+        # frag_owner tells stage() which retail fragment each variant belongs
+        # to, so every row gets its own <row>.frag.s and the comparison below
+        # is uniform. stage() raises if anything cannot be staged rather than
+        # dropping it silently, which is what made the three earlier versions
+        # of this block report "nothing measured" instead of naming the cause.
+        names = cv.stage(staged_rows, work, ctx,
+                         frag_owner={tag: nm for tag, (nm, _w) in owner.items()})
         (work / "names.txt").write_text("\n".join(names) + "\n")
         (work / "variants.txt").write_text("agbcc agbcc \n")
         print(f"{len(targets)} candidate(s) x {len(WIDTHS)} widths = {len(names)} compiles")
@@ -173,7 +159,24 @@ def main() -> int:
                 best[name] = (diff, w)
 
         if not best:
-            print("\nNOTHING WAS MEASURED -- no verdict. Re-run with --keep.")
+            # Say WHY, rather than making the reader go and look. "Nothing was
+            # measured" is honest but useless on its own, and this project's
+            # tools have a habit of stopping at the honest half.
+            from collections import Counter as _C
+            errs = _C()
+            for tag in names:
+                f = work / f"{tag}.agbcc.cc.err"
+                if f.exists():
+                    for ln in f.read_text(errors="ignore").splitlines():
+                        if ":" in ln and not ln.rstrip().endswith(":"):
+                            errs[ln.split(":")[-1].strip()[:60]] += 1
+                            break
+            print("\nNOTHING WAS MEASURED -- no variant compiled. These "
+                  "candidates fail on something OTHER than the bare dereference:")
+            for k, v in errs.most_common(5):
+                print(f"   {v:>4}  {k}")
+            if not errs:
+                print("   (no compiler output either -- re-run with --keep)")
             return 2
 
         exact = [n for n, (d, _) in best.items() if d == 0]
