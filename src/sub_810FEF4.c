@@ -117,14 +117,19 @@ void sub_8110134(void *arg0)
   }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8110178.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+extern s32 sub_810F5E4;
+void sub_8110178(void *arg0)
+{
+  void *temp_r2_17;
+  if ((sub_8087CE4() << 0x18) == 0)
+  {
+    sub_8082E1C(arg0, 4, 0, 0);
+    temp_r2_17 = *((void **) (((s8 *) arg0) + 8));
+    *((u8 *) (temp_r2_17 + 0x12)) = (u8) (((-7) & (*(((s8 *) temp_r2_17) + ((unsigned short) 0x12)))) | 2);
+    stop_sfx_80195A8(0x11B);
+    *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_810F5E4;
+  }
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81101BC.s\"");
