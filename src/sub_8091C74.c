@@ -65,17 +65,14 @@ void sub_8091D78(void *arg0) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8091D9C.s\"");
-#else
 s32 sub_8090E74(void *);                        /* extern */
 s32 sub_8090F14(void *);                        /* extern */
 extern s32 sub_8087540;
 
 s32 sub_8091D9C(void *arg0) {
-    s32 temp_r1_11;
+    s16 temp_r1_11;
 
-    temp_r1_11 = M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */);
+    temp_r1_11 = (*(s16 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x28)))) + (0xEC)));
     if (temp_r1_11 == -1) {
         sub_8090E74(arg0);
     } else if (temp_r1_11 == -2) {
@@ -84,7 +81,6 @@ s32 sub_8091D9C(void *arg0) {
     (*(s32 **)((s8 *)(arg0) + (0x68))) = &sub_8087540;
     return 1;
 }
-#endif
 
 s32 sub_8090FB8(void *);                        /* extern */
 s32 sub_8091548(void *);                        /* extern */
