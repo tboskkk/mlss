@@ -157,10 +157,18 @@ def check_expected_freshness():
     if not exp.exists():
         return line(BAD, "expected/ snapshot", "missing -- every asm-differ score is invalid")
     age_h = (time.time() - exp.stat().st_mtime) / 3600
-    newest_src = max((p.stat().st_mtime for p in (gitops.REPO / "src").glob("*.c")), default=0)
-    stale = newest_src > exp.stat().st_mtime
-    line(WARN if stale else OK, "expected/ snapshot",
-         f"{age_h:.1f}h old" + (" -- src/ is NEWER, refresh it" if stale else ""))
+    # NOT "is src/ newer" - on a live factory it always is, which makes the
+    # check fire constantly and therefore get ignored. What actually
+    # invalidates the snapshot is MATCHES landing, since each one removes a
+    # guard and rewrites the object asm-differ compares against.
+    since = subprocess.run(
+        ["git", "log", "--since", f"@{int(exp.stat().st_mtime)}", "--oneline",
+         "--grep", "^Match ", "--extended-regexp"],
+        cwd=gitops.REPO, capture_output=True, text=True).stdout
+    n = len([l for l in since.splitlines() if l.strip()])
+    line(WARN if n > 25 else OK, "expected/ snapshot",
+         f"{age_h:.1f}h old, {n} match(es) committed since -- "
+         f"refresh at >25 or scores drift")
 
 
 # --------------------------------------------------------------------------

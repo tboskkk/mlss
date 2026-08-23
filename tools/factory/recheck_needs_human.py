@@ -54,12 +54,19 @@ def compile_text(tag, text):
 ERR_RE = re.compile(r"^[^\s:]+:\d+:\s*(.*)$", re.M)
 
 conn = db.connect()
+# ALL dead-end rows carrying a candidate, not one note pattern. The
+# blocking condition is usually somebody else's broken draft, and which
+# note a row happens to carry says nothing about whether that is still
+# true. Measured on a later run: 96 of 125 compiled.
 rows = list(conn.execute(
-    "SELECT name, candidate_body FROM functions WHERE state='needs_human' "
-    "AND notes LIKE 'plain-build asm-differ score 0%'"))
-limit = int(sys.argv[1]) if len(sys.argv) > 1 else len(rows)
+    "SELECT name, candidate_body FROM functions WHERE state IN "
+    "('needs_human','stalled') AND candidate_body IS NOT NULL"))
+apply_fix = "--apply" in sys.argv
+args = [a for a in sys.argv[1:] if not a.startswith("-")]
+limit = int(args[0]) if args else len(rows)
 
 clusters, examples, no_body, ok = collections.Counter(), {}, 0, 0
+recovered = []
 for i, r in enumerate(rows[:limit], 1):
     name, body = r["name"], r["candidate_body"]
     if not body:
@@ -72,6 +79,7 @@ for i, r in enumerate(rows[:limit], 1):
     rc, out = compile_text(name, text)
     if rc == 0:
         ok += 1
+        recovered.append(name)
         continue
     msgs = [m.group(1) for m in ERR_RE.finditer(out)]
     fatal = next((m for m in msgs if "warning" not in m.lower()), msgs[0] if msgs else out[:70])
@@ -86,3 +94,14 @@ for k, v in clusters.most_common(15):
     e = examples.get(k)
     if e: print(f"        e.g. {e[0]}: {e[1][:100]}")
 print(f"\ncompiles fine now: {ok}   no candidate_body: {no_body}")
+if recovered and apply_fix:
+    import time
+    q = ",".join("?" * len(recovered))
+    conn.execute(
+        f"UPDATE functions SET state='tier2_ready', worker_id=NULL, notes='requeued "
+        f"by recheck_needs_human: the destination file compiles with this candidate "
+        f"now', updated_at=? WHERE name IN ({q})", [time.time()] + recovered)
+    conn.commit()
+    print(f"requeued {len(recovered)} -> tier2_ready (the validator re-verifies)")
+elif recovered:
+    print(f"pass --apply to requeue those {len(recovered)}")
