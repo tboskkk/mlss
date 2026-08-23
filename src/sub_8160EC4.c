@@ -7,14 +7,11 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8160EC4.s\"");
-#else
-void sub_8160EC4(void *arg0) {
-    (*(s32 *)((s8 *)(arg0) + (0x804))) = 0;
-    (*(s32 *)((s8 *)(arg0) + (0x80C))) = 0;
+s32 * sub_8160EC4(s32 * a0) {
+    *(a0 + 513) = 0;
+    *(a0 + 515) = 0;
+    return a0;
 }
-#endif
 
 s32 process_remove(void *, s32);                /* extern */
 void sub_8160EDC(void *arg0)
