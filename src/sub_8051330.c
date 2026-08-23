@@ -7,16 +7,18 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8051330.s\"");
-#else
-void sub_8051330(void *arg0) {
-    if (M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */) != 0) {
-        (*(s8 *)((s8 *)(arg0) + (0x23B))) = 0;
-        (*(u16 *)((s8 *)(arg0) + (0x33E))) = (u16) (0xFFFFFE01 & (*(u16 *)((s8 *)(arg0) + (0x33E))));
-    }
+void sub_8051330(void *arg0)
+{
+  int new_var2;
+  s16 new_var;
+  new_var = *((s16 *) (((s8 *) arg0) + 0x340));
+  new_var2 = 0xFFFFFE01;
+  if (new_var != 0)
+  {
+    *((s8 *) (((s8 *) arg0) - ((0, -0x23B)))) = 0;
+    *((u16 *) (((s8 *) arg0) + 0x33E)) = (u16) (new_var2 & (*((u16 *) (((s8 *) arg0) + 0x33E))));
+  }
 }
-#endif
 
 s32 sub_8021ED8(s32);                           /* extern */
 
