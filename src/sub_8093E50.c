@@ -8,6 +8,9 @@
 asm_unified(".include \"asm/macros.inc\"");
 
 
+
+extern s32 sub_8087540;
+
 s32 sub_8082E1C();
 extern s32 sub_8095548;
 
@@ -25,17 +28,13 @@ s32 sub_8093E50(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8093EA4.s\"");
-#else
 s32 sub_8093F08(void *);                        /* extern */
 s32 sub_8093F8C(void *);                        /* extern */
-extern s32 sub_8087540;
 
 s32 sub_8093EA4(void *arg0) {
-    s32 temp_r1_11;
+    s16 temp_r1_11;
 
-    temp_r1_11 = M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */);
+    temp_r1_11 = (*(s16 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x28)))) + (0xEC)));
     if (temp_r1_11 == -1) {
         sub_8093F8C(arg0);
     } else if (temp_r1_11 == -2) {
@@ -44,7 +43,6 @@ s32 sub_8093EA4(void *arg0) {
     (*(s32 **)((s8 *)(arg0) + (0x68))) = &sub_8087540;
     return 1;
 }
-#endif
 
 s32 sub_8093194(void *);                        /* extern */
 s32 sub_8093724(void *);                        /* extern */
