@@ -7,6 +7,9 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
+
+s32 sub_8082E1C();
+
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_807D5E8.s\"");
 #else
