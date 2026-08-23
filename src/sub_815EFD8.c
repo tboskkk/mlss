@@ -8,6 +8,9 @@
 asm_unified(".include \"asm/macros.inc\"");
 
 
+
+s32 sub_815FB14();
+
 int sub_815FAA4();
 
 #ifndef NONMATCHING
@@ -142,22 +145,18 @@ void sub_815F168(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_815F19C.s\"");
-#else
-s32 sub_815FB14(void *, s32);                   /* extern */
-
 void sub_815F19C(void *arg0, s32 arg1) {
+    void *temp_r1_14;
     void *temp_r2_11;
 
     (*(s32 *)((s8 *)(arg0) + (0x30))) = 0x08CDCED0;
     temp_r2_11 = (*(void **)((s8 *)(arg0) + (0x34)));
     if (temp_r2_11 != NULL) {
-        (*(s32 (**)(void *, s32))((s8 *)((*(void **)((s8 *)(temp_r2_11) + (0x30)))) + (0xC)))(temp_r2_11 + M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */), 3);
+        temp_r1_14 = (*(void **)((s8 *)(temp_r2_11) + (0x30)));
+        (*(s32 (**)(void *, s32))((s8 *)(temp_r1_14) + (0xC)))(temp_r2_11 + (*(s16 *)((s8 *)(temp_r1_14) + (8))), 3);
     }
     sub_815FB14(arg0, arg1);
 }
-#endif
 
 void sub_815F1D0(void) {
     sub_815FAA4();
