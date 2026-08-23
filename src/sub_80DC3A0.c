@@ -282,19 +282,17 @@ asm_unified(".include \"asm/nonmatching/sub_80DD600.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-extern s32 sub_80DD740;
-
+void sub_80DD740(void *arg0);
 void sub_80DD6D0(void *arg0) {
     if (sub_8082B00() == 0) {
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80DD740;
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_80DD740;
     }
 }
 
-extern s32 sub_80DD76C;
-
+void sub_80DD76C(void *arg0);
 void sub_80DD6EC(void *arg0) {
     if (sub_8082B00() == 0) {
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80DD76C;
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_80DD76C;
     }
 }
 
