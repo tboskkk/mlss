@@ -12,13 +12,10 @@ asm_unified(".include \"asm/macros.inc\"");
 void sub_8068DEC(void *arg0);
 
 s32 sub_8082E1C();
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8068818.s\"");
-#else
 void sub_8068818(void *arg0) {
     s32 temp_r0_16;
 
-    if (M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */) == 0) {
+    if ((*(s16 *)((s8 *)(arg0) + (0xAC))) == 0) {
         temp_r0_16 = (*(s32 *)((s8 *)(arg0) + (0x10))) + 0xFFFFFE00;
         (*(s32 *)((s8 *)(arg0) + (0x10))) = temp_r0_16;
         if ((s32) (*(s32 *)((s8 *)(arg0) + (0x84))) >= temp_r0_16) {
@@ -26,7 +23,6 @@ void sub_8068818(void *arg0) {
         }
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8068844.s\"");
