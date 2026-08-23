@@ -12,28 +12,17 @@ void sub_81507EC(s32 arg0, void *arg1) {
     (*(s32 *)((s8 *)(arg1) + (0x10))) = (s32) ((*(s32 *)((s8 *)(arg1) + (0x10))) + (*(s16 *)((s8 *)(arg1) + (0x244))));
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8150810.s\"");
-#else
-extern void sub_81507A8();
+extern s32 sub_81507A8;
 
-void sub_8150810(u8* p1, u8* p2)
-{
-    u32* r3 = (u32*)((u8*)p1 + 0x18);
-    if (*(u32*)((u8*)p1 + 0x18) > 0xFF)
-    {
-        *(u32*)((u8*)p1 + 0x248) = *(u32*)((u8*)p1 + 0x2C8);
-        *(u32*)((u8*)p2) = (u32)sub_81507A8;
+void sub_8150810(s32 arg0, void *arg1, s32 **arg2) {
+    if ((s32) (*(s32 *)((s8 *)(arg1) + (0x18))) > 0xFF) {
+        (*(s32 *)((s8 *)(arg1) + (0x248))) = (s32) (*(s32 *)((s8 *)(arg1) + (0x2C8)));
+        *arg2 = &sub_81507A8;
+        return;
     }
-    else
-    {
-        s16 r1 = *(s16*)((u8*)p1 + 0x242);
-        *(u32*)((u8*)p1 + 0x0C) += r1;
-        r1 = *(s16*)((u8*)p1 + 0x244);
-        *(u32*)((u8*)p1 + 0x10) += r1;
-    }
+    (*(s32 *)((s8 *)(arg1) + (0xC))) = (s32) ((*(s32 *)((s8 *)(arg1) + (0xC))) + (*(s16 *)((s8 *)(arg1) + (0x242))));
+    (*(s32 *)((s8 *)(arg1) + (0x10))) = (s32) ((*(s32 *)((s8 *)(arg1) + (0x10))) + (*(s16 *)((s8 *)(arg1) + (0x244))));
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_815085C.s\"");
