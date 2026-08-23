@@ -7,6 +7,9 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
+
+int stop_sfx_80195A8();
+
 s32 sub_803C508(void *arg0) {
     if (((s32) (*(s16 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x200)))) + (4))) <= 0xC) && ((s32) (*(s16 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x204)))) + (4))) <= 0xC)) {
         return 0;
@@ -60,19 +63,14 @@ void sub_803C5A4(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_803C610.s\"");
-#else
-s32 stop_sfx_80195A8(s32);                      /* extern */
-
 void sub_803C610(void) {
-    stop_sfx_80195A8(0x157);
-    stop_sfx_80195A8(0x87);
-    stop_sfx_80195A8(0xDB);
-    stop_sfx_80195A8(0xDA);
-    stop_sfx_80195A8(0xDA);
+    stop_sfx_80195A8(343);
+    stop_sfx_80195A8(135);
+    stop_sfx_80195A8(219);
+    stop_sfx_80195A8(218);
+    stop_sfx_80195A8(218);
+    return;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_803C638.s\"");
