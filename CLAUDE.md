@@ -2064,12 +2064,36 @@ before and then failed a different one. This is agbcc's `-ffix-debug-line`
 debug-info emission, and adding a NEW header (`include/entity.h`) fails the same
 way for the same reason.
 
-**Therefore: not shipped.** The one benefit it delivers is already covered by
-`tools/factory/fix_decl_conflicts.py`, which repairs the same class after the
-fact and is byte-verified. Paying an unexplained, position-dependent build
-break for a benefit we already have, in exchange for zero score improvement, is
-a bad trade. `tools/scan_entity.py` is kept: the offsets and widths are real,
-and they are the best description of this struct anyone here has.
+**UNBLOCKED 2026-08-23, and the struct is now IN `include/common.h`.** The
+blocker was never the struct -- section T.9 established that `-g` feeds agbcc's
+buggy debug-line emitter, that `-ffix-debug-line` only suppresses most of the
+damage, and that `-g` is byte-neutral for the shipped ROM. The Makefile now
+recompiles any object the assembler rejects without `-g`.
+
+Retested by inserting `struct Entity` at line 30 of `common.h` -- the exact
+position class this section recorded as failing:
+
+    ROM                       mlss.gba: OK
+    macros.inc errors         0
+    objects using -g fallback 5
+    layout                    ok
+
+**The bug still fires -- five times -- and the fallback catches every one.** So
+this is structurally fixed rather than a lucky position, which is what the
+original note said could not be relied on.
+
+The layout is verified rather than asserted: 15 compile-time offset checks
+(negative-size-array trick, since agbcc is C89) covering `sizeof == 0xB4`,
+`handler == 0x4C`, `unk12 == 0x12`, `unk7E == 0x7E`, `unkAC == 0xAC` and the
+rest. Fields are named only where `tools/scan_entity.py` is confident; every
+gap is an explicit `pad` array rather than an invented name.
+
+**What this does and does not buy.** Still no score improvement -- the A/B
+above stands, because m2c emits explicit-width casts that compile identically
+to struct access. What it buys is READABILITY, which is the actual reason to
+want it: `entity->handler` instead of `(*(s32 **)((s8 *)(arg0) + (0x4C)))`,
+across the 980 functions that touch that field. That is the gate on any
+"make the decompiled C human-readable" work, and it is now open.
 
 **If someone wants to revisit it**, the tractable route is not the header. It is
 to make `m2c_bridge` inline the struct definition into each generated seed the

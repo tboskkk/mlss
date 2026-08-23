@@ -28,6 +28,54 @@ struct Process {
 struct GameState {
     u16 field_0;
     u16 field_2;
+
+/* The entity/process object nearly every gameplay function takes as arg0.
+ * Offsets and access widths are measured, not guessed -- tools/scan_entity.py
+ * over 4,151 fragments: +0x00 in 48% of them, +0x08 in 25%, +0x4C in 22%
+ * (98% word-width), +0x12 and +0x7E byte-width, +0xAC half-width.
+ * Gaps are padding rather than invented names; only fields the scan is
+ * confident about are named. */
+struct Entity {
+/* 0x00 */ s32 unk00;
+/* 0x04 */ s32 unk04;
+/* 0x08 */ s32 unk08;
+/* 0x0C */ s32 unk0C;
+/* 0x10 */ u8  unk10;
+/* 0x11 */ u8  unk11;
+/* 0x12 */ u8  unk12;
+/* 0x13 */ u8  unk13;
+/* 0x14 */ s32 unk14;
+/* 0x18 */ s32 unk18;
+/* 0x1C */ u8  pad1C[0x04];
+/* 0x20 */ s32 unk20;
+/* 0x24 */ u8  unk24;
+/* 0x25 */ u8  pad25[0x03];
+/* 0x28 */ s32 unk28;
+/* 0x2C */ s32 unk2C;
+/* 0x30 */ s32 unk30;
+/* 0x34 */ s32 unk34;
+/* 0x38 */ s32 unk38;
+/* 0x3C */ s32 unk3C;
+/* 0x40 */ s32 unk40;
+/* 0x44 */ u8  pad44[0x08];
+/* 0x4C */ s32 *handler;
+/* 0x50 */ u8  pad50[0x24];
+/* 0x74 */ s32 unk74;
+/* 0x78 */ u8  pad78[0x06];
+/* 0x7E */ u8  unk7E;
+/* 0x7F */ u8  pad7F[0x01];
+/* 0x80 */ u8  pad80[0x04];
+/* 0x84 */ s32 unk84;
+/* 0x88 */ s32 unk88;
+/* 0x8C */ s32 unk8C;
+/* 0x90 */ u8  pad90[0x0C];
+/* 0x9C */ s32 unk9C;
+/* 0xA0 */ u8  padA0[0x08];
+/* 0xA8 */ s32 unkA8;
+/* 0xAC */ u16 unkAC;
+/* 0xAE */ u8  padAE[0x06];
+};  /* 0xB4 */
+
     u32 field_4;
     u8 gap8[4];
     struct Process* startProcessLink;
