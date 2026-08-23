@@ -24,27 +24,23 @@ void sub_80796B8(void) {
     sub_807C298();
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80796C4.s\"");
-#else
 extern s32 sub_8078678;
-
-void sub_80796C4(void *arg0) {
-    s32 temp_r3_9;
-    void *temp_r1_17;
-
-    temp_r3_9 = (*(s32 *)((s8 *)(arg0) + (0x80)));
-    if (temp_r3_9 == 0) {
-        (*(s32 *)((s8 *)(arg0) + (0x9C))) = 0x100;
-        temp_r1_17 = (arg0 + 0x9C) - 0x10;
-        (*(s32 *)((s8 *)(temp_r1_17) + (0))) = 0x10;
-        (*(s16 *)((s8 *)(temp_r1_17) + (0x20))) = 1;
-        (*(s16 *)((s8 *)(arg0) + (0xB2))) = (s16) temp_r3_9;
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8078678;
-        play_sfx_80195B4(0x9C, -1);
-    }
+void sub_80796C4(void *arg0)
+{
+  s32 temp_r3_9;
+  void *temp_r1_17;
+  temp_r3_9 = *((s32 *) (((s8 *) arg0) + 0x80));
+  if (temp_r3_9 == 0)
+  {
+    *((s32 *) (((s8 *) arg0) + 0x9C)) = 0x100;
+    ;
+    *((s32 *) (((s8 *) ((arg0 + 0x9C) - 0x10)) + 0)) = 0x10;
+    *((s16 *) (((s8 *) ((arg0 + 0x9C) - 0x10)) + 0x20)) = 1;
+    *((s16 *) (((s8 *) arg0) + 0xB2)) = (s16) temp_r3_9;
+    *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_8078678;
+    play_sfx_80195B4(0x9C, -1);
+  }
 }
-#endif
 
 void sub_8079704(void *arg0) {
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
