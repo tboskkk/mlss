@@ -36,15 +36,9 @@ void sub_8047D44(void *arg0) {
     sub_8116654((*(s32 *)((s8 *)(arg0) + (0x334))), (*(u8 *)((s8 *)(arg0) + (0x26E))));
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8047D64.s\"");
-#else
-s32 sub_8116680(s32, u8);                       /* extern */
-
 void sub_8047D64(void *arg0) {
     sub_8116680((*(s32 *)((s8 *)(arg0) + (0x334))), (*(u8 *)((s8 *)(arg0) + (0x26E))));
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8047D84.s\"");
