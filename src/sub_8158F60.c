@@ -29,17 +29,15 @@ void sub_8158F88(void *arg0, s16 arg1) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8159258.s\"");
-#else
 s32 sub_8151650(void *, s32);                   /* extern */
 
 void sub_8159258(void *arg0) {
     void *temp_r0_10;
+    void *temp_r2_11;
 
     temp_r0_10 = (*(void **)((s8 *)(arg0) + (0x1CAC)));
-    if (((*(s32 (**)(void *, void *))((s8 *)((*(void **)((s8 *)(temp_r0_10) + (4)))) + (0x14)))(temp_r0_10 + M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */), arg0) == 0) && (arg0 != NULL)) {
+    temp_r2_11 = (*(void **)((s8 *)(temp_r0_10) + (4)));
+    if (((*(s32 (**)(void *, void *))((s8 *)(temp_r2_11) + (0x14)))(temp_r0_10 + (*(s16 *)((s8 *)(temp_r2_11) + (0x10))), arg0) == 0) && (arg0 != NULL)) {
         sub_8151650(arg0, 3);
     }
 }
-#endif
