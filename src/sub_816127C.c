@@ -43,15 +43,11 @@ void sub_81612E4(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_81612F8.s\"");
-#else
 void sub_81612F8(void *arg0, s32 arg1) {
     struct Sprite *temp_r0_18;
 
-    temp_r0_18 = sub_8020DD0(0, M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */), arg1, -1, -1, -1, -1);
+    temp_r0_18 = sub_8020DD0(0, (s32) (*(s16 *)((s8 *)(arg0) + (6))), arg1, -1, -1, -1, -1);
     (*(struct Sprite **)((s8 *)(arg0) + (0xC))) = temp_r0_18;
     temp_r0_18->xPosition = (s16) ((s32) (*(s32 *)((s8 *)(arg0) + (0x14))) >> 8);
     (*(struct Sprite **)((s8 *)(arg0) + (0xC)))->yPosition = (s16) ((s32) (*(s32 *)((s8 *)(arg0) + (0x18))) >> 8);
 }
-#endif
