@@ -159,8 +159,7 @@ asm_unified(".include \"asm/nonmatching/sub_80798C4.s\"");
 #endif
 
 extern s32 sub_807940C;
-extern s32 sub_8079BA8;
-
+void sub_8079BA8(void *arg0);
 void sub_807991C(void *arg0) {
     s32 *temp_r0_8;
     s32 *temp_r2_21;
@@ -171,7 +170,7 @@ void sub_807991C(void *arg0) {
         return;
     }
     sub_8082E1C(arg0, 0x11, 0, 0);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8079BA8;
+    (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_8079BA8;
     temp_r2_21 = (*(s32 **)((s8 *)(arg0) + (0x30)));
     (*(s32 *)((s8 *)(temp_r2_21) + (0xA0))) = (s32) (*(s32 *)((s8 *)(arg0) + (0x9C)));
     (*(s32 **)((s8 *)(temp_r2_21) + (0x4C))) = &sub_807940C;
@@ -329,12 +328,11 @@ asm_unified(".include \"asm/nonmatching/sub_8079BD0.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-extern s32 sub_8079C70;
-
+void sub_8079C70(void *arg0);
 void sub_8079C0C(void *arg0) {
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
         sub_8082E1C(arg0, 0xD, 0x4029, 0);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8079C70;
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_8079C70;
     }
 }
 

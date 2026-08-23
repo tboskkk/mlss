@@ -19,7 +19,7 @@ extern s32 sub_8063FC0;
 extern s32 sub_8064424;
 int sub_8086D80();
 
-extern s32 sub_80643DC;
+void sub_80643DC(void *arg0);
 int sub_80871A8();
 
 extern s32 sub_8063C60;
@@ -159,7 +159,7 @@ s32 sub_8064274(void *arg0)
   if (var_r0_8 == 0)
   {
     var_r0_8 = 0x4C;
-    *((s32 **) (arg0 + var_r0_8)) = &sub_80643DC;
+    *((s32 **) (arg0 + var_r0_8)) = (s32 *) &sub_80643DC;
     var_r0_8 = 0;
   }
   return var_r0_8;
