@@ -52,7 +52,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import db  # noqa: E402
 import declare_missing  # noqa: E402
-import gitops  # noqa: E402
+import gitops
+import werror_casts  # noqa: E402
 
 LOCK_BREATH_S = 0.3
 SCORE_RE = re.compile(r"CURRENT \((\d+)\)")
@@ -145,6 +146,20 @@ def main():
         try:
             with gitops.repo_lock(what=f"rescore {name}"):
                 new = plain_score(name, body, keep_decls=args.promote)
+                if new is None:
+                    # Not necessarily a bad seed. A plain build compiles every
+                    # sibling as its retail `.include`, so a declaration that
+                    # lived in a sibling's `#else` draft is no longer in scope
+                    # and the candidate can trip an -Werror warning it never
+                    # hit under NONMATCHING=1 (CLAUDE.md N.1, same trap from
+                    # the other direction). werror_casts fixes exactly that
+                    # class and PROVES it codegen-neutral by requiring the
+                    # object to come out byte-identical, so it can recover a
+                    # score but never invent one.
+                    fixed, _why = werror_casts.apply(name, body)
+                    if fixed is not None:
+                        body = fixed
+                        new = plain_score(name, body, keep_decls=args.promote)
         except Exception as e:
             print(f"    [{i}/{len(rows)}] {name:22} error: {e}")
             continue

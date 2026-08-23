@@ -1967,6 +1967,43 @@ revisits accumulates stale verdicts at exactly the rate the rest of the system
 improves. Re-check it periodically, or give it an owner. The same argument
 applies to `stalled` and to rows parked behind a ruleset stamp.
 
+**R. N.4a's positional artifact is real, but it is NOT what keeps the
+high-score band out of the queue - those seeds simply do not compile.**
+
+N.4a showed `best_score` tracks position-in-file and concluded that section
+F's "227 seeds above 20,000 have been searched and none has ever matched" was
+measuring position rather than difficulty. Half right, and the other half
+matters more.
+
+Tested directly by re-scoring the above-ceiling band against a plain build,
+worst-first: **148 of 158 returned no score at all** - the candidate does not
+compile - against 10 that scored. And the three highest came back
+`149,300 -> 149,300`, `127,590 -> 127,590`, `104,085 -> 104,085`: IDENTICAL
+under both build modes, i.e. genuinely that far from retail, with no artifact
+involved.
+
+`werror_casts` does not rescue them either; it reports "fails even with
+warnings allowed (a real error, not -Werror)" on the ones sampled. So the
+above-20,000 band is the section G/H non-compiling pile wearing a score, not
+good work that was mis-ranked.
+
+**What this does NOT overturn:** the scoring fix itself. For seeds that DO
+compile the artifact is large and the correction is decisive - the jump-table
+seeds went `78,000 -> 1,365` and `25,800 -> 4,780`, and two that could not be
+scored at all (a broken sibling failed the whole unit under `NONMATCHING=1`)
+scored 2,475 and 5,577 once measured in a plain build. That second effect is
+worth naming separately: **a plain build compiles every sibling as its retail
+`.include`, so translation-unit poisoning cannot affect a measurement taken
+that way.** Section I's whole "compiles in isolation" workaround is
+unnecessary for scoring once this lands.
+
+**The practical rule:** fix scoring at SEED time (`tier_m2c`, done), where it
+decides claim order for compiling candidates. Do not spend the repo lock bulk
+re-scoring the high band - measured at roughly 6% useful, while the factory
+alongside it was converting at 126 matches/hour. Re-scoring is worth it for a
+band you have reason to believe compiles, which is how the jump-table seeds
+were found.
+
 **Next levers, in rough order of value:**
 0. **The other 94 jump-table candidates** (section O) - the tool refuses
    them rather than guessing. The dominant cause is a raw run that mixes

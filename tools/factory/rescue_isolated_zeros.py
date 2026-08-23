@@ -197,7 +197,19 @@ def rescue_one(conn, name: str, dry_run: bool) -> str:
         if file_backup is not None and _cp is not None:
             with gitops.repo_lock(what=f"revert decl repair {name}"):
                 _cp.write_text(file_backup)
-        return "no compiling prefix" if best is None else f"best in-place score {best}, not a match"
+        if best is None:
+            return "no compiling prefix"
+        # Keep the plain-build score. The row's stored best_score is usually
+        # the positional artifact (CLAUDE.md N.4a), and tier2 claims
+        # closest-first within a round -- so a genuine near-miss like 5 or 12
+        # stays buried behind inflated numbers unless the real figure is
+        # written back. Costs nothing: the score was already measured.
+        with db.tx(conn):
+            db.set_state(conn, name, "tier2_ready", worker_id=None,
+                         best_score=best,
+                         notes=f"rescue: permuter zero did not reproduce in the real "
+                               f"file; plain-build score {best}")
+        return f"best in-place score {best}, not a match"
     body = best
     if dry_run:
         return "WOULD PROMOTE (score 0)"
