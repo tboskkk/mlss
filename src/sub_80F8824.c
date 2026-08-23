@@ -49,9 +49,6 @@ _080F8856:
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/script_cmd_btl_return.s\"");
-#else
 u8 script_cmd_return(s32, s32);                     /* extern */
 
 u8 script_cmd_btl_return(s32 arg0, s32 arg1, s32 *arg2) {
@@ -63,7 +60,6 @@ u8 script_cmd_btl_return(s32 arg0, s32 arg1, s32 *arg2) {
     }
     return script_cmd_return(arg0 + 0x1C, arg1);
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80F889C.s\"");

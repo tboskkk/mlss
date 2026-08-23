@@ -11,13 +11,9 @@ asm_unified(".include \"asm/macros.inc\"");
 extern s32 sub_813B360;
 extern s32 sub_813E618;
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8142B4C.s\"");
-#else
 extern s32 sub_813E504;
-extern s32 sub_813E618;
 
-void sub_8142B4C(void *arg1, s32 **arg2) {
+void sub_8142B4C(s32 arg0, void *arg1, s32 **arg2) {
     s32 temp_r0_11;
 
     temp_r0_11 = (*(s32 *)((s8 *)(arg1) + (0x18))) + 0x100;
@@ -27,7 +23,6 @@ void sub_8142B4C(void *arg1, s32 **arg2) {
         *arg2 = &sub_813E618;
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8142B88.s\"");

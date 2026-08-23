@@ -67,15 +67,26 @@ asm_unified(".include \"asm/nonmatching/set_surface_height_fields.s\"");
    counts this as unmatched. Write the C here, replacing this comment. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8158E90.s\"");
-#else
-/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
-   compiles a whole translation unit at a time, so an #error here fails
-   every OTHER function in this file under NONMATCHING=1. Guard intact, so
-   the real ROM still gets the verbatim retail bytes and progress.py still
-   counts this as unmatched. Write the C here, replacing this comment. */
-#endif
+s32 get_surface_height_at_x(s32, s32);              /* extern */
+s32 sub_815FACC(void *);                        /* extern */
+
+void sub_8158E90(void *arg0, s32 arg1) {
+    s32 temp_r0_18;
+    s32 temp_r2_12;
+
+    temp_r2_12 = (s32) (get_surface_height_at_x(arg1, (*(s32 *)((s8 *)(arg0) + (4)))) << 0x10) >> 8;
+    (*(s32 *)((s8 *)(arg0) + (0x44))) = temp_r2_12;
+    if ((s32) (*(s32 *)((s8 *)(arg0) + (8))) > temp_r2_12) {
+        (*(s32 *)((s8 *)(arg0) + (8))) = temp_r2_12;
+        temp_r0_18 = (*(s32 *)((s8 *)(arg0) + (4)));
+        (*(s16 *)((s8 *)(arg0) + (0x14))) = (s16) (temp_r0_18 - (*(s32 *)((s8 *)(arg0) + (0xC))));
+        (*(s16 *)((s8 *)(arg0) + (0x18))) = (s16) (temp_r2_12 - (*(s32 *)((s8 *)(arg0) + (0x10))));
+        (*(s32 *)((s8 *)(arg0) + (0xC))) = temp_r0_18;
+        (*(s32 *)((s8 *)(arg0) + (0x10))) = temp_r2_12;
+        return;
+    }
+    sub_815FACC(arg0);
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8158ECC.s\"");

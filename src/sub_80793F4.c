@@ -11,22 +11,23 @@ asm_unified(".include \"asm/macros.inc\"");
 
 s32 sub_807C298();
 s32 sub_8082E1C();
-extern s32 sub_807940C;
-
+void sub_807940C(void *arg0);
 void sub_80793F4(void *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_807940C;
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_807940C;
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_807940C.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+extern s32 sub_80798C4;
+
+void sub_807940C(void *arg0) {
+    if (*(s32 *)0x03000F6C == 0) {
+        sub_8082E1C(arg0, 2, 0x4029, 0);
+    } else {
+        sub_8082E1C(arg0, 7, 0x4029, 0);
+    }
+    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80798C4;
+}
 
 void sub_8079450(void *arg0) {
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
@@ -136,7 +137,7 @@ asm_unified(".include \"asm/nonmatching/sub_8079568.s\"");
 #endif
 
 u32 sub_8199F30();                                  /* extern */
-extern s32 sub_8079654;
+void sub_8079654(void *arg0);
 void sub_80795D4(void *arg0)
 {
   s32 temp_r1_34;
@@ -151,18 +152,19 @@ void sub_80795D4(void *arg0)
     *((s32 *) (((s8 *) arg0) + 0x14)) = temp_r4_29;
     *((s32 *) (((s8 *) arg0) + 0x18)) = temp_r1_34;
     sub_8082E1C(arg0, 0, 0, 0);
-    *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_8079654;
+    *((s32 **) (((s8 *) arg0) + 0x4C)) = (s32 *) &sub_8079654;
   }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8079654.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+extern s32 sub_80789B4;
+
+void sub_8079654(void *arg0) {
+    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+        sub_8082E1C(arg0, 1, 0, 0);
+        (*(s32 *)((s8 *)(arg0) + (0x9C))) = 4;
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80789B4;
+    }
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8079688.s\"");

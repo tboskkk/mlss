@@ -49,9 +49,6 @@ s32 sub_80EA88C(s32 arg0, s32 arg1, void *arg2) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80EA8A4.s\"");
-#else
 s32 reset_game_80189C4();                       /* extern */
 s32 sub_801AD3C();                              /* extern */
 s32 sub_801AD80();                              /* extern */
@@ -77,7 +74,6 @@ s32 sub_80EA8A4(s32 arg0, s32 arg1, s32 *arg2) {
     }
     return 1;
 }
-#endif
 
 s32 script_test_condition(s32, u8, s32, s32);   /* extern */
 

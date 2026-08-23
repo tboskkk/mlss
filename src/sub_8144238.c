@@ -26,20 +26,16 @@ int sub_8137A4C();
 s32 sub_81382A8();
 extern s32 sub_8139364;
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8144238.s\"");
-#else
 extern s32 sub_8143E90;
 
-void sub_8144238(void *arg1, s32 **arg2) {
+void sub_8144238(s32 arg0, void *arg1, s32 **arg2) {
     void *temp_r1_10;
 
     temp_r1_10 = (*(void **)((s8 *)(arg1) + (0x294)));
-    if (((*(u8 *)((s8 *)(temp_r1_10) + (0x23))) == 0) && ((s32) M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */) <= (s32) (s8) (*(u8 *)((s8 *)(temp_r1_10) + (0x20))))) {
+    if (((*(u8 *)((s8 *)(temp_r1_10) + (0x23))) == 0) && ((s32) (*(s16 *)((s8 *)(temp_r1_10) + (0x2A))) <= (s32) (s8) (*(u8 *)((s8 *)(temp_r1_10) + (0x20))))) {
         *arg2 = &sub_8143E90;
     }
 }
-#endif
 
 void sub_814426C(void *arg0, void *arg1, s32 **arg2)
 {
