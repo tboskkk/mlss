@@ -15,22 +15,18 @@ void sub_8108CBC(void *arg0) {
     (*(u16 *)((s8 *)(arg0) + (0x11E))) = (u16) (0xFFF & (*(u16 *)((s8 *)(arg0) + (0x11E))));
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8108CD0.s\"");
-#else
 void *sub_807FFB8(s32 *);                       /* extern */
 extern s32 sub_8108BE0;
 
 void sub_8108CD0(void *arg0) {
     if (3 & (*(u16 *)((s8 *)(arg0) + (0x11E)))) {
-        if (((s32) M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */) < 0) && !(0x20 & (*(u8 *)((s8 *)(arg0) + (0x122))))) {
+        if (((s32) (*(s16 *)((s8 *)(arg0) + (0xEC))) < 0) && !(0x20 & (*(u8 *)((s8 *)(arg0) + (0x122))))) {
             (*(void **)((s8 *)(sub_807FFB8(&sub_8108BE0)) + (8))) = arg0;
             (*(u8 *)((s8 *)(arg0) + (0x122))) = (u8) ((*(u8 *)((s8 *)(arg0) + (0x122))) | 0x20);
         }
         (*(u16 *)((s8 *)(arg0) + (0x11E))) = (u16) (0xFFFC & (*(u16 *)((s8 *)(arg0) + (0x11E))));
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8108D2C.s\"");
