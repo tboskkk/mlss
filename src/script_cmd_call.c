@@ -7,17 +7,13 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/script_cmd_call.s\"");
-#else
-u32 script_cmd_call(u32* a0, u32* a1, u32 a2) {
-    if (a2 == 1) {
-        *a1 = *a0;
+s32 script_cmd_call(s32 arg0, void *arg1, void *arg2) {
+    if ((*(s32 *)((s8 *)(arg2) + (0))) == 1) {
+        (*(s32 *)((s8 *)(arg1) + (0x10))) = (s32) (*(s32 *)((s8 *)(arg1) + (0)));
     }
-    *a0 = a2;
+    (*(s32 *)((s8 *)(arg1) + (0))) = (s32) (*(s32 *)((s8 *)(arg2) + (4)));
     return 1;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/script_cmd_return.s\"");

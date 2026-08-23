@@ -70,9 +70,6 @@ void sub_8171D58(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8171DD4.s\"");
-#else
 s32 stop_sfx_80195A8(s32);                      /* extern */
 
 void sub_8171DD4(void *arg0) {
@@ -81,7 +78,6 @@ void sub_8171DD4(void *arg0) {
         stop_sfx_80195A8(0x97);
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8171DF0.s\"");

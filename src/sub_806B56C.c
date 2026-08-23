@@ -9,21 +9,11 @@ asm_unified(".include \"asm/macros.inc\"");
 
 
 s32 sub_8082E1C();
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_806B56C.s\"");
-#else
-u32 sub_806B56C(u32* param_1) {
-    u32* puVar1;
-    u8 uVar2;
-    
-    puVar1 = param_1;
-    uVar2 = *(u8*)(param_1[2] + 0x12);
-    if (uVar2 & 0x8) {
-        puVar1[0x13] = 0;
+void sub_806B56C(void *arg0) {
+    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+        (*(s32 *)((s8 *)(arg0) + (0x4C))) = 0;
     }
-    return (u32)puVar1;
 }
-#endif
 
 extern s32 sub_806AA18;
 

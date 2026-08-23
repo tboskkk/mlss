@@ -38,16 +38,12 @@ void sub_81615B4(void* p0, s32 p1)
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_81615E4.s\"");
-#else
 s32 sub_8160E4C(s32);                           /* extern */
 
 void sub_81615E4(void) {
     sub_8160E4C((*(s32 *)((s8 *)(*(void **)0x03001024) + (0x2C))));
     sub_8160E4C((*(s32 *)((s8 *)(*(void **)0x03001024) + (0x30))));
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8161604.s\"");

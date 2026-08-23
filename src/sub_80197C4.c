@@ -7,9 +7,6 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80197C4.s\"");
-#else
 s32 sub_80197C4(s32 arg0) {
     s32 var_r1_9;
     s32 var_r2_8;
@@ -22,7 +19,6 @@ s32 sub_80197C4(s32 arg0) {
     } while (var_r1_9 <= arg0);
     return var_r2_8;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80197E0.s\"");

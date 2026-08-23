@@ -18,17 +18,14 @@ void sub_80DE948(void *arg0) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80DE960.s\"");
-#else
-s32 stop_sfx_80195A8(s32);                      /* extern */
 s32 sub_8086C64(s32, s32, s32);                 /* extern */
-
-void sub_80DE960(s32 arg0, s32 arg1, s32 arg2) {
-    stop_sfx_80195A8(0x11A);
-    sub_8086C64(arg0, arg1, arg2);
+volatile unsigned short sub_80DE960(s32 arg0, s32 arg1, s32 arg2)
+{
+  s32 new_var;
+  stop_sfx_80195A8(0x11A);
+  new_var = arg1;
+  sub_8086C64(arg0, new_var, arg2);
 }
-#endif
 
 s32 sub_810DD7C(s32, s32, s32);                 /* extern */
 unsigned long sub_80DE980(s32 arg0, s32 arg1, s32 arg2)
