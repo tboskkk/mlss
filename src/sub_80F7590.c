@@ -46,26 +46,32 @@ void sub_80F75D8(s32 arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80F7608.s\"");
-#else
 s32 sub_810C950();                              /* extern */
 s32 sub_810CA30();                              /* extern */
-
-void sub_80F7608(u8 arg0) {
-    u8 temp_r4_8;
-    void *temp_r2_17;
-
-    temp_r4_8 = arg0;
-    if (temp_r4_8 != 0) {
-        sub_810CA30();
-    } else {
-        sub_810C950();
-    }
-    temp_r2_17 = *(void **)0x03000FD8;
-    (*(u8 *)((s8 *)(temp_r2_17) + (0x2BF))) = (u8) ((-2 & (*(u8 *)((s8 *)(temp_r2_17) + (0x2BF)))) | (1 & temp_r4_8));
+void sub_80F7608(u8 arg0)
+{
+  s8 *new_var4;
+  u8 temp_r4_8;
+  int new_var3;
+  void *temp_r2_17;
+  int new_var2;
+  int new_var;
+  new_var2 = (new_var3 = -2);
+  temp_r4_8 = arg0;
+  if (temp_r4_8 != 0)
+  {
+    sub_810CA30();
+  }
+  else
+  {
+    sub_810C950();
+  }
+  new_var4 = ((s8 *) (*((void **) 0x03000FD8))) + 0x2BF;
+  new_var = 1;
+  new_var = new_var & temp_r4_8;
+  *((u8 *) (((s8 *) (*((void **) 0x03000FD8))) + 0x2BF)) = (u8) ((new_var2 & (*((u8 *) new_var4))) | new_var);
+  ;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80F7644.s\"");
