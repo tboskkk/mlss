@@ -2197,6 +2197,47 @@ apply the same transformations the splice does, or it under-reports.
 four rows under "X redeclared" that the real path now fixes; simulating the
 repairs turned those into requeues.
 
+**T.16 -- the project DOES compound, but not through the mechanism section E
+predicted, and E's threshold was keyed on the wrong variable.**
+
+Section E parks "feed m2c's `--context` the signatures of functions already
+matched" as marginal at ~280/5,986 and "worth revisiting around 20-30%
+matched". Section H.1 then measured it at that time and found nothing: 0/45
+twice, because only 2.3% of the callees referenced by failing seeds were
+matched.
+
+Re-measured at **1,555 matched (25.6%)**, i.e. inside E's own window:
+
+| | section H | now |
+|---|---:|---:|
+| matched functions | ~280 | 1,555 |
+| callee coverage in failing seeds | 2.3% | **7.6%** |
+| seeds where EVERY callee is matched | 0 of 49 | **0 of 708** |
+
+Coverage more than tripled -- the compounding is real -- and the lever is still
+dead, because **a seed needs ALL of its callees known, not some**. At 7.6%, a
+seed with two callees has about a 0.6% chance of full coverage and one with
+three about 0.04%. The threshold is roughly **50% CALLEE coverage**, which is
+not the same thing as 50% of the corpus matched.
+
+And callee coverage LAGS the headline number badly -- 7.6% against 25.6% --
+because callees are a biased sample: a heavily-called function tends to be one
+of the big hard ones still outstanding. So the gap will close more slowly than
+the match count suggests. **Do not re-try the context lever on the strength of
+the headline percentage; measure callee coverage directly** (the query is in
+this section's commit).
+
+**What DOES compound, and is delivering right now: twin propagation.** Every
+match is a solved TEMPLATE, and structural twins take its C for free. Measured
+over one 2h window at this point in the project: twin 26, m2c 26, tier2 15 --
+so roughly a quarter of live production is matches producing further matches.
+That, not the context lever, is the compounding effect this project actually
+has.
+
+**Working against both: pool depletion.** The easy functions go first, so the
+residue is harder by construction and yield falls even when nothing regresses.
+Any "days to completion" figure derived from a current rate is a best case.
+
 **T.15 -- a broken measurement in this project ALWAYS fails toward "this work
 is bad". That is why they survive.**
 
