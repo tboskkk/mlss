@@ -132,15 +132,44 @@ asm_unified(".include \"asm/nonmatching/sub_80D8048.s\"");
    counts this as unmatched. Write the C here, replacing this comment. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80D8180.s\"");
-#else
-/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
-   compiles a whole translation unit at a time, so an #error here fails
-   every OTHER function in this file under NONMATCHING=1. Guard intact, so
-   the real ROM still gets the verbatim retail bytes and progress.py still
-   counts this as unmatched. Write the C here, replacing this comment. */
-#endif
+s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
+s32 sub_8087CE4(void *);                        /* extern */
+extern s32 sub_80D8238;
+extern s32 sub_80D8438;
+void sub_80D8180(void *arg0)
+{
+  s32 temp_r1_41;
+  s32 temp_r1_65;
+  void *temp_r1_16;
+  void *temp_r2_76;
+  void *temp_r4_12;
+  void *temp_r5_13;
+  void *temp_r6_10;
+  temp_r6_10 = *((void **) (((s8 *) (*((void **) 0x03000FD8))) + 0x74));
+  temp_r4_12 = temp_r6_10 + 8;
+  temp_r5_13 = *((void **) (((s8 *) arg0) + 0x2C));
+  sub_8087CE4(temp_r4_12);
+  temp_r1_16 = *((void **) (((s8 *) temp_r4_12) + 0x30));
+  *((s32 *) (((s8 *) temp_r1_16) + 0x10)) = (s32) (*((s32 *) (((s8 *) temp_r4_12) + 0x10)));
+  *((s32 *) (((s8 *) temp_r1_16) + 0x14)) = (s32) (*((s32 *) (((s8 *) temp_r4_12) + 0x14)));
+  *((s32 *) (((s8 *) temp_r1_16) + 0x18)) = (s32) (*((s32 *) (((s8 *) temp_r4_12) + 0x18)));
+  if ((((*((s32 *) (((s8 *) temp_r5_13) + 0xA8))) != 0) && (((s32) (*((s32 *) (((s8 *) temp_r5_13) + 0x40)))) < ((*((s32 *) (((s8 *) temp_r4_12) + 0x18))) + (*((s8 *) (((s8 *) temp_r6_10) + 0xCD)))))) && (((temp_r1_41 = 6 & (*((u8 *) (((s8 *) temp_r5_13) + 0x76))), temp_r1_41 == 2)) || (temp_r1_41 == 4)))
+  {
+    *((s32 **) (((s8 *) temp_r5_13) + 0x4C)) = &sub_80D8438;
+  }
+  if (0x20 & (*((u8 *) (((s8 *) temp_r4_12) + 0x79))))
+  {
+    play_sfx_80195B4(0x65, -1);
+    temp_r1_65 = 6 & (*((u8 *) (((s8 *) temp_r4_12) + 0x76)));
+    if ((temp_r1_65 == 2) || (temp_r1_65 == 4))
+    {
+      sub_8082E1C(temp_r4_12, 0, 0x2005, 0);
+      temp_r2_76 = *((void **) (((s8 *) temp_r4_12) + 8));
+      *((u8 *) (((s8 *) temp_r2_76) + 0x12)) = (u8) (((-7) & (*(((s8 *) temp_r2_76) + 0x12))) | 2);
+    }
+    *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_80D8238;
+  }
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80D8238.s\"");
