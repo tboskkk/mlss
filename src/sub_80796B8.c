@@ -380,11 +380,7 @@ void sub_8079C70(void *arg0) {
     (*(s32 *)((s8 *)(arg0) + (0xA8))) = 0;
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8079C9C.s\"");
-#else
 s32 sub_80790CC(void *);                        /* extern */
-s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 extern s32 sub_8079018;
 
 void sub_8079C9C(void *arg0) {
@@ -409,7 +405,6 @@ void sub_8079C9C(void *arg0) {
         }
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8079D1C.s\"");

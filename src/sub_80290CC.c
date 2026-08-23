@@ -36,11 +36,28 @@ void sub_80290E0(void *arg0) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8029120.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+void sub_8029120(void *arg0, s32 arg1, u16 arg2) {
+    void *sp0;
+    s32 var_r7_14;
+    u32 var_r4_11;
+    void *var_r3_12;
+    void *var_r5_13;
+
+    var_r4_11 = arg2 | (arg1 << 0x10);
+    var_r3_12 = (void *)0x02000080;
+    var_r5_13 = (*(void **)((s8 *)(arg0) + (0x24)));
+    var_r7_14 = 1;
+    if (var_r4_11 != 0) {
+        do {
+            if (1 & var_r4_11) {
+                sp0 = var_r3_12;
+                CpuFastSet(var_r3_12, var_r5_13, 8U);
+                (*(s32 *)((s8 *)(arg0) + (0xF0))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0xF0))) | var_r7_14);
+            }
+            var_r3_12 += 0x20;
+            var_r5_13 += 0x20;
+            var_r7_14 *= 2;
+            var_r4_11 = var_r4_11 >> 1;
+        } while (var_r4_11 != 0);
+    }
+}

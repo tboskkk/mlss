@@ -324,15 +324,19 @@ void sub_80612D4(void *arg0) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80612FC.s\"");
-#else
-/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
-   compiles a whole translation unit at a time, so an #error here fails
-   every OTHER function in this file under NONMATCHING=1. Guard intact, so
-   the real ROM still gets the verbatim retail bytes and progress.py still
-   counts this as unmatched. Write the C here, replacing this comment. */
-#endif
+extern s32 sub_80610D4;
+
+void sub_80612FC(void *arg0) {
+    if (((u32) (*(u16 *)((s8 *)(arg0) + (0xAC))) <= 0x3FFFU) && ((s32) (*(s32 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x2C)))) + (0x40))) > 0)) {
+        (*(s32 *)((s8 *)(arg0) + (0xA8))) = 1;
+    }
+    (*(u16 *)((s8 *)(arg0) + (0xAC))) = (u16) ((*(u16 *)((s8 *)(arg0) + (0xAC))) + 1);
+    if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
+        sub_8082E1C(arg0, 3, 0, 0);
+        (*(s8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x20))) = 0x10;
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80610D4;
+    }
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8061354.s\"");
@@ -527,15 +531,21 @@ void sub_8061F3C(void *arg0) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8061F68.s\"");
-#else
-/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
-   compiles a whole translation unit at a time, so an #error here fails
-   every OTHER function in this file under NONMATCHING=1. Guard intact, so
-   the real ROM still gets the verbatim retail bytes and progress.py still
-   counts this as unmatched. Write the C here, replacing this comment. */
-#endif
+s32 sub_807C298(void *);                        /* extern */
+
+void sub_8061F68(void *arg0) {
+    s32 temp_r4_17;
+    void *temp_r1_8;
+
+    temp_r1_8 = (*(void **)((s8 *)(arg0) + (8)));
+    (*(u16 *)((s8 *)(temp_r1_8) + (0xC))) = (u16) ((*(u16 *)((s8 *)(temp_r1_8) + (0xC))) + 0x1600);
+    temp_r4_17 = (*(s32 *)((s8 *)(arg0) + (0x10))) + 0xFFFFFD80;
+    (*(s32 *)((s8 *)(arg0) + (0x10))) = temp_r4_17;
+    (*(s32 *)((s8 *)(arg0) + (0x14))) = (s32) (((s32) ((temp_r4_17 - ((*(s16 *)((s8 *)(arg0) + (0xAE))) << 8)) * (*(s32 *)((s8 *)(arg0) + (0x88)))) / (s32) (*(s32 *)((s8 *)(arg0) + (0x84)))) + ((*(s16 *)((s8 *)(arg0) + (0xB0))) << 8));
+    if (temp_r4_17 < -0x20) {
+        sub_807C298(arg0);
+    }
+}
 
 void sub_8061FC8(void *arg0) {
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {

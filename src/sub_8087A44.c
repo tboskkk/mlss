@@ -65,42 +65,24 @@ void sub_8087A44(u16* p0, u16* p1, s32 p2, s32 p3)
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8087AE0.s\"");
-#else
-extern void sub_8086F0C();
+extern s32 sub_8086F0C;
 
-void sub_8087AE0(u32* p0)
-{
-    u32* r0;
-    u32* r2;
-    u32* r3;
-    u8 r1;
-    u32 r4;
-    
-    r0 = (u32*)0x03000FD8;
-    r0 = (u32*)((u8*)r0 + 0x0);
-    r2 = (u32*)((u8*)r0 + 0x70);
-    r3 = (u32*)((u8*)r0 + 0x74);
-    
-    r0 = (u32*)((u8*)r2 + 0x7E);
-    r1 = *(u8*)r0;
-    r4 = 0x06;
-    r0 = (u32*)((u8*)r2 + 0x81);
-    r1 = *(u8*)r0;
-    r1 |= 0x04;
-    *(u8*)r0 = r1;
-    
-    r0 = (u32*)((u8*)r3 + 0x7E);
-    r1 = *(u8*)r0;
-    r0 = (u32*)((u8*)r3 + 0x81);
-    r1 = *(u8*)r0;
-    r1 |= 0x04;
-    *(u8*)r0 = r1;
-    
-    *(u32*)((u8*)p0 + 0x04) = (u32)sub_8086F0C;
+void sub_8087AE0(void *arg0) {
+    void *temp_r0_9;
+    void *temp_r2_10;
+    void *temp_r3_11;
+
+    temp_r0_9 = *(void **)0x03000FD8;
+    temp_r2_10 = (*(void **)((s8 *)(temp_r0_9) + (0x70)));
+    temp_r3_11 = (*(void **)((s8 *)(temp_r0_9) + (0x74)));
+    if ((6 & (*(u8 *)((s8 *)(temp_r2_10) + (0x7E)))) == 2) {
+        (*(u8 *)((s8 *)(temp_r2_10) + (0x81))) = (u8) ((*(u8 *)((s8 *)(temp_r2_10) + (0x81))) | 4);
+    }
+    if ((6 & (*(u8 *)((s8 *)(temp_r3_11) + (0x7E)))) == 2) {
+        (*(u8 *)((s8 *)(temp_r3_11) + (0x81))) = (u8) ((*(u8 *)((s8 *)(temp_r3_11) + (0x81))) | 4);
+    }
+    (*(s32 **)((s8 *)(arg0) + (4))) = &sub_8086F0C;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8087B34.s\"");

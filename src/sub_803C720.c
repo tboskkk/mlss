@@ -7,9 +7,6 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_803C720.s\"");
-#else
 s32 sub_802DDB4(void *, void *, u32, s32);      /* extern */
 
 void sub_803C720(void *arg0, s32 arg1) {
@@ -22,7 +19,6 @@ void sub_803C720(void *arg0, s32 arg1) {
         sub_802DDB4(arg0, (*(void **)((s8 *)(arg0) + (0x204))), (u32) ((*(u8 *)((s8 *)(arg0) + (0x208))) << 0x1B) >> 0x1F, 0);
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_803C788.s\"");

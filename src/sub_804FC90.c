@@ -92,23 +92,19 @@ asm_unified(".include \"asm/nonmatching/sub_804FDF4.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_804FE68.s\"");
-#else
 s32 sub_80402C4(void *);                        /* extern */
 
 void sub_804FE68(void *arg0) {
     if (1 & (*(u8 *)((s8 *)(arg0) + (0x20C)))) {
         if (!(7 & (*(u8 *)((s8 *)(arg0) + (0x2B5))))) {
-            (*(s32 *)((s8 *)(arg0) + (0xC))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0xC))) + M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */));
-            (*(s32 *)((s8 *)(arg0) + (0x10))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x10))) + M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */));
+            (*(s32 *)((s8 *)(arg0) + (0xC))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0xC))) + (*(s16 *)((s8 *)(arg0) + (0x242))));
+            (*(s32 *)((s8 *)(arg0) + (0x10))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x10))) + (*(s16 *)((s8 *)(arg0) + (0x244))));
         }
         if (!(8 & (*(u8 *)((s8 *)(arg0) + (0x2B5))))) {
             sub_80402C4(arg0);
         }
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_804FEC8.s\"");
