@@ -19,22 +19,19 @@ void sub_810CBDC(void *arg0) {
     (*(u16 *)((s8 *)((void *)0x0400001A) + (4))) = (u16) *(u16 *)0x0200001E;
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_810CC0C.s\"");
-#else
-void sub_810CC0C(void *arg0) {
-    s16 temp_r0_11;
-
-    temp_r0_11 = 0x19 - (*(u16 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x14)));
-    (*(s16 *)((s8 *)(arg0) + (0x10))) = temp_r0_11;
-    if ((s32) temp_r0_11 > 0x17) {
-        (*(s32 *)((s8 *)(arg0) + (4))) = 0;
-        return;
-    }
-    (*(s16 *)((s8 *)((void *)0x0400001A) + (0))) = (s16) (*(u16 *)0x0200001A - 0x18);
-    (*(s16 *)((s8 *)((void *)0x0400001A) + (4))) = (s16) (*(u16 *)0x0200001E - 0x18);
+void sub_810CC0C(void *arg0)
+{
+  s16 temp_r0_11;
+  temp_r0_11 = 0x19 - (*((u16 *) (((s8 *) (*((void **) (((s8 *) arg0) + 8)))) + 0x14)));
+  *((s16 *) (((s8 *) arg0) + 0x10)) = 0x19 - (*((u16 *) (((s8 *) (*((void **) (((s8 *) arg0) + 8)))) + 0x14)));
+  if (((s32) temp_r0_11) > 0x17)
+  {
+    *((s32 *) (((s8 *) arg0) + 4)) = 0;
+    return;
+  }
+  *((s16 *) (((s8 *) ((void *) 0x0400001A)) + 0)) = (s16) ((*((u16 *) 0x0200001A)) - 0x18);
+  *((s16 *) (((s8 *) ((void *) 0x0400001A)) + 4)) = (s16) ((*((u16 *) 0x0200001E)) - 0x18);
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_810CC4C.s\"");
