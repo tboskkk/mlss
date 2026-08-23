@@ -27,29 +27,36 @@ asm_unified(".include \"asm/nonmatching/sub_81DD6B0.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_81DD710.s\"");
-#else
-void sub_81DD710(void *arg0, s32 arg1) {
-    void *var_r4_11;
-
-    (*(s32 *)((s8 *)(arg0) + (0xC))) = 0x08CDD0D0;
-    var_r4_11 = (*(void **)((s8 *)(arg0) + (0)));
-    if (var_r4_11 != NULL) {
-        do {
-            (*(s32 (**)(void *, s32))((s8 *)((*(void **)((s8 *)(var_r4_11) + (8)))) + (0xC)))(var_r4_11 + 8 + M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */), 2);
-            if (var_r4_11 != NULL) {
-                (*(void **)((s8 *)(var_r4_11) + (8))) = (void *)0x08CDD0B8;
-                free_heap_8018DA8(var_r4_11);
-            }
-            var_r4_11 = (*(void **)((s8 *)(var_r4_11) + (4)));
-        } while (var_r4_11 != NULL);
+void free_heap_8018DA8(void *ptr);
+void sub_81DD710(void *arg0, s32 arg1)
+{
+  s8 *new_var;
+  void *temp_r2_15;
+  void *var_r4_11;
+  void *new_var2;
+  *((s32 *) (((s8 *) arg0) + 0xC)) = 0x08CDD0D0;
+  var_r4_11 = *((void **) (((s8 *) arg0) + 0));
+  if (var_r4_11 != ((void *) 0))
+  {
+    do
+    {
+      temp_r2_15 = *((void **) (((s8 *) var_r4_11) + 8));
+      (*((s32 (**)(void *, s32)) (((s8 *) temp_r2_15) + 0xC)))((new_var2 = var_r4_11 + 8) + (*((s16 *) (((s8 *) temp_r2_15) + 8))), 2);
+      if (var_r4_11 != ((void *) 0))
+      {
+        *((void **) (((s8 *) var_r4_11) + 8)) = (void *) 0x08CDD0B8;
+        free_heap_8018DA8(var_r4_11);
+      }
+      var_r4_11 = *((void **) (((s8 *) var_r4_11) + 4));
     }
-    (*(s32 *)((s8 *)(arg0) + (4))) = 0;
-    (*(void **)((s8 *)(arg0) + (0))) = NULL;
-    (*(s32 *)((s8 *)(arg0) + (8))) = 0;
-    if (1 & arg1) {
-        free_heap_8018DA8(arg0);
-    }
+    while (var_r4_11 != ((void *) 0));
+  }
+  *((s32 *) (((s8 *) arg0) + 4)) = 0;
+  new_var = (s8 *) arg0;
+  *((void **) (new_var + 0)) = (void *) 0;
+  *((s32 *) (((s8 *) arg0) + 8)) = 0;
+  if (1 & arg1)
+  {
+    free_heap_8018DA8(arg0);
+  }
 }
-#endif
