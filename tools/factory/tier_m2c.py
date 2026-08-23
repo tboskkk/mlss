@@ -205,7 +205,7 @@ def process_one(conn, no_score: bool = False) -> str | None:
         with db.tx(conn):
             db.set_state(conn, name, "tier2_ready", worker_id=None,
                          candidate_body=body, candidate_source="m2c",
-                         seed_ruleset=m2c_bridge.ruleset_version(),
+                         seed_ruleset=m2c_bridge.ruleset_version(), iso_score=None,
                          notes="m2c seed (fast drain -- not scored here; tier2 will "
                                "detect it if it is already byte-exact)")
         db.log_event(conn, name, "seeded", "m2c fast-drain seed, unscored")
@@ -282,7 +282,7 @@ def process_one(conn, no_score: bool = False) -> str | None:
             with db.tx(conn):
                 db.set_state(conn, name, "tier2_ready", worker_id=None,
                              candidate_body=body, candidate_source="m2c",
-                             seed_ruleset=m2c_bridge.ruleset_version(),
+                             seed_ruleset=m2c_bridge.ruleset_version(), iso_score=None,
                              notes="m2c seed: compiles in ISOLATION but not in its "
                                    "shared translation unit (a sibling's draft is "
                                    "broken) -- the permuter works in isolation, so "
@@ -301,7 +301,7 @@ def process_one(conn, no_score: bool = False) -> str | None:
     with db.tx(conn):
         db.set_state(conn, name, new_state, worker_id=None, candidate_body=body,
                      candidate_source="m2c",
-                     seed_ruleset=m2c_bridge.ruleset_version(),
+                     seed_ruleset=m2c_bridge.ruleset_version(), iso_score=None,
                      notes=f"m2c seed, plain-build asm-differ score {score}{cast_note}")
     db.log_event(conn, name, "converged" if score == 0 else "seeded", f"m2c score={score}")
     if score == 0:

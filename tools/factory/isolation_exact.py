@@ -118,6 +118,7 @@ def main() -> int:
             capture_output=True, text=True, timeout=7200)
 
         scored, exact = 0, []
+        measured: dict[str, int] = {}
         for name in staged:
             d = cv.distance(work / f"{name}.agbcc.bin", work / f"{name}.retail.bin",
                             work / f"{name}.agbcc.rel", work / f"{name}.retail.rel")
@@ -125,6 +126,7 @@ def main() -> int:
                 continue
             scored += 1
             diff, _dlen, rel = d
+            measured[name] = diff
             if diff == 0 and rel:
                 exact.append(name)
 
@@ -147,6 +149,19 @@ def main() -> int:
                 print(f"  {n:<20}{r['state']:<14}{str(r['best_score']):>13}")
             if len(exact) > 40:
                 print(f"  ... and {len(exact) - 40} more")
+
+        if args.apply and measured:
+            # Record the distance for EVERY measured candidate, not just the
+            # exact ones. This is the artifact-free number the queue should be
+            # ranked by: best_score is an asm-differ score taken inside the
+            # shared translation unit, which N.4a showed tracks position in
+            # file more than code quality, and which is NULL for most rows
+            # because that build frequently cannot produce a number at all.
+            with db.tx(conn):
+                for n, dv in measured.items():
+                    conn.execute("UPDATE functions SET iso_score = ? WHERE name = ?",
+                                 (dv, n))
+            print(f"recorded iso_score for {len(measured)} candidate(s)")
 
         if exact and args.apply:
             routed = 0

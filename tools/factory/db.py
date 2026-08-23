@@ -102,6 +102,17 @@ MIGRATIONS = [
     # NULL means "not seeded by m2c" (a twin/permuter/rescore candidate) and
     # is deliberately NOT treated as stale.
     ("seed_ruleset", "TEXT"),
+    # Byte distance from retail, measured with the function compiled ALONE
+    # (isolation_exact.py). Kept separate from best_score deliberately: they
+    # are different scales and different things. best_score is an asm-differ
+    # number measured inside the shared translation unit, which CLAUDE.md
+    # N.4a showed tracks position-in-file more than code quality -- same code,
+    # 76x the score, purely from how many functions follow it -- and which is
+    # NULL for most rows because that build often cannot produce a number at
+    # all (57% of the byte-exact candidates found in the first sweep had no
+    # score). iso_score has neither problem: no translation unit to poison, no
+    # trailing content to diff against.
+    ("iso_score", "INTEGER"),
 ]
 
 

@@ -45,6 +45,16 @@ REPO = gitops.REPO
 # Seeds at or above this asm-differ score are searched only when nothing
 # below it is claimable. See claim_one() for the measurement behind it.
 SEED_SCORE_CEILING = 5000
+
+# Ceiling on iso_score -- the byte distance measured with the function compiled
+# alone (isolation_exact.py). Provisional, and deliberately generous: the
+# observed distribution over 2,316 rows is 24 at zero, 172 at 1-9, 554 at
+# 10-49, 1032 at 50-199, 524 at 200-999, 10 beyond. 200 admits about three
+# quarters of the pool, and since the sort is ASC the ordering does most of the
+# work anyway -- this only stops a several-hundred-byte candidate taking a slot
+# while a near-miss waits. Like SEED_SCORE_CEILING it is a ceiling, not an
+# exclusion.
+ISO_SCORE_CEILING = 200
 NONMATCHINGS_DIR = REPO / "nonmatchings"
 WORKER_ID = "tier2"
 
@@ -532,11 +542,36 @@ def run_pool(jobs: int, stall_min: float, max_functions: int):
             # this can only reorder work, never drop it, and a new m2c rule
             # that re-seeds a function to a lower score puts it straight
             # back in contention.
-            order = "escalation_count ASC, best_score IS NULL ASC, best_score ASC"
+            # iso_score FIRST, because best_score is not a measure of code
+            # quality. N.4a: it is an asm-differ number taken inside the shared
+            # translation unit, and it tracks POSITION IN FILE -- the same code
+            # scores 76x higher purely from how many functions follow it. The
+            # conversion table above, which justified the ceiling, is therefore
+            # partly a measurement of position, not difficulty.
+            #
+            # iso_score (isolation_exact.py) is the byte distance with the
+            # function compiled ALONE: no translation unit to poison, no
+            # trailing content to diff against. Measured across 2,316 rows, the
+            # two agree only broadly -- Spearman 0.717 -- and they disagree
+            # exactly where it matters. 247 candidates are within 16 bytes of
+            # retail, and 72 of those the old ordering could not see or
+            # actively buried: sub_8065310 is SIX bytes off and scored 94,430,
+            # sub_806CB3C is seven bytes off and scored 100,225. Both sit above
+            # the 5000 ceiling, so they were only ever claimed when nothing
+            # cheaper existed -- near-certain matches, starved.
+            #
+            # So when a row has an iso_score, rank and admit on it and ignore
+            # best_score entirely; fall back to the old behaviour when it has
+            # none. Still a ceiling and not an exclusion: the unfiltered claim
+            # below takes anything the moment nothing under a ceiling is left.
+            order = ("escalation_count ASC, "
+                     "iso_score IS NULL ASC, iso_score ASC, "
+                     "best_score IS NULL ASC, best_score ASC")
             row = db.claim_for_worker(
                 conn, "tier2_ready", WORKER_ID, order_by=order,
-                extra_where="(best_score IS NULL OR best_score < ?)",
-                params=(SEED_SCORE_CEILING,))
+                extra_where="(CASE WHEN iso_score IS NOT NULL THEN iso_score < ? "
+                            "ELSE (best_score IS NULL OR best_score < ?) END)",
+                params=(ISO_SCORE_CEILING, SEED_SCORE_CEILING))
             if row is not None:
                 return row
             return db.claim_for_worker(conn, "tier2_ready", WORKER_ID, order_by=order)
