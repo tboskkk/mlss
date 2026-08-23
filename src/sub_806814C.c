@@ -39,9 +39,6 @@ s32 sub_8068168(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_806819C.s\"");
-#else
 void sub_806819C(void *arg0)
 {
   s32 temp_r1_8;
@@ -59,8 +56,8 @@ void sub_806819C(void *arg0)
   {
     var_r0_10 = temp_r1_8 - 0x34;
   }
-  temp_r1_8 = var_r0_10 >> 8;
-  if (((s32) temp_r1_8) > (-0x20))
+  temp_r1_8 = (s32) (var_r0_10 >> 8);
+  if (temp_r1_8 > (-0x20))
   {
     var_r0_26 = temp_r3_14;
     if (var_r0_26 < 0)
@@ -79,7 +76,6 @@ void sub_806819C(void *arg0)
 
   }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80681EC.s\"");
