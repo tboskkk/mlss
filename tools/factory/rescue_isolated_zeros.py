@@ -119,11 +119,17 @@ def all_on_disk(conn) -> list[str]:
     decides whether it is real, so widening the candidate set costs a build per
     function and cannot promote anything unearned.
     """
+    # ONE query, not one per directory. There are thousands of directories and
+    # the factory is writing to this database continuously, so a per-row query
+    # spends its life waiting on SQLite locks -- observed taking >4 minutes to
+    # produce the first line of output, which reads as a hang.
+    state_of = {r["name"]: r["state"] for r in
+                conn.execute("SELECT name, state FROM functions")}
     out = []
     for d in sorted(Path("nonmatchings").glob("*/")):
         name = d.name
-        row = conn.execute("SELECT state FROM functions WHERE name = ?", (name,)).fetchone()
-        if row is None or row["state"] in ("matched", "validating", "permuting", "excluded"):
+        st = state_of.get(name)
+        if st is None or st in ("matched", "validating", "permuting", "excluded"):
             continue
         # Require a real permuter WIN, not winning_source()'s base.c fallback.
         # That fallback is right for affected(), where an event already said the
