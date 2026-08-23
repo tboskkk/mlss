@@ -28,16 +28,30 @@ doesn't scale to ~6,000 functions. Everything below exists to fix that.
 ## Where this could lead
 
 Not a commitment, not a roadmap item -- a stated hope worth recording so it
-doesn't get lost between sessions. This is, as far as the maintainer and
-this project have found, the first serious byte-matching decomp attempt at
-this specific game, and one of very few for GBA titles generally outside
-the well-trodden pokeemerald-style Pokémon line. The "Generating C: use
-m2c, not an LLM" finding above matters beyond this repo for the same
-reason: m2c's ARM/Thumb backend is barely a year old and had, before this
-project, no completed real-world GBA project putting real mileage on it.
-If this repo ends up being the thing that proves that backend out at
-scale, it's a genuinely useful reference point for whoever tries a
-byte-matching GBA decomp next -- the same role sotn-decomp plays for PS1
+doesn't get lost between sessions.
+
+**CORRECTED 2026-08-22 by actually looking.** This file used to claim this
+was "the first serious byte-matching decomp attempt at this specific game,
+and one of very few for GBA titles generally". The first half stands; the
+second half is simply false and was never checked. Sonic Advance 1/2
+(`SAT-R/sa2`) is at roughly **99.2%**, The Minish Cap is decompiled, and so
+is Mario Kart: Super Circuit -- by **jellees, this repo's own upstream
+author**, who moved on to it. GBA matching decomps get finished. What is
+genuinely unusual here is the METHOD, not the target: sa2 reached ~100%
+with a human community on decomp.me under an explicit "Strict No LLM / No
+AI Policy", while this repo is one maintainer plus automated corpus-level
+tooling.
+
+The m2c claim needs the same correction. An independent benchmark
+(macabeus, 60 functions) ran m2c + compiler + objdiff + decomp-permuter
+over 30 Sonic Advance 3 functions -- GBA, Thumb, agbcc, the same stack this
+repo uses -- and matched **zero**. The same pipeline matched 4 per run on
+N64/IDO code. So this project's 17%+ did NOT come from m2c and the
+permuter; it came from the corpus-level layer built on top of them. Read
+that before deciding to invest in either tool: it is the branch measured at
+0/30 on this platform. If this repo is a useful reference point for the
+next GBA decomp, it will be for the corpus-level method -- the same role
+sotn-decomp plays for PS1
 matching decomps built on Psy-Q/maspsx.
 
 The maintainer's actual hope is bigger than "prove the tooling works":
@@ -50,11 +64,22 @@ has nothing analogous -- no display lists, no microcode, no real 3D. A
 GBA port framework is closer to "a GBA emulator minus the CPU" (natively
 compile the decompiled game code, still reimplement the PPU/tilemap/OAM
 rasterizer, DMA, IRQs, and the m4a/Sappy sound driver underneath it) than
-it is a Fast3D-style translation layer. That's real, separate engineering
-this repo doesn't attempt and isn't scoped to -- what this repo can
-realistically hand to that effort is a completed, byte-exact decompiled
-codebase to build the runtime layer against, plus whatever's learned here
-about matching-decomp tooling for agbcc/Thumb specifically.
+it is a Fast3D-style translation layer.
+
+**CORRECTED 2026-08-22: that engineering already exists.** `gbarecomp` is a
+collection of GBA static-recompilation projects -- MKSC Recomp,
+EmeraldRecomp, FireRedLeafGreenRecomp among them. So the framing above
+("real, separate engineering this repo doesn't attempt") is no longer the
+obstacle it describes: someone has built the runtime layer, and the thing
+it needs from a game is precisely what this repo produces. The on-ramp for
+the maintainer's stated hope is therefore much shorter than this file
+assumed -- it is "finish the decomp", not "also write a GBA runtime".
+Worth verifying the current state of those projects before relying on it,
+but the category error was assuming the category was empty.
+
+What this repo hands to that effort is a completed, byte-exact decompiled
+codebase to build against, plus whatever's learned here about
+matching-decomp tooling for agbcc/Thumb specifically.
 
 ## Building
 
