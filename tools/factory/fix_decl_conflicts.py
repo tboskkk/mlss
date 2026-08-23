@@ -22,9 +22,7 @@ import gitops
 
 DIAG = gitops.REPO / ".claude" / "factory" / "diag"
 DIAG.mkdir(parents=True, exist_ok=True)
-conn = sqlite3.connect('.claude/factory/state.db')
-FAIL = ['sub_806021C','sub_806025C','sub_8062F00','sub_806A894',
-        'sub_8079BA8','sub_8079C70','sub_8106EB0']
+
 
 
 def definition_prototype(file_text, sym):
@@ -38,16 +36,50 @@ def definition_prototype(file_text, sym):
 
 
 def repair(body, file_text):
-    m = re.search(r'^extern\s+s32\s+(\w+);\s*$', body, re.M)
-    if not m:
+    """Replace every `extern s32 X;` whose X the FILE defines as a function.
+
+    Returns (new_body, [symbols]) or (None, []) if there was nothing to fix.
+    Loops: a body can carry several such declarations.
+    """
+    fixed, syms = body, []
+    for m in re.finditer(r'^extern\s+s32\s+(\w+);\s*$', body, re.M):
+        sym = m.group(1)
+        proto = definition_prototype(file_text, sym)
+        if proto is None:
+            continue
+        fixed = re.sub(r'^extern\s+s32\s+%s;\s*$' % re.escape(sym), proto,
+                       fixed, flags=re.M)
+        fixed = fixed.replace('&%s;' % sym, '(s32 *) &%s;' % sym)
+        syms.append(sym)
+    return (fixed, syms) if syms else (None, [])
+
+
+def repair_file_scope(file_text, target, body):
+    """Fix a stale file-scope `extern s32 <target>;` before <target> is defined.
+
+    The second shape of this conflict, and the more common one in permuter
+    output. The declaration is NOT in the candidate: it sits at file scope,
+    emitted earlier for a SIBLING that takes `&target`, back when target was
+    still a guard. Splicing target's definition in then collides with it.
+
+    Returns (new_file_text, prototype) or (None, None).
+
+    Editing the file touches code that may already be MATCHED - the sibling
+    holding `&target`. That is safe here only because the change is
+    byte-neutral (the linker sets a function pointer's Thumb bit from the
+    symbol's type, not from how C declared it) AND because finish_match()
+    re-checks the whole ROM's sha1, so a break anywhere in the file fails the
+    gate rather than slipping through.
+    """
+    if not re.search(r'^extern\s+s32\s+%s;\s*$' % re.escape(target), file_text, re.M):
         return None, None
-    sym = m.group(1)
-    proto = definition_prototype(file_text, sym)
+    proto = definition_prototype(body, target)
     if proto is None:
-        return None, sym
-    out = re.sub(r'^extern\s+s32\s+%s;\s*$' % sym, proto, body, flags=re.M)
-    out = out.replace('&%s;' % sym, '(s32 *) &%s;' % sym)
-    return out, sym
+        return None, None
+    out = re.sub(r'^extern\s+s32\s+%s;\s*$' % re.escape(target), proto,
+                 file_text, flags=re.M)
+    out = out.replace('&%s;' % target, '(s32 *) &%s;' % target)
+    return out, proto
 
 
 def compile_text(tag, text):
@@ -65,6 +97,11 @@ def compile_text(tag, text):
 
 
 if __name__ == "__main__":
+    conn = sqlite3.connect('.claude/factory/state.db')
+    FAIL = sys.argv[1:] or [
+        r["name"] for r in conn.execute(
+            "SELECT name FROM functions WHERE state='needs_human' "
+            "AND notes LIKE 'plain-build asm-differ score 0%'")]
     fixed = {}
     for n in FAIL:
         body = conn.execute('select candidate_body from functions where name=?',
@@ -73,12 +110,12 @@ if __name__ == "__main__":
         if cp is None:
             print(f"{n:14} no guard block"); continue
         ftext = cp.read_text()
-        new, sym = repair(body, ftext)
+        new, syms = repair(body, ftext)
         if new is None:
-            print(f"{n:14} could not derive a prototype for {sym}"); continue
+            print(f"{n:14} nothing to repair"); continue
         rc, out = compile_text(n, ftext.replace(block, new.rstrip() + "\n"))
         if rc == 0:
-            print(f"{n:14} OK   ({sym} -> forward declaration + cast)")
+            print(f"{n:14} OK   ({', '.join(syms)} -> forward declaration + cast)")
             fixed[n] = new
         else:
             first = next((l for l in out.splitlines() if 'rror' in l or 'redeclared' in l), out[:90])

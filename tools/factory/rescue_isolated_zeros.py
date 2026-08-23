@@ -42,6 +42,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import db  # noqa: E402
 import gitops  # noqa: E402
+import fix_decl_conflicts
 import rescore_seeds
 import tier2  # noqa: E402
 
@@ -143,8 +144,36 @@ def rescue_one(conn, name: str, dry_run: bool) -> str:
     if src is None:
         return "no score-0 output on disk"
 
+    # Variants: what reattach_decls produces, plus a decl-conflict repair of
+    # each. Measured on the first 37 of this sweep, EVERY "no compiling prefix"
+    # failure (10 of 10) was the same cause - `X redeclared as different kind
+    # of symbol`, where m2c's `extern s32 X;` for an address-taken symbol
+    # collides with the same file DEFINING X as a function. See
+    # fix_decl_conflicts.py; the repair is byte-neutral.
+    variants = [b for b in tier2.reattach_decls(src.read_text(), name) if name in b]
+    _cp, _block = gitops.find_guard_block(name)
+    file_backup = None
+    if _cp is not None and variants:
+        ftext = _cp.read_text()
+        # Shape 2, and the common one here: the stale `extern s32 <name>;` is at
+        # FILE scope, emitted earlier for a sibling that takes `&name` while
+        # name was still a guard. Splicing name's definition collides with it.
+        # Repairing that means editing the file, so keep a backup and put it
+        # back unless this candidate actually wins.
+        newf, _proto = fix_decl_conflicts.repair_file_scope(ftext, name, variants[0])
+        if newf is not None:
+            file_backup = ftext
+            with gitops.repo_lock(what=f"decl repair {name}"):
+                _cp.write_text(newf)
+            ftext = newf
+        # Shape 1: the declaration is inside the candidate itself.
+        for b in list(variants):
+            repaired, _syms = fix_decl_conflicts.repair(b, ftext)
+            if repaired:
+                variants.append(repaired)
+
     best = None
-    for body in tier2.reattach_decls(src.read_text(), name):
+    for body in variants:
         if name not in body:
             continue
         # Scored against a PLAIN build, not asm_differ_score()'s NONMATCHING
@@ -165,6 +194,9 @@ def rescue_one(conn, name: str, dry_run: bool) -> str:
         time.sleep(LOCK_BREATH_S)
 
     if not isinstance(best, str):
+        if file_backup is not None and _cp is not None:
+            with gitops.repo_lock(what=f"revert decl repair {name}"):
+                _cp.write_text(file_backup)
         return "no compiling prefix" if best is None else f"best in-place score {best}, not a match"
     body = best
     if dry_run:
