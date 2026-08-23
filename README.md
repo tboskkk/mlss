@@ -14,23 +14,23 @@ No retail ROM is needed to build. Everything comes from `asm/` and `src/` in thi
 
 <!-- progress:start -->
 
-![matched](https://img.shields.io/badge/matched-13.5%25-orange?style=for-the-badge&label=functions%20matched)
+![matched](https://img.shields.io/badge/matched-19.1%25-orange?style=for-the-badge&label=functions%20matched)
 
 ```
-######......................................  13.5%
+########....................................  19.1%
 ```
 
 | state | functions | share | meaning |
 |---|---:|---:|---|
-| **matched** | 809 | 13.5% | compiles byte-identical to retail |
-| **in progress** | 4,315 | 72.0% | extracted, a real C attempt exists |
-| **not started** | 850 | 14.2% | extracted, no attempt yet |
+| **matched** | 1,146 | 19.1% | compiles byte-identical to retail |
+| **in progress** | 4,040 | 67.4% | extracted, a real C attempt exists |
+| **not started** | 788 | 13.1% | extracted, no attempt yet |
 | **not extracted** | 22 | 0.4% | still raw in `asm/*.s` |
 | | **5,996** | | **total (game proper)** |
 
 Plus **923** functions in `asm/mariobros.s` - a complete, separate *Mario Bros.* minigame ROM embedded in the cartridge. Different game, different original developers, tracked apart and **not** counted toward the totals above.
 
-<sub>Counts are functions, not code bytes - regenerate with `tools/gen_readme_progress.py`. Last updated 2026-08-22.</sub>
+<sub>Counts are functions, not code bytes - regenerate with `tools/gen_readme_progress.py`. Last updated 2026-08-23.</sub>
 
 <!-- progress:end -->
 
