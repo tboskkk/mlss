@@ -88,7 +88,25 @@ def main() -> int:
                     help="route byte-exact rows to `validating` (the validator "
                          "still runs the from-scratch gate)")
     ap.add_argument("--keep", action="store_true")
+    ap.add_argument("--loop", type=float, default=0, metavar="SECONDS",
+                    help="run continuously, sweeping every SECONDS (implies --apply)")
     args = ap.parse_args()
+
+    # Loop mode exists because this tool feeds an AUTOMATED queue while being a
+    # MANUAL tool, and the mismatch quietly wasted most of the search capacity.
+    #
+    # tier_m2c clears iso_score whenever it writes a new seed (it must -- a
+    # score measured on a body the row no longer has is worse than none), and
+    # it produces seeds continuously as it drains the unseeded backlog. So the
+    # ranking data goes stale as fast as it is generated. Measured: 2,254 of
+    # 2,508 queued rows (90%) had no score, and over one 3h window 210 of 336
+    # searches went to unscored rows and produced ONE convergence -- 63% of the
+    # pool's capacity spent on rows nobody had measured yet.
+    #
+    # A full sweep is ~75s at ~2,000 rows/min, so refreshing every few minutes
+    # costs almost nothing and keeps tier2 ranking on current data.
+    if args.loop:
+        args.apply = True
 
     ctx = m2c_bridge.ensure_context()
     if ctx is None:
@@ -191,5 +209,21 @@ def main() -> int:
             shutil.rmtree(work, ignore_errors=True)
 
 
+def loop(interval: float) -> int:
+    while True:
+        try:
+            main()
+        except Exception as e:                     # never let one sweep kill the worker
+            print(f"sweep failed: {type(e).__name__}: {e}", flush=True)
+        time.sleep(interval)
+
+
 if __name__ == "__main__":
+    _argv = sys.argv[1:]
+    if "--loop" in _argv:
+        _iv = float(_argv[_argv.index("--loop") + 1])
+        sys.argv = [a for i, a in enumerate(sys.argv)
+                    if a != "--loop" and (i == 0 or sys.argv[i - 1] != "--loop")]
+        sys.argv.append("--apply")
+        raise SystemExit(loop(_iv))
     raise SystemExit(main())

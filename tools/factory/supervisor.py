@@ -74,6 +74,13 @@ PROCESSES = {
     "tier1":     ("tier1.py",     ["--loop", "30"],   False),
     "tier_m2c":  ("tier_m2c.py",  ["--loop", "10"],   False),
     "tier2":     ("tier2.py",     ["--loop", "20", "--stall-min", "15"], False),
+    # Keeps iso_score fresh. tier2 ranks and admits on that number, and
+    # tier_m2c clears it on every new seed -- so without a worker refreshing
+    # it, the ranking runs on stale data within minutes. Measured before this
+    # existed: 90% of the queue unscored, and 63% of searches going to unscored
+    # rows for one convergence in 210. A sweep is ~75s; every 5 minutes is
+    # cheap and it never takes the repo lock.
+    "isoscore":  ("isolation_exact.py", ["--loop", "300", "--limit", "6000"], False),
     # Supervised rather than run by hand, because the failure it catches is
     # invisible to everything else here: the supervisor only restarts a
     # process that DIED, and tier2 can stop working while staying alive,
