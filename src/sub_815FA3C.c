@@ -11,9 +11,6 @@ u32 sub_815FA3C(u32* param_1) {
     return *param_1;
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_815FA40.s\"");
-#else
 void sub_815FA40(struct Sprite **arg0) {
     struct Sprite *temp_r0_7;
 
@@ -22,7 +19,6 @@ void sub_815FA40(struct Sprite **arg0) {
         sprite_hide_8021F20(temp_r0_7);
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_815FA50.s\"");
