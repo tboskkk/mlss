@@ -7,6 +7,9 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
+
+int sub_8029A0C();
+
 s32 sub_802DDB4(void *, void *, u32, s32);      /* extern */
 
 void sub_803C720(void *arg0, s32 arg1) {
@@ -62,15 +65,9 @@ asm_unified(".include \"asm/nonmatching/sub_803C834.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_803C898.s\"");
-#else
-s32 sub_8029A0C(s32, s32, s32);         /* extern */
-
 void sub_803C898(s32 arg0, s32 arg1) {
     sub_8029A0C(arg0, arg1, 1);
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_803C8A4.s\"");
