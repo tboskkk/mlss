@@ -171,20 +171,14 @@ void sub_81122D0(void *arg0)
   }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_811230C.s\"");
-#else
-s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
-
 void sub_811230C(void *arg0) {
-    if ((0 - M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */)) != 1) {
+    if ((0 - (*(s16 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x28)))) + (0xEC)))) != 1) {
         sub_8082E1C(arg0, 1, 0x2057, 0);
     } else {
         sub_8082E1C(arg0, 1, 0x2028, 0);
     }
     (*(s32 *)((s8 *)(arg0) + (0x4C))) = 0x081125C9;
 }
-#endif
 
 void sub_8112350(s32 arg0) {
     void *temp_r2_11;
