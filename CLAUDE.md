@@ -2197,6 +2197,44 @@ apply the same transformations the splice does, or it under-reports.
 four rows under "X redeclared" that the real path now fixes; simulating the
 repairs turned those into requeues.
 
+**T.14 -- section P's bug was in TWO promotion paths; P fixed one. The
+re-ranking is what made the other visible.**
+
+`tier2.already_matches()` spliced the candidate into the `#else` branch and
+called `gitops.asm_differ_matches()`, which rebuilds with `NONMATCHING=1` and
+diffs OBJECTS -- precisely the verdict section P proved worthless (same
+candidate: 0 in a plain build, 13,467 under `NONMATCHING`). P fixed
+`validator.validate_one()` and stopped.
+
+But a permuter win reaches `tier2` FIRST. If this check says no, the row is
+filed *"permuter reached score 0 in isolation but no declaration prefix made it
+match in its real source file"* and sent back to be searched again from
+nothing. Section Q reported that failure count driven to zero -- it was only
+ever driven to zero for the validator.
+
+Measured, scoring the permuter's ACTUAL winning output (from
+`nonmatchings/<name>/output-*/source.c`, not the stored seed) in a plain build:
+
+    sub_806EADC   plain_score  0   -- MATCHES, filed as a failure
+    sub_80DC638   plain_score  0   -- MATCHES, filed as a failure
+    sub_809CA24   plain_score 60   -- genuinely does not
+    sub_80DDA78   plain_score 60   -- genuinely does not
+
+**Two of four sampled were finished work thrown away.** Fixed to score in a
+plain build, falling back to the legacy check only when `plain_score` returns
+no verdict -- never silently answering "no".
+
+**The part worth generalising: fixing the ranking is what exposed this.**
+Before T.13 the pool spent its slots on functions far from retail, which rarely
+reach score 0, so the broken promotion check almost never fired. Feeding it
+near-misses made a latent downstream bug produce 12 losses in two hours. *When
+you remove a bottleneck, re-audit everything downstream of it immediately* --
+the new load exercises paths the old one never reached.
+
+Independent confirmation from `audit_instruments.py` the same morning:
+**12/12 sampled stored scores differ by more than 50% from a plain-build
+re-score.** Not a sample with some noise in it -- every single one.
+
 **T.13 -- the permuter queue is now ranked by isolation distance, and the old
 ranking was starving near-certain matches.**
 
