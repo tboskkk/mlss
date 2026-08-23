@@ -7,6 +7,10 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
+
+s32 sub_8199F30();
+s32 sub_81DD77C();
+
 void sub_8108CBC(void *arg0) {
     (*(u16 *)((s8 *)(arg0) + (0x11E))) = (u16) (0xFFF & (*(u16 *)((s8 *)(arg0) + (0x11E))));
 }
