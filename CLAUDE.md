@@ -2076,8 +2076,154 @@ to make `m2c_bridge` inline the struct definition into each generated seed the
 way it already expands the `M2C_*` macros, so nothing in `include/` changes at
 all. That was not attempted.
 
+**T. Four more instrument failures, and two clean negatives. 2026-08-22.**
+
+Found by auditing the toolchain rather than the code. Full plan and evidence:
+`docs/plan-2026-08-22-toolchain-overhaul.md`.
+
+**First, the attribution that should frame everything below.** Matched rows by
+`candidate_source`, straight from the live DB (n=1,156): `rescore` 415,
+`permuter` 278, `m2c` 186, `twin` 130, `tier2` 101, unattributed 46. **47% of
+every match this project has ever made came from `rescore` + `twin`** -- from
+repairing a measurement and propagating across functions, with zero new search.
+64% came from something other than the permuter finding an answer. On 08-23 the
+factory logged 199 `t2_launch` events and 233 matches: more matches than
+searches. The producing machinery is not the search.
+
+**T.1 -- a row PROMOTED to tier2_ready could never be re-seeded, forever.**
+`tier_m2c._claim()` read `needs_attempt`, then `stalled`, and nothing else. So
+the instant a row was seeded and promoted, its `candidate_body` froze for life,
+however much the seeder improved afterwards. That is section D's law ("any tier
+that declines work must leave SOMETHING able to reclaim it") stated for the
+PROMOTE path, and it cost more than the decline case did:
+
+  * **1,639 rows** still stored a body containing `M2C_ERROR` -- 6,905 `ldsh`
+    and 592 `ldsb`, i.e. exactly what section J's patch fixed.
+  * **863 of them sat in `tier2_ready`**, being fed to the permuter as though
+    they were candidates.
+  * **596 permuter launches (9.4% of all 6,335)** had already been spent
+    searching code that cannot compile.
+
+Section J's patch is applied and working (`arch_arm.py:137`); section N.1's
+`ruleset_version()` fix is in place. Neither could reach a row that had already
+moved on. The smallest case was a three-instruction function parked at score
+210 whose current m2c output is a one-liner.
+
+Fixed: seeds carry the ruleset that produced them (new `seed_ruleset` column),
+and `tier_m2c` reclaims a promoted row whose stamp is stale -- LAST in its claim
+order, so it can never starve a first attempt.
+`tools/factory/requeue_stale_seeds.py` was the one-time catch-up: 1,624 rows
+requeued, `M2C_ERROR` bodies **1,639 -> 5** (the residual `swi` BIOS veneers m2c
+genuinely cannot translate).
+
+**T.2 -- 407 functions are declared as DATA at file scope in the very file that
+would define them, and it only breaks AT SPLICE TIME.** `declare_missing` emits
+`extern s32 X;` when a SIBLING takes `&X` (N.4's rule, correct for a symbol the
+file only references). Then X's own candidate arrives and defines X as a
+function.
+
+The conflict does not exist in the tree at rest -- while the guard is in place
+there is no definition -- which is why a static scan finds nothing and
+`fix_decl_conflicts.py` reported `0/0 repaired`. It materialises exactly when
+the validator splices to measure. agbcc says ``sub_806C8C0' redeclared as
+different kind of symbol``, the WHOLE object fails to build, asm-differ has
+nothing to score, and a byte-exact candidate is filed as "wasn't
+byte-identical" and sent back to be searched again from nothing.
+
+Proven, not inferred: `sub_806C8C0`'s stored candidate compiles
+**instruction-for-instruction identical to retail**, and it had been rejected on
+every attempt. `splice_candidate()` now applies
+`fix_decl_conflicts.repair_file_scope`, so every consumer (validator,
+`plain_score`, rescue) gets it. `sub_806C8C0` matched through the real
+from-scratch gate immediately afterwards.
+
+**T.3 -- `supervisor.py` ran `git checkout -- .` REPO-WIDE on every start.**
+Its comment argued that anything uncommitted is in-flight factory work that was
+going to be redone anyway. That is true of `asm/` and `src/` and false of
+`tools/`, `docs/`, and CLAUDE.md itself. **Caught live: the T.1 and T.2 fixes
+above were destroyed by restarting the factory to load them.** N.2 records this
+exact failure mode and the fix was applied to `gitops.revert_to_clean()` -- but
+the supervisor kept its own unscoped copy, so the landmine was only half
+removed. Now scoped to `FACTORY_PATHS`.
+
+Two habits follow, both already in N.2 and both worth repeating because they
+were not enough on their own: commit a fix BEFORE restarting the thing that
+loads it, and grep for every copy of a pattern you fix, not just the one that
+bit you.
+
+**T.4 -- the promotion path applies `declare_missing` but never
+`werror_casts`, and the order matters.** Chasing why six more byte-exact
+candidates still failed: after the T.2 repair they hit a DIFFERENT blocker, a
+sibling defined later in the same file with no forward declaration
+(``sub_805DEB4' undeclared`` / `used prior to declaration`). `declare_missing`
+fixes that correctly on its own -- and what remains is then only a WARNING,
+`assignment from incompatible pointer type`, fatal solely under `-Werror`.
+That is section G's "-Werror only" class, ~22% of the non-compiling pile, and
+`werror_casts.py` exists for it.
+
+But `werror_casts.apply()` bails with "fails even with warnings allowed (a real
+error, not -Werror)" -- because it splices and compiles BEFORE
+`declare_missing` has run, so the hard error is still there. Same shape as
+section M's sequencing lesson ("unblock first, rescue second"). **Not yet
+fixed**: the promotion path should be `declare_missing` -> `werror_casts` ->
+score. The six functions are correct C sitting in `needs_human`.
+
+**T.5 -- CLEAN NEGATIVE: this ROM has ONE compiler configuration.**
+`tools/agbcc/bin/` ships `agbcc`, `old_agbcc` AND `agbcc_arm`, and the Makefile
+invokes only the first. `old_agbcc` really does differ -- register allocation,
+operand order, and **literal-pool ordering**, which is a whole-function property
+no C-level permutation can fix -- and `-fprologue-bugfix` really does change
+leaf-function output. Klonoa needs `old_agbcc -ftst` for its m4a module and
+per-function `-fprologue-bugfix` units, so the question was live.
+
+Tested with `tools/factory/compiler_variants.py` (compiles each stored candidate
+under all four variants in a scratch container, compares `.text` + relocations
+against the retail fragment; repo mounted read-only, no repo lock, safe against
+a live factory). Over 58 high-score functions: **agbcc is closest for 54**, the
+4 where `old_agbcc` wins do so by 2-4 bytes out of ~100-200, and `old_agbcc`
+never produces a byte-exact result agbcc does not. **Hypothesis retired.** Do
+not re-chase it; the residue in section R is not a compiler-variant problem.
+
+**T.6 -- CLEAN NEGATIVE: two of the three obvious permuter passes have nothing
+to act on here.** decomp-permuter ships no ARM/agbcc weight profile at all --
+`[base]`, `[ido]`, `[mwcc]`, `[gcc]` -- and `permuter_settings.toml` selected
+`"gcc"`, whose own comment says its passes "were originally written with IDO in
+mind". So ~6,300 searches ran MIPS-derived weights on ARM/Thumb. Fixed: an
+`[agbcc]` profile with 11 evidence-backed deltas, held as a patch under
+`tools/permuter_patches/` for the same submodule reason as `tools/m2c_patches/`.
+
+The interesting part is what was NOT built. Klonoa's ablations name bitfield
+container type and multi-dimensional array shape as real agbcc levers, and
+neither has ANY corresponding mutation (`bitsize` appears zero times in
+`randomizer.py`; `perm_randomize_internal_type` requires `ca.TypeDecl` so it
+skips arrays). Both look like obvious wins. A census of our own 3,124 stored
+candidate bodies killed both: **0 declare a bitfield, 1 declares an array, 0
+mention float/double, and 2,983 (95%) are built from flat `*(TYPE *)(base +
+off)` casts.** m2c emits pointer arithmetic, not structs, so there is nothing
+for either pass to mutate. Measure the corpus before writing a mutation for it.
+
+The lever that IS both measured and applicable is Klonoa's highest-value one --
+a named `extern` versus a cast address constant, numerically identical and
+compiled differently, 20-29 points across four of their functions. **561 of our
+bodies carry a raw `0x08xxxxxx` constant.** No pass exists; one needs project
+knowledge (`tools/symbols/rom.txt`), which is exactly why it belongs in our
+fork. Not yet written.
+
+**T.7 -- read this before adding a check.** Two of the tools written during this
+session shipped the project's own recurring bug on the first try: a verdict
+asserted from zero observations (`compiler_variants.py` printed "the hypothesis
+does NOT hold" after measuring nothing), and a diagnostic filter that silently
+dropped the evidence (`grep 'rror'` misses agbcc's real diagnostics, which say
+``X' redeclared`` and `X undeclared` with no "error" in the line). Both were
+caught only because the numbers looked too clean. **A check that cannot
+distinguish "nothing is wrong" from "nothing was measured" is not a check.**
+
 **Next levers, in rough order of value:**
-0. **The other 94 jump-table candidates** (section O) - the tool refuses
+0a. **Wire `werror_casts` into the promotion path, after `declare_missing`**
+   (section T.4). Six functions with byte-exact candidates are sitting in
+   `needs_human` for want of exactly this ordering, and the whole "-Werror
+   only" class is ~22% of the non-compiling pile.
+0b. **The other 94 jump-table candidates** (section O) - the tool refuses
    them rather than guessing. The dominant cause is a raw run that mixes
    trailing data into the code region; a smarter code/data boundary than
    "stop at the first non-Thumb-1 instruction" would recover more. Also
