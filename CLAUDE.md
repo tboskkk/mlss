@@ -1883,6 +1883,56 @@ throughput disagrees with effort in this project, suspect the instrument
 before the code. And note where this one lived - not in the search, not in the
 seeds, but in the check that decides whether finished work counts.
 
+**Q. `needs_human` is a dead-end queue, and most of what was in it had
+already fixed itself.**
+
+Nothing in the factory ever reclaims from `needs_human`. `health.py` says so
+("nothing re-claims needs_human, so these are invisible, not hard"), but the
+consequence had not been drawn: a row filed there keeps its verdict FOREVER,
+while this project fixes things in the shared tree continuously -
+`quarantine_broken_drafts`, `unblock_files`, `declare_missing`, and every
+match that lands in a neighbouring guard all change whether some OTHER
+function's file compiles.
+
+106 rows were filed as "plain-build asm-differ score 0 (very likely correct
+C), but the destination file will not compile with it spliced". Re-checked
+with `tools/factory/recheck_needs_human.py`: **99 of the 106 compiled
+perfectly well.** They were finished, byte-correct functions parked in a queue
+nobody looks at. Requeued to `validating`, and they converted straight through
+`finish_match()`'s from-scratch gate - matched went **809 -> 893** over that
+batch and the harvest running alongside it, with no rejections.
+
+Only **7** still carry the real conflict, and it is section N.4's classification
+problem biting from the other side: `X redeclared as different kind of symbol`,
+where `declare_missing` emitted `extern s32 X;` because the file takes `&X`,
+while the same file also DEFINES X as a function. N.4's rule ("used as `&X` ->
+declare it data") is right for a symbol the file only references and wrong for
+one it defines. The fix is a function declaration plus a cast at the
+address-taken site; agbcc's warnings do not change codegen, so such a cast is
+verifiable byte-identical.
+
+**The 7, resolved 5 of 7.** `tools/factory/fix_decl_conflicts.py` replaces
+`extern s32 X;` with a forward declaration derived from the file's OWN
+definition and casts the address-taken site. Deleting the declaration does not
+work - X is often defined LATER in the file, so the use becomes undeclared.
+Byte-neutral by construction: the linker sets bit 0 of a function pointer from
+the SYMBOL's Thumb type, not from how C declared it (retail for `sub_806021C`
+is `.4byte sub_80603D8` loading `0x080603D9` either way). All 5 matched.
+
+**The remaining 2 (`sub_8079BA8`, `sub_8079C70`) are a different shape and are
+left for a human on purpose.** The stale `extern s32 <target>;` is not in the
+candidate, it is at FILE scope in `src/sub_80796B8.c` (lines 162 and 332),
+emitted for a sibling that takes `&<target>` - and that sibling, `sub_807991C`,
+is already MATCHED. The same transformation applies, but it edits committed,
+byte-exact code, so it needs a from-scratch build plus a re-check that
+`sub_807991C` still matches before it can be trusted. Cheap, just not safe to
+do while something else holds the repo lock.
+
+**The general point, and it applies to any terminal state:** a queue nothing
+revisits accumulates stale verdicts at exactly the rate the rest of the system
+improves. Re-check it periodically, or give it an owner. The same argument
+applies to `stalled` and to rows parked behind a ruleset stamp.
+
 **Next levers, in rough order of value:**
 0. **The other 94 jump-table candidates** (section O) - the tool refuses
    them rather than guessing. The dominant cause is a raw run that mixes
