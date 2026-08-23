@@ -2161,12 +2161,70 @@ fixes that correctly on its own -- and what remains is then only a WARNING,
 That is section G's "-Werror only" class, ~22% of the non-compiling pile, and
 `werror_casts.py` exists for it.
 
-But `werror_casts.apply()` bails with "fails even with warnings allowed (a real
-error, not -Werror)" -- because it splices and compiles BEFORE
-`declare_missing` has run, so the hard error is still there. Same shape as
-section M's sequencing lesson ("unblock first, rescue second"). **Not yet
-fixed**: the promotion path should be `declare_missing` -> `werror_casts` ->
-score. The six functions are correct C sitting in `needs_human`.
+But `werror_casts.apply()` bailed with "fails even with warnings allowed (a
+real error, not -Werror)" -- because it spliced and compiled BEFORE
+`declare_missing` had run, so the hard error was still there. Same shape as
+section M's sequencing lesson ("unblock first, rescue second"): a repair that
+runs before its prerequisite measures the PREREQUISITE's failure and blames the
+thing it was asked to fix.
+
+**FIXED, and it took three passes because there are four distinct shapes of
+this conflict, not one.** Worth listing, because each one was hiding behind the
+last and each was individually invisible:
+
+  1. `extern s32 <target>;` at FILE scope, target defined by the candidate.
+     `repair_file_scope` -- wired into `splice_candidate` (T.2).
+  2. `extern s32 X;` at FILE scope for a THIRD-PARTY symbol the candidate
+     calls. `repair_file_third_party` -- already existed.
+  3. **`extern s32 X;` inside the CANDIDATE**, for a symbol the destination
+     file DEFINES as a function (m2c declares a symbol data whenever the body
+     takes its address). `fix_decl_conflicts.repair()` already implemented this
+     exactly -- and was only ever called from `rescue_isolated_zeros.py`, so
+     nothing on the seed or validator path benefited. Now applied in BOTH
+     splice primitives.
+  4. Shape 1 again, but on the `splice_into_else` path. Under `NONMATCHING=1`
+     the `#else` branch IS the definition, so the same file-scope collision
+     happens with the guard still in place. Fixing only `splice_candidate` left
+     every `#else`-path consumer -- `werror_casts` among them -- still broken.
+
+Result on the six byte-exact candidates parked in `needs_human`: 0 -> 2 -> 5
+reporting "clean under -Werror, object byte-identical" as each shape was
+covered. **All five routed and matched.**
+
+**The generalisable rule:** any tool that PREDICTS what a splice will do must
+apply the same transformations the splice does, or it under-reports.
+`recheck_needs_human.py` was doing a raw guard-block substitution and clustering
+four rows under "X redeclared" that the real path now fixes; simulating the
+repairs turned those into requeues.
+
+**T.8 -- measuring ONE SYMBOL ALONE finds finished work by the hundred, in
+seconds.** `tools/factory/isolation_exact.py`.
+
+The whole recurring bug family (D, I, M, N.4a, P, T.2, T.4) shares one cause:
+verdicts are taken by building the candidate inside its real translation unit
+and diffing whole OBJECTS. Measuring the function alone removes both halves --
+there is no unit to poison and no trailing content to diff against:
+
+    retail    = assemble asm/nonmatching/<name>.s              -> .text + relocs
+    candidate = preprocessed context + candidate_body -> agbcc -> .text + relocs
+
+Equal is not a score, it is an answer. Relocations are compared alongside the
+bytes for the reason `twin_backfill._text_image` documents.
+
+Swept the entire claimable pool: **2,097 candidates measured in 63 seconds
+(~2,000/min), of which 205 (9.8%) are byte-exact** -- finished functions
+sitting in `tier2_ready`, `stalled` and `needs_human`. The first 58 tried by
+hand had included `sub_806C8C0`, instruction-for-instruction identical to
+retail and rejected on every previous attempt.
+
+**It routes, it never promotes.** Byte-exact in isolation does not prove a
+match in the real file: agbcc couples codegen across a translation unit, and
+the Klonoa decomp measured a byte-identical edit changing a DIFFERENT function
+1,833 lines further down the same `.c`. `finish_match()`'s from-scratch build
+plus ROM sha1 remains the only verdict. Re-run it after any batch of seed
+repairs -- it is the cheapest yield in the repo, and it is read-only against
+the working tree (repo mounted read-only, all work in a scratch dir, no repo
+lock).
 
 **T.5 -- CLEAN NEGATIVE: this ROM has ONE compiler configuration.**
 `tools/agbcc/bin/` ships `agbcc`, `old_agbcc` AND `agbcc_arm`, and the Makefile
@@ -2219,10 +2277,10 @@ caught only because the numbers looked too clean. **A check that cannot
 distinguish "nothing is wrong" from "nothing was measured" is not a check.**
 
 **Next levers, in rough order of value:**
-0a. **Wire `werror_casts` into the promotion path, after `declare_missing`**
-   (section T.4). Six functions with byte-exact candidates are sitting in
-   `needs_human` for want of exactly this ordering, and the whole "-Werror
-   only" class is ~22% of the non-compiling pile.
+0a. **Re-run `tools/factory/isolation_exact.py --apply`** after any batch of
+   seed repairs (section T.8). It measures one symbol alone at ~2,000/min and
+   found 205 byte-exact candidates on its first full sweep. Cheapest yield in
+   the repo, and read-only against the working tree.
 0b. **The other 94 jump-table candidates** (section O) - the tool refuses
    them rather than guessing. The dominant cause is a raw run that mixes
    trailing data into the code region; a smarter code/data boundary than
