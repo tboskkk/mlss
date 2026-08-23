@@ -7,19 +7,19 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80FA6BC.s\"");
-#else
 s32 sub_81219C4(s32);                               /* extern */
-
-s32 sub_80FA6BC(void *arg0, void *arg1) {
-    if ((sub_81219C4((*(s32 *)((s8 *)(arg0) + (0x14)))) << 0x18) == 0) {
-        return 1;
-    }
-    (*(s32 *)((s8 *)(arg1) + (0))) = (s32) (*(s32 *)((s8 *)(arg1) + (0x14)));
-    return 0;
+s32 sub_80FA6BC(void *arg0, void *arg1)
+{
+  int new_var;
+  new_var = 0;
+  if ((sub_81219C4(*((s32 *) (((s8 *) arg0) + 0x14))) << 0x18) == new_var)
+  {
+    return 1;
+  }
+ do { } while (new_var);
+  *((s32 *) (((s8 *) arg1) + new_var)) = (s32) (*((s32 *) (((s8 *) arg1) + 0x14)));
+  return new_var;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80FA6DC.s\"");
