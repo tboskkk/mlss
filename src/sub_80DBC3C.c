@@ -8,6 +8,10 @@
 asm_unified(".include \"asm/macros.inc\"");
 
 
+
+s32 stop_sfx_80195A8();
+s32 sub_8087540();
+
 s32 sub_8082E1C();
 
 s32 sub_8086C64(void *);                            /* extern */
@@ -30,19 +34,12 @@ void sub_80DBC60(void *arg0) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80DBC84.s\"");
-#else
-s32 stop_sfx_80195A8(s32);                      /* extern */
-s32 sub_8087540(void *);                        /* extern */
-
 void sub_80DBC84(void *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
         stop_sfx_80195A8(0x11A);
         sub_8087540(arg0);
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80DBCA4.s\"");
