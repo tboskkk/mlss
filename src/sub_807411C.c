@@ -15,21 +15,20 @@ void sub_80745A8(void *arg0);
 extern s32 sub_80744B4;
 
 s32 sub_807C298();
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_807411C.s\"");
-#else
-extern s32 sub_80744B4;
-
-void sub_807411C(void *arg0) {
-    u16 temp_r0_11;
-
-    temp_r0_11 = (*(u16 *)((s8 *)(arg0) + (0xAC))) - 1;
-    (*(u16 *)((s8 *)(arg0) + (0xAC))) = temp_r0_11;
-    if ((s32) (temp_r0_11 << 0x10) <= 0) {
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80744B4;
-    }
+void sub_807411C(void *arg0)
+{
+  s8 *new_var2;
+  u16 *new_var;
+  unsigned long temp_r0_11;
+  new_var2 = (s8 *) arg0;
+  new_var = &(*((u16 *) (0xAC + new_var2)));
+  temp_r0_11 = (*new_var) - 1;
+  *((u16 *) (new_var2 + 0xAC)) = temp_r0_11;
+  if (((s32) (temp_r0_11 << 0x10)) <= 0)
+  {
+    *((s32 **) (new_var2 + 0x4C)) = &sub_80744B4;
+  }
 }
-#endif
 
 void sub_8074508(void *arg0);
 void sub_807413C(void *arg0)
