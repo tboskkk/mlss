@@ -38,7 +38,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import db  # noqa: E402
-import gitops  # noqa: E402
+import gitops
+import rescore_seeds  # noqa: E402
 import m2c_bridge  # noqa: E402
 import werror_casts  # noqa: E402
 import tier3  # noqa: E402
@@ -168,7 +169,24 @@ def process_one(conn, no_score: bool = False) -> str | None:
                              notes=_declined("produced output but couldn't splice (no guard block)"))
             return name
         try:
-            score = gitops.asm_differ_score(name)
+            # Scored against a PLAIN build, not asm_differ_score()'s
+            # NONMATCHING one. Two reasons, both measured.
+            #
+            # 1. Under NONMATCHING=1 every sibling whose `#else` is the empty
+            #    "no C attempt yet" placeholder does not exist in the object,
+            #    while expected/ holds all of them -- and asm-differ -o diffs
+            #    OBJECTS. The score therefore tracks POSITION IN FILE, not
+            #    code quality (CLAUDE.md N.4a: same code, 76x the score).
+            #    Every jump-table seed decoded in commit 2a4fae50 landed here
+            #    scored 25,800-78,000 with a perfectly good switch() body, so
+            #    all of them sat behind SEED_SCORE_CEILING and were never
+            #    claimed. That is why that work produced no matches.
+            # 2. A plain build compiles each SIBLING as its retail `.include`,
+            #    not as its unproven `#else` draft -- so a broken neighbour
+            #    can no longer fail this measurement at all. That is the
+            #    translation-unit poisoning of CLAUDE.md section I, removed
+            #    from scoring by construction rather than worked around.
+            score = rescore_seeds.plain_score(name, body)
         finally:
             gitops.run(["git", "checkout", "--", str(c_path.relative_to(gitops.REPO))])
 
@@ -191,7 +209,7 @@ def process_one(conn, no_score: bool = False) -> str | None:
                 cast_note = " (casts inserted to satisfy -Werror; object verified identical)"
                 c_path = gitops.splice_into_else(name, body)
                 try:
-                    score = gitops.asm_differ_score(name)
+                    score = rescore_seeds.plain_score(name, body)
                 finally:
                     gitops.run(["git", "checkout", "--",
                                 str(c_path.relative_to(gitops.REPO))])
@@ -231,7 +249,7 @@ def process_one(conn, no_score: bool = False) -> str | None:
     with db.tx(conn):
         db.set_state(conn, name, new_state, worker_id=None, candidate_body=body,
                      candidate_source="m2c",
-                     notes=f"m2c seed, raw asm-differ score {score}{cast_note}")
+                     notes=f"m2c seed, plain-build asm-differ score {score}{cast_note}")
     db.log_event(conn, name, "converged" if score == 0 else "seeded", f"m2c score={score}")
     if score == 0:
         print(f"      -> {name}: byte-exact from m2c, zero search needed")
