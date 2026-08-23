@@ -19,16 +19,9 @@ u8 sub_8029060(u8 param_1) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8029070.s\"");
-#else
-u8 sub_8029070(u8 arg0) {
-    u16 temp = 0x96 << 1;
-    arg0 += temp;
-    arg0 |= 0x01;
-    return arg0;
+void sub_8029070(void *arg0) {
+    (*(u8 *)((s8 *)(arg0) + (0x12C))) = (u8) ((*(u8 *)((s8 *)(arg0) + (0x12C))) | 1);
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8029080.s\"");

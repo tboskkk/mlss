@@ -7,18 +7,9 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8047994.s\"");
-#else
-u32 sub_8047994(u32 param_1) {
-    u32 *ptr;
-    
-    ptr = (u32*)((u32)param_1 + 0x2B5);
-    *ptr = (*ptr & 0x3F);
-    
-    return param_1;
+void sub_8047994(void *arg0) {
+    (*(u8 *)((s8 *)(arg0) + (0x2B5))) = (u8) (0x3F & (*(u8 *)((s8 *)(arg0) + (0x2B5))));
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80479A8.s\"");

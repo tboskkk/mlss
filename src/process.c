@@ -301,15 +301,11 @@ void sub_801A2A0(void) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_801A33C.s\"");
-#else
-u32 sub_801A33C(void) {
-    u32 r0 = 0x03000D0C;
-    u32 r1 = *(u32*)r0;
-    u8 r0_2 = *(u8*)r1;
-    if (r0_2 != 0)
-        *(u8*)(r1 + 6) = 1;
-    return r0_2;
+void sub_801A33C(void) {
+    void *temp_r1_8;
+
+    temp_r1_8 = *(void **)0x03000D0C;
+    if ((*(u8 *)((s8 *)(temp_r1_8) + (0))) != 0) {
+        (*(s8 *)((s8 *)(temp_r1_8) + (6))) = 1;
+    }
 }
-#endif

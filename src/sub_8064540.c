@@ -7,21 +7,11 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8064540.s\"");
-#else
-u32 sub_8064540(u32* param_1) {
-    u8* puVar1;
-    u32 uVar2;
-    
-    puVar1 = (u8*)param_1[2];
-    uVar2 = puVar1[0x12] & 8;
-    if (uVar2 != 0) {
-        param_1[0x13] = 0;
+void sub_8064540(void *arg0) {
+    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+        (*(s32 *)((s8 *)(arg0) + (0x4C))) = 0;
     }
-    return param_1[0];
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8064558.s\"");

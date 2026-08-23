@@ -32,16 +32,12 @@ void sub_816129C(void *arg0, s32 arg1) {
     sprite_hide_8021F20((*(struct Sprite **)((s8 *)(arg0) + (0xC))));
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_81612E4.s\"");
-#else
 s32 sub_8021308(s32);                           /* extern */
 
 void sub_81612E4(void *arg0) {
     sub_8021308((*(s32 *)((s8 *)(arg0) + (0xC))));
     (*(s32 *)((s8 *)(arg0) + (0xC))) = 0;
 }
-#endif
 
 void sub_81612F8(void *arg0, s32 arg1) {
     struct Sprite *temp_r0_18;

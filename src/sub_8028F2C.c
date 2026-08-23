@@ -11,17 +11,9 @@ void sub_8028F2C(void *arg0) {
     (*(u8 *)((s8 *)(arg0) + (0x12D))) = (u8) ((*(u8 *)((s8 *)(arg0) + (0x12D))) | 0x20);
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8028F40.s\"");
-#else
-u32 sub_8028F40(u32 param_1) {
-    u32* puVar1;
-    
-    puVar1 = (u32*)((u32)param_1 + 0x12D);
-    *puVar1 = (*puVar1 & 0xFFFFFFEF) | 0x10;
-    return param_1;
+void sub_8028F40(void *arg0) {
+    (*(u8 *)((s8 *)(arg0) + (0x12D))) = (u8) ((*(u8 *)((s8 *)(arg0) + (0x12D))) | 0x10);
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/make_btl_8028F54.s\"");

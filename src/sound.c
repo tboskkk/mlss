@@ -125,9 +125,6 @@ void sub_8019508(u8 arg0, u8 arg1) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8019588.s\"");
-#else
 s32 sub_819BABC();                                  /* extern */
 
 u32 sub_8019588(void) {
@@ -136,7 +133,6 @@ u32 sub_8019588(void) {
     temp_r0_7 = sub_819BABC();
     return (u32) ((0 - temp_r0_7) | temp_r0_7) >> 0x1F;
 }
-#endif
 
 void stop_all_sfx_801959C(void) {
     sub_819BA00();
