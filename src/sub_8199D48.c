@@ -7,17 +7,10 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8199D48.s\"");
-#else
-u32 sub_8199D48(u32 arg0, u32 arg1) {
-    u32 *ptr = (u32 *)0x03001070;
-    ptr = (u32 *)((u8 *)ptr + arg1 * 4);
-    arg0 = *ptr;
-    *(u32 *)(arg0 + 4) = arg0;
+s32 sub_8199D48(s32 * a0, s32 a1) {
+    a0[1] = ((s32 *)*(s32 *)50335856)[a1];
     return 0;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8199D5C.s\"");
