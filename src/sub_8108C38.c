@@ -21,19 +21,20 @@ void sub_8108C38(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8108C64.s\"");
-#else
-void sub_8108C64(void *arg0) {
-    u16 temp_r1_11;
-
-    temp_r1_11 = (*(u16 *)((s8 *)(arg0) + (0x11E)));
-    if (0x20 & temp_r1_11) {
-        (*(u16 *)((s8 *)(arg0) + (0x11E))) = (u16) (0xFFDF & temp_r1_11);
-        (*(s16 *)((s8 *)(arg0) + (0x10C))) = 0x100;
-    }
+void sub_8108C64(void *arg0)
+{
+  u16 *new_var;
+  u16 temp_r1_11;
+  int new_var2;
+  new_var2 = 0x100;
+  new_var = &(*((u16 *) (((s8 *) arg0) + 0x11E)));
+  ;
+  if (0x20 & (*new_var))
+  {
+    *((u16 *) (((s8 *) arg0) + 0x11E)) = (u16) (0xFFDF & (*new_var));
+    *((s16 *) (((s8 *) arg0) + 0x10C)) = new_var2;
+  }
 }
-#endif
 
 void sub_8108C90(void *arg0)
 {
