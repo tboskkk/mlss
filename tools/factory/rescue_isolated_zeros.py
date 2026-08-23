@@ -162,10 +162,18 @@ def rescue_one(conn, name: str, dry_run: bool) -> str:
         # back unless this candidate actually wins.
         newf, _proto = fix_decl_conflicts.repair_file_scope(ftext, name, variants[0])
         if newf is not None:
-            file_backup = ftext
-            with gitops.repo_lock(what=f"decl repair {name}"):
-                _cp.write_text(newf)
             ftext = newf
+        # Shape 3: some OTHER symbol the file declares as data (because it
+        # takes its address) but this candidate CALLS. Both declarations land
+        # in one unit and the object dies. Measured on the second sweep: this
+        # was most of what still reported "no compiling prefix".
+        newf3, _syms = fix_decl_conflicts.repair_file_third_party(ftext, variants[0])
+        if newf3 is not None:
+            ftext = newf3
+        if ftext != _cp.read_text():
+            file_backup = _cp.read_text()
+            with gitops.repo_lock(what=f"decl repair {name}"):
+                _cp.write_text(ftext)
         # Shape 1: the declaration is inside the candidate itself.
         for b in list(variants):
             repaired, _syms = fix_decl_conflicts.repair(b, ftext)

@@ -82,6 +82,50 @@ def repair_file_scope(file_text, target, body):
     return out, proto
 
 
+def repair_file_third_party(file_text, body):
+    """Fix `extern s32 X;` in the FILE when the CANDIDATE calls X as a function.
+
+    The third and commonest shape. X is neither the target nor declared in the
+    candidate's own guard: it is some other ROM symbol that this file takes the
+    address of (so declare_missing declared it DATA, per CLAUDE.md N.4) while
+    the candidate being spliced CALLS it. One translation unit, both
+    declarations, fatal.
+
+    Real example - src/sub_808EC88.c holds
+
+        extern s32 sub_808DD2C;
+        ... (*(s32 **)((s8 *)(arg0) + (0x68))) = &sub_808DD2C;
+
+    while the candidate for sub_808FBB4 carries
+
+        s32 sub_808DD2C(void *);
+        ... sub_808DD2C(arg0);
+
+    N.4's rule picks by USE, and both uses are present, so no single choice by
+    use can be right. The function declaration is the one that can serve both:
+    you cannot call data, but you can cast a function's address. So the file's
+    declaration becomes the candidate's prototype and the address-taken sites
+    get a cast.
+
+    Byte-neutral: the linker resolves `&X` from the symbol, not from how C
+    declared it, and a cast emits no code. The from-scratch gate confirms.
+
+    Returns (new_file_text, [symbols]) or (None, []).
+    """
+    out, fixed = file_text, []
+    for m in re.finditer(r'^\s*([A-Za-z_][\w \*]*?\b(\w+)\s*\([^;{]*\));', body, re.M):
+        proto, sym = m.group(1).strip(), m.group(2)
+        if not re.search(r'^extern\s+s32\s+%s;\s*$' % re.escape(sym), out, re.M):
+            continue
+        if f'{sym}(' not in body:               # declared but never called
+            continue
+        out = re.sub(r'^extern\s+s32\s+%s;\s*$' % re.escape(sym), proto + ';',
+                     out, flags=re.M)
+        out = out.replace(f'&{sym};', f'(s32 *) &{sym};')
+        fixed.append(sym)
+    return (out, fixed) if fixed else (None, [])
+
+
 def compile_text(tag, text):
     src, pre = DIAG / f"{tag}.c", DIAG / f"{tag}.i"
     src.write_text(text)
