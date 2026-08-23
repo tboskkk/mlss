@@ -32,14 +32,21 @@ asm_unified(".include \"asm/nonmatching/sub_809EB8C.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_809EBDC.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
+extern s32 sub_809E5E4;
+
+void sub_809EBDC(void *arg0) {
+    void *temp_r5_8;
+
+    temp_r5_8 = (*(void **)((s8 *)(arg0) + (0x2C)));
+    if ((*(s16 *)((s8 *)((*(void **)((s8 *)(temp_r5_8) + (0x28)))) + (0xEC))) == -1) {
+        sub_8082E1C(arg0, 0x14, 0, 0);
+    }
+    if ((*(s16 *)((s8 *)((*(void **)((s8 *)(temp_r5_8) + (0x28)))) + (0xEC))) == -2) {
+        sub_8082E1C(arg0, 0x15, 0, 0);
+    }
+    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_809E5E4;
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_809EC28.s\"");
