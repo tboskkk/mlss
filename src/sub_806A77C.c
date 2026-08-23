@@ -19,11 +19,6 @@ s32 stop_sfx_80195A8();
 extern s32 sub_806A3F8;
 int sub_8082B00();
 s32 sub_8082E1C();
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_806A77C.s\"");
-#else
-extern s32 sub_808750C;
-
 void sub_806A77C(void *arg0) {
     s32 temp_r0_10;
 
@@ -34,7 +29,6 @@ void sub_806A77C(void *arg0) {
         (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_808750C;
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_806A7A0.s\"");

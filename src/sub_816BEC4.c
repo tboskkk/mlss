@@ -256,16 +256,12 @@ void sub_816D6D4(void *arg0) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_816D6F0.s\"");
-#else
 void sub_816D6F0(void *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0x88))) == 0) {
         (*(s32 *)((s8 *)(arg0) + (0x88))) = 1;
         play_sfx_80195B4(0x97, -1);
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_816D710.s\"");

@@ -7,9 +7,6 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80EA778.s\"");
-#else
 void sub_80EA778(s32 arg0, void *arg1) {
     s32 temp_r0_10;
 
@@ -19,7 +16,6 @@ void sub_80EA778(s32 arg0, void *arg1) {
         (*(u16 *)((s8 *)(arg1) + (0xA0))) = (u16) (0xFFEF & (*(u16 *)((s8 *)(arg1) + (0xA0))));
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/script_test_condition.s\"");
