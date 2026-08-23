@@ -160,21 +160,19 @@ void sub_805068C(void *arg0, s16 arg1, s16 arg2, s32 arg3) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80506D0.s\"");
-#else
 s32 sub_8047FDC();                              /* extern */
 
 void sub_80506D0(void *arg0) {
+    void *temp_r1_26;
     void *temp_r4_12;
 
     sub_8047FDC();
     temp_r4_12 = (*(void **)((s8 *)(arg0) + (0x344)));
     if ((temp_r4_12 != NULL) && (1 & (*(u8 *)((s8 *)(temp_r4_12) + (0x20C))))) {
-        (*(s32 (**)(void *))((s8 *)((*(void **)((s8 *)(temp_r4_12) + (0x338)))) + (0x24)))(temp_r4_12 + M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */));
+        temp_r1_26 = (*(void **)((s8 *)(temp_r4_12) + (0x338)));
+        (*(s32 (**)(void *))((s8 *)(temp_r1_26) + (0x24)))(temp_r4_12 + (*(s16 *)((s8 *)(temp_r1_26) + (0x20))));
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8050710.s\"");
