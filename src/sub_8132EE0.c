@@ -58,18 +58,14 @@ asm_unified(".include \"asm/nonmatching/sub_81331AC.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_813321C.s\"");
-#else
 s32 sub_807C298(void *);                        /* extern */
-s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 extern s32 sub_81332BC;
 
 void sub_813321C(void *arg0) {
     s32 temp_r1_12;
     void *temp_r2_14;
 
-    temp_r1_12 = (*(s32 *)((s8 *)(arg0) + (0x10))) - M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */);
+    temp_r1_12 = (*(s32 *)((s8 *)(arg0) + (0x10))) - (*(s16 *)((s8 *)(arg0) + (0xAE)));
     (*(s32 *)((s8 *)(arg0) + (0x10))) = temp_r1_12;
     temp_r2_14 = (*(void **)((s8 *)(arg0) + (0x28)));
     if (temp_r1_12 <= (s32) ((*(s32 *)((s8 *)(temp_r2_14) + (0x40))) + 0xFFFFF600)) {
@@ -79,4 +75,3 @@ void sub_813321C(void *arg0) {
         sub_807C298(arg0);
     }
 }
-#endif
