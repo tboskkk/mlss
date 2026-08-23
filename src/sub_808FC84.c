@@ -8,6 +8,10 @@
 asm_unified(".include \"asm/macros.inc\"");
 
 
+
+s32 sub_80903DC(void *arg0);
+s32 sub_8090420(void *arg0);
+
 extern s32 sub_8087540;
 
 #ifndef NONMATCHING
@@ -199,17 +203,10 @@ void sub_8090378(void *arg0) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80903A0.s\"");
-#else
-s32 sub_80903DC(void *);                        /* extern */
-s32 sub_8090420(void *);                        /* extern */
-extern s32 sub_8087540;
-
 s32 sub_80903A0(void *arg0) {
-    s32 temp_r1_11;
+    s16 temp_r1_11;
 
-    temp_r1_11 = M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */);
+    temp_r1_11 = (*(s16 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x28)))) + (0xEC)));
     if (temp_r1_11 == -1) {
         sub_8090420(arg0);
     } else if (temp_r1_11 == -2) {
@@ -218,7 +215,6 @@ s32 sub_80903A0(void *arg0) {
     (*(s32 **)((s8 *)(arg0) + (0x68))) = &sub_8087540;
     return 1;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80903DC.s\"");
