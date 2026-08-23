@@ -16,25 +16,21 @@ void sub_816127C(void *arg0, void *arg1) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_816129C.s\"");
-#else
 void sub_816129C(void *arg0, s32 arg1) {
+    struct Sprite *temp_r3_10;
     u8 temp_r0_17;
-    void *temp_r3_10;
 
-    temp_r3_10 = (*(void **)((s8 *)(arg0) + (0xC)));
+    temp_r3_10 = (*(struct Sprite **)((s8 *)(arg0) + (0xC)));
     temp_r0_17 = 0x40 & (*(u8 *)((s8 *)(temp_r3_10) + (0x29)));
     if (temp_r0_17 == 0) {
-        sub_801E150(temp_r3_10, M2C_ERROR(/* unknown instruction: ldsb $r1, ($mem_loc_fictive_) */), -1, 0, (s32) temp_r0_17);
+        sub_801E150(temp_r3_10, (s32) (*(s8 *)((s8 *)(arg0) + (8))), -1, 0, (s32) temp_r0_17);
     }
     if (arg1 != 0) {
-        sprite_show_8020CBC((*(void **)((s8 *)(arg0) + (0xC))));
+        sprite_show_8020CBC((*(struct Sprite **)((s8 *)(arg0) + (0xC))));
         return;
     }
-    sprite_hide_8021F20((*(void **)((s8 *)(arg0) + (0xC))));
+    sprite_hide_8021F20((*(struct Sprite **)((s8 *)(arg0) + (0xC))));
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81612E4.s\"");
