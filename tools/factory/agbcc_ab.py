@@ -90,15 +90,36 @@ def main() -> int:
         y = (100.0 * t["converged"] / n) if n else 0.0
         print(f"  {a:<8}{n:>10}{t['converged']:>11}{t['state:matched']:>9}{y:>8.1f}%")
 
-    lo = min(tally[a]["t2_launch"] for a in ("agbcc", "gcc") if a in tally)
+    # A two-proportion z-test, because printing two percentages side by side
+    # invites reading a gap that is not there. The first run of this tool
+    # showed 9.1% vs 13.3% and looked like a verdict; it is about ONE standard
+    # error, p ~= 0.3. Stating that plainly is the whole point -- this project
+    # has repeatedly acted on numbers that were really noise.
+    import math
+    a, b = tally["agbcc"], tally["gcc"]
+    na, nb = a["t2_launch"], b["t2_launch"]
     print()
-    if lo < 100:
-        print(f"NOT YET CONCLUSIVE -- the smaller arm has only {lo} search(es).")
-        print("Weights change how fast a stochastic search converges, so this needs")
-        print("hundreds of launches per arm before a gap means anything.")
+    if min(na, nb) < 30:
+        print(f"NOT CONCLUSIVE -- smaller arm has {min(na, nb)} search(es). Keep waiting.")
+        return 0
+    pa, pb = a["converged"] / na, b["converged"] / nb
+    pool = (a["converged"] + b["converged"]) / (na + nb)
+    se = math.sqrt(pool * (1 - pool) * (1 / na + 1 / nb))
+    z = (pa - pb) / se if se else 0.0
+    # Two-sided p from the normal CDF, via erfc -- no scipy in this container.
+    pval = math.erfc(abs(z) / math.sqrt(2))
+    print(f"difference {100*(pa-pb):+.1f} points, z = {z:+.2f}, p = {pval:.2f}")
+    if pval > 0.05:
+        print("NOT DISTINGUISHABLE FROM NOISE. Do not act on the direction; the")
+        print("arms need several hundred more launches each before this decides")
+        print("anything. Leaving the profile in place costs nothing meanwhile,")
+        print("because weights affect only search speed, never correctness.")
+    elif pa > pb:
+        print("The agbcc profile is measurably BETTER. Keep it.")
     else:
-        print("Compare the two yields against each other, not against CLAUDE.md's")
-        print("historical 15.6% -- that was measured under a different pipeline.")
+        print("The agbcc profile is measurably WORSE. Revert it:")
+        print("  git revert the [agbcc] profile commit, and set")
+        print("  compiler_type back to \"gcc\" in permuter_settings.toml.")
     return 0
 
 
