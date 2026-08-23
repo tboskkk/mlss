@@ -100,14 +100,21 @@ void sub_8106B90(void *arg0) {
     sub_810D3B8((*(s16 *)((s8 *)(arg0) + (0x16))), (*(s16 *)((s8 *)(arg0) + (0x12))) + 8, (*(s16 *)((s8 *)(arg0) + (0x14))) - 8, 0);
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8106BB0.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+void *sub_807FFD8(s32, s32 *);                  /* extern */
+extern s32 sub_8102F54;
+extern s32 sub_81071F0;
+void sub_8106BB0(void *arg0)
+{
+  int new_var;
+  void *temp_r0_16;
+  if ((sub_8082B00() << 0x18) == 0)
+  {
+    temp_r0_16 = sub_807FFD8((*((s32 *) 0x03000FD8)) + 0x4C, &sub_81071F0);
+    *((s16 *) (((s8 *) temp_r0_16) + 0x12)) = (s16) (new_var = *((s16 *) (((s8 *) arg0) + 0x12)));
+    *((s32 *) (((s8 *) temp_r0_16) + 0xC)) = (s32) (*((s32 *) (((s8 *) arg0) + 0xC)));
+    *((s32 **) (((s8 *) arg0) + 4)) = &sub_8102F54;
+  }
+}
 
 void sub_8106BEC(void *arg0) {
     sub_810D3B8((*(s32 *)((s8 *)(arg0) + (0xC))), (*(s16 *)((s8 *)(arg0) + (0x12))), (*(s16 *)((s8 *)(arg0) + (0x14))), ((s32) ((*(u16 *)((s8 *)(arg0) + (0x10))) << 0x10) >> 0x1C) & 1);
