@@ -1,0 +1,55 @@
+diff --git a/default_weights.toml b/default_weights.toml
+index 7c9e3e0..d88ef96 100644
+--- a/default_weights.toml
++++ b/default_weights.toml
+@@ -63,3 +63,50 @@ perm_dummy_comma_expr = 0.5
+ perm_add_self_assignment = 0.5
+ perm_duplicate_assignment = 0.5
+ perm_pad_var_decl = 0.5
++
++# agbcc (GCC 2.95 for ARM7TDMI Thumb, -O2) -- the Mario & Luigi: Superstar
++# Saga decomp. LOCAL to that project's fork; see tools/permuter_patches/.
++#
++# Before this existed the project ran `compiler_type = "gcc"`, whose own
++# comment above says its adjustments "were originally written with IDO in
++# mind" -- i.e. ~6,300 searches used MIPS-derived weights on ARM/Thumb.
++#
++# Every line below has a reason. Two sources:
++#   K = ablation-measured on agbcc by the Klonoa: Empire of Dreams decomp
++#       (docs/learnings/agbcc-source-shape-levers.md in kl-eod-decomp)
++#   C = a census of this project's own 3,124 m2c candidate bodies
++[agbcc]
++# K: operand order is one of the strongest agbcc levers. Writing the varying
++# index term first suppresses strength reduction (19 points on
++# DispatchLevelLayerSetup); multiplication operand order decides which of
++# ldrh/ldrb is emitted first and was the entire remaining gap on
++# LoadBGTileData. Base weight 5 was chosen for MIPS.
++perm_commutative = 30
++
++# C: 2,983 of 3,124 candidate bodies (95%) are built from explicit
++# `*(TYPE *)(base + off)` casts -- m2c emits flat pointer arithmetic, not
++# structs. Cast spelling is therefore the dominant mutable surface here.
++perm_cast_simple = 25
++
++# K: the declared width of a temporary decides whether a constant is
++# synthesised or loaded from the literal pool -- an s32 intermediate emits
++# mov/neg where a u16 loads the pool word, worth 18 -> 12 (byte-exact) on
++# StreamCmd_DisableVBlankAndStopMusic from the type alone.
++perm_randomize_internal_type = 20
++
++# C: 0 of 3,124 bodies contain a struct definition. m2c emits pointer casts,
++# so there is nothing for a struct-reference mutation to act on.
++perm_struct_ref = 0.5
++
++# C: 0 of 3,124 bodies mention float or double. This is fixed-point GBA game
++# code and agbcc has no hardware FP.
++perm_float_literal = 0.5
++
++# Upstream's own [gcc] note: these were written for IDO and are not
++# beneficial for GCC. agbcc IS gcc (2.95), so the same applies.
++perm_add_mask = 0.5
++perm_xor_zero = 0.5
++perm_refer_to_var = 0.5
++perm_sameline = 0.5
++perm_empty_stmt = 0.5
++perm_condition = 0.5

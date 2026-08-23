@@ -4,6 +4,12 @@
 # compiler_command mirrors this project's own Makefile rule for src/*.c
 # (agbcc -> as) exactly, flag for flag, rather than a generic example -
 # CFLAGS/ASFLAGS here must stay in sync with Makefile if those ever change.
-compiler_type = "gcc"
+# "agbcc", not "gcc". Upstream ships no ARM/agbcc profile, and [gcc]'s own
+# comment in default_weights.toml says its adjustments "were originally
+# written with IDO in mind" -- so ~6,300 searches ran MIPS-derived weights on
+# ARM/Thumb. The [agbcc] profile is a LOCAL addition; see
+# tools/permuter_patches/ (it lives in a submodule and is lost on
+# `git submodule update` unless reapplied from there).
+compiler_type = "agbcc"
 compiler_command = "tools/agbcc/bin/agbcc -O2 -mthumb-interwork -fno-common -Wimplicit -Wparentheses -Werror -g -ffix-debug-line -o /dev/stdout | arm-none-eabi-as -mcpu=arm7tdmi -I include"
 assembler_command = "arm-none-eabi-as -mcpu=arm7tdmi -I include"
