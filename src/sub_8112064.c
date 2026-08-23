@@ -84,23 +84,22 @@ void sub_81120E4(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_811213C.s\"");
-#else
-s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 extern s32 sub_8112498;
-
-void sub_811213C(void *arg0) {
-    void *temp_r2_18;
-
-    if (M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */) != 0) {
-        sub_8082E1C(arg0, 0xD, 0, 0);
-        temp_r2_18 = (*(void **)((s8 *)(arg0) + (8)));
-        (*(u8 *)((s8 *)(temp_r2_18) + (0x12))) = (u8) ((-7 & (*(u8 *)((s8 *)(temp_r2_18) + (0x12)))) | 2);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8112498;
-    }
+void sub_811213C(void *arg0)
+{
+  void *temp_r2_18;
+  int new_var2;
+  u8 new_var;
+  new_var2 = -7;
+  if ((*((s16 *) (((s8 *) arg0) + 0xAC))) != 0)
+  {
+    sub_8082E1C(arg0, 0xD, 0, 0);
+    temp_r2_18 = *((void **) (((s8 *) arg0) + 8));
+    new_var = (u8) (((*((u8 *) (((s8 *) temp_r2_18) + 0x12))) & new_var2) | 2);
+    *((u8 *) (((s8 *) temp_r2_18) + 0x12)) = new_var;
+    *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_8112498;
+  }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8112174.s\"");
