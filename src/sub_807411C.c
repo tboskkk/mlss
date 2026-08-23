@@ -25,23 +25,21 @@ void sub_807411C(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_807413C.s\"");
-#else
 extern s32 sub_8074508;
-
-void sub_807413C(void *arg0) {
-    s32 temp_r0_11;
-
-    temp_r0_11 = (*(s32 *)((s8 *)(arg0) + (0xA8))) + 1;
-    (*(s32 *)((s8 *)(arg0) + (0xA8))) = temp_r0_11;
-    if (temp_r0_11 > 0x71) {
-        (*(s32 *)((s8 *)(arg0) + (0xA8))) = 0x72;
-        (*(s16 *)((s8 *)((arg0 + 0xA8)) + (4))) = 0x12C;
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8074508;
-    }
+void sub_807413C(void *arg0)
+{
+  s32 temp_r0_11;
+  int new_var;
+  temp_r0_11 = (*((s32 *) (((s8 *) arg0) + 0xA8))) + 1;
+  *((s32 *) (((s8 *) arg0) + 0xA8)) = temp_r0_11;
+  new_var = 0x12C;
+  if (temp_r0_11 > 0x71)
+  {
+    *((s32 *) (((s8 *) arg0) + 0xA8)) = 0x72;
+    *((s16 *) (((s8 *) (arg0 + 0xA8)) + 4)) = new_var;
+    *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_8074508;
+  }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8074164.s\"");
