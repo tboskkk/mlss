@@ -7,19 +7,15 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8158F60.s\"");
-#else
-void sub_8158F60(void *arg0) {
-    u16 temp_r0_11;
-
-    temp_r0_11 = (*(u16 *)((s8 *)(arg0) + (0x1F2A))) - 1;
-    (*(u16 *)((s8 *)(arg0) + (0x1F2A))) = temp_r0_11;
-    if ((s32) (temp_r0_11 << 0x10) < 0) {
-        (*(s16 *)((s8 *)(arg0) + (0x1F28))) = 0;
-    }
+void sub_8158F60(void *arg0)
+{
+  u16 temp_r0_11;
+  temp_r0_11 = (*((u16 *) (((s8 *) arg0) + 0x1F2A)) = (*((u16 *) (((s8 *) arg0) + 0x1F2A))) - 1);
+  if (((s32) (temp_r0_11 << 0x10)) < 0)
+  {
+    *((s16 *) (((s8 *) arg0) + 0x1F28)) = 0;
+  }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8158F88.s\"");
