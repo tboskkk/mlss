@@ -70,21 +70,19 @@ s32 sub_8108DE4(void *arg0, s32 arg1)
   return 0;
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8108E3C.s\"");
-#else
-s32 sub_8199F30();                                  /* extern */
-s32 sub_81DD77C(s32, s32);                          /* extern */
-
-s32 sub_8108E3C(void *arg0, s32 arg1) {
-    if (!(0x1000 & (*(u16 *)((s8 *)(arg0) + (0x11E)))) && (arg1 >= sub_81DD77C(0x64, sub_8199F30()))) {
-        (*(u16 *)((s8 *)(arg0) + (0x11E))) = (u16) ((0xFFF & (*(u16 *)((s8 *)(arg0) + (0x11E)))) | 0x1000);
-        (*(u8 *)((s8 *)(arg0) + (0x122))) = (u8) ((-0x1D & (*(u8 *)((s8 *)(arg0) + (0x122)))) | 0xC);
-        return 1;
-    }
-    return 0;
+s32 sub_8108E3C(void *arg0, s32 arg1)
+{
+  if ((!(0x1000 & (*((u16 *) (((s8 *) arg0) + 0x11E))))) && (arg1 >= sub_81DD77C(0x64, sub_8199F30())))
+  {
+    int new_var;
+    *((u16 *) (((s8 *) arg0) + 0x11E)) = (u16) ((0xFFF & (*((u16 *) (((s8 *) arg0) + 0x11E)))) | 0x1000);
+    new_var = *((u8 *) (((s8 *) arg0) + 0x122));
+    new_var = ((-0x1D) & new_var) | 0xC;
+    *((u8 *) (((s8 *) arg0) + 0x122)) = (u8) new_var;
+    return 1;
+  }
+  return 0;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8108E94.s\"");
