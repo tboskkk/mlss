@@ -529,7 +529,31 @@ def generate(name: str) -> str | None:
         return None  # m2c emitted something, but not this function
     c = fix_void_dereference(c)
     c = fix_uncast_address_dereference(c)
+    c = fix_indirect_call_precedence(c)
     return restore_omitted_leading_params(c, name)
+
+
+# `*(s32 (**)(s32, s32))0x03000D48(a, b)` -- m2c's shape for "load a function
+# pointer from this address and call it". It does not parse the way it reads:
+# a call binds tighter than unary `*`, so C sees
+# `*( ((s32 (**)(s32,s32))0x03000D48)(a, b) )` -- calling the CAST expression,
+# which is `called object is not a function`.
+#
+# One pair of parentheses fixes it, and the fix is purely syntactic: the
+# operand, the cast and the arguments are all unchanged, so it cannot alter
+# what the seed means. It changes an uncompilable seed into a compilable one.
+#
+# Worth the rule rather than a one-off: `called object is not a function` was
+# the largest single error class in CLAUDE.md section G (24.4%) and is still
+# 75 of the 248 genuine failures in the isolation clustering (T.15), and this
+# exact shape appears in 142 stored candidate bodies.
+INDIRECT_CALL_RE = re.compile(
+    r"\*\((\s*[\w\s\*]+\(\*\*\)\s*\([^()]*\)\s*)\)\s*([0-9A-Za-z_]+)\s*\(")
+
+
+def fix_indirect_call_precedence(c: str) -> str:
+    """Parenthesise a dereferenced function pointer before it is called."""
+    return INDIRECT_CALL_RE.sub(lambda m: f"(*({m.group(1)}){m.group(2)})(", c)
 
 
 VOID_DEREF_RE = re.compile(r"\*\(void \*\)")
