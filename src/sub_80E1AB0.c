@@ -7,11 +7,8 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80E1AB0.s\"");
-#else
 s32 sub_807FB34(void *);                        /* extern */
-s32 sub_807FC54(void *, s32, s32, s32, s32); /* extern */
+s32 sub_807FC54(void *, s16, s16, s16, s32);    /* extern */
 
 void sub_80E1AB0(void *arg0) {
     u8 temp_r0_14;
@@ -20,13 +17,12 @@ void sub_80E1AB0(void *arg0) {
     temp_r5_9 = (*(void **)((s8 *)(arg0) + (8)));
     temp_r0_14 = 8 & (*(u8 *)((s8 *)(temp_r5_9) + (0x12)));
     if (temp_r0_14 == 0) {
-        sub_807FC54(temp_r5_9, M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */), M2C_ERROR(/* unknown instruction: ldsh $r2, ($mem_loc_fictive_) */), M2C_ERROR(/* unknown instruction: ldsh $r3, ($mem_loc_fictive_) */), (s32) temp_r0_14);
+        sub_807FC54(temp_r5_9, (*(s16 *)((s8 *)(arg0) + (0x12))), (*(s16 *)((s8 *)(arg0) + (0x14))), (*(s16 *)((s8 *)(arg0) + (0x16))), (s32) temp_r0_14);
         return;
     }
     sub_807FB34(temp_r5_9);
     (*(s32 *)((s8 *)(arg0) + (4))) = 0;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80E1AF0.s\"");
