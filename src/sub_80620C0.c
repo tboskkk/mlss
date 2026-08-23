@@ -7,6 +7,9 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
+
+extern s32 sub_8062188;
+
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80620C0.s\"");
 #else
@@ -29,25 +32,22 @@ s32 sub_80620C0(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80620F8.s\"");
-#else
-extern s32 sub_8062188;
-
-s32 sub_80620F8(void *arg0) {
-    s32 *var_r1_18;
-    s32 var_r0_19;
-
-    if (M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */) == -1) {
-        var_r1_18 = arg0 + 0x9C;
-        var_r0_19 = 0;
-    } else {
-        var_r1_18 = arg0 + 0x9C;
-        var_r0_19 = 1;
-    }
-    *var_r1_18 = var_r0_19;
-    (*(s32 *)((s8 *)(arg0) + (0xA0))) = 0;
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8062188;
-    return 1;
+s32 sub_80620F8(void *arg0)
+{
+  s32 *var_r1_18;
+  s32 var_r0_19;
+  if ((*((s16 *) (((s8 *) (*((void **) (((s8 *) (*((void **) (((s8 *) arg0) + 0x2C)))) + 0x28)))) + 0xEC))) == (-1))
+  {
+    var_r1_18 = arg0 + 0x9C;
+ do { var_r0_19 = 0; } while (0);
+  }
+  else
+  {
+    var_r1_18 = arg0 + 0x9C;
+    var_r0_19 = 1;
+  }
+  *var_r1_18 = var_r0_19;
+  *((s32 *) (((s8 *) arg0) + 0xA0)) = 0;
+  *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_8062188;
+  return 1;
 }
-#endif
