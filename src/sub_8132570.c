@@ -85,14 +85,25 @@ asm_unified(".include \"asm/nonmatching/sub_8132818.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_81329AC.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+s32 sub_808552C(void *, void *, void *, s32, s32, s32, s32, s32, s32, s32); /* extern */
+extern s32 sub_8132CE8;
+
+void sub_81329AC(void *arg0) {
+    s32 temp_r4_22;
+    void *temp_r1_13;
+
+    temp_r1_13 = (*(void **)((s8 *)(arg0) + (8)));
+    (*(u16 *)((s8 *)(temp_r1_13) + (0xC))) = (u16) ((*(u16 *)((s8 *)(temp_r1_13) + (0xC))) + 0x1200);
+    temp_r4_22 = (*(s32 *)((s8 *)(arg0) + (0x10))) + 0xFFFFFC00;
+    (*(s32 *)((s8 *)(arg0) + (0x10))) = temp_r4_22;
+    (*(s32 *)((s8 *)(arg0) + (0x14))) = (s32) (((s32) ((temp_r4_22 - ((*(s16 *)((s8 *)(arg0) + (0xAE))) << 8)) * (*(s32 *)((s8 *)(arg0) + (0x88)))) / (s32) (*(s32 *)((s8 *)(arg0) + (0x84)))) + ((*(s16 *)((s8 *)(arg0) + (0xB0))) << 8));
+    (*(s32 *)((s8 *)(arg0) + (0x18))) = (s32) (((s32) ((temp_r4_22 - ((*(s16 *)((s8 *)(arg0) + (0xAE))) << 8)) * (*(s32 *)((s8 *)(arg0) + (0x8C)))) / (s32) (*(s32 *)((s8 *)(arg0) + (0x84)))) + ((*(s16 *)((s8 *)(arg0) + (0xB2))) << 8));
+    if (temp_r4_22 < (s32) (((*(s16 *)((s8 *)(arg0) + (0xAE))) << 8) + (*(s32 *)((s8 *)(arg0) + (0x84))))) {
+        play_sfx_80195B4(0xAD, -1);
+        (*(s32 *)((s8 *)(arg0) + (0x94))) = sub_808552C(arg0 + 0xAE, arg0 + 0xB0, arg0 + 0xB2, 0xFFFF3800, (s32) (0 - ((*(s32 *)((s8 *)(arg0) + (0x88))) * 0xC800)) / (s32) (*(s32 *)((s8 *)(arg0) + (0x84))), 0, 0x3000, 0x400, 0x100, 0);
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8132CE8;
+    }
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8132AA4.s\"");
