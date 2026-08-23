@@ -7,16 +7,16 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80EAA5C.s\"");
-#else
-s32 sub_80E9C4C(s32, s32, s32, s32, s32, s32);  /* extern */
 
-s32 sub_80EAA5C(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
-    sub_80E9C4C(arg3, arg1 + 0x18, 0, 0, M2C_ERROR(/* unknown instruction: ldsh $r2, ($mem_loc_fictive_) */), (s32) (*(u16 *)((s8 *)((void *)0x0300034C) + (0x2E))));
-    return 1;
+s32 sub_80E9C4C();
+
+s32 sub_80EAA5C(s32 arg0, s32 arg1, s16 *arg2, s32 arg3)
+{
+  int new_var;
+  new_var = 0x2E;
+  sub_80E9C4C(arg3, arg1 + 0x18, 0, 0, (s32) (*arg2), (s32) (*((u16 *) (((s8 *) ((void *) 0x0300034C)) + new_var))));
+  return 1;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80EAA84.s\"");
