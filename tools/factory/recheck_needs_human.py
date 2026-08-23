@@ -29,10 +29,33 @@ DIAG.mkdir(parents=True, exist_ok=True)
 
 
 def spliced_text(name, body):
+    """The destination file with `body` spliced in, AS THE REAL PATH WOULD DO IT.
+
+    The two declaration repairs matter here, not just cosmetically. A tool that
+    simulates a splice but skips the repairs the real splice applies reports
+    conflicts that will not actually happen, and those rows stay filed in a
+    queue nothing revisits (CLAUDE.md section Q). Before this, four rows in
+    this very report were clustered under `X redeclared as different kind of
+    symbol` -- a class gitops.splice_candidate() now fixes on its own.
+
+    General rule worth keeping: any tool that PREDICTS what a splice will do
+    must apply the same transformations the splice does, or it under-reports.
+    """
     c_path, block = gitops.find_guard_block(name)
     if c_path is None:
         return None, None
-    return c_path, c_path.read_text().replace(block, body.rstrip() + "\n")
+    # 1. declarations inside the candidate that contradict the file
+    body = gitops._repair_body_decls(c_path, body)
+    text = c_path.read_text().replace(block, body.rstrip() + "\n")
+    # 2. a stale file-scope `extern s32 <name>;` for the symbol being defined
+    try:
+        import fix_decl_conflicts
+        out, _proto = fix_decl_conflicts.repair_file_scope(text, name, body)
+        if out:
+            text = out
+    except Exception:
+        pass
+    return c_path, text
 
 
 def compile_text(tag, text):
