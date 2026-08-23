@@ -16,14 +16,10 @@ extern s32 sub_8069558;
 int sub_8082E1C();
 int sub_8086858();
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_806A2FC.s\"");
-#else
 void sub_806A2FC(void *arg0)
 {
-  long temp_r0_11;
-  temp_r0_11 = (*((u16 *) (((s8 *) arg0) + 0xAC))) - 1;
-  *((u16 *) (((s8 *) arg0) + 0xAC)) = temp_r0_11;
+  u16 temp_r0_11;
+  temp_r0_11 = (*((u16 *) (((s8 *) arg0) + 0xAC)) = (*((u16 *) (((s8 *) arg0) + 0xAC))) - 1);
   if (((s32) (temp_r0_11 << 0x10)) <= 0)
   {
     sub_8082E1C(arg0, 5, 0, 0);
@@ -32,7 +28,6 @@ void sub_806A2FC(void *arg0)
     play_sfx_80195B4(0xAF, -1);
   }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_806A348.s\"");
