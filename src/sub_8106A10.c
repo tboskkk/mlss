@@ -7,6 +7,13 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
+
+
+s32 sub_8082B00();
+extern s32 sub_8100E5C;
+
+s32 sub_80F7538();
+
 extern s32 sub_8104D14;
 
 void sub_8106A10(void *arg0) {
@@ -152,21 +159,15 @@ void sub_8106C64(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8106D20.s\"");
-#else
-s32 sub_80F7538(s32);                           /* extern */
 extern s32 sub_81054D4;
-
-void sub_8106D20(void *arg0) {
-    void *temp_r3_12;
-
-    temp_r3_12 = (*(void **)((s8 *)(*(void **)0x03000FD8) + (0x2D8)));
-    (*(u8 *)((s8 *)(temp_r3_12) + (5))) = (u8) ((-4 & (*(u8 *)((s8 *)(temp_r3_12) + (5)))) | 2);
-    (*(s32 **)((s8 *)(arg0) + (4))) = &sub_81054D4;
-    sub_80F7538(0x200000);
+void sub_8106D20(void *arg0)
+{
+  void *temp_r3_12;
+  temp_r3_12 = *((void **) (((s8 *) (*((void **) 0x03000FD8))) + 0x2D8));
+  *((u8 *) (((s8 *) temp_r3_12) + 5)) = (u8) (((-4) & (*(((s8 *) temp_r3_12) + 5))) | 2);
+  *((s32 **) (((s8 *) arg0) + 4)) = &sub_81054D4;
+  sub_80F7538(0x200000);
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8106D54.s\"");
