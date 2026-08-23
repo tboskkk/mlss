@@ -158,14 +158,20 @@ void sub_8099FE0(void *arg0) {
     (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_809A09C;
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8099FFC.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+extern s32 sub_80997E4;
+void sub_8099FFC(void *arg0)
+{
+  void *temp_r1_16;
+  sub_8082E1C(arg0, 2, 0, 0);
+  if (1)
+  {
+    *((s16 *) (((s8 *) arg0) + 0xAC)) = 0;
+    ;
+    *((s32 *) (((s8 *) ((arg0 + 0xAC) - 0x28)) + 0)) = (s32) (*((s32 *) (((s8 *) arg0) + 0x38)));
+  }
+  *((s32 *) (((s8 *) ((arg0 + 0xAC) - 0x28)) + 4)) = (s32) (*((s32 *) (((s8 *) arg0) + 0x3C)));
+  *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_80997E4;
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_809A02C.s\"");
