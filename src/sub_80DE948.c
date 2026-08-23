@@ -7,6 +7,9 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
+
+s32 stop_sfx_80195A8();
+
 extern s32 sub_808750C;
 
 void sub_80DE948(void *arg0) {
@@ -27,17 +30,12 @@ void sub_80DE960(s32 arg0, s32 arg1, s32 arg2) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80DE980.s\"");
-#else
-s32 stop_sfx_80195A8(s32);                      /* extern */
 s32 sub_810DD7C(s32, s32, s32);                 /* extern */
-
-void sub_80DE980(s32 arg0, s32 arg1, s32 arg2) {
-    stop_sfx_80195A8(0x11A);
-    sub_810DD7C(arg0, arg1, arg2);
+unsigned long sub_80DE980(s32 arg0, s32 arg1, s32 arg2)
+{
+  stop_sfx_80195A8(0x11A);
+  sub_810DD7C(arg0, arg1, arg2);
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80DE9A0.s\"");
