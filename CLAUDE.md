@@ -2330,13 +2330,32 @@ object. Section S's framing -- and T.9's own first draft -- treated the flag as
 the trigger. It is a partial fix for a deeper agbcc debug-line bug, and the
 `declare_missing` case is one the fix does not cover.
 
-That closes off the route this entry originally recommended. What has NOT been
-tried: dropping `-g` for the affected object (debug info should not reach
-`.text`, but that must be proven byte-identical, not assumed), and finding an
-insertion point for the declarations that the debug-line emitter survives.
-Test either on the single affected object, not the whole ROM -- three full
-builds cost about 40 minutes and a one-object compile answers the same
-question.
+**RESOLVED. `-g` is the trigger, and it is byte-neutral, so the fix is a
+per-object fallback.** Measured, in this order:
+
+    the blocked object, without -g          -> compiles clean
+    .text + relocs, 8 files, with vs no -g  -> 8/8 IDENTICAL
+    whole ROM, CFLAGS lacking -g            -> mlss.gba: OK, layout clean
+
+So the chain is: agbcc's debug-line emission is buggy; `-ffix-debug-line`
+suppresses it for most inputs (which is why removing that flag makes MORE
+objects fail); the `declare_missing` case is one it does not cover; and `-g`
+itself is what feeds the emitter.
+
+The Makefile now compiles normally and, **only if the assembler rejects the
+generated `.s`**, recompiles that one object with `CFLAGS_NODEBUG`
+(`$(filter-out -g,$(CFLAGS))`) and re-assembles, printing a note naming the
+object. It cannot change output -- byte-neutrality was proven at ROM level,
+not merely per object -- and it triggers on nothing that already works.
+Verified end to end: the previously-unbuildable `sub_8106840` builds with the
+note, and a full from-scratch build still reports `mlss.gba: OK` with a clean
+layout.
+
+**Why this matters beyond the rows it unblocks:** the class was
+`declare_missing` CORRECTLY fixing a `-Werror` warning and thereby converting
+a tractable problem into an unbuildable one. Every future candidate needing a
+declaration in an affected file was hitting the same wall silently, and being
+filed as "candidate doesn't compile".
 
 **T.8 -- measuring ONE SYMBOL ALONE finds finished work by the hundred, in
 seconds.** `tools/factory/isolation_exact.py`.

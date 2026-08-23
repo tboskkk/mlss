@@ -29,6 +29,14 @@ LDFLAGS			:= -Ltools/agbcc/lib -lgcc -lc --just-symbols=symbols.txt -g
 # This branch fixes debug lines so they are emitted properly. If the compiler doesn't produce the
 # same output please switch back to the normal agbcc repo.
 CFLAGS			:= -O2 -mthumb-interwork -fno-common -Wimplicit -Wparentheses -Werror -g -ffix-debug-line
+# Same flags without -g, for the fallback in the %.o rule below. agbcc's
+# debug-line emission is buggy: for some inputs it makes the generated .s
+# unassemblable, and the error names asm/macros.inc, which is innocent.
+# -ffix-debug-line covers most of it (dropping that flag makes MORE objects
+# fail, measured), but not all. Proven byte-neutral: a full from-scratch ROM
+# build with CFLAGS lacking -g reproduces rom.sha1 exactly, with a clean
+# layout check. See CLAUDE.md section T.9.
+CFLAGS_NODEBUG	:= $(filter-out -g,$(CFLAGS))
 CPPFLAGS 		:= -I tools/agbcc/include -nostdinc -undef -iquote include -Wno-trigraphs
 
 # `make NONMATCHING=1`: compiles the #else branch of every
@@ -85,7 +93,11 @@ $(C_BUILDDIR)/%.o : $(C_SUBDIR)/%.c
 	@$(CPP) $(CPPFLAGS) $< -o $(C_BUILDDIR)/$*.i
 	@$(CC1) $(C_BUILDDIR)/$*.i $(CFLAGS) -o $(C_BUILDDIR)/$*.s
 	@echo -e ".text\n\t.align\t2, 0\n" >> $(C_BUILDDIR)/$*.s
-	$(AS) $(ASFLAGS) -o $@ $(C_BUILDDIR)/$*.s
+	@$(AS) $(ASFLAGS) -o $@ $(C_BUILDDIR)/$*.s 2>/dev/null || { \
+		echo "note: $* tripped agbcc's debug-line bug -- recompiling it without -g" >&2; \
+		$(CC1) $(C_BUILDDIR)/$*.i $(CFLAGS_NODEBUG) -o $(C_BUILDDIR)/$*.s && \
+		echo -e ".text\n\t.align\t2, 0\n" >> $(C_BUILDDIR)/$*.s && \
+		$(AS) $(ASFLAGS) -o $@ $(C_BUILDDIR)/$*.s; }
 
 $(ASM_BUILDDIR)/%.o: $(ASM_SUBDIR)/%.s
 	$(AS) $(ASFLAGS) -o $@ $<
