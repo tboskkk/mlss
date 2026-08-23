@@ -7,14 +7,17 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8163BB8.s\"");
-#else
-u32 sub_8163BB8(void) {
-    *(u16*)0x0300102C = 0;
-    return 0;
+u32 sub_8163BB8(void)
+{
+  u16 *new_var2;
+  int new_var;
+  int new_var3;
+  new_var = 0x0300102C;
+  new_var2 = (u16 *) new_var;
+  new_var3 = 0;
+  *new_var2 = 0;
+  return new_var3;
 }
-#endif
 
 s32 sub_8163BC4(void **arg0, s32 arg1) {
     s32 var_r3_8;
