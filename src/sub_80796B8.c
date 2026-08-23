@@ -345,14 +345,12 @@ void sub_8079C3C(void *arg0) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8079C70.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+void sub_8079C70(void *arg0) {
+    sub_8082E1C(arg0, 0xD, 0x4029, 0);
+    (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_8079C9C;
+    (*(s32 *)((s8 *)(arg0) + (0xA4))) = 0;
+    (*(s32 *)((s8 *)(arg0) + (0xA8))) = 0;
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8079C9C.s\"");
