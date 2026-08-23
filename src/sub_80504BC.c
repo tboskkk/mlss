@@ -188,21 +188,19 @@ void sub_8050710(void *arg0) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8050740.s\"");
-#else
 s32 sub_8040AE0();                              /* extern */
 
 void sub_8050740(void *arg0, s32 arg1) {
+    void *temp_r1_19;
     void *temp_r4_13;
 
     sub_8040AE0();
     temp_r4_13 = (*(void **)((s8 *)(arg0) + (0x344)));
     if (temp_r4_13 != NULL) {
-        (*(s32 (**)(void *, s32))((s8 *)((*(void **)((s8 *)(temp_r4_13) + (0x338)))) + (0x34)))(temp_r4_13 + M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */), arg1);
+        temp_r1_19 = (*(void **)((s8 *)(temp_r4_13) + (0x338)));
+        (*(s32 (**)(void *, s32))((s8 *)(temp_r1_19) + (0x34)))(temp_r4_13 + (*(s16 *)((s8 *)(temp_r1_19) + (0x30))), arg1);
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8050774.s\"");
