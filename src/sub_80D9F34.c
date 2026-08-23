@@ -11,17 +11,13 @@ asm_unified(".include \"asm/macros.inc\"");
 s32 sub_8082E1C();
 void sub_80DA098(void *arg0);
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80D9F34.s\"");
-#else
 extern s32 sub_80DA0E0;
 
 void sub_80D9F34(void *arg0) {
-    if (M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */) != 0) {
+    if ((*(s16 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x28)))) + (0xF6))) != 0) {
         (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80DA0E0;
     }
 }
-#endif
 
 s32 sub_8086858(void *, s32);                   /* extern */
 extern s32 sub_80D9E34;
