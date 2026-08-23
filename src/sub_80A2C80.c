@@ -7,19 +7,18 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80A2C80.s\"");
-#else
-u32* sub_80A2C80(u32* param_1) {
-    u32* puVar1;
-    
-    puVar1 = param_1;
-    puVar1 = (u32*)((s32)puVar1 + 0xb2);
-    *(u16*)puVar1 = 0xFE4D;
-    *(u32*)(param_1 + 0x13) = (u32)sub_80A2BC0;
-    return param_1;
+extern s32 sub_80A2BC0;
+void sub_80A2C80(void *arg0)
+{
+  s8 *new_var3;
+  void *new_var;
+  int new_var2;
+  new_var3 = ((s8 *) arg0) + 0xB2;
+  new_var2 = 0xFE4D;
+  *((s16 *) new_var3) = new_var2;
+  new_var = arg0;
+  *((s32 **) (((s8 *) new_var) + 0x4C)) = &sub_80A2BC0;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80A2C98.s\"");
