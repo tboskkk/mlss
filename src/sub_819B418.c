@@ -105,14 +105,12 @@ asm_unified(".include \"asm/nonmatching/sub_819BA00.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_819BA10.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+volatile short sub_819BA10(s32 arg0, s32 arg1)
+{
+  unsigned long long new_var;
+  new_var = (unsigned long long) 0xFFFF8000;
+  sub_819B418((u16) (((arg0 << 8) | new_var) | arg1));
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_819BA2C.s\"");
