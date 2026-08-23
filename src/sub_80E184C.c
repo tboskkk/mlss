@@ -78,20 +78,18 @@ _080E18CE:
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80E18D8.s\"");
-#else
 s32 sub_807BC90();                              /* extern */
-s32 sub_8084338(u16, s32, s32, s32);            /* extern */
+s32 sub_8084338(u16, s16, s32, s32);                /* extern */
 s32 sub_80E1AB0(void *);                        /* extern */
 
 void sub_80E18D8(void *arg0) {
     s32 temp_r4_15;
+    void *temp_r1_8;
 
-    temp_r4_15 = sub_8084338(*(*(u16 **)((s8 *)(arg0) + (0xC))), M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */), 2, 1);
+    temp_r1_8 = (*(void **)((s8 *)(arg0) + (0xC)));
+    temp_r4_15 = sub_8084338((*(u16 *)((s8 *)(temp_r1_8) + (0))), (*(s16 *)((s8 *)(temp_r1_8) + (2))), 2, 1);
     sub_807BC90();
     (*(s32 *)((s8 *)(arg0) + (8))) = temp_r4_15;
     (*(s32 (**)(void *))((s8 *)(arg0) + (4))) = sub_80E1AB0;
     sub_80E1AB0(arg0);
 }
-#endif
