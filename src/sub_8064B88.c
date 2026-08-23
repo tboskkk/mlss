@@ -8,6 +8,10 @@
 asm_unified(".include \"asm/macros.inc\"");
 
 
+
+extern s32 sub_8064614;
+s32 sub_8082E1C();
+
 s32 sub_807C298();
 
 #ifndef NONMATCHING
@@ -110,23 +114,16 @@ block_7:
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8064D20.s\"");
-#else
-s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
-extern s32 sub_8064614;
-
 void sub_8064D20(void *arg0) {
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
         if ((*(s32 *)((s8 *)(arg0) + (0xA0))) == 0) {
-            sub_8082E1C(arg0, 5, 0, 0);
+            sub_8082E1C(arg0, 0x05, 0, 0);
         } else {
-            sub_8082E1C(arg0, 9, 0, 0);
+            sub_8082E1C(arg0, 0x09, 0, 0);
         }
         (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8064614;
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8064D64.s\"");

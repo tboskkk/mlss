@@ -12,6 +12,10 @@ asm_unified(".include \"asm/macros.inc\"");
 
 
 
+
+void sub_8068EF4(void *arg0);
+int sub_8086C64();
+
 void sub_8068F10(void *arg0);
 
 s32 sub_810DD7C();
