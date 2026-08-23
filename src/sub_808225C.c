@@ -7,19 +7,15 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_808225C.s\"");
-#else
 extern s32 sub_8081F84;
 
 void sub_808225C(void *arg0) {
-    if ((s32) M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */) > 0) {
+    if ((s32) (s16) (*(u16 *)((s8 *)(arg0) + (0x10))) > 0) {
         (*(u16 *)((s8 *)(arg0) + (0x10))) = (u16) ((*(u16 *)((s8 *)(arg0) + (0x10))) - 1);
         return;
     }
     (*(s32 **)((s8 *)(arg0) + (4))) = &sub_8081F84;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_808227C.s\"");
