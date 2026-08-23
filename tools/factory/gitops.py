@@ -228,6 +228,13 @@ def splice_into_else(name: str, body: str) -> Path | None:
     # the pipeline just refused to believe it.
     if new_text != text:
         c_path.write_text(new_text)
+    # Same repair splice_candidate() needs, for the same reason: under
+    # NONMATCHING=1 the #else branch IS the definition, so a stale file-scope
+    # `extern s32 <name>;` collides with it exactly as it does when the guard
+    # is removed. Leaving it out here made werror_casts and every other
+    # #else-path consumer see `X redeclared as different kind of symbol` and
+    # blame the candidate.
+    _repair_self_declaration(c_path, name, body)
     return c_path
 
 
