@@ -59,11 +59,23 @@ def main() -> int:
     for k, v in src.most_common():
         if k != LIVE:
             print(f"  converged, {k:<16}: {v}   (not a live search)")
-    if launches:
-        print(f"\n  live search yield: {100*live/launches:.1f}%   "
-              f"(CLAUDE.md baseline 15.6%)")
-    else:
+    # A yield printed from a handful of launches is noise wearing a decimal
+    # point. At the 15.6% baseline you need on the order of 100 launches before
+    # the number distinguishes "the search got worse" from an ordinary quiet
+    # stretch -- over 32 launches the baseline itself predicts about 5, and
+    # seeing 1 means nothing. This project has repeatedly acted on numbers that
+    # small, so the tool refuses rather than inviting it.
+    MIN_LAUNCHES = 100
+    if not launches:
         print("\n  no launches in the window -- no verdict")
+    elif launches < MIN_LAUNCHES:
+        print(f"\n  {live} live convergence(s) in {launches} launch(es) -- "
+              f"NOT ENOUGH TO STATE A YIELD.")
+        print(f"  Needs >= {MIN_LAUNCHES} launches; at the 15.6% baseline this "
+              f"window would predict ~{0.156*launches:.0f}.")
+    else:
+        print(f"\n  live search yield: {100*live/launches:.1f}%   "
+              f"(CLAUDE.md baseline 15.6%, n={launches})")
     if src.get("permuter"):
         print("\n  NOTE: a rescue/harvest run is inflating the raw converged count.")
         print("  Only the LIVE SEARCH line speaks to whether the search is working.")
