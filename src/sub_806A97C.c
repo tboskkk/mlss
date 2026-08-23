@@ -221,9 +221,9 @@ asm_unified(".include \"asm/nonmatching/sub_806B424.s\"");
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 extern s32 sub_806AEFC;
 
-void sub_806B50C(void *arg0) {
+void sub_806B50C(struct Entity *arg0) {
     sub_8082E1C(arg0, 2, 0, 0);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_806AEFC;
+    arg0->handler = &sub_806AEFC;
 }
 
 s32 sub_807C298(void *);                        /* extern */

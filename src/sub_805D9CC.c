@@ -9,7 +9,7 @@ asm_unified(".include \"asm/macros.inc\"");
 
 
 
-void sub_805DEB4(void *arg0);
+void sub_805DEB4(struct Entity *arg0);
 
 extern s32 sub_805DEDC;
 int sub_8082B00();
@@ -137,17 +137,17 @@ asm_unified(".include \"asm/nonmatching/sub_805DE0C.s\"");
 #endif
 
 s32 stop_sfx_80195A8(s32);                      /* extern */
-void sub_805DE90(void *arg0) {
+void sub_805DE90(struct Entity *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_805DEB4;
+        arg0->handler = (s32 *) &sub_805DEB4;
         stop_sfx_80195A8(0x11B);
     }
 }
 
-void sub_805DEB4(void *arg0) {
+void sub_805DEB4(struct Entity *arg0) {
     if (sub_8082B00() == 0) {
         sub_8082E1C(arg0, 0x03, 0, 0);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_805DEDC;
+        arg0->handler = &sub_805DEDC;
     }
 }
 

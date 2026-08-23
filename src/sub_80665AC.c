@@ -100,10 +100,10 @@ void sub_8066820(void *arg0) {
 }
 #endif
 
-void sub_8066864(void *arg0) {
+void sub_8066864(struct Entity *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
         sub_8082E1C(arg0, 0x00, 0, 0);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_808750C;
+        arg0->handler = &sub_808750C;
     }
 }
 
@@ -179,10 +179,10 @@ void sub_8066CEC(void *arg0)
   }
 }
 
-void sub_8066D50(void *arg0) {
+void sub_8066D50(struct Entity *arg0) {
     if (sub_8082B00() == 0) {
         sub_8082E1C(arg0, 0x02, 0, 0);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8066DA4;
+        arg0->handler = &sub_8066DA4;
     }
 }
 

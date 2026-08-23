@@ -16,7 +16,7 @@ asm_unified(".include \"asm/macros.inc\"");
 void sub_8068EF4(void *arg0);
 int sub_8086C64();
 
-void sub_8068F10(void *arg0);
+void sub_8068F10(struct Entity *arg0);
 
 s32 sub_810DD7C();
 
@@ -206,20 +206,20 @@ void sub_8068D74(void *arg0)
 
 extern s32 sub_8068AA8;
 
-void sub_8068DBC(void *arg0) {
+void sub_8068DBC(struct Entity *arg0) {
     if (sub_8082B00() == 0) {
         sub_8082E1C(arg0, 2, 0, 0);
         (*(s32 *)((s8 *)(arg0) + (0x8C))) = 0x300;
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8068AA8;
+        arg0->handler = &sub_8068AA8;
     }
 }
 
 s32 sub_807F4FC(void *);                        /* extern */
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 extern s32 sub_8068B68;
-s32 sub_8068E60(void *arg0);
+s32 sub_8068E60(struct Entity *arg0);
 s32 sub_8068E7C(void *arg0);
-void sub_8068E98(void *arg0);
+void sub_8068E98(struct Entity *arg0);
 void sub_8068DEC(void *arg0) {
     s32 temp_r1_16;
 
@@ -240,9 +240,9 @@ void sub_8068DEC(void *arg0) {
     }
 }
 
-s32 sub_8068E60(void *arg0) {
+s32 sub_8068E60(struct Entity *arg0) {
     sub_810DD7C(arg0, (*(s32 *)((s8 *)(arg0) + (0x2C))), 0xFF);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8068B68;
+    arg0->handler = &sub_8068B68;
     return 0;
 }
 
@@ -260,7 +260,7 @@ s32 sub_8068E7C(void *arg0)
 }
 
 s32 sub_8086858(void *, s32);                       /* extern */
-void sub_8068E98(void *arg0) {
+void sub_8068E98(struct Entity *arg0) {
     s32 temp_r0_19;
     s32 temp_r1_11;
 
@@ -272,7 +272,7 @@ void sub_8068E98(void *arg0) {
         sub_8082E1C(arg0, 0xA, 0, 0);
         *(s32 *)0x03000E3C = sub_8086858(arg0, 0x1608);
         play_sfx_80195B4(0xAF, -1);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_8068F10;
+        arg0->handler = (s32 *) &sub_8068F10;
     }
 }
 
@@ -284,10 +284,10 @@ void sub_8068EF4(void *arg0) {
     (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_808750C;
 }
 
-void sub_8068F10(void *arg0) {
+void sub_8068F10(struct Entity *arg0) {
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
         sub_8082E1C(arg0, 0xB, 0, 0);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_808750C;
+        arg0->handler = &sub_808750C;
     }
 }
 
@@ -339,7 +339,7 @@ asm_unified(".include \"asm/nonmatching/sub_80692DC.s\"");
 s32 sub_8086D80();                                  /* extern */
 extern s32 sub_80690F8;
 
-s32 sub_8069354(void *arg0) {
+s32 sub_8069354(struct Entity *arg0) {
     s32 var_r0_8;
 
     var_r0_8 = sub_8086D80();
@@ -350,7 +350,7 @@ s32 sub_8069354(void *arg0) {
             stop_sfx_80195A8(0x81);
         }
         (*(s32 *)((s8 *)(arg0) + (0x80))) = 0;
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80690F8;
+        arg0->handler = &sub_80690F8;
         var_r0_8 = 0;
     }
     return var_r0_8;

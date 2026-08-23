@@ -22,7 +22,7 @@ void sub_80613FC(void *arg0);
 extern s32 sub_8060A58;
 
 void sub_8060694(void *arg0);
-void sub_80605CC(void *arg0);
+void sub_80605CC(struct Entity *arg0);
 int sub_8082E1C();
 
 extern s32 sub_808750C;
@@ -71,18 +71,18 @@ void sub_80605A4(void *arg0) {
 
 extern s32 sub_80602B4;
 
-void sub_80605CC(void *arg0) {
+void sub_80605CC(struct Entity *arg0) {
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
         sub_8082E1C(arg0, 2, 0, 0);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80602B4;
+        arg0->handler = &sub_80602B4;
     }
 }
 
-void sub_80605F8(void *arg0) {
+void sub_80605F8(struct Entity *arg0) {
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
         sub_8082E1C(arg0, 0x06, 0, 0);
         (*(s16 *)((s8 *)(arg0) + (0xAC))) = 0x01;
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_8060694;
+        arg0->handler = (s32 *) &sub_8060694;
     }
 }
 
@@ -166,7 +166,7 @@ asm_unified(".include \"asm/nonmatching/sub_8060AF8.s\"");
 #endif
 
 u8 sub_801B1C8(void *, s32, s32);                   /* extern */
-void sub_8060B68(void *arg0) {
+void sub_8060B68(struct Entity *arg0) {
     if (sub_801B1C8(*(void **)0x03000E18, 0x03000E1C, 0x03000E20) == 1) {
         (*(s32 *)((s8 *)(arg0) + (0x10))) = (s32) *(s32 *)0x03000E1C;
         (*(s32 *)((s8 *)(arg0) + (0x14))) = (s32) *(s32 *)0x03000E20;
@@ -175,7 +175,7 @@ void sub_8060B68(void *arg0) {
     (*(s32 *)((s8 *)(arg0) + (0x10))) = (s32) *(s32 *)0x03000E1C;
     (*(s32 *)((s8 *)(arg0) + (0x14))) = (s32) *(s32 *)0x03000E20;
     free_heap_8018DA8(*(void **)0x03000E18);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_8060CB8;
+    arg0->handler = (s32 *) &sub_8060CB8;
 }
 
 #ifndef NONMATCHING
@@ -316,10 +316,10 @@ asm_unified(".include \"asm/nonmatching/sub_806123C.s\"");
 s32 sub_810DD7C();                              /* extern */
 extern s32 sub_806123C;
 
-s32 sub_80612B4(void *arg0) {
+s32 sub_80612B4(struct Entity *arg0) {
     sub_810DD7C();
     (*(s32 *)((s8 *)(arg0) + (0x80))) = 0;
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_806123C;
+    arg0->handler = &sub_806123C;
     return 0;
 }
 

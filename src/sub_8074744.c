@@ -414,9 +414,9 @@ asm_unified(".include \"asm/nonmatching/sub_8076034.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-void sub_807608C(void *arg0) {
+void sub_807608C(struct Entity *arg0) {
     sub_8082E1C(arg0, 0x0E, 0, 0);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80760F4;
+    arg0->handler = &sub_80760F4;
 }
 
 #ifndef NONMATCHING
@@ -765,9 +765,9 @@ void sub_80774E4(void *arg0) {
 }
 #endif
 
-void sub_8077538(void *arg0) {
+void sub_8077538(struct Entity *arg0) {
     sub_8082E1C(arg0, 0x0A, 0, 0);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8076574;
+    arg0->handler = &sub_8076574;
 }
 
 #ifndef NONMATCHING

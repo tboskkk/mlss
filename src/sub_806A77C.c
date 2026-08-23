@@ -95,9 +95,9 @@ void sub_806A83C(void *arg0) {
 }
 #endif
 
-void sub_806A894(void *arg0) {
+void sub_806A894(struct Entity *arg0) {
     sub_8082E1C(arg0, 2, 0, 0);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_806A908;
+    arg0->handler = (s32 *) &sub_806A908;
 }
 
 void sub_806A8B0(void *arg0)
@@ -113,10 +113,10 @@ void sub_806A8B0(void *arg0)
   }
 }
 
-void sub_806A8E0(void *arg0) {
+void sub_806A8E0(struct Entity *arg0) {
     if (sub_8082B00() == 0) {
         sub_8082E1C(arg0, 0x02, 0, 0);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_806A3F8;
+        arg0->handler = &sub_806A3F8;
     }
 }
 

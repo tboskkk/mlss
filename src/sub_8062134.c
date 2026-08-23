@@ -124,10 +124,10 @@ asm_unified(".include \"asm/nonmatching/sub_8062394.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-void sub_80623F8(void *arg0) {
+void sub_80623F8(struct Entity *arg0) {
     if (sub_8082B00() == 0) {
         sub_8082E1C(arg0, 0x02, 0, 0);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8062420;
+        arg0->handler = &sub_8062420;
     }
 }
 
@@ -242,9 +242,9 @@ asm_unified(".include \"asm/nonmatching/sub_8062C94.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-void sub_8062D68(void *arg0) {
+void sub_8062D68(struct Entity *arg0) {
     sub_8082E1C(arg0, 0x0E, 0, 0);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_808750C;
+    arg0->handler = &sub_808750C;
 }
 
 #ifndef NONMATCHING
@@ -290,14 +290,14 @@ asm_unified(".include \"asm/nonmatching/sub_8062E98.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-void sub_8062F00(void *arg0) {
+void sub_8062F00(struct Entity *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
         if ((*(s32 *)((s8 *)(arg0) + (0x9C))) == 0) {
             sub_8082E1C(arg0, 4, 0, 0);
         } else {
             sub_8082E1C(arg0, 7, 0, 0);
         }
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_8062F40;
+        arg0->handler = (s32 *) &sub_8062F40;
     }
 }
 

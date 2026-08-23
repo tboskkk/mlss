@@ -7,18 +7,18 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-void sub_8099034(void *arg0);
-s32 sub_8099028(void *arg0) {
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_8099034;
+void sub_8099034(struct Entity *arg0);
+s32 sub_8099028(struct Entity *arg0) {
+    arg0->handler = (s32 *) &sub_8099034;
     return 1;
 }
 
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 extern s32 sub_8099050;
 
-void sub_8099034(void *arg0) {
+void sub_8099034(struct Entity *arg0) {
     sub_8082E1C(arg0, 0xF, 0, 0);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8099050;
+    arg0->handler = &sub_8099050;
 }
 
 #ifndef NONMATCHING

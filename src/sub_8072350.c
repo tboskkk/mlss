@@ -101,9 +101,9 @@ void sub_8072500(struct Entity *arg0) {
 
 extern s32 sub_80725D0;
 
-void sub_8072528(void *arg0) {
+void sub_8072528(struct Entity *arg0) {
     sub_8082E1C((*(s32 *)((s8 *)(*(void **)0x03000FD8) + (0x58))) + 8, 0x2F, 0, 0);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80725D0;
+    arg0->handler = &sub_80725D0;
 }
 
 #ifndef NONMATCHING
@@ -124,10 +124,10 @@ asm_unified(".include \"asm/nonmatching/sub_80725D0.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-void sub_8072650(void *arg0) {
+void sub_8072650(struct Entity *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
         sub_8082E1C(arg0, 0x16, 0, 0);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_807197C;
+        arg0->handler = &sub_807197C;
     }
 }
 

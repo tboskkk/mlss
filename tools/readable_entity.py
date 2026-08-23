@@ -111,6 +111,25 @@ def rewrite(text: str, matched: set[str]) -> tuple[str, list[str]]:
         new_chunk = (old_chunk[:m.start(3) - m.start()] + new_params
                      + old_chunk[m.end(3) - m.start():(start - m.start())] + new_body)
         out = out.replace(old_chunk, new_chunk, 1)
+
+        # Retype the function's own forward DECLARATION too, if the file has
+        # one. Several files both declare and define a function -- the
+        # declaration is what fix_decl_conflicts emits so a sibling can take
+        # its address before it is defined -- and retyping only the definition
+        # is `conflicting types for X`, which fails the whole object. That was
+        # the entire cause of the 11 files this pass first skipped; they were
+        # not producing different bytes, they were not compiling at all.
+        decl = re.compile(
+            rf"^([A-Za-z_][\w \*]*?\b{re.escape(fname)}\s*\()([^;{{)]*)(\)\s*;)", re.M)
+
+        def _fix_decl(dm):
+            params_d = dm.group(2)
+            if params_d.count("void *") != 1 and not re.search(r"\bvoid\s*\*", params_d):
+                return dm.group(0)
+            return dm.group(1) + re.sub(r"\bvoid(\s*\*)", r"struct Entity\1",
+                                        params_d, count=1) + dm.group(3)
+
+        out = decl.sub(_fix_decl, out)
         done.append(fname)
     return out, done
 

@@ -622,9 +622,9 @@ void sub_80D9A98(void *arg0)
 
 extern s32 sub_80D9BE0;
 
-void sub_80D9B08(void *arg0) {
+void sub_80D9B08(struct Entity *arg0) {
     if (sub_8082B00() == 0) {
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80D9BE0;
+        arg0->handler = &sub_80D9BE0;
     }
 }
 

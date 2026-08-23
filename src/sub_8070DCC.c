@@ -69,12 +69,12 @@ void sub_8070F64(struct Entity *arg0) {
 
 extern s32 sub_806F90C;
 
-void sub_8070F98(void *arg0) {
+void sub_8070F98(struct Entity *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
         stop_sfx_80195A8(0x11C);
         sub_8082E1C(arg0, 0x16, 0, 0);
         (*(s16 *)((s8 *)(arg0) + (0xAC))) = 4;
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_806F90C;
+        arg0->handler = &sub_806F90C;
     }
 }
 
@@ -175,12 +175,12 @@ asm_unified(".include \"asm/nonmatching/sub_8071110.s\"");
 
 extern s32 sub_806FCF0;
 
-void sub_807116C(void *arg0) {
+void sub_807116C(struct Entity *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
         stop_sfx_80195A8(0x11C);
         (*(s32 *)((s8 *)(arg0) + (0x8C))) = 0x14;
         sub_8082E1C(arg0, 0x25, 0, 0);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_806FCF0;
+        arg0->handler = &sub_806FCF0;
     }
 }
 

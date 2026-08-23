@@ -64,9 +64,9 @@ void sub_80DC4C0(void *arg0) {
 
 extern s32 sub_80DC554;
 
-void sub_80DC4D8(void *arg0) {
+void sub_80DC4D8(struct Entity *arg0) {
     if (sub_8082B00() == 0) {
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80DC554;
+        arg0->handler = &sub_80DC554;
     }
 }
 
@@ -318,16 +318,16 @@ asm_unified(".include \"asm/nonmatching/sub_80DD600.s\"");
 #endif
 
 void sub_80DD740(void *arg0);
-void sub_80DD6D0(void *arg0) {
+void sub_80DD6D0(struct Entity *arg0) {
     if (sub_8082B00() == 0) {
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_80DD740;
+        arg0->handler = (s32 *) &sub_80DD740;
     }
 }
 
 void sub_80DD76C(void *arg0);
-void sub_80DD6EC(void *arg0) {
+void sub_80DD6EC(struct Entity *arg0) {
     if (sub_8082B00() == 0) {
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_80DD76C;
+        arg0->handler = (s32 *) &sub_80DD76C;
     }
 }
 

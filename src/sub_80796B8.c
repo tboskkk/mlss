@@ -15,7 +15,7 @@ asm_unified(".include \"asm/macros.inc\"");
 
 void sub_8079B48(void *arg0);
 
-void sub_8079C0C(void *arg0);
+void sub_8079C0C(struct Entity *arg0);
 
 void sub_8079C3C(void *arg0);
 
@@ -162,7 +162,7 @@ void sub_80798A8(void *arg0) {
     }
 }
 
-void sub_80798C4(void *arg0) {
+void sub_80798C4(struct Entity *arg0) {
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
         if (*(s32 *)0x03000F6C == 0) {
             sub_8082E1C(arg0, 3, 0x4029, 0);
@@ -170,12 +170,12 @@ void sub_80798C4(void *arg0) {
             sub_8082E1C(arg0, 8, 0x4029, 0);
         }
         (*(s16 *)((s8 *)(arg0) + (0xAC))) = 6;
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_8079B48;
+        arg0->handler = (s32 *) &sub_8079B48;
     }
 }
 
 extern s32 sub_807940C;
-void sub_8079BA8(void *arg0);
+void sub_8079BA8(struct Entity *arg0);
 void sub_807991C(void *arg0) {
     s32 *temp_r0_8;
     s32 *temp_r2_21;
@@ -225,11 +225,11 @@ void sub_807995C(void *arg0) {
 
 extern s32 sub_8078A5C;
 
-void sub_80799B4(void *arg0) {
+void sub_80799B4(struct Entity *arg0) {
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
         sub_8082E1C(arg0, (*(s32 *)((s8 *)(arg0) + (0xA8))) + 5, 0, 0);
         (*(s16 *)((s8 *)(arg0) + (0xAC))) = 0x14;
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8078A5C;
+        arg0->handler = &sub_8078A5C;
     }
 }
 
@@ -350,10 +350,10 @@ void sub_8079B48(void *arg0)
   }
 }
 
-void sub_8079BA8(void *arg0) {
+void sub_8079BA8(struct Entity *arg0) {
     if ((*(s32 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x30)))) + (0x4C))) == 0) {
         sub_8082E1C(arg0, 0x12, 0, 0);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_8079C3C;
+        arg0->handler = (s32 *) &sub_8079C3C;
     }
 }
 
@@ -374,11 +374,11 @@ void sub_8079BD0(void *arg0)
   }
 }
 
-void sub_8079C70(void *arg0);
-void sub_8079C0C(void *arg0) {
+void sub_8079C70(struct Entity *arg0);
+void sub_8079C0C(struct Entity *arg0) {
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
         sub_8082E1C(arg0, 0xD, 0x4029, 0);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_8079C70;
+        arg0->handler = (s32 *) &sub_8079C70;
     }
 }
 
@@ -390,9 +390,9 @@ void sub_8079C3C(void *arg0) {
     }
 }
 
-void sub_8079C70(void *arg0) {
+void sub_8079C70(struct Entity *arg0) {
     sub_8082E1C(arg0, 0xD, 0x4029, 0);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_8079C9C;
+    arg0->handler = (s32 *) &sub_8079C9C;
     (*(s32 *)((s8 *)(arg0) + (0xA4))) = 0;
     (*(s32 *)((s8 *)(arg0) + (0xA8))) = 0;
 }

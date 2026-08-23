@@ -26,23 +26,23 @@ void sub_809A14C(void *arg0);
 int sub_807C298();
 
 void sub_809A808(void *arg0);
-void sub_809A120(void *arg0);
+void sub_809A120(struct Entity *arg0);
 s32 sub_8082E1C();
 extern s32 sub_809A09C;
 
 int sub_8087540();
 
-void sub_80993C8(void *arg0);
-s32 sub_80993BC(void *arg0) {
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_80993C8;
+void sub_80993C8(struct Entity *arg0);
+s32 sub_80993BC(struct Entity *arg0) {
+    arg0->handler = (s32 *) &sub_80993C8;
     return 1;
 }
 
 extern s32 sub_80993E4;
 
-void sub_80993C8(void *arg0) {
+void sub_80993C8(struct Entity *arg0) {
     sub_8082E1C(arg0, 0xC, 0, 0);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80993E4;
+    arg0->handler = &sub_80993E4;
 }
 
 #ifndef NONMATCHING
@@ -159,9 +159,9 @@ void sub_8099FC4(void *arg0) {
     }
 }
 
-void sub_8099FE0(void *arg0) {
+void sub_8099FE0(struct Entity *arg0) {
     sub_8082E1C(arg0, 0x06, 0, 0);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_809A09C;
+    arg0->handler = &sub_809A09C;
 }
 
 extern s32 sub_80997E4;
@@ -220,10 +220,10 @@ void sub_809A0F4(void *arg0)
   }
 }
 
-void sub_809A120(void *arg0) {
+void sub_809A120(struct Entity *arg0) {
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
         sub_8082E1C(arg0, 9, 0, 0);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_809A14C;
+        arg0->handler = (s32 *) &sub_809A14C;
     }
 }
 
@@ -256,7 +256,7 @@ asm_unified(".include \"asm/nonmatching/sub_809A364.s\"");
 
 extern s32 sub_809A364;
 
-void sub_809A560(void *arg0) {
+void sub_809A560(struct Entity *arg0) {
     s32 temp_r1_81;
     void *temp_r0_54;
     void *temp_r1_39;
@@ -282,7 +282,7 @@ void sub_809A560(void *arg0) {
             (*(s32 *)((s8 *)(arg0) + (0x10))) = (s32) (*(s32 *)((s8 *)(arg0) + (0x84)));
             (*(s32 *)((s8 *)(arg0) + (0x14))) = (s32) (*(s32 *)((s8 *)(arg0) + (0x88)));
             (*(s32 *)((s8 *)(arg0) + (0x18))) = (s32) (*(s32 *)((s8 *)(arg0) + (0x8C)));
-            (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_809A364;
+            arg0->handler = &sub_809A364;
             return;
         }
         sub_807C298(arg0);

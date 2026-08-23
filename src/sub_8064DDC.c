@@ -96,7 +96,7 @@ void sub_80651B0(void *arg0) {
 
 s32 sub_8086858(void *, s32);                       /* extern */
 s32 sub_8065310(void *arg0);
-void sub_806533C(void *arg0);
+void sub_806533C(struct Entity *arg0);
 void sub_80651CC(struct Entity *arg0) {
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
         sub_8082E1C(arg0, 2, 0, 0);
@@ -131,10 +131,10 @@ asm_unified(".include \"asm/nonmatching/sub_8065230.s\"");
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 extern s32 sub_808750C;
 
-void sub_80652B0(void *arg0) {
+void sub_80652B0(struct Entity *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0x30))) == 0) {
         sub_8082E1C(arg0, 0, 0, 0);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_808750C;
+        arg0->handler = &sub_808750C;
     }
 }
 
@@ -161,12 +161,12 @@ s32 sub_8065310(void *arg0)
 
 extern s32 sub_806541C;
 
-void sub_806533C(void *arg0) {
+void sub_806533C(struct Entity *arg0) {
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
         sub_8082E1C(arg0, 3, 0, 0);
         *(s32 *)0x03000E3C = sub_8086858(arg0, 0x151D);
         (*(s32 **)((s8 *)(arg0) + (0x5C))) = &sub_806541C;
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_80651B0;
+        arg0->handler = (s32 *) &sub_80651B0;
     }
 }
 
@@ -179,10 +179,10 @@ asm_unified(".include \"asm/nonmatching/sub_8065384.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-void sub_80653CC(void *arg0) {
+void sub_80653CC(struct Entity *arg0) {
     if (sub_8082B00() == 0) {
         sub_8082E1C(arg0, 0x02, 0, 0);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8065428;
+        arg0->handler = &sub_8065428;
     }
 }
 
