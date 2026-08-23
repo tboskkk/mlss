@@ -11,6 +11,9 @@ asm_unified(".include \"asm/macros.inc\"");
 
 
 
+
+s32 stop_sfx_80195A8();
+
 s32 sub_8082B00();
 s32 sub_8087540();
 s32 sub_8082E1C();
@@ -66,17 +69,12 @@ void sub_80DEB1C(void *arg0) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80DEB58.s\"");
-#else
-s32 stop_sfx_80195A8(s32);                      /* extern */
 s32 sub_8087124(s32, s32, s32);                 /* extern */
-
-void sub_80DEB58(s32 arg0, s32 arg1, s32 arg2) {
-    stop_sfx_80195A8(0x11C);
-    sub_8087124(arg0, arg1, arg2);
+unsigned int sub_80DEB58(s32 arg0, s32 arg1, s32 arg2)
+{
+  stop_sfx_80195A8(0x11C);
+  sub_8087124(arg0, arg1, arg2);
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80DEB78.s\"");
