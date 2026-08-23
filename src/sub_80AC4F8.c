@@ -7,6 +7,10 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
+
+s32 sub_8082E1C();
+s32 sub_8087CE4();
+
 extern s32 sub_80AC610;
 void sub_80AC4F8(void *arg0)
 {
@@ -54,36 +58,33 @@ void sub_80AC530(void) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80AC5A4.s\"");
-#else
-s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
-s32 sub_8087CE4(void *);                        /* extern */
 extern s32 sub_80A6F78;
-
-void sub_80AC5A4(void *arg0) {
-    s32 temp_r1_26;
-    void *temp_r2_38;
-    void *temp_r2_44;
-    void *temp_r4_10;
-    void *temp_r5_12;
-
-    temp_r4_10 = (*(void **)((s8 *)(*(void **)0x03000FD8) + (0x70)));
-    temp_r5_12 = temp_r4_10 + 8;
-    sub_8087CE4(temp_r5_12);
-    if (0x20 & (*(u8 *)((s8 *)(temp_r4_10) + (0x81)))) {
-        temp_r1_26 = 6 & (*(u8 *)((s8 *)(temp_r4_10) + (0x7E)));
-        if ((temp_r1_26 == 2) || (temp_r1_26 == 4)) {
-            sub_8082E1C(temp_r5_12, 0, -1, 0);
-            temp_r2_38 = (*(void **)((s8 *)(temp_r5_12) + (8)));
-            (*(u8 *)((s8 *)(temp_r2_38) + (0x11))) = (u8) (-0x41 & (*(u8 *)((s8 *)(temp_r2_38) + (0x11))));
-            temp_r2_44 = (*(void **)((s8 *)(temp_r5_12) + (8)));
-            (*(u8 *)((s8 *)(temp_r2_44) + (0x12))) = (u8) (-7 & (*(u8 *)((s8 *)(temp_r2_44) + (0x12))));
-        }
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80A6F78;
+void sub_80AC5A4(void *arg0)
+{
+  unsigned int new_var;
+  s32 temp_r1_26;
+  void *temp_r2_38;
+  void *temp_r2_44;
+  void *temp_r4_10;
+  void *temp_r5_12;
+  temp_r4_10 = *((void **) (((s8 *) (*((void **) 0x03000FD8))) + 0x70));
+  temp_r5_12 = temp_r4_10 + 8;
+  sub_8087CE4(temp_r5_12);
+  if (0x20 & (*((u8 *) (((s8 *) temp_r4_10) + 0x81))))
+  {
+    new_var = -7;
+    temp_r1_26 = 6 & (*((u8 *) (((s8 *) temp_r4_10) + 0x7E)));
+    if ((temp_r1_26 == 2) || (temp_r1_26 == 4))
+    {
+      sub_8082E1C(temp_r5_12, 0, -1, 0);
+      temp_r2_38 = *((void **) (((s8 *) temp_r5_12) + 8));
+      *((u8 *) (((s8 *) temp_r2_38) + 0x11)) = (u8) ((-0x41) & (*(((s8 *) temp_r2_38) + 0x11)));
+      temp_r2_44 = *((void **) (((s8 *) temp_r5_12) + 8));
+      *((u8 *) (((s8 *) temp_r2_44) + 0x12)) = (u8) (new_var & (*((u8 *) (((s8 *) temp_r2_44) + 0x12))));
     }
+    *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_80A6F78;
+  }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80AC610.s\"");
