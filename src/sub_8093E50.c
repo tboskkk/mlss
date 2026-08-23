@@ -10,6 +10,9 @@ asm_unified(".include \"asm/macros.inc\"");
 
 
 
+
+void sub_8094750(void *arg0);
+
 void sub_8094724(void *arg0);
 
 extern s32 sub_8087540;
