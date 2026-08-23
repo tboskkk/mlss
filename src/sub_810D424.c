@@ -10,26 +10,24 @@ asm_unified(".include \"asm/macros.inc\"");
 
 s32 sub_8109CF4();
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_810D424.s\"");
-#else
-s32 sub_8109CF4(s32, s32, s32, s32, s32);       /* extern */
-
-void sub_810D424(void) {
-    s32 temp_r4_13;
-    void *temp_r0_24;
-    void *temp_r2_9;
-
-    temp_r2_9 = *(void **)0x03000FD8;
-    temp_r4_13 = (*(s32 *)((s8 *)(temp_r2_9) + (0x30C)));
-    (*(u8 *)((s8 *)(temp_r2_9) + (7))) = (u8) ((0x1F & (*(u8 *)((s8 *)(temp_r2_9) + (7)))) | 0xA0);
-    do {
-
-    } while (temp_r4_13 == 0);
-    temp_r0_24 = (*(void **)((s8 *)(*(void **)0x03000FD8) + (0x7C)));
-    sub_8109CF4(temp_r4_13, (*(s32 *)((s8 *)(temp_r0_24) + (0x40))), (*(s32 *)((s8 *)(temp_r0_24) + (0x44))), 0x3000, 0x3800);
+volatile int sub_810D424(void)
+{
+  s32 temp_r4_13;
+  void *temp_r0_24;
+  void *temp_r2_9;
+  void **new_var;
+  new_var = (void **) 0x03000FD8;
+  temp_r2_9 = *new_var;
+  temp_r4_13 = temp_r4_13;
+  temp_r4_13 = *((s32 *) (((s8 *) temp_r2_9) + 0x30C));
+  *((u8 *) (((s8 *) temp_r2_9) + 7)) = (u8) ((0x1F & (*((u8 *) (((s8 *) (*new_var)) + 7)))) | 0xA0);
+  do
+  {
+  }
+  while (temp_r4_13 == 0);
+  temp_r0_24 = *((void **) (((s8 *) (*new_var)) + 0x7C));
+  sub_8109CF4(temp_r4_13, *((s32 *) (((s8 *) temp_r0_24) + 0x40)), *((s32 *) (((s8 *) temp_r0_24) + 0x44)), 0x3000, 0x3800);
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_810D468.s\"");
