@@ -7,33 +7,43 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_814BEA8.s\"");
-#else
+
 extern s32 sub_814998C;
 extern s32 sub_814BA70;
 
-void sub_814BEA8(void *arg1, s32 **arg2) {
-    s32 *var_r0_60;
-    s32 temp_r2_33;
-    u8 temp_r1_53;
-
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg1) + (0x294)))) + (0x12)))) {
-        (*(u8 *)((s8 *)(arg1) + (0x214))) = (u8) (-8 & (*(u8 *)((s8 *)(arg1) + (0x214))));
+void sub_814BEA8(s32 arg0, void *arg1, s32 **arg2)
+{
+  s32 *new_var2;
+  s8 *new_var;
+  int new_var4;
+  s32 *var_r0_60;
+  s32 temp_r2_33;
+  u8 temp_r1_53;
+  s32 *new_var3;
+  new_var4 = -8;
+  new_var = (s8 *) arg1;
+  if (8 & (*((u8 *) (((s8 *) (*((void **) (((s8 *) arg1) + 0x294)))) + 0x12))))
+  {
+    *((u8 *) (((s8 *) arg1) + 0x214)) = (u8) (new_var4 & (*((u8 *) (new_var + 0x214))));
+  }
+  temp_r2_33 = (*((s32 *) (new_var + 0x18))) - (*((s16 *) (((0, new_var)) + 0x2DC)));
+  *((s32 *) (new_var + 0x18)) = temp_r2_33;
+  if (((*((s32 *) (new_var + 0x24))) & 0x18000) || (((s32) ((*((s32 *) (new_var + 0x14))) + temp_r2_33)) <= ((s32) (*((s32 *) (new_var + 0x2D4))))))
+  {
+    temp_r1_53 = *((u8 *) (new_var + 0x1D8));
+    if (((temp_r1_53 << 0x1F) != ((*((s16 *) (new_var + 0x2DC))) * 0)) && (((s32) (temp_r1_53 << 0x1E)) < 0))
+    {
+      var_r0_60 = &sub_814998C;
     }
-    temp_r2_33 = (*(s32 *)((s8 *)(arg1) + (0x18))) - M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */);
-    (*(s32 *)((s8 *)(arg1) + (0x18))) = temp_r2_33;
-    if (((*(s32 *)((s8 *)(arg1) + (0x24))) & 0x18000) || ((s32) ((*(s32 *)((s8 *)(arg1) + (0x14))) + temp_r2_33) <= (s32) (*(s32 *)((s8 *)(arg1) + (0x2D4))))) {
-        temp_r1_53 = (*(u8 *)((s8 *)(arg1) + (0x1D8)));
-        if (((temp_r1_53 << 0x1F) != 0) && ((s32) (temp_r1_53 << 0x1E) < 0)) {
-            var_r0_60 = &sub_814998C;
-        } else {
-            var_r0_60 = &sub_814BA70;
-        }
-        *arg2 = var_r0_60;
+    else
+    {
+      new_var3 = &sub_814BA70;
+      new_var2 = new_var3;
+      var_r0_60 = new_var2;
     }
+    *arg2 = var_r0_60;
+  }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_814BF28.s\"");
