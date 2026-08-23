@@ -245,20 +245,23 @@ void sub_80507E0(void *arg0) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8050850.s\"");
-#else
-void sub_8050850(void *arg0, s32 arg1) {
-    void *temp_r2_17;
-
-    (*(s32 *)((s8 *)(arg0) + (0x338))) = 0x08CDBF28;
-    temp_r2_17 = (*(void **)((s8 *)(arg0) + (0x344)));
-    if (temp_r2_17 != NULL) {
-        (*(s32 (**)(void *, s32))((s8 *)((*(void **)((s8 *)(temp_r2_17) + (0x338)))) + (0xC)))(temp_r2_17 + M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */), 3);
-    }
-    (*(s32 *)((s8 *)(arg0) + (0x338))) = 0x08CDBDE8;
-    if (1 & arg1) {
-        free_heap_8018DA8(arg0);
-    }
+void free_heap_8018DA8(void *ptr);
+void sub_8050850(void *arg0, s32 arg1)
+{
+  long long new_var;
+  void *temp_r1_23;
+  void *temp_r2_17;
+  *((s32 *) (((s8 *) arg0) + 0x338)) = 0x08CDBF28;
+  temp_r2_17 = *((void **) (((s8 *) arg0) + 0x344));
+  if (temp_r2_17 != ((void *) 0))
+  {
+    temp_r1_23 = *((void **) (((s8 *) temp_r2_17) + 0x338));
+    (*((s32 (**)(void *, s32)) (((s8 *) temp_r1_23) + 0xC)))(temp_r2_17 + (*((s16 *) (((s8 *) temp_r1_23) + 8))), 3);
+  }
+  new_var = 0x338;
+  *((s32 *) (((s8 *) arg0) + new_var)) = 0x08CDBDE8;
+  if (1 & arg1)
+  {
+    free_heap_8018DA8(arg0);
+  }
 }
-#endif
