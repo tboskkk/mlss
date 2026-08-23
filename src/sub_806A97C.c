@@ -9,6 +9,9 @@ asm_unified(".include \"asm/macros.inc\"");
 
 
 
+
+s32 sub_807C298();
+
 extern s32 sub_806B3D0;
 int sub_810DD7C();
 
@@ -170,11 +173,6 @@ s32 sub_806B390(void *arg0) {
     return 0;
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_806B3AC.s\"");
-#else
-s32 sub_807C298(void *);                        /* extern */
-
 void sub_806B3AC(void *arg0) {
     s32 temp_r1_11;
 
@@ -184,7 +182,6 @@ void sub_806B3AC(void *arg0) {
         sub_807C298(arg0);
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_806B3D0.s\"");
