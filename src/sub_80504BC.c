@@ -42,21 +42,23 @@ void sub_8050518(void *arg0, s32 arg1, u8 arg2)
   }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8050554.s\"");
-#else
 s32 sub_8041FFC();                              /* extern */
-
-void sub_8050554(void *arg0) {
-    void *temp_r4_12;
-
-    sub_8041FFC();
-    temp_r4_12 = (*(void **)((s8 *)(arg0) + (0x344)));
-    if (temp_r4_12 != NULL) {
-        (*(s32 (**)(void *))((s8 *)(((*(s32 *)((s8 *)(temp_r4_12) + (0x338))) + 0x68)) + (4)))(temp_r4_12 + M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */));
-    }
+volatile int sub_8050554(void *arg0)
+{
+  void **new_var;
+  void *temp_r1_18;
+  void *temp_r4_12;
+  void *new_var2;
+  sub_8041FFC();
+  temp_r4_12 = *((void **) (((s8 *) arg0) + 0x344));
+  new_var = &(*((void **) (((s8 *) arg0) + 0x344)));
+  if ((*new_var) != ((void *) 0))
+  {
+    temp_r1_18 = *((void **) (((s8 *) temp_r4_12) + 0x338));
+    new_var2 = temp_r1_18 + 0x68;
+    (*((s32 (**)(void *)) (((s8 *) new_var2) + 4)))(temp_r4_12 + (*((s16 *) (((s8 *) temp_r1_18) + 0x68))));
+  }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8050584.s\"");
