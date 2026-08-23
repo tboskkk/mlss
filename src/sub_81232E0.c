@@ -27,17 +27,15 @@ asm_unified(".include \"asm/nonmatching/sub_8123308.s\"");
    counts this as unmatched. Write the C here, replacing this comment. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8123340.s\"");
-#else
-void sub_8123340(void)
-{
-    u32 *r4 = (u32 *)0x03000FF4;
-    if (*r4 != 0)
-        free_heap_8018D9C();
-    *r4 = 0;
+void sub_8123340(void) {
+    void *temp_r0_8;
+
+    temp_r0_8 = *(void **)0x03000FF4;
+    if (temp_r0_8 != NULL) {
+        free_heap_8018D9C(temp_r0_8);
+    }
+    *(void **)0x03000FF4 = NULL;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_812335C.s\"");
