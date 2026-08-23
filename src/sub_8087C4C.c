@@ -21,33 +21,33 @@ void sub_8087C4C(void *arg0) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8087C6C.s\"");
-#else
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 s32 sub_8087CE4();                              /* extern */
 extern s32 sub_8088508;
-
-void sub_8087C6C(void *arg0) {
-    s32 temp_r1_20;
-    void *temp_r2_48;
-
-    sub_8087CE4();
-    if (0x20 & (*(u8 *)((s8 *)(arg0) + (0x79)))) {
-        temp_r1_20 = 6 & (*(u8 *)((s8 *)(arg0) + (0x76)));
-        if ((temp_r1_20 == 2) || (temp_r1_20 == 4)) {
-            if (M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */) == -1) {
-                sub_8082E1C(arg0, 8, 0x2000, 0);
-            } else {
-                sub_8082E1C(arg0, 8, 0x204D, 0);
-            }
-            temp_r2_48 = (*(void **)((s8 *)(arg0) + (8)));
-            (*(u8 *)((s8 *)(temp_r2_48) + (0x12))) = (u8) ((-7 & (*(u8 *)((s8 *)(temp_r2_48) + (0x12)))) | 2);
-        }
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8088508;
+void sub_8087C6C(void *arg0)
+{
+  s32 temp_r1_20;
+  void *temp_r2_48;
+  sub_8087CE4();
+  if (0x20 & (*((u8 *) (((s8 *) arg0) + 0x79))))
+  {
+    temp_r1_20 = 6 & (*((u8 *) (((s8 *) arg0) + 0x76)));
+    if ((temp_r1_20 == 2) || (temp_r1_20 == 4))
+    {
+      if ((*((s16 *) (((s8 *) (*((void **) (((s8 *) arg0) + 0x28)))) + 0xEC))) == (-1))
+      {
+        sub_8082E1C(arg0, 8, 0x2000, 0);
+      }
+      else
+      {
+        sub_8082E1C(arg0, 8, 0x204D, 0);
+      }
+      temp_r2_48 = *((void **) (((s8 *) arg0) + 8));
+      *((u8 *) (((s8 *) temp_r2_48) + 0x12)) = (u8) (((-7) & (*(((s8 *) temp_r2_48) + 0x12))) | 2);
     }
+    *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_8088508;
+  }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8087CE4.s\"");
