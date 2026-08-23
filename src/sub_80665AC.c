@@ -10,6 +10,9 @@ asm_unified(".include \"asm/macros.inc\"");
 
 
 
+
+void sub_8066EB4(void *arg0);
+
 extern s32 sub_806688C;
 void sub_8066D78(void *arg0);
 
@@ -202,8 +205,7 @@ asm_unified(".include \"asm/nonmatching/sub_8066DA4.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-extern s32 sub_8066E5C;
-
+void sub_8066E5C(void *arg0);
 void sub_8066E0C(void *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
         if ((*(s32 *)((s8 *)(arg0) + (0x9C))) == 0) {
@@ -212,7 +214,7 @@ void sub_8066E0C(void *arg0) {
             sub_8082E1C(arg0, 5, 0, 0);
         }
         (*(s16 *)((s8 *)(arg0) + (0xAC))) = 4;
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8066E5C;
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_8066E5C;
         play_sfx_80195B4(0xD5, -1);
     }
 }
