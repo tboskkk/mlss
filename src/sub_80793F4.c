@@ -108,26 +108,23 @@ void sub_80794FC(void *arg0) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_807953C.s\"");
-#else
-s32 sub_807C298(void *);                        /* extern */
-
-void sub_807953C(void *arg0) {
-    s32 temp_r1_8;
-    s32 var_r0_10;
-
-    temp_r1_8 = (*(s32 *)((s8 *)(arg0) + (0x10)));
-    var_r0_10 = temp_r1_8 + 0xFFFFFD80;
-    (*(s32 *)((s8 *)(arg0) + (0x10))) = var_r0_10;
-    if (var_r0_10 < 0) {
-        var_r0_10 = temp_r1_8 + 0xFFFFFE7F;
-    }
-    if ((s32) (var_r0_10 >> 8) <= -0x20) {
-        sub_807C298(arg0);
-    }
+void sub_807953C(void *arg0)
+{
+  s32 temp_r1_8;
+  void *new_var;
+  s32 var_r0_10;
+  new_var = arg0;
+  temp_r1_8 = *((s32 *) (((s8 *) arg0) + 0x10));
+  var_r0_10 = (*((s32 *) (((s8 *) arg0) + 0x10)) = temp_r1_8 + 0xFFFFFD80);
+  if (var_r0_10 < 0)
+  {
+    var_r0_10 = temp_r1_8 + 0xFFFFFE7F;
+  }
+  if (((s32) (var_r0_10 >> 8)) <= (-0x20))
+  {
+    sub_807C298(new_var);
+  }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8079568.s\"");
