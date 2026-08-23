@@ -1919,14 +1919,23 @@ Byte-neutral by construction: the linker sets bit 0 of a function pointer from
 the SYMBOL's Thumb type, not from how C declared it (retail for `sub_806021C`
 is `.4byte sub_80603D8` loading `0x080603D9` either way). All 5 matched.
 
-**The remaining 2 (`sub_8079BA8`, `sub_8079C70`) are a different shape and are
-left for a human on purpose.** The stale `extern s32 <target>;` is not in the
-candidate, it is at FILE scope in `src/sub_80796B8.c` (lines 162 and 332),
-emitted for a sibling that takes `&<target>` - and that sibling, `sub_807991C`,
-is already MATCHED. The same transformation applies, but it edits committed,
-byte-exact code, so it needs a from-scratch build plus a re-check that
-`sub_807991C` still matches before it can be trusted. Cheap, just not safe to
-do while something else holds the repo lock.
+**The remaining 2 were a SECOND shape, now also fixed - and it turned out to
+be the more important one.** There the stale `extern s32 <target>;` is not in
+the candidate at all: it sits at FILE scope, emitted earlier for a sibling that
+takes `&<target>` back when target was still a guard. Repairing it edits the
+file, and that file holds already-MATCHED code (`sub_807991C`). Safe for two
+reasons, both of which must hold: the change is byte-neutral, and
+`finish_match()` re-checks the whole ROM sha1, so a break anywhere in the file
+fails the gate rather than slipping through. Both matched.
+`repair_file_scope()` handles it, and `rescue_isolated_zeros.py` restores the
+file unless the candidate actually wins.
+
+**That second shape was the entire "no compiling prefix" residue of the
+harvest.** Clustered over the sweep's first 37 functions, **10 of 10** such
+failures were this one cause - not section F's "the permuter solved a different
+problem", which is what that verdict had always been read as. With the repair
+wired in, that failure count went to **zero** and `sub_8060694`, which had
+failed twice, matched. All 106 rows of this class are now resolved.
 
 **The general point, and it applies to any terminal state:** a queue nothing
 revisits accumulates stale verdicts at exactly the rate the rest of the system
