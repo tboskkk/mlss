@@ -7,26 +7,28 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8081FD4.s\"");
-#else
 s32 process_disable(s32);                       /* extern */
 s32 sub_8081FB0(void *);                        /* extern */
-
-void sub_8081FD4(void *arg0) {
-    u8 temp_r1_12;
-    void *temp_r0_9;
-
-    temp_r0_9 = *(void **)0x03000FD8;
-    temp_r1_12 = (*(u8 *)((s8 *)(temp_r0_9) + (0x2BF)));
-    if (0x20 & temp_r1_12) {
-        (*(u8 *)((s8 *)(temp_r0_9) + (0x2BF))) = (u8) (-0x21 & temp_r1_12);
-        process_disable((*(s32 *)((s8 *)(*(void **)0x03000FD8) + (0x244))));
-        (*(s32 (**)(void *))((s8 *)(arg0) + (4))) = sub_8081FB0;
-        sub_8081FB0(arg0);
-    }
+void sub_8081FD4(void *arg0)
+{
+  u8 temp_r1_12;
+  int new_var3;
+  void *temp_r0_9;
+  s8 *new_var;
+  s32 new_var2;
+  temp_r0_9 = *((void **) 0x03000FD8);
+  temp_r1_12 = *((u8 *) (((s8 *) temp_r0_9) + 0x2BF));
+  if (0x20 & temp_r1_12)
+  {
+    new_var = ((s8 *) temp_r0_9) + 0x2BF;
+    new_var3 = -0x21;
+    new_var3 = new_var3 & temp_r1_12;
+    *((u8 *) new_var) = (u8) new_var3;
+    process_disable(new_var2 = *((s32 *) (((s8 *) (*((void **) 0x03000FD8))) + 0x244)));
+    *((s32 (**)(void *)) (((s8 *) arg0) + 4)) = sub_8081FB0;
+    sub_8081FB0(arg0);
+  }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_808201C.s\"");
