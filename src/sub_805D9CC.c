@@ -36,14 +36,35 @@ void sub_805DA04(void *arg0, u16 arg1)
   sub_805D914(arg0, *((u16 *) (((s8 *) arg0) + 0x1E)));
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_805DA1C.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+void process_remove(struct Process* process, u32 flags);
+s32 sub_80184F4(s32);                           /* extern */
+
+void sub_805DA1C(struct Process *arg0, u32 arg1) {
+    void *temp_r0_16;
+    void *temp_r0_23;
+    void *temp_r0_30;
+    void *temp_r0_37;
+
+    arg0->definition = (struct ProcessDefinition *)0x08CDC2C8;
+    sub_80184F4(0x06000000);
+    temp_r0_16 = (*(void **)((s8 *)(arg0) + (0xA4)));
+    if (temp_r0_16 != NULL) {
+        free_heap_8018D9C(temp_r0_16);
+    }
+    temp_r0_23 = (*(void **)((s8 *)(arg0) + (0xA8)));
+    if (temp_r0_23 != NULL) {
+        free_heap_8018D9C(temp_r0_23);
+    }
+    temp_r0_30 = (*(void **)((s8 *)(arg0) + (0x98)));
+    if (temp_r0_30 != NULL) {
+        free_heap_8018D9C(temp_r0_30);
+    }
+    temp_r0_37 = (*(void **)((s8 *)(arg0) + (0x94)));
+    if (temp_r0_37 != NULL) {
+        free_heap_8018D9C(temp_r0_37);
+    }
+    process_remove(arg0, arg1);
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_805DA78.s\"");
