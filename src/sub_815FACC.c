@@ -19,14 +19,10 @@ void sub_815FACC(void *arg0) {
     (*(s32 *)((s8 *)(arg0) + (0x10))) = temp_r2_10;
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_815FAE4.s\"");
-#else
 void sub_815FAE4(void *arg0, s32 arg1) {
-    (*(s32 *)((s8 *)(arg0) + (4))) = (s32) ((*(s32 *)((s8 *)(arg0) + (4))) + M2C_ERROR(/* unknown instruction: ldsh $r3, ($mem_loc_fictive_) */));
-    (*(s32 *)((s8 *)(arg0) + (8))) = (s32) ((*(s32 *)((s8 *)(arg0) + (8))) + M2C_ERROR(/* unknown instruction: ldsh $r3, ($mem_loc_fictive_) */) + arg1);
+    (*(s32 *)((s8 *)(arg0) + (4))) = (s32) ((*(s32 *)((s8 *)(arg0) + (4))) + (*(s16 *)((s8 *)(arg0) + (0x14))));
+    (*(s32 *)((s8 *)(arg0) + (8))) = (s32) ((*(s32 *)((s8 *)(arg0) + (8))) + (*(s16 *)((s8 *)(arg0) + (0x18))) + arg1);
 }
-#endif
 
 s32 sub_8021308();                              /* extern */
 
