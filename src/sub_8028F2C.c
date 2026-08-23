@@ -34,33 +34,33 @@ void make_btl_8028F54(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8028FBC.s\"");
-#else
 s32 sub_8019628(s32);                           /* extern */
 s32 sub_80273E4(void *);                        /* extern */
 s32 sub_8057B58(s32, s32);                      /* extern */
 s32 sub_80E8DC0();                              /* extern */
-s32 sub_815085C(s32);                       /* extern */
-
-void sub_8028FBC(void *arg0) {
-    s32 temp_r0_17;
-
-    sub_801A6B0();
-    sub_8019628(0);
-    sub_80273E4(arg0);
-    sub_80E8DC0();
-    temp_r0_17 = (*(s32 *)((s8 *)(arg0) + (0x304)));
-    if (temp_r0_17 != 0) {
-        sub_8057B58(temp_r0_17, 3);
-        (*(s32 *)((s8 *)(arg0) + (0x304))) = 0;
-    }
-    sub_8018B78(2, 0);
-    (*(s8 *)((s8 *)(arg0) + (0))) = 1;
-    if (*(s32 *)0x03000C78 == 0) {
-        *(s32 *)0x03000C78 = 0x0800063C;
-    }
-    sub_815085C(M2C_ERROR(/* unknown instruction: ldsb $r0, ($mem_loc_fictive_) */));
-    (*(s8 *)((s8 *)(arg0) + (0x12B))) = 0xFF;
+s32 sub_815085C(s8);                            /* extern */
+void sub_8028FBC(void *arg0)
+{
+  s32 temp_r0_17;
+  s8 new_var;
+  sub_801A6B0();
+  sub_8019628(0);
+  sub_80273E4(arg0);
+  sub_80E8DC0();
+  temp_r0_17 = *((s32 *) (((s8 *) arg0) + 0x304));
+  if (temp_r0_17 != 0)
+  {
+    sub_8057B58(temp_r0_17, 3);
+    *((s32 *) (((s8 *) arg0) + 0x304)) = 0;
+  }
+  sub_8018B78(2, (void *) 0);
+  *((s8 *) (((s8 *) arg0) + 0)) = 1;
+  if ((unsigned int) ((*((s32 *) 0x03000C78)) == 0))
+  {
+    *((s32 *) 0x03000C78) = 0x0800063C;
+  }
+  new_var = *((s8 *) (((s8 *) arg0) + 0x12B));
+  sub_815085C(new_var);
+  new_var = -1;
+  *((s8 *) (((s8 *) arg0) + 0x12B)) = new_var;
 }
-#endif
