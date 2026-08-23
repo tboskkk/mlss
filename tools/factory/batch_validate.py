@@ -50,6 +50,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import db  # noqa: E402
+import declare_missing
 import gitops  # noqa: E402
 
 DEFAULT_BATCH = 24
@@ -67,10 +68,21 @@ def revert_working_tree():
     gitops.run(["git", "clean", "-fd", *gitops.FACTORY_PATHS])
 
 
+_ROM_SYMS = None
+
+
+def _rom_symbols() -> set:
+    global _ROM_SYMS
+    if _ROM_SYMS is None:
+        _ROM_SYMS = frozenset(declare_missing.rom_symbols())
+    return set(_ROM_SYMS)
+
+
 def apply_candidates(rows) -> list:
     """Splice each candidate in as real C and delete the fragment it
     replaces. -> the names actually applied."""
     applied = []
+    touched: set[str] = set()
     for row in rows:
         name, body = row["name"], row["candidate_body"]
         if gitops.splice_candidate(name, body) is None:
@@ -79,6 +91,29 @@ def apply_candidates(rows) -> list:
         if frag.exists():
             frag.unlink()
         applied.append(name)
+        touched.add(gitops._owning_source_stem(name) or name)
+
+    # Declare what the spliced candidates now reference, exactly as the serial
+    # validator does. It reaches this through rescore_seeds.plain_score(), which
+    # calls declare_missing.repair_in_place() before scoring; this tool splices
+    # and builds directly, so without it batch validation was strictly WEAKER
+    # than the one-at-a-time path it exists to replace.
+    #
+    # The failure it caused looks like the candidate's fault and is not: a
+    # spliced candidate routinely calls a sibling that nothing in the file
+    # declares, giving `implicit declaration of function X`, fatal under
+    # -Werror. Measured on the first batch of 16 after the isolation_exact
+    # sweep: 3 rejected, all of them this, all with byte-exact candidates.
+    #
+    # nonmatching=False because this is a PLAIN build -- every other guard in
+    # the file is its retail `.include`, which is the state the ROM check runs
+    # in. Declarations emit no code, so they cannot change the bytes; the
+    # from-scratch sha1 below re-checks that regardless.
+    for stem in sorted(touched):
+        try:
+            declare_missing.repair_in_place(stem, _rom_symbols(), nonmatching=False)
+        except Exception:
+            pass
     return applied
 
 
