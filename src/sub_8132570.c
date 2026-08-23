@@ -117,14 +117,33 @@ asm_unified(".include \"asm/nonmatching/sub_8132AA4.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8132B8C.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+s32 sub_807F47C(void *);                        /* extern */
+void sub_8132B8C(void *arg0)
+{
+  s32 temp_r2_32;
+  int new_var;
+  void *temp_r1_11;
+  void *temp_r1_56;
+  temp_r1_11 = *((void **) (((s8 *) arg0) + 8));
+  *((u16 *) (((s8 *) temp_r1_11) + 0xC)) = (u16) ((*((u16 *) (((s8 *) temp_r1_11) + 0xC))) + 0x1000);
+  *((u16 *) (((s8 *) arg0) + 0xB2)) = (u16) ((*((u16 *) (((s8 *) arg0) + 0xB2))) + (*((s32 *) (((s8 *) arg0) + 0x94))));
+  temp_r2_32 = (*((s32 *) (0x10 + ((s8 *) arg0)))) + (*((s16 *) (((s8 *) arg0) + 0xAE)));
+  *((s32 *) (((s8 *) arg0) + 0x10)) = temp_r2_32;
+  *((s32 *) (((s8 *) arg0) + 0x14)) = (s32) ((*((s32 *) (((s8 *) arg0) + 0x14))) + (*((s16 *) (((s8 *) arg0) + 0xB0))));
+  *((s32 *) (((s8 *) arg0) + 0x18)) = (s32) ((*((s32 *) (((s8 *) arg0) + 0x18))) + ((s16) (*((u16 *) (((s8 *) arg0) + 0xB2)))));
+  new_var = 0xFFFFF000;
+  if (temp_r2_32 < new_var)
+  {
+    play_sfx_80195B4(0x62, -1);
+    *((s32 *) (((s8 *) arg0) + 0x10)) = 0x10000;
+    temp_r1_56 = *((void **) (((s8 *) arg0) + 0x28));
+    *((s32 *) (((s8 *) arg0) + 0x14)) = (s32) (*((s32 *) (((s8 *) temp_r1_56) + 0x44)));
+    *((s32 *) (((s8 *) arg0) + 0x18)) = (s32) (*((s32 *) (((s8 *) temp_r1_56) + 0x48)));
+    *((s32 *) (((s8 *) arg0) + 0x94)) = sub_808552C(arg0 + 0xAE, arg0 + 0xB0, arg0 + 0xB2, (*((s32 *) (((s8 *) temp_r1_56) + 0x40))) + 0xFFFF1700, 0x500, 0x2300, 0x4000, 0x280, 0x100, 0);
+    sub_807F47C(arg0);
+    *((s32 **) (((s8 *) arg0) + 0x4C)) = (s32 *) &sub_8132C54;
+  }
+}
 
 s32 sub_807C298(void *);                        /* extern */
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
