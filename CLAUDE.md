@@ -453,6 +453,19 @@ doesn't count toward headline progress numbers unless that changes.
   relevant `build/.../*.o`) and rebuild.
 - **`asm-differ -f` (whole-ROM mode) doesn't work on this project** - see
   the asm-differ section above. Use `-o`.
+- **You cannot reliably add a struct definition to `include/common.h`, and
+  the error blames an innocent file.** The build dies with
+  `asm/macros.inc:1: Error: junk at end of line, first unrecognized character
+  is '@'` - macros.inc is untouched and correct; line 1 is an ordinary `@`
+  comment. The real cause is agbcc's `-ffix-debug-line` debug-info emission.
+  Bisected: not the self-referential function pointer, not padding arrays, not
+  the line count (80 lines of pure comment are fine). The trigger is the
+  struct's POSITION in the file - the identical struct builds at insertion
+  offset 0 or 5 and fails at 17 or 30 - and the object that fails MOVES as the
+  tree changes, so no position is stable. Adding a new header
+  (`include/entity.h`) fails identically. If you need a struct visible to
+  generated seeds, inline it into the seed rather than into a header. Full
+  writeup in section S.
 - **`pycparser>=3.0` breaks decomp-permuter-agbcc** - see above.
 - **`split_func.py` couldn't extract anything - "already claimed" on
   every symbol, including brand new ones.** Regression from the `cd
@@ -2003,6 +2016,65 @@ re-scoring the high band - measured at roughly 6% useful, while the factory
 alongside it was converting at 126 matches/hour. Re-scoring is worth it for a
 band you have reason to believe compiles, which is how the jump-table seeds
 were found.
+
+**S. The `+0x4C` struct: measured, tested, and it does NOT do what N.5
+predicted. Also, you cannot add a struct to `include/common.h`.**
+
+N.5 named this the biggest untouched lever: one struct accessed by ~1,254
+unmatched functions, its `+0x4C` a handler function pointer, defined nowhere,
+and "one struct definition improves 1,254 functions at once". It was never
+tried. It has now been tried, and the headline claim is **wrong**.
+
+**What was measured** (`tools/scan_entity.py`, re-derivable): across 4,528
+fragments, 1,177 functions access `arg0+0x4C` and 98% of those accesses are
+word-width. Co-occurrence cleanly separates the struct - `0x60` at 11.9x
+lift over baseline, `0x58` 8.1x, `0x5C` 6.6x, `0x6C` 5.6x - while `0x04` and
+`0x0C` ANTI-correlate at 0.1x, i.e. they belong to something else (they are
+`Process`'s `frames` and `previousProcess`; `struct Process` is only 0x1C
+bytes, so this is a different, larger object). A first pass missed everything
+above 0x7C entirely because Thumb's ldr immediate caps there and larger fields
+arrive via `adds rN, #0xAC` - the struct really runs to at least 0xB4.
+
+**Result 1, the negative one: it does not improve matching.** A/B over the
+seeds that compile both ways: **4 identical scores, 1 worse, 0 better**. That
+is not surprising in hindsight and should have been predicted - m2c already
+emits explicit-width `M2C_FIELD` casts, so `arg0->field_AC = 2` and
+`M2C_FIELD(arg0, s16 *, 0xAC) = 2` compile to the same instructions. A struct
+buys readability, not codegen. **N.5's premise confused "m2c does not know the
+type" with "m2c gets the width wrong". It mostly does not.**
+
+**Result 2, the real one: it fixes the DECLARATION class.** Over 60 functions,
+`extern <type> X;` data-declarations of handlers fell **71 -> 10**, and 58 of
+60 seeds emitted `arg0->handler = sub_X;`. That is the exact root cause of
+"X redeclared as different kind of symbol" - the class behind all 106
+`needs_human` rows in section Q and 10 of 10 sampled "no compiling prefix"
+harvest failures. So the struct attacks a real and expensive problem, just not
+through the score.
+
+**Result 3, the blocker: adding it to `include/common.h` breaks the build.**
+`asm/macros.inc:1: Error: junk at end of line, first unrecognized character is
+'@'` - an error pointing at an innocent file, which is what makes it so
+confusing. Bisected carefully, and none of the obvious suspects is it: not the
+self-referential function pointer, not padding arrays, not the line count (80
+lines of pure comment are fine). What reproduces deterministically is the
+struct's POSITION: identical struct at insertion offset 0 or 5 builds, at 17 or
+30 fails. And the failing OBJECT moves as the tree changes, so a working
+position is not stable - placing it at the top passed the file that failed
+before and then failed a different one. This is agbcc's `-ffix-debug-line`
+debug-info emission, and adding a NEW header (`include/entity.h`) fails the same
+way for the same reason.
+
+**Therefore: not shipped.** The one benefit it delivers is already covered by
+`tools/factory/fix_decl_conflicts.py`, which repairs the same class after the
+fact and is byte-verified. Paying an unexplained, position-dependent build
+break for a benefit we already have, in exchange for zero score improvement, is
+a bad trade. `tools/scan_entity.py` is kept: the offsets and widths are real,
+and they are the best description of this struct anyone here has.
+
+**If someone wants to revisit it**, the tractable route is not the header. It is
+to make `m2c_bridge` inline the struct definition into each generated seed the
+way it already expands the `M2C_*` macros, so nothing in `include/` changes at
+all. That was not attempted.
 
 **Next levers, in rough order of value:**
 0. **The other 94 jump-table candidates** (section O) - the tool refuses
