@@ -74,12 +74,61 @@ def main() -> int:
         print(f"  Needs >= {MIN_LAUNCHES} launches; at the 15.6% baseline this "
               f"window would predict ~{0.156*launches:.0f}.")
     else:
-        print(f"\n  live search yield: {100*live/launches:.1f}%   "
-              f"(CLAUDE.md baseline 15.6%, n={launches})")
+        print(f"\n  live search yield: {100*live/launches:.1f}%   (n={launches})")
+        # Deliberately NOT compared against CLAUDE.md's 15.6%. That figure was
+        # measured on a pool that still had its easy functions in it, and yield
+        # falls as a pool depletes no matter how good the pipeline is -- ~370
+        # matches came out of this one in a single day. Quoting it invites the
+        # conclusion that the search got worse when the population changed.
+        # What IS comparable is the breakdown below: which candidates are worth
+        # a slot, measured on the pool as it stands now.
+
     if src.get("permuter"):
         print("\n  NOTE: a rescue/harvest run is inflating the raw converged count.")
         print("  Only the LIVE SEARCH line speaks to whether the search is working.")
+
+    by_band(conn, since)
     return 0
+
+
+def by_band(conn, since):
+    """Convergence by isolation distance -- where a search slot actually pays.
+
+    This is the actionable half. Measured over one 6h window: the 200+ band
+    converted 0 of 76, 50-199 converted 4%, 10-49 converted 17%, and 1-9
+    converted only 8% despite being closest. That last one is the interesting
+    result -- a handful of bytes is often a literal-pool or immediate
+    difference the permuter cannot reach by shuffling C, while a few dozen
+    bytes is usually register allocation, which is exactly what it randomises.
+    """
+    launched = [r[0] for r in conn.execute(
+        "SELECT DISTINCT function_name FROM events WHERE kind='t2_launch' AND ts>?",
+        (since,))]
+    if not launched:
+        return
+    q = ",".join("?" * len(launched))
+    rows = conn.execute(
+        f"SELECT name, iso_score FROM functions WHERE name IN ({q})", launched).fetchall()
+    conv = {r[0] for r in conn.execute(
+        f"SELECT DISTINCT function_name FROM events WHERE kind='converged' "
+        f"AND ts>? AND function_name IN ({q})", (since, *launched))}
+
+    def band(i):
+        if i is None:
+            return "no score"
+        return ("0" if i == 0 else "1-9" if i < 10 else "10-49" if i < 50
+                else "50-199" if i < 200 else "200+")
+
+    tot, won = Counter(), Counter()
+    for name, iso in rows:
+        b = band(iso)
+        tot[b] += 1
+        if name in conv:
+            won[b] += 1
+    print(f"\n  {'iso band':<11}{'searched':>9}{'converged':>11}{'rate':>7}")
+    for b in ["0", "1-9", "10-49", "50-199", "200+", "no score"]:
+        if tot[b]:
+            print(f"    {b:<9}{tot[b]:>9}{won[b]:>11}{100*won[b]/tot[b]:>6.0f}%")
 
 
 if __name__ == "__main__":
