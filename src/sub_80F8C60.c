@@ -13,15 +13,19 @@ void sub_80F8C60(void *arg0, void *arg1) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80F8C8C.s\"");
-#else
-void sub_80F8C8C(void *arg0, void *arg1) {
-    if (!(0x20 & (*(u16 *)((s8 *)(((((u8) (*(u8 *)((s8 *)(arg1) + (0xFD))) >> 4) << 8) + (*(s32 *)((s8 *)(arg0) + (0x2C))))) + (0x7A0))))) {
-        (*(u16 *)((s8 *)(arg1) + (0xA0))) = (u16) (0xF7FF & (*(u16 *)((s8 *)(arg1) + (0xA0))));
-    }
+void sub_80F8C8C(void *arg0, void *arg1)
+{
+  u8 new_var2;
+  s32 new_var3;
+  s8 *new_var;
+  new_var2 = ((u8) (*((u8 *) (((s8 *) arg1) + 0xFD)))) >> 4;
+  new_var3 = *((s32 *) (((s8 *) arg0) + 0x2C));
+  if (!(0x20 & (*((u16 *) (((s8 *) ((new_var2 << 8) + new_var3)) + 0x7A0)))))
+  {
+    new_var = ((s8 *) arg1) + 0xA0;
+    *((u16 *) (((s8 *) arg1) + 0xA0)) = (u16) (0xF7FF & (*((u16 *) ((0, new_var)))));
+  }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80F8CC0.s\"");
