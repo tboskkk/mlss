@@ -2197,6 +2197,43 @@ apply the same transformations the splice does, or it under-reports.
 four rows under "X redeclared" that the real path now fixes; simulating the
 repairs turned those into requeues.
 
+**T.12 -- the jump-table class was blocked by ONE line of label emission, and
+the error message pointed at the wrong problem.** Section O left it at 181
+candidates and **zero** rewritable. It is now **49**, recovering **6,637
+instructions and 654 switch cases** from raw bytes.
+
+These are the highest-value functions available, because m2c refuses them
+OUTRIGHT ("Unable to determine jump table") -- they have no seed at all, so
+nothing downstream can touch them. 13 of 20 sampled now emit a real `switch()`.
+
+The cause: `code_prefix()` stops decoding at the first non-Thumb-1 instruction
+and leaves the rest as raw `.byte`, but the switch still branches in there.
+Those addresses were in the label set (every table entry is) while nothing ever
+DEFINED them, so the rewrite emitted a `.4byte _0805396E` reference against a
+label that did not exist. The assembler then said
+
+    unresolved symbol '_0805396E' (not defined in this fragment)
+
+which reads exactly like a cross-fragment target -- precisely what section
+O.1's guardrail refuses on sight. **It is not cross-fragment.** For
+`bclr_update_8053778` the "missing" `_0805396E` sits 502 bytes into its own
+1,338-byte fragment. **74 of the 84 refusals were this.**
+
+Fix: split each leftover raw run at every referenced address and emit a label
+there. Labels emit no bytes, so it is neutral by construction; the tool's own
+byte-identity check and a from-scratch build both confirm it (`mlss.gba: OK`,
+layout clean). All 49 rows were requeued explicitly, per O.2 -- changing a
+fragment's CONTENT leaves its rows stamped shut otherwise.
+
+**The recurring shape, now six times in one session:** a diagnostic that is
+accurate about what it measured and wrong about what it blames. "Unresolved
+symbol" was true; "therefore the target is outside the fragment" was not.
+Before trusting an error message's implied cause, check the cause directly --
+here that was one arithmetic comparison between an address and a range.
+
+Remaining in this class: 29 assemble failures, 10 byte-differs, 5 unaligned
+tables, 2 duplicate labels. Smaller and distinct.
+
 **T.10 -- CLEAN NEGATIVE: Klonoa's highest-value lever needs ROM symbols we do
 not have.** Their `agbcc-source-shape-levers.md` puts "a named `extern` is not
 the same as a cast address constant" first -- numerically identical, compiled
