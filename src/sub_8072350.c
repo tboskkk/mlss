@@ -36,32 +36,29 @@ void sub_8072370(void *arg0) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8072390.s\"");
-#else
 s32 stop_sfx_80195A8(s32);                      /* extern */
-s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 extern s32 sub_8071A64;
-
-void sub_8072390(void *arg0) {
-    u16 temp_r0_11;
-
-    temp_r0_11 = (*(u16 *)((s8 *)(arg0) + (0xAE))) + 1;
-    (*(u16 *)((s8 *)(arg0) + (0xAE))) = temp_r0_11;
-    if ((s16) temp_r0_11 == 0x46) {
-        play_sfx_80195B4(0xA7, -1);
-    }
-    if (M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */) == 0x14) {
-        play_sfx_80195B4(0x6C, -1);
-    }
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
-        sub_8082E1C(arg0, 3, 0x40B7, 0);
-        sub_8082E1C((*(void **)((s8 *)(arg0) + (0x30))), 3, 0, 0);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8071A64;
-        stop_sfx_80195A8(0x6C);
-    }
+void sub_8072390(void *arg0)
+{
+  u16 temp_r0_11;
+  temp_r0_11 = (*((u16 *) (((s8 *) arg0) + 0xAE))) + 1;
+  *((u16 *) (((s8 *) arg0) + 0xAE)) = (*((u16 *) (((s8 *) arg0) + 0xAE))) + 1;
+  if (((s16) temp_r0_11) == 0x46)
+  {
+    play_sfx_80195B4(0xA7, -1);
+  }
+  if (((s16) (*((u16 *) (((s8 *) arg0) + 0xAE)))) == 0x14)
+  {
+    play_sfx_80195B4(0x6C, -1);
+  }
+  if (8 & (*((u8 *) (((s8 *) (*((void **) (((s8 *) arg0) + 8)))) + 0x12))))
+  {
+    sub_8082E1C(arg0, 3, 0x40B7, 0);
+    sub_8082E1C(*((void **) (((s8 *) arg0) + 0x30)), 3, 0, 0);
+    *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_8071A64;
+    stop_sfx_80195A8(0x6C);
+  }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8072400.s\"");
