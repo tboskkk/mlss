@@ -89,8 +89,9 @@ def ruleset_version() -> str:
     changes, which is exactly the condition under which retrying is worth
     anything.
 
-    Hashes this file, the pinned m2c submodule revision, AND every header
-    under include/ -- the three things that decide what a seed comes out as.
+    Hashes this file, the m2c source CONTENT, every header under include/,
+    AND the Makefile -- the four things that decide what a seed comes out as
+    and whether it compiles.
 
     The headers are not padding. ensure_context() regenerates m2c's
     `--context` whenever any include/**/*.h is newer than it, and that
@@ -141,6 +142,27 @@ def ruleset_version() -> str:
         for hdr in sorted((gitops.REPO / "include").rglob("*.h")):
             h.update(hdr.relative_to(gitops.REPO).as_posix().encode())
             h.update(hdr.read_bytes())
+    except Exception:
+        pass
+    # The Makefile too, for the same reason the headers are here and by the
+    # same argument. A decline is very often "produced output but it doesn't
+    # compile" -- and whether a seed compiles is decided by CFLAGS and the
+    # compile rule, not only by what m2c emitted.
+    #
+    # Found the hard way. The `-g` debug-line fallback (CLAUDE.md T.9) made a
+    # whole class of previously-unbuildable objects build, which is exactly
+    # the verdict these rows are stamped with -- and it re-opened NONE of
+    # them, because the Makefile was not part of the hash. health.py was
+    # reporting `1847 row(s) (31% of corpus) ... 0 still claimable` with the
+    # queue running dry at 4 matches/hr while the fix that unblocks them was
+    # already committed.
+    #
+    # Same lesson as the submodule-SHA hole above (section N.1): the stamp has
+    # to cover everything that decides the verdict, or the project's best
+    # deterministic wins land and reach nothing.
+    try:
+        mk = gitops.REPO / "Makefile"
+        h.update(mk.read_bytes())
     except Exception:
         pass
     return h.hexdigest()[:8]

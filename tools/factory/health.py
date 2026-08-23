@@ -282,8 +282,18 @@ def checks(conn) -> list[tuple[str, str, str]]:
     if exp.is_dir():
         for obj in (REPO / "build" / "src").glob("*.o"):
             ref = exp / obj.name
-            if ref.is_file() and obj.stat().st_size * 2 < ref.stat().st_size:
-                stale.append(obj.name)
+            # The factory deletes and recreates objects constantly, so a path
+            # yielded by glob() can be gone by the time stat() runs. This
+            # module's whole contract is "strictly read-only, safe to run
+            # against a live factory as often as you like" -- and it was
+            # crashing with FileNotFoundError against exactly that, which made
+            # the one tool you reach for when something looks wrong the tool
+            # that will not run when the factory is busiest.
+            try:
+                if ref.is_file() and obj.stat().st_size * 2 < ref.stat().st_size:
+                    stale.append(obj.name)
+            except FileNotFoundError:
+                continue
     if stale:
         out.append(("stale objects", WARN,
                     f"{len(stale)} object(s) in build/src/ far smaller than expected/ "
