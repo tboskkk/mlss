@@ -16,14 +16,40 @@ asm_unified(".include \"asm/nonmatching/sub_8164FA4.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8164FF4.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+void sub_8164FF4(void *arg0, s32 arg1, s32 arg2, s32 arg3)
+{
+  s32 temp_r1_33;
+  s32 temp_r3_25;
+  s32 var_r2_0;
+  s32 var_r5_8;
+  var_r2_0 = arg2;
+  var_r5_8 = arg1;
+  *((s32 *) (((s8 *) arg0) + 0x9C)) = 0;
+  *((s32 *) (((s8 *) arg0) + 0x98)) = arg3;
+  if (var_r5_8 <= 3)
+  {
+    var_r5_8 = 4;
+  }
+  if (var_r2_0 <= 3)
+  {
+    var_r2_0 = 4;
+  }
+  temp_r3_25 = (*((s32 *) (((s8 *) arg0) + 0x30))) * 8;
+  if (((s32) (var_r5_8 + temp_r3_25)) > 0xEC)
+  {
+    var_r5_8 = 0xEC - temp_r3_25;
+  }
+  temp_r1_33 = (*((s32 *) (((s8 *) arg0) + 0x34))) * 8;
+  if (((s32) (var_r2_0 + temp_r1_33)) > 0x9C)
+  {
+    var_r2_0 = 0x9C - temp_r1_33;
+  }
+  *((s32 *) (((s8 *) arg0) + 0x90)) = var_r5_8;
+  var_r5_8 = var_r2_0;
+  *((s32 *) (((s8 *) (arg0 + 0x90)) + 4)) = var_r5_8;
+  sprite_hide_8021F20(*((struct Sprite **) (((s8 *) arg0) + 0)));
+  sprite_hide_8021F20(*((struct Sprite **) (((s8 *) arg0) + 4)));
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_816504C.s\"");
