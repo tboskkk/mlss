@@ -8,6 +8,9 @@
 asm_unified(".include \"asm/macros.inc\"");
 
 
+
+void sub_8090A24(void *arg0);
+
 s32 sub_8082E1C();
 
 #ifndef NONMATCHING
