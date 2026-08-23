@@ -9,22 +9,17 @@ asm_unified(".include \"asm/macros.inc\"");
 
 
 
+
+void sub_80886BC(void *arg0);
+
 extern s32 sub_808750C;
 
 s32 sub_8082E1C();
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_808862C.s\"");
-#else
-u32* sub_808862C(u32* param_1) {
-    u32* puVar1;
-    
-    puVar1 = param_1 + 0x13;
-    *(param_1 + 0x14) = *puVar1;
-    *(param_1 + 0x13) = 0x080886BD;
-    return param_1;
+void sub_808862C(void *arg0) {
+    (*(s32 **)((s8 *)(arg0) + (0x50))) = (s32 *) (*(s32 **)((s8 *)(arg0) + (0x4C)));
+    (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_80886BC;
 }
-#endif
 
 extern s32 sub_80886E0;
 
