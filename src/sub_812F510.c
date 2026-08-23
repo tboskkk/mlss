@@ -7,18 +7,17 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_812F510.s\"");
-#else
 s32 sub_8116620(s32);                               /* extern */
-
-s32 sub_812F510(void *arg0) {
-    if ((sub_8116620((*(s32 *)((s8 *)(arg0) + (0x20)))) << 0x18) != 0) {
-        return 1;
-    }
-    return 0;
+s32 sub_812F510(void *arg0)
+{
+  int new_var;
+  new_var = (sub_8116620(*((s32 *) (((s8 *) arg0) + 0x20))) << 0x18) != 0;
+  if (new_var)
+  {
+    return 1;
+  }
+  return 0;
 }
-#endif
 
 s32 sub_81151E4(s32, s32, s32, s32, s32, s32, s32, s32); /* extern */
 
