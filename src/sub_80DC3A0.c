@@ -306,23 +306,21 @@ void sub_80DD6EC(void *arg0) {
     }
 }
 
-extern s32 sub_80DD798;
-
+void sub_80DD798(void *arg0);
 void sub_80DD708(void *arg0) {
     if (sub_8082B00() == 0) {
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80DD798;
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_80DD798;
     }
 }
 
-extern s32 sub_80DD7C4;
-
+void sub_80DD7C4(void *arg0);
 void sub_80DD724(void *arg0) {
     if (sub_8082B00() == 0) {
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80DD7C4;
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_80DD7C4;
     }
 }
 
-extern s32 sub_80DD7F0;
+void sub_80DD7F0(void *arg0);
 void sub_80DD740(void *arg0)
 {
   void *temp_r2_12;
@@ -331,7 +329,7 @@ void sub_80DD740(void *arg0)
   new_var = (s8 *) arg0;
   temp_r2_12 = *((void **) (new_var + 8));
   *((u8 *) (((s8 *) temp_r2_12) + 0x12)) = (u8) (((-7) & (*(((s8 *) temp_r2_12) + 0x12))) | 2);
-  *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_80DD7F0;
+  *((s32 **) (((s8 *) arg0) + 0x4C)) = (s32 *) &sub_80DD7F0;
 }
 
 extern s32 sub_80DD878;
