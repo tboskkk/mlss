@@ -7,6 +7,9 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
+
+s32 sub_8082E1C();
+
 void sub_8077570(void *arg0) {
     s32 var_r0_17;
 
