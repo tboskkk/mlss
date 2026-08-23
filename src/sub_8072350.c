@@ -13,21 +13,16 @@ extern s32 sub_807197C;
 s32 sub_8082E1C();
 extern s32 sub_8071B14;
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8072350.s\"");
-#else
 extern s32 sub_80722F8;
-
-void sub_8072350(void *arg0) {
-    u16 temp_r0_11;
-
-    temp_r0_11 = (*(u16 *)((s8 *)(arg0) + (0xAC))) - 1;
-    (*(u16 *)((s8 *)(arg0) + (0xAC))) = temp_r0_11;
-    if ((s32) (temp_r0_11 << 0x10) <= 0) {
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80722F8;
-    }
+void sub_8072350(void *arg0)
+{
+  u16 temp_r0_11;
+  temp_r0_11 = (*((u16 *) (((s8 *) arg0) + 0xAC)) = (*((u16 *) (((s8 *) arg0) + 0xAC))) - 1);
+  if (((s32) (temp_r0_11 << 0x10)) <= 0)
+  {
+    *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_80722F8;
+  }
 }
-#endif
 
 void sub_8072370(void *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
