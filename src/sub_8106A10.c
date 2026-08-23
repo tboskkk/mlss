@@ -10,6 +10,9 @@ asm_unified(".include \"asm/macros.inc\"");
 
 
 
+
+s32 sub_810D3B8();
+
 s32 sub_807FB34();
 
 s32 sub_8082B00();
@@ -93,15 +96,9 @@ asm_unified(".include \"asm/nonmatching/sub_8106B0C.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8106B90.s\"");
-#else
-s32 sub_810D3B8(s32, s32, s32, s32);            /* extern */
-
-void sub_8106B90(s32 arg0) {
-    sub_810D3B8(M2C_ERROR(/* unknown instruction: ldsh $r3, ($mem_loc_fictive_) */), M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */) + 8, M2C_ERROR(/* unknown instruction: ldsh $r2, ($mem_loc_fictive_) */) - 8, 0);
+void sub_8106B90(void *arg0) {
+    sub_810D3B8((*(s16 *)((s8 *)(arg0) + (0x16))), (*(s16 *)((s8 *)(arg0) + (0x12))) + 8, (*(s16 *)((s8 *)(arg0) + (0x14))) - 8, 0);
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8106BB0.s\"");
