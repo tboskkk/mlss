@@ -25,26 +25,29 @@ asm_unified(".include \"asm/nonmatching/sub_80801BC.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8080220.s\"");
-#else
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
-
-void sub_8080220(void *arg0) {
-    void *temp_r2_37;
-
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
-        if (M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */) == -1) {
-            sub_8082E1C(arg0, 1, 0x2039, 0);
-        } else {
-            sub_8082E1C(arg0, 1, 0x2068, 0);
-        }
-        temp_r2_37 = (*(void **)((s8 *)(arg0) + (8)));
-        (*(u8 *)((s8 *)(temp_r2_37) + (0x12))) = (u8) (-7 & (*(u8 *)((s8 *)(temp_r2_37) + (0x12))));
-        (*(s32 *)((s8 *)(arg0) + (0x4C))) = 0;
+void sub_8080220(void *arg0)
+{
+  void **new_var;
+  int new_var2;
+  void *temp_r2_37;
+  new_var2 = -7;
+  if (8 & (*((u8 *) (((s8 *) (*((void **) (((s8 *) arg0) + 8)))) + 0x12))))
+  {
+    new_var = &(*((void **) (((s8 *) arg0) + 0x28)));
+    if ((*((s16 *) (((s8 *) (*new_var)) + 0xEC))) == (-1))
+    {
+      sub_8082E1C(arg0, 1, 0x2039, 0);
     }
+    else
+    {
+      sub_8082E1C(arg0, 1, 0x2068, 0);
+    }
+    temp_r2_37 = *((void **) (((s8 *) arg0) + 8));
+    *((u8 *) (((s8 *) temp_r2_37) + 0x12)) = (u8) (new_var2 & (*((u8 *) (((s8 *) temp_r2_37) + 0x12))));
+    *((s32 *) (((s8 *) arg0) + 0x4C)) = 0;
+  }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_808027C.s\"");
