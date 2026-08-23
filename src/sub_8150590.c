@@ -15,14 +15,30 @@ void sub_8150590(s32 arg0) {
     sub_804761C(arg0, 0);
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_81505A8.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+extern s32 sub_814E1BC;
+void sub_81505A8(s32 arg0, void *arg1, s32 **arg2)
+{
+  struct Sprite *new_var;
+  int new_var2;
+  s16 temp_r1_14;
+  new_var2 = -8;
+  temp_r1_14 = *((s16 *) (((s8 *) arg1) + 0x1BE));
+  switch (temp_r1_14)
+  {
+    case 0:
+      sub_801E150(*((struct Sprite **) (((s8 *) arg1) + 0x294)), 6, -1, 0, (s32) temp_r1_14);
+      break;
+
+    case 1:
+      new_var = *((struct Sprite **) (((s8 *) arg1) + 0x294));
+      sub_801E150(new_var, 7, -1, 0, 0);
+      break;
+
+  }
+
+  *((u8 *) (((s8 *) arg1) + 0x214)) = (u8) ((new_var2 & (*((u8 *) (((s8 *) arg1) + 0x214)))) | 1);
+  *arg2 = &sub_814E1BC;
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8150618.s\"");
