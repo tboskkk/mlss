@@ -129,7 +129,42 @@ def stage(rows, work: Path, ctx: Path) -> list[str]:
         if ".include" not in body:
             body = '\t.include "asm/macros.inc"\n' + body
         (work / f"{r['name']}.frag.s").write_text(body)
-        (work / f"{r['name']}.body.c").write_text(r["candidate_body"])
+        # Prepend declarations for the ROM symbols the body references that
+        # nothing else declares. Without them the isolation compile is not
+        # measuring "is this body compilable", it is measuring "does this body
+        # happen to reference only header-declared symbols" -- CLAUDE.md N.4b,
+        # where the committed byte-exact C of three already-MATCHED functions
+        # failed the same check.
+        #
+        # Measured cost of leaving it out: clustering the candidates that
+        # produce no iso_score at all, `X undeclared` was the single largest
+        # class at 104 of 335 (31%), with `called object is not a function` a
+        # further 74. Those are declarations the real source file supplies and
+        # this harness did not, so those rows were being denied a ranking
+        # score for a reason that has nothing to do with their C.
+        #
+        # Not stacking the deck: declarations emit no code, declare_missing.py
+        # supplies the same ones in the real build, and the byte comparison is
+        # unaffected by them.
+        body = r["candidate_body"]
+        try:
+            decls = gitops.rom_symbol_declarations(body)
+        except Exception:
+            decls = ""
+        # Include the project headers as SOURCE and let cpp run over the whole
+        # thing, exactly as the real build does -- rather than concatenating a
+        # pre-preprocessed context.
+        #
+        # A pre-preprocessed context has already had its macros expanded and
+        # DISCARDED, so a body that says NULL, TRUE or FALSE hits an undefined
+        # identifier that the real build resolves without difficulty. Measured:
+        # clustering the candidates that produce no iso_score at all,
+        # `X undeclared` was the largest class -- 104 of 335, 31% -- and the
+        # undeclared identifier was `NULL`. Those rows were denied a ranking
+        # score, and any byte-exact ones among them were never found, for a
+        # defect in this harness rather than anything about their C.
+        (work / f"{r['name']}.body.c").write_text(
+            '#include "global.h"\n#include "common.h"\n' + (decls or "") + body)
         staged.append(r["name"])
     return staged
 
@@ -147,11 +182,13 @@ for n in $(cat names.txt); do
   # agbcc IS cc1: it consumes ALREADY-PREPROCESSED input and does not strip
   # comments -- the Makefile runs cpp separately for exactly this reason. m2c
   # annotates its output with `/* extern */`, which reaches cc1 raw and is a
-  # syntax error. So preprocess the concatenation, as the real build does.
-  cat ctx.i $n.body.c > $n.full.c
-  arm-none-eabi-cpp -P -nostdinc -undef $n.full.c -o $n.pp.c 2>$n.pp.err || { echo "$n PP_FAIL"; continue; }
+  # syntax error. These CPPFLAGS mirror the Makefile's exactly, so macros the
+  # headers define (NULL, TRUE, FALSE) are live for the body.
+  arm-none-eabi-cpp -I /workspace/tools/agbcc/include -nostdinc -undef \
+      -iquote /workspace/include -Wno-trigraphs $n.body.c -o $n.pp.c 2>$n.pp.err \
+      || { echo "$n PP_FAIL"; continue; }
   while read -r vname cc flags; do
-    /workspace/tools/agbcc/bin/$cc $n.pp.c FLAGS $flags -o $n.$vname.s 2>$n.$vname.cc.err || { echo "$n $vname CC_FAIL"; continue; }
+    /workspace/tools/agbcc/bin/$cc $n.pp.c @@FLAGS@@ $flags -o $n.$vname.s 2>$n.$vname.cc.err || { echo "$n $vname CC_FAIL"; continue; }
     printf '\t.text\n\t.align 2, 0\n' >> $n.$vname.s
     arm-none-eabi-as -mcpu=arm7tdmi -mthumb-interwork -I /workspace \
         -o $n.$vname.o $n.$vname.s 2>$n.$vname.as.err || { echo "$n $vname AS_FAIL"; continue; }
@@ -208,7 +245,7 @@ def main() -> int:
             "\n".join(f"{v} {cc} {' '.join(fl)}" for v, (cc, fl) in VARIANTS.items()) + "\n")
         print(f"testing {len(staged)} function(s) x {len(VARIANTS)} variant(s)")
 
-        script = SCRIPT.replace("FLAGS", " ".join(BASE_FLAGS))
+        script = SCRIPT.replace("@@FLAGS@@", " ".join(BASE_FLAGS))
         proc = subprocess.run(
             ["podman", "run", "--rm",
              "-v", f"{REPO}:/workspace:ro", "-v", f"{work}:/w:Z",

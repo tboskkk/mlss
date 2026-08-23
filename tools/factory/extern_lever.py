@@ -208,7 +208,7 @@ def main() -> int:
         (work / "variants.txt").write_text("agbcc agbcc \n")
         print(f"comparing {len(pairs)} function(s), stored body vs minted-extern rewrite")
 
-        script = cv.SCRIPT.replace("FLAGS", " ".join(cv.BASE_FLAGS))
+        script = cv.SCRIPT.replace("@@FLAGS@@", " ".join(cv.BASE_FLAGS))
         subprocess.run(["podman", "run", "--rm",
                         "-v", f"{gitops.REPO}:/workspace:ro", "-v", f"{work}:/w:Z",
                         cv.IMAGE, "bash", "-c", script],
