@@ -7,26 +7,30 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_811104C.s\"");
-#else
-s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
+
+s32 sub_8082E1C();
+
 extern s32 sub_8111174;
-
-void sub_811104C(void *arg0) {
-    s32 var_r1_14;
-    void *temp_r2_23;
-
-    var_r1_14 = 0x11;
-    if ((0 - M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */)) != 1) {
-        var_r1_14 = 0x12;
-    }
-    sub_8082E1C(arg0, var_r1_14, 0, 0);
-    temp_r2_23 = (*(void **)((s8 *)(arg0) + (8)));
-    (*(u8 *)((s8 *)(temp_r2_23) + (0x12))) = (u8) ((-7 & (*(u8 *)((s8 *)(temp_r2_23) + (0x12)))) | 2);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8111174;
+void sub_811104C(void *arg0)
+{
+  s32 var_r1_14;
+  void *temp_r2_23;
+  u8 *new_var;
+  void *new_var2;
+  int new_var3;
+  new_var3 = 0 - (*((s16 *) (((s8 *) (*((void **) (((s8 *) (*((void **) (0x2C + ((s8 *) arg0))))) + 0x28)))) + 0xEC)));
+  var_r1_14 = 0x11;
+  if (new_var3 != 1)
+  {
+    var_r1_14 = 0x12;
+  }
+  new_var2 = arg0;
+  sub_8082E1C(new_var2, var_r1_14, 0, 0);
+  temp_r2_23 = *((void **) (((s8 *) new_var2) + 8));
+  ;
+  *((u8 *) (((s8 *) temp_r2_23) + 0x12)) = (u8) (((-7) & (*(((s8 *) temp_r2_23) + 0x12))) | 2);
+  *((s32 **) (((s8 *) new_var2) + 0x4C)) = &sub_8111174;
 }
-#endif
 
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 
