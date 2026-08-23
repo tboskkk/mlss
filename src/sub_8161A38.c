@@ -17,24 +17,20 @@ void sub_8161A38(s32 *arg0, s32 arg1) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8161A58.s\"");
-#else
 void *sub_8161A58(void *arg0) {
-    void *temp_r0_18;
+    struct Sprite *temp_r0_18;
 
     temp_r0_18 = sub_8020DD0(4, 0x5005, 1, -1, -1, -1, -1);
-    (*(void **)((s8 *)(arg0) + (0))) = temp_r0_18;
+    (*(struct Sprite **)((s8 *)(arg0) + (0))) = temp_r0_18;
     sub_801E150(temp_r0_18, 0x21, -1, 0, 0);
-    sprite_show_8020CBC((*(void **)((s8 *)(arg0) + (0))));
-    (*(s16 *)((s8 *)((*(void **)((s8 *)(arg0) + (0)))) + (0))) = 0x78;
-    (*(s16 *)((s8 *)((*(void **)((s8 *)(arg0) + (0)))) + (2))) = 0x50;
+    sprite_show_8020CBC((*(struct Sprite **)((s8 *)(arg0) + (0))));
+    (*(struct Sprite **)((s8 *)(arg0) + (0)))->xPosition = 0x78;
+    (*(struct Sprite **)((s8 *)(arg0) + (0)))->yPosition = 0x50;
     (*(s32 *)((s8 *)(arg0) + (0xC))) = 0;
     (*(s32 *)((s8 *)(arg0) + (4))) = 0x100;
     (*(s32 *)((s8 *)(arg0) + (8))) = 0;
     return arg0;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8161AAC.s\"");

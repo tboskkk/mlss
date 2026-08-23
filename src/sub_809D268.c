@@ -64,7 +64,7 @@ void sub_809D358(void *arg0)
   *((s32 *) (((s8 *) arg0) + 0x4C)) = (new_var = 0);
 }
 
-extern s32 sub_809D454;
+void sub_809D454(void *arg0);
 void sub_809D394(void *arg0)
 {
   void *temp_r2_32;
@@ -80,11 +80,11 @@ void sub_809D394(void *arg0)
     temp_r2_32 = *((void **) (((s8 *) (*((void **) (((s8 *) arg0) + 0x30)))) + 8));
     *((u8 *) (((s8 *) temp_r2_32) + 0x12)) = (u8) (new_var & (*((u8 *) (((s8 *) temp_r2_32) + 0x12))));
     *((s16 *) (((s8 *) arg0) + 0xAC)) = 0x32;
-    *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_809D454;
+    *((s32 **) (((s8 *) arg0) + 0x4C)) = (s32 *) &sub_809D454;
   }
 }
 
-extern s32 sub_809D49C;
+void sub_809D49C(void *arg0);
 void sub_809D3F4(void *arg0)
 {
   long long new_var;
@@ -100,27 +100,33 @@ void sub_809D3F4(void *arg0)
     temp_r2_32 = *((void **) (((s8 *) (*((void **) (((s8 *) arg0) + 0x30)))) + 8));
     *((u8 *) (((s8 *) temp_r2_32) + 0x12)) = (u8) (new_var & (*((u8 *) (((s8 *) temp_r2_32) + 0x12))));
     *((s16 *) (((s8 *) arg0) + 0xAC)) = 0;
-    *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_809D49C;
+    *((s32 **) (((s8 *) arg0) + 0x4C)) = (s32 *) &sub_809D49C;
   }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_809D454.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+extern s32 sub_809CEB0;
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_809D49C.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+void sub_809D454(void *arg0) {
+    if ((s32) (s16) (*(u16 *)((s8 *)(arg0) + (0xAC))) > 0) {
+        (*(u16 *)((s8 *)(arg0) + (0xAC))) = (u16) ((*(u16 *)((s8 *)(arg0) + (0xAC))) - 1);
+        return;
+    }
+    sub_8082E1C(arg0, 0, 0x4108, 0);
+    sub_8082E1C((*(void **)((s8 *)(arg0) + (0x30))), 6, 0x4109, 0);
+    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_809CEB0;
+}
+
+extern s32 sub_809CAF0;
+
+void sub_809D49C(void *arg0) {
+    if ((s32) (s16) (*(u16 *)((s8 *)(arg0) + (0xAC))) > 0) {
+        (*(u16 *)((s8 *)(arg0) + (0xAC))) = (u16) ((*(u16 *)((s8 *)(arg0) + (0xAC))) - 1);
+        return;
+    }
+    sub_8082E1C(arg0, 0, 0x4108, 0);
+    sub_8082E1C((*(void **)((s8 *)(arg0) + (0x30))), 6, 0x4109, 0);
+    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_809CAF0;
+}
 
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 s32 sub_80880C4(void *, s32);                   /* extern */

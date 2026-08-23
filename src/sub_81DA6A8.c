@@ -49,25 +49,19 @@ u32 sub_81DA6C0(void) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_81DA6E4.s\"");
-#else
-void sub_81DA6E4(s32 r0)
-{
-    u32* r1 = (u32*)0x03001BD0;
-    if (r0 == 4)
-    {
-        *r1 = 0x0821DBAC;
+s32 sub_81DA6E4(u16 arg0) {
+    s32 var_r2_9;
+    u16 temp_r0_8;
+
+    temp_r0_8 = arg0;
+    var_r2_9 = 0;
+    if (temp_r0_8 == 4) {
+        *(s32 *)0x03001BD0 = 0x0821DBAC;
+    } else if (temp_r0_8 == 0x40) {
+        *(u32 *)0x03001BD0 = 0x0821DBB8;
+    } else {
+        *(u32 *)0x03001BD0 = 0x0821DBAC;
+        var_r2_9 = 1;
     }
-    else if (r0 == 0x40)
-    {
-        *r1 = 0x0821DBB8;
-    }
-    else
-    {
-        *r1 = 0x0821DBAC;
-        r0 = 1;
-    }
-    r0;
+    return var_r2_9;
 }
-#endif

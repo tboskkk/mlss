@@ -67,10 +67,6 @@ void sub_81442D4(s32 arg0, void *arg1)
   (*((s32 (**)(s32, void *)) (((s8 *) arg1) + 0x198)))(arg0, arg1);
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_814432C.s\"");
-#else
-s32 sub_81387C8(void *, s32);                   /* extern */
 s32 sub_8138FD4(void *, s32);                   /* extern */
 s32 sub_8139030(void *, s32);                   /* extern */
 s32 sub_81435E4(s32, void *);                   /* extern */
@@ -85,7 +81,6 @@ void sub_814432C(s32 arg0, void *arg1) {
     (*(s32 **)((s8 *)(arg1) + (0x1A4))) = &sub_8139420;
     sub_81435E4(arg0, arg1);
 }
-#endif
 
 u8 sub_8138C8C();                                   /* extern */
 void sub_814437C(s32 arg0, void *arg1)

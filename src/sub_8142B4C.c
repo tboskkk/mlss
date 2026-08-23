@@ -24,22 +24,18 @@ void sub_8142B4C(s32 arg0, void *arg1, s32 **arg2) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8142B88.s\"");
-#else
-s32 sub_801E68C(void *);                        /* extern */
+s32 sub_801E68C(struct Sprite *);               /* extern */
 extern s32 sub_8142F74;
 
 void sub_8142B88(s32 arg0, void *arg1, s32 **arg2) {
-    void *temp_r0_15;
+    struct Sprite *temp_r0_15;
 
-    temp_r0_15 = (*(void **)((s8 *)(arg1) + (0x294)));
-    sub_801E150(temp_r0_15, (*(u8 *)((s8 *)(temp_r0_15) + (0x21))), 2, 0, 0);
-    sub_801E68C((*(void **)((s8 *)(arg1) + (0x294))));
+    temp_r0_15 = (*(struct Sprite **)((s8 *)(arg1) + (0x294)));
+    sub_801E150(temp_r0_15, (s32) temp_r0_15->field_20[1], 2, 0, 0);
+    sub_801E68C((*(struct Sprite **)((s8 *)(arg1) + (0x294))));
     (*(s32 *)((s8 *)(arg1) + (0x18))) = 0;
     *arg2 = &sub_8142F74;
 }
-#endif
 
 s32 sub_813B650(void *);                            /* extern */
 extern s32 sub_813B1E8;

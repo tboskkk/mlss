@@ -16,22 +16,17 @@ void sub_80290CC(void *arg0, s32 arg1)
   *new_var = (u8) ((3 & (*((u8 *) (((s8 *) arg0) + 0x12C)))) | new_var2);
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80290E0.s\"");
-#else
-s32 CpuFastSet(s32, s32, s32);                  /* extern */
-
 void sub_80290E0(void *arg0) {
-    s32 var_r5_13;
-    s32 var_r6_14;
     u32 temp_r0_30;
+    void *var_r5_13;
+    void *var_r6_14;
 
     if ((*(u32 *)((s8 *)(arg0) + (0xF0))) != 0) {
-        var_r5_13 = (*(s32 *)((s8 *)(arg0) + (0x24)));
-        var_r6_14 = 0x02000080;
+        var_r5_13 = (*(void **)((s8 *)(arg0) + (0x24)));
+        var_r6_14 = (void *)0x02000080;
         do {
             if ((*(u32 *)((s8 *)(arg0) + (0xF0))) & 1) {
-                CpuFastSet(var_r5_13, var_r6_14, 8);
+                CpuFastSet(var_r5_13, var_r6_14, 8U);
             }
             var_r5_13 += 0x20;
             var_r6_14 += 0x20;
@@ -40,7 +35,6 @@ void sub_80290E0(void *arg0) {
         } while (temp_r0_30 != 0);
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8029120.s\"");
