@@ -26,8 +26,10 @@
 > **Current live levers**, in the order I would take them:
 > 1. `isolation_exact.py --apply` after any seed repair -- harvests byte-exact
 >    candidates AND refreshes the ranking. Cheapest yield in the repo.
-> 2. `asmlift_bridge.py` -- a second programmatic seeder that covers 24% of the
->    pile m2c cannot seed, 9 byte-exact per 400. Needs Node installed.
+> 2. `asmlift_bridge.py` -- a second programmatic seeder for the pile m2c
+>    cannot seed. 12% pile-wide (143 of 1,200), 2 byte-exact; 27% and 8
+>    byte-exact on a SMALLEST-FIRST sample, which is not representative -- its
+>    value is concentrated in small functions. Needs Node installed.
 > 3. m2c's remaining type-inference failures: `invalid type argument` (102),
 >    `invalid use of void expression` (69). `fix_bare_deref.py` addresses part
 >    of this by enumerating widths against the byte oracle.

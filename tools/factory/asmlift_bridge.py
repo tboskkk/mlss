@@ -7,21 +7,31 @@ matching decompilation on retro compilers, and it supports ARMv4T/Thumb with
 `--target agbcc`. It reads the same pret-style split assembly this project
 already emits, so `asm/nonmatching/<name>.s` needs no conversion.
 
-WHY BOTHER, GIVEN m2c WORKS. Because the two fail on different things, and the
-overlap is where the remaining work is. Measured on 150 fragments whose m2c
-seed does NOT compile (no `iso_score`, i.e. the residue after every repair in
-CLAUDE.md sections T.2-T.15):
+WHY BOTHER, GIVEN m2c WORKS. Because the two fail on different things. How MUCH
+it is worth depends entirely on which functions you point it at, and the first
+measurement of that here was wrong in an instructive way.
 
-    asmlift produced C for            40 of 150   (27%)
-    ...of those, byte-EXACT            8
-    ...within 1-9 bytes                5
-    ...within 10-49 bytes             12
-    ...50+ bytes                      13
-    ...did not compile                 2
+Smallest-first, 150 fragments whose m2c seed does not compile:
 
-**Eight immediate matches out of functions m2c cannot handle at all**, plus
-five near-misses well inside the band that converges. That is a better return
-than anything else currently available on this pile.
+    produced C   40 of 150 (27%)     byte-EXACT 8    1-9 bytes 5
+
+The whole remaining pile, 1,200 fragments:
+
+    produced C  143 of 1200 (12%)    byte-EXACT 2    10-49 bytes 6
+                                     50+ bytes 110   no compile 25
+
+**Both numbers are real; the first is not representative.** Ordering by line
+count put the easiest functions first, and CLAUDE.md N.4b records exactly this
+trap -- "a random sample compiled 0/40, smallest-first compiled 15/40, always
+say which sampling a number came from". Taking the 27% as the pile-wide figure
+overstated asmlift's reach by more than double, and it was written down that
+way before the full run corrected it.
+
+So: asmlift's value is concentrated in SMALL functions, where it yields a
+handful of immediate matches out of code m2c cannot touch at all. On large
+functions it usually emits something that compiles but sits 50+ bytes from
+retail -- outside the band that converges. Run it, keep the wins, do not
+expect it to scale across the corpus.
 
 They also share limits: both decline `swi` (BIOS calls) for the same reason,
 so this is a complement rather than a replacement. m2c stays the primary
