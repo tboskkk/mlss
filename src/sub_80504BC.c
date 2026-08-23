@@ -143,25 +143,25 @@ void sub_805065C(void *arg0)
   }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_805068C.s\"");
-#else
 s32 sub_8040CF4(void *, s16, s16);              /* extern */
-
-void sub_805068C(void *arg0, s16 arg1, s16 arg2, s32 arg3) {
-    s16 temp_r5_12;
-    s16 temp_r6_10;
-    void *temp_r4_19;
-
-    temp_r6_10 = arg1;
-    temp_r5_12 = arg2;
-    sub_8040CF4(arg0, temp_r6_10, temp_r5_12);
-    temp_r4_19 = (*(void **)((s8 *)(arg0) + (0x344)));
-    if (temp_r4_19 != NULL) {
-        (*(s32 (**)(void *, s16, s16, s32))((s8 *)(((*(s32 *)((s8 *)(temp_r4_19) + (0x338))) + 0x40)) + (4)))(temp_r4_19 + M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */), temp_r6_10, temp_r5_12, arg3);
-    }
+void sub_805068C(void *arg0, s16 arg1, s16 arg2, s32 arg3)
+{
+  s16 temp_r5_12;
+  s16 temp_r6_10;
+  void *new_var;
+  void *temp_r1_25;
+  void *temp_r4_19;
+  temp_r6_10 = arg1;
+  temp_r5_12 = arg2;
+  sub_8040CF4(arg0, temp_r6_10, temp_r5_12);
+  temp_r4_19 = *((void **) (((s8 *) arg0) + 0x344));
+  if (temp_r4_19 != ((void *) 0))
+  {
+    temp_r1_25 = *((void **) (((s8 *) temp_r4_19) + 0x338));
+    new_var = temp_r1_25 + 0x40;
+    (*((s32 (**)(void *, s16, s16, s32)) (((s8 *) new_var) + 4)))(temp_r4_19 + (*((s16 *) (((s8 *) temp_r1_25) + 0x40))), temp_r6_10, temp_r5_12, arg3);
+  }
 }
-#endif
 
 s32 sub_8047FDC();                              /* extern */
 
