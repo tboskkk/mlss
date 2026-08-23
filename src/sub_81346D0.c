@@ -7,6 +7,9 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
+
+s32 sub_8021308();
+
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81346D0.s\"");
 #else
@@ -63,18 +66,12 @@ asm_unified(".include \"asm/nonmatching/sub_81348BC.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8134928.s\"");
-#else
-s32 sub_8021308();                              /* extern */
-
 void sub_8134928(void *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0xC))) != 0) {
         sub_8021308();
         (*(s32 *)((s8 *)(arg0) + (0xC))) = 0;
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8134940.s\"");
