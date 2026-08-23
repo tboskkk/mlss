@@ -244,7 +244,54 @@ def splice_candidate(name: str, body: str) -> Path | None:
     if new_text == text:
         return None
     c_path.write_text(new_text)
+    _repair_self_declaration(c_path, name, body)
     return c_path
+
+
+def _repair_self_declaration(c_path: Path, name: str, body: str) -> bool:
+    """Fix a file-scope `extern s32 <name>;` in the file we just DEFINED <name> in.
+
+    Measured: 407 unmatched functions are declared as DATA at file scope inside
+    the very file that would define them. declare_missing emits `extern s32 X;`
+    when some SIBLING in that file takes `&X` (CLAUDE.md N.4's rule, which is
+    right for a symbol the file only references) -- and then the candidate for
+    X itself arrives and defines X as a function.
+
+    The conflict does not exist in the tree at rest, which is why a static scan
+    finds nothing and fix_decl_conflicts.py reported 0/0: while the guard is in
+    place there is no definition. It materialises at SPLICE time, i.e. exactly
+    when the validator measures. agbcc then says
+
+        src/sub_806C1A8.c:185: `sub_806C8C0' redeclared as different kind of symbol
+
+    the whole object fails to build, asm-differ has nothing to score, and the
+    validator files a byte-exact candidate as "wasn't byte-identical" and sends
+    it back to be searched again from nothing. Confirmed on sub_806C8C0, whose
+    candidate is instruction-for-instruction identical to retail yet had been
+    rejected on every attempt.
+
+    So the repair belongs HERE, on the splice path, rather than in a sweep --
+    every consumer of splice_candidate (validator, plain_score, rescue) hits
+    the same wall.
+
+    Byte-neutral by the argument in fix_decl_conflicts.repair_file_scope: the
+    linker sets a function pointer's Thumb bit from the SYMBOL's type, not from
+    how C declared it, so replacing the data declaration with a prototype and
+    casting the address-taken site cannot change the emitted bytes. And
+    finish_match() re-checks the whole ROM sha1, so if that reasoning were ever
+    wrong the gate fails rather than something slipping through.
+    """
+    # Local import: fix_decl_conflicts imports this module.
+    try:
+        import fix_decl_conflicts
+    except Exception:
+        return False
+    text = c_path.read_text()
+    out, _proto = fix_decl_conflicts.repair_file_scope(text, name, body)
+    if out is None or out == text:
+        return False
+    c_path.write_text(out)
+    return True
 
 
 _DECL_RE = re.compile(

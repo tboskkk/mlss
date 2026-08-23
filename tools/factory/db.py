@@ -90,6 +90,18 @@ CREATE INDEX IF NOT EXISTS idx_functions_state ON functions(state);
 MIGRATIONS = [
     ("candidate_body", "TEXT"),
     ("candidate_source", "TEXT"),
+    # Which m2c ruleset produced the stored seed, so a row that has already
+    # been PROMOTED can still be re-seeded when the seeder improves.
+    #
+    # Without this, tier_m2c only ever claimed needs_attempt/stalled, so a
+    # seed froze permanently the moment its row reached tier2_ready --
+    # section J's ldsh/ldsb patch re-opened ZERO of the 863 tier2_ready rows
+    # holding an uncompilable M2C_ERROR body, and the permuter spent 596
+    # launches searching them. See requeue_stale_seeds.py.
+    #
+    # NULL means "not seeded by m2c" (a twin/permuter/rescore candidate) and
+    # is deliberately NOT treated as stale.
+    ("seed_ruleset", "TEXT"),
 ]
 
 

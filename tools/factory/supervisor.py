@@ -36,6 +36,7 @@ import requests
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import db  # noqa: E402
+import gitops  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent.parent
 FACTORY_DIR = REPO / "tools" / "factory"
@@ -252,13 +253,26 @@ def clean_slate():
     # reproduce. Seen for real: an 80-second run killed mid-flight left
     # `mlss.gba: FAILED` behind. Nothing downstream can make progress from
     # that state, so a restart must repair it rather than inherit it.
-    # Safe to revert unconditionally on failure: the factory only ever
-    # COMMITS on a verified match, so anything uncommitted is by
-    # definition in-flight work that was going to be redone anyway.
+    # Scoped to FACTORY_PATHS, NOT repo-wide. This used to be
+    # `git checkout -- .` on the reasoning that "the factory only ever COMMITS
+    # on a verified match, so anything uncommitted is in-flight work that was
+    # going to be redone anyway." That is true of asm/ and src/ and false of
+    # everything else in the repo -- tool edits under tools/, docs/, CLAUDE.md
+    # itself. A repo-wide checkout silently destroys all of it, and this runs
+    # on every supervisor START, so a plain `restart.py` was enough to trigger
+    # it.
+    #
+    # Caught live: edits to db.py, tier_m2c.py and gitops.py implementing the
+    # stale-seed fix vanished the instant the factory was restarted to load
+    # them. CLAUDE.md N.2 records this exact failure ("a full session's worth
+    # of docs/formats/README.md research got wiped") and the fix was applied
+    # to gitops.revert_to_clean() -- but the supervisor kept its own unscoped
+    # copy, so the landmine was only half removed.
     r = subprocess.run(["./container.sh", "make"], cwd=REPO, capture_output=True, text=True)
     if "mlss.gba: OK" not in r.stdout:
         log("!! repo does not reproduce the ROM (left broken by a previous crash) -- reverting")
-        subprocess.run(["git", "checkout", "--", "."], cwd=REPO, capture_output=True)
+        subprocess.run(["git", "checkout", "--", *gitops.FACTORY_PATHS],
+                       cwd=REPO, capture_output=True)
         subprocess.run(["git", "clean", "-fd", "asm/", "src/"], cwd=REPO, capture_output=True)
         import shutil
         shutil.rmtree(REPO / "build", ignore_errors=True)

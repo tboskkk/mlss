@@ -96,10 +96,60 @@ def _claim(conn, state: str):
     return row
 
 
+def _claim_stale_seed(conn):
+    """Claim a tier2_ready row whose stored seed predates the current ruleset.
+
+    Spin-safe by construction, which is the property to preserve: re-seeding
+    stamps the row with the CURRENT ruleset so it cannot be claimed again
+    until the ruleset changes, and if m2c declines it `_declined()` stamps
+    notes with that same version, which `_claim()` already excludes. Both exit
+    paths close the row against this query.
+
+    `seed_ruleset IS NOT NULL` matters: NULL means the candidate did not come
+    from m2c at all (twin, permuter, rescore), and re-seeding those would
+    THROW AWAY a better candidate for a generated one.
+
+    `worker_id IS NULL` keeps this off rows another process holds. tier2 moves
+    a row tier2_ready -> permuting inside a transaction, so the worst case is
+    a lost race sqlite serialises, not a double claim.
+    """
+    cur = m2c_bridge.ruleset_version()
+    with db.tx(conn):
+        row = conn.execute(
+            "SELECT * FROM functions WHERE state = 'tier2_ready' "
+            "AND worker_id IS NULL "
+            "AND seed_ruleset IS NOT NULL AND seed_ruleset != ? "
+            "AND (notes IS NULL OR notes NOT LIKE ?) "
+            "ORDER BY updated_at ASC LIMIT 1",
+            (cur, f"m2c:{cur}:%"),
+        ).fetchone()
+        if row is None:
+            return None
+        conn.execute("UPDATE functions SET worker_id = ?, updated_at = ? WHERE name = ?",
+                     (WORKER_ID, time.time(), row["name"]))
+        db.log_event(conn, row["name"], "reclaimed",
+                     f"seed from ruleset {row['seed_ruleset']}, current is {cur}")
+    return row
+
+
 def process_one(conn, no_score: bool = False) -> str | None:
     row = _claim(conn, "needs_attempt")
     if row is None:
         row = _claim(conn, "stalled")
+    if row is None:
+        # LAST, deliberately: a tier2_ready row whose seed came from an OLDER
+        # ruleset. Genuinely unseeded work and stalled work come first, so
+        # this can never starve a first attempt -- it only fills idle capacity.
+        #
+        # This is the fix for finding F11. tier_m2c claimed from needs_attempt
+        # and stalled and nothing else, so the instant a row was PROMOTED its
+        # candidate_body froze forever, however much the seeder improved after.
+        # Section D's law stated for the promote path: any tier that promotes
+        # work must leave something able to re-do it when the thing that
+        # produced it gets better. Measured cost of not having it: section J's
+        # ldsh/ldsb patch re-opened zero of 863 affected tier2_ready rows and
+        # the permuter burned 596 launches on seeds that cannot compile.
+        row = _claim_stale_seed(conn)
     if row is None:
         return None
     name = row["name"]
@@ -155,6 +205,7 @@ def process_one(conn, no_score: bool = False) -> str | None:
         with db.tx(conn):
             db.set_state(conn, name, "tier2_ready", worker_id=None,
                          candidate_body=body, candidate_source="m2c",
+                         seed_ruleset=m2c_bridge.ruleset_version(),
                          notes="m2c seed (fast drain -- not scored here; tier2 will "
                                "detect it if it is already byte-exact)")
         db.log_event(conn, name, "seeded", "m2c fast-drain seed, unscored")
@@ -231,6 +282,7 @@ def process_one(conn, no_score: bool = False) -> str | None:
             with db.tx(conn):
                 db.set_state(conn, name, "tier2_ready", worker_id=None,
                              candidate_body=body, candidate_source="m2c",
+                             seed_ruleset=m2c_bridge.ruleset_version(),
                              notes="m2c seed: compiles in ISOLATION but not in its "
                                    "shared translation unit (a sibling's draft is "
                                    "broken) -- the permuter works in isolation, so "
@@ -249,6 +301,7 @@ def process_one(conn, no_score: bool = False) -> str | None:
     with db.tx(conn):
         db.set_state(conn, name, new_state, worker_id=None, candidate_body=body,
                      candidate_source="m2c",
+                     seed_ruleset=m2c_bridge.ruleset_version(),
                      notes=f"m2c seed, plain-build asm-differ score {score}{cast_note}")
     db.log_event(conn, name, "converged" if score == 0 else "seeded", f"m2c score={score}")
     if score == 0:
