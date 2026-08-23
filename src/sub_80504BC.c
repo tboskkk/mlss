@@ -127,21 +127,21 @@ void sub_805062C(void *arg0)
   }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_805065C.s\"");
-#else
 s32 sub_8040FA0();                              /* extern */
-
-void sub_805065C(void *arg0) {
-    void *temp_r4_12;
-
-    sub_8040FA0();
-    temp_r4_12 = (*(void **)((s8 *)(arg0) + (0x344)));
-    if (temp_r4_12 != NULL) {
-        (*(s32 (**)(void *))((s8 *)(((*(s32 *)((s8 *)(temp_r4_12) + (0x338))) + 0x48)) + (4)))(temp_r4_12 + M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */));
-    }
+void sub_805065C(void *arg0)
+{
+  void *temp_r1_18;
+  void *new_var;
+  void *temp_r4_12;
+  sub_8040FA0();
+  temp_r4_12 = *((void **) (((s8 *) arg0) + 0x344));
+  if (((void *) 0) != temp_r4_12)
+  {
+    temp_r1_18 = *((void **) (((s8 *) temp_r4_12) + 0x338));
+    new_var = temp_r1_18 + 0x48;
+    (*((s32 (**)(void *)) (((s8 *) new_var) + 4)))(temp_r4_12 + (*((s16 *) (((s8 *) temp_r1_18) + 0x48))));
+  }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_805068C.s\"");
