@@ -7,16 +7,19 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
+
+s32 sub_808DD2C();
+
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8091C74.s\"");
 #else
-extern s32 sub_808DD2C;
+s32 sub_808DD2C(void *);
 void sub_8091DD8(void *arg0);
 s32 sub_8091C74(void *arg0) {
     (*(u8 *)((s8 *)(arg0) + (0x77))) = (u8) (-0x41 & (*(u8 *)((s8 *)(arg0) + (0x77))) & ~0x20);
     (*(s32 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x28)))) + (0x114))) = (s32) (*(u16 *)((s8 *)((*(s32 *)0x03000FF4 + (~M2C_ERROR(/* unknown instruction: ldsh $r2, ($mem_loc_fictive_) */) * 0x3C))) + (0x2C)));
     (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_8091DD8;
-    (*(s32 **)((s8 *)(arg0) + (0x68))) = &sub_808DD2C;
+    (*(s32 **)((s8 *)(arg0) + (0x68))) = (s32 *) &sub_808DD2C;
     return 1;
 }
 #endif
@@ -255,14 +258,29 @@ asm_unified(".include \"asm/nonmatching/sub_8092AC8.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8092C70.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+void sub_8092C70(void *arg0)
+{
+  int new_var;
+  u16 temp_r1_34;
+  void *temp_r1_8;
+  temp_r1_8 = *((void **) (((s8 *) arg0) + 0x28));
+  new_var = -5;
+  if (temp_r1_8 != ((void *) 0))
+  {
+    *((u8 *) (((s8 *) temp_r1_8) + 0x111)) = (u8) (new_var & (*((u8 *) (((s8 *) temp_r1_8) + 0x111))));
+  }
+  if (0x38 & (*((u8 *) (((s8 *) arg0) + 0x76))))
+  {
+    sub_808DD2C(arg0);
+    return;
+  }
+  temp_r1_34 = *((u16 *) (((s8 *) arg0) + 0xAC));
+  *((u16 *) (((s8 *) arg0) + 0xAC)) = (u16) (temp_r1_34 + 1);
+  if (((s32) ((s16) temp_r1_34)) > 0x17)
+  {
+    sub_808DD2C(arg0);
+  }
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8092CC0.s\"");
