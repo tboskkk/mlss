@@ -98,15 +98,24 @@ asm_unified(".include \"asm/nonmatching/sub_8158ECC.s\"");
    counts this as unmatched. Write the C here, replacing this comment. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8158EEC.s\"");
-#else
-/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
-   compiles a whole translation unit at a time, so an #error here fails
-   every OTHER function in this file under NONMATCHING=1. Guard intact, so
-   the real ROM still gets the verbatim retail bytes and progress.py still
-   counts this as unmatched. Write the C here, replacing this comment. */
-#endif
+s32 sub_815FAFC();                              /* extern */
+s32 sub_815FB14(void *, s32);                   /* extern */
+
+void sub_8158EEC(void *arg0, s32 arg1) {
+    void *temp_r1_18;
+    void *temp_r2_15;
+
+    (*(s32 *)((s8 *)(arg0) + (0x30))) = 0x08CDC9F0;
+    if ((*(void **)((s8 *)(arg0) + (0x3C))) != NULL) {
+        sub_815FAFC();
+        temp_r2_15 = (*(void **)((s8 *)(arg0) + (0x3C)));
+        if (temp_r2_15 != NULL) {
+            temp_r1_18 = (*(void **)((s8 *)(temp_r2_15) + (0x30)));
+            (*(s32 (**)(void *, s32))((s8 *)(temp_r1_18) + (0xC)))(temp_r2_15 + (*(s16 *)((s8 *)(temp_r1_18) + (8))), 3);
+        }
+    }
+    sub_815FB14(arg0, arg1);
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8158F28.s\"");
