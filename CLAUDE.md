@@ -2197,6 +2197,50 @@ apply the same transformations the splice does, or it under-reports.
 four rows under "X redeclared" that the real path now fixes; simulating the
 repairs turned those into requeues.
 
+**T.15 -- a broken measurement in this project ALWAYS fails toward "this work
+is bad". That is why they survive.**
+
+Four instrument bugs were written and caught in a single day, all in new tools,
+all by the author of the tools:
+
+  * a verdict stated from ZERO observations (`compiler_variants` printed "the
+    hypothesis does NOT hold" after measuring nothing)
+  * a diagnostic filter that dropped the evidence (`grep 'rror'` misses agbcc's
+    real messages, which read ``X' undeclared`` with no "error" in the line)
+  * clustering on the TAIL of a multi-line diagnostic, making "for each
+    function it appears in.)" the largest error class, 102 of 335
+  * a placeholder collision -- substituting flags for the bare word `STRICT`
+    also rewrote the success marker in `echo "$n STRICT_OK"`, so every clean
+    compile became an unparseable line and **151 of 399 candidates were counted
+    as failures while the tool reported "100% a genuine error"**
+
+Plus one in the harness they all share: the context was PRE-PREPROCESSED, so
+its macros were gone, and a body referencing `NULL` failed as an undeclared
+identifier. That was another 104 of 335.
+
+**The pattern is not that measurement is hard. It is directional.** Every one
+of these -- and every one of sections F, I, M, N.4a, P, Q, T.2, T.4, T.14 --
+failed the same way: work that was fine got reported as broken. None of them
+ever produced a false MATCH, because the from-scratch ROM sha1 gate makes that
+impossible.
+
+So the errors are invisible by construction. A false negative looks exactly
+like a hard function, and this corpus has thousands of genuinely hard
+functions to hide among. That asymmetry, not carelessness, is why fourteen
+sections of this file are the same bug.
+
+**Two habits follow, and they are cheap:**
+
+1. **Every measurement tool must refuse to answer when it cannot.** Not "return
+   a default" -- refuse, loudly, naming what was missing. `isolation_exact`,
+   `compiler_variants`, `agbcc_ab` and `search_yield` all now do this, and
+   `search_yield` additionally refuses to quote a rate below 100 launches
+   because 1-in-32 is noise wearing a decimal point.
+2. **When a tool reports that most of the corpus is bad, suspect the tool
+   first.** "100% a genuine error" and "0/30 does not compile" were both the
+   instrument. The prior should be that this codebase is mostly fine and
+   mostly mismeasured, because that is what fourteen sections of evidence say.
+
 **T.14 -- section P's bug was in TWO promotion paths; P fixed one. The
 re-ranking is what made the other visible.**
 
