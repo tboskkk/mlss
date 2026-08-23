@@ -2197,6 +2197,30 @@ apply the same transformations the splice does, or it under-reports.
 four rows under "X redeclared" that the real path now fixes; simulating the
 repairs turned those into requeues.
 
+**T.10 -- CLEAN NEGATIVE: Klonoa's highest-value lever needs ROM symbols we do
+not have.** Their `agbcc-source-shape-levers.md` puts "a named `extern` is not
+the same as a cast address constant" first -- numerically identical, compiled
+differently, 20-29 points across four of their functions. 561 of our candidate
+bodies carry a raw `0x08xxxxxx` constant, so a `perm_symbol_vs_constant` pass
+looked like the obvious next thing to write.
+
+Counted before writing it. `tools/symbols/rom.txt` holds **56 symbols total**.
+Unmatched seeds contain **1,863 raw ROM-address constants, 684 distinct**, of
+which **60 (3.2%), covering 16 distinct addresses**, have a name. A pass that
+swaps a constant for a symbol has almost nothing to swap to.
+
+**The prerequisite is naming ROM data, not writing the pass** -- which is
+Klonoa's own corollary ("if a table only exists as a `#define ADDR 0x...`,
+promoting it to a real `extern` object plus a linker-script line is often the
+whole match"). Route: the Phase 4 data work already described above
+(`find_pointer_tables.py`, `map_raw_regions.py`), plus minting symbols for
+those 684 addresses -- `--just-symbols=symbols.txt` resolves them, and the
+`room_props_table` renames already proved that mechanism works.
+
+That is now the third time in one session a corpus census killed a plausible
+permuter pass before it was built (bitfields 0/3,124, arrays 1/3,124, this
+3.2%). **Measure the corpus before writing a mutation for it.**
+
 **T.9 -- `declare_missing` can turn a fixable `-Werror` warning into an
 UNFIXABLE assembler error, and it is section S wearing different clothes.**
 
