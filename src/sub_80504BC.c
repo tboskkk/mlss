@@ -230,22 +230,20 @@ void sub_80507A4(void *arg0, s32 arg1, s32 arg2, s32 arg3) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80507E0.s\"");
-#else
 s32 sub_80E9958(s32, s32, s32, s32);            /* extern */
 
 void sub_80507E0(void *arg0) {
     void *temp_r1_35;
+    void *temp_r1_46;
 
     sub_80E9958(*(s32 *)0x03000FC0 + 0x38C, 0, ((u32) ((*(s32 *)((s8 *)(arg0) + (0x22C))) << 0xA) >> 0x14) + 0x960, 0);
     if (0x10 & (*(u8 *)((s8 *)(arg0) + (0x33E)))) {
         temp_r1_35 = (*(void **)((s8 *)(arg0) + (0x344)));
         (*(u8 *)((s8 *)(temp_r1_35) + (0x20C))) = (u8) ((*(u8 *)((s8 *)(temp_r1_35) + (0x20C))) | 1);
-        (*(s32 (**)(void *))((s8 *)((*(void **)((s8 *)(arg0) + (0x338)))) + (0x24)))(arg0 + M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */));
+        temp_r1_46 = (*(void **)((s8 *)(arg0) + (0x338)));
+        (*(s32 (**)(void *))((s8 *)(temp_r1_46) + (0x24)))(arg0 + (*(s16 *)((s8 *)(temp_r1_46) + (0x20))));
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8050850.s\"");
