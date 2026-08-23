@@ -58,3 +58,16 @@ void sub_80821C4(void *arg0) {
     (*(s32 **)((s8 *)(arg0) + (4))) = &sub_8081F84;
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8082204.s\"");
+#else
+/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
+   compiles a whole translation unit at a time, so an #error here fails
+   every OTHER function in this file under NONMATCHING=1 -- which is how
+   853 functions ended up blocked behind 936 placeholders. Nothing is lost
+   by leaving it empty: the #ifndef branch above is untouched, so the real
+   ROM still gets the verbatim retail bytes, and progress.py still counts
+   this function as unmatched because the guard is still here. Write the C
+   here, replacing this comment. */
+#endif
