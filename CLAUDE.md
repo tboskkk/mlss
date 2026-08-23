@@ -2311,8 +2311,29 @@ symbol" was true; "therefore the target is outside the fragment" was not.
 Before trusting an error message's implied cause, check the cause directly --
 here that was one arithmetic comparison between an address and a range.
 
-Remaining in this class: 29 assemble failures, 10 byte-differs, 5 unaligned
-tables, 2 duplicate labels. Smaller and distinct.
+Remaining in this class: 29 assemble failures and 10 byte-differs. **A second
+attempt at those gained nothing, and the attempt is worth recording so it is
+not repeated.** After the leftover-splitting fix the dominant assemble failure
+became `symbol '_080F36E4' is already defined` (2 -> 14), because a generated
+leftover-cut can name an address the fragment already labels. Two corrections
+were tried:
+
+  * define each label once (guarded emitter, pre-seeded with the labels on
+    verbatim-copied lines)
+  * emit pre-table leftovers BEFORE the table, in address order, rather than
+    after the tail
+
+Both are correct in themselves. Neither made a single additional function
+rewritable: refusals went from 29 assemble + 10 byte-differ to 15 assemble +
+24 byte-differ -- the same total, with hard failures converted into silent
+byte differences. **Reverted**, on the grounds that shipping extra complexity
+for a measured gain of zero is a bad trade even when each piece is defensible.
+
+What that tells you about the residue: for these functions the duplicate label
+is a SYMPTOM, not the cause. The same address genuinely appears at two output
+positions, so suppressing one definition leaves the layout wrong and the byte
+check refuses it either way. Fixing them needs the region/`code_prefix`
+boundary logic to be right, not the label emission.
 
 **T.10 -- CLEAN NEGATIVE: Klonoa's highest-value lever needs ROM symbols we do
 not have.** Their `agbcc-source-shape-levers.md` puts "a named `extern` is not
