@@ -7,19 +7,16 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8150E2C.s\"");
-#else
-u32 sub_8150E2C(u32* param_1) {
-    u32 temp;
-    
-    temp = param_1[0x2C / sizeof(u32)];
-    temp &= 0xFFFFFFFD;
-    param_1[0x2C / sizeof(u32)] = temp;
-    
-    return temp;
+void sub_8150E2C(void *arg0)
+{
+  u16 *new_var2;
+  s8 *new_var;
+  long long new_var3;
+  new_var = ((s8 *) arg0) + 0x2C;
+  new_var3 = -2;
+  new_var2 = &(*((u16 *) new_var));
+  *((u16 *) new_var) = (u16) (new_var3 & (*new_var2));
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8150E38.s\"");
