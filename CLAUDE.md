@@ -2197,6 +2197,48 @@ apply the same transformations the splice does, or it under-reports.
 four rows under "X redeclared" that the real path now fixes; simulating the
 repairs turned those into requeues.
 
+**T.13 -- the permuter queue is now ranked by isolation distance, and the old
+ranking was starving near-certain matches.**
+
+N.4a established that `best_score` measures position-in-file more than code
+quality. What had not been drawn from that: with ~2,600 rows queued against 12
+slots, **claim order is one of the highest-leverage things in the factory**,
+and it was keyed on that artifact.
+
+`isolation_exact.py` already produces the artifact-free number at ~1,900/min --
+byte distance with the function compiled ALONE, so no translation unit to
+poison and no trailing content to diff. Recorded as a separate `iso_score`
+column (different scale from `best_score`; keeping them apart matters).
+
+Measured over 2,316 rows, the two agree only broadly -- **Spearman 0.717** --
+and they disagree exactly in the tail that decides scheduling:
+
+    247 candidates sit within 16 bytes of retail
+     72 of those the old ordering could not see or actively buried
+
+    sub_8065310    6 bytes from retail    best_score  94,430
+    sub_806CB3C    7 bytes from retail    best_score 100,225
+
+Both are above `SEED_SCORE_CEILING`, so they were claimed only when nothing
+cheaper existed. `tier2` now ranks AND admits on `iso_score` when a row has
+one, ignoring `best_score` entirely, falling back to the old behaviour when it
+does not. Still a ceiling, not an exclusion.
+
+Immediately visible: the pool went from searching whatever happened to sit last
+in its file to searching iso 2, 2, 6, 7, 20, 20, 20, 20, 21, 24, 24, 24.
+`tier_m2c` clears `iso_score` at all three seed-write sites, so a re-seeded row
+can never be ranked on a measurement of a body it no longer has.
+
+**This is most of what Phase 1 of the toolchain plan wanted, at a fraction of
+the cost.** The plan called for regenerating `expected/` from the ROM and
+scoring per-symbol with objdiff; measuring one symbol alone gets the same
+artifact-free number without touching the build. The remaining Phase 1 benefit
+-- a trustworthy score on the PROMOTION path -- is already handled by
+`_matches_in_plain_build` plus the from-scratch gate.
+
+**Re-run `isolation_exact.py --apply` after any batch of seed repairs.** It now
+does double duty: harvests finished work AND refreshes the ranking.
+
 **T.12 -- the jump-table class was blocked by ONE line of label emission, and
 the error message pointed at the wrong problem.** Section O left it at 181
 candidates and **zero** rewritable. It is now **49**, recovering **6,637
@@ -2475,9 +2517,10 @@ distinguish "nothing is wrong" from "nothing was measured" is not a check.**
 
 **Next levers, in rough order of value:**
 0a. **Re-run `tools/factory/isolation_exact.py --apply`** after any batch of
-   seed repairs (section T.8). It measures one symbol alone at ~2,000/min and
-   found 205 byte-exact candidates on its first full sweep. Cheapest yield in
-   the repo, and read-only against the working tree.
+   seed repairs (sections T.8, T.13). It measures one symbol alone at
+   ~2,000/min, harvests byte-exact candidates (205 on its first full sweep),
+   AND refreshes `iso_score`, which is what the permuter queue is now ranked
+   by. Cheapest yield in the repo, and read-only against the working tree.
 0b. **The other 94 jump-table candidates** (section O) - the tool refuses
    them rather than guessing. The dominant cause is a raw run that mixes
    trailing data into the code region; a smarter code/data boundary than
