@@ -30,23 +30,21 @@ void sub_8106840(void *arg0)
   sub_81067D4(arg0);
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8106874.s\"");
-#else
-s32 sub_807FB64(s32);                           /* extern */
 s32 sub_8105F28(void *);                        /* extern */
-
-void sub_8106874(void *arg0) {
-    if (M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */) != 0) {
-        (*(u16 *)((s8 *)(arg0) + (0x10))) = (u16) ((*(u16 *)((s8 *)(arg0) + (0x10))) - 1);
-        return;
-    }
-    sub_807FB64((*(s32 *)((s8 *)(arg0) + (8))));
-    (*(u16 *)((s8 *)(arg0) + (0x10))) = 0x10U;
-    (*(s32 (**)(void *))((s8 *)(arg0) + (4))) = sub_8105F28;
-    sub_8105F28(arg0);
+void sub_8106874(void *arg0)
+{
+  s16 new_var;
+  new_var = (s16) (*((u16 *) (((s8 *) arg0) + 0x10)));
+  if (new_var != 0)
+  {
+    *((u16 *) (((s8 *) arg0) + 0x10)) = (u16) ((*((u16 *) (((s8 *) arg0) + 0x10))) - 1);
+    return;
+  }
+  sub_807FB64(*((s32 *) (((s8 *) arg0) + 8)));
+  *((u16 *) (((s8 *) arg0) + 0x10)) = 0x10U;
+  *((s32 (**)(void *)) (((s8 *) arg0) + 4)) = sub_8105F28;
+  sub_8105F28(arg0);
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81068A8.s\"");
