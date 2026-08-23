@@ -38,7 +38,16 @@ import time
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent.parent
-PROCS = ["supervisor", "scanner", "validator", "tier1", "tier_m2c", "tier2", "watchdog"]
+# Derived from supervisor.PROCESSES rather than restated, so a worker added
+# there is verified here automatically. The hardcoded list had already stopped
+# covering `isoscore` within minutes of it being added.
+import sys as _sys
+_sys.path.insert(0, str(Path(__file__).resolve().parent))
+try:
+    import supervisor as _sup
+    PROCS = ["supervisor"] + list(_sup.PROCESSES)
+except Exception:
+    PROCS = ["supervisor", "scanner", "validator", "tier1", "tier_m2c", "tier2", "watchdog"]
 
 
 def factory_pids() -> dict:

@@ -39,7 +39,16 @@ import tier2
 
 REPO = gitops.REPO  # noqa: E402
 
-WORKERS = ["scanner", "validator", "tier1", "tier_m2c", "tier2", "watchdog"]
+# Derived from supervisor.PROCESSES, not restated. A hardcoded copy silently
+# stops covering any worker added later: `isolation_exact` ran as a supervised
+# worker for its first minutes completely invisible to this check, so if it had
+# died nothing would have reported it -- and it is the worker that keeps tier2's
+# ranking data fresh. Same failure shape as everything in CLAUDE.md section T.
+try:
+    import supervisor as _sup
+    WORKERS = [k for k in _sup.PROCESSES]
+except Exception:
+    WORKERS = ["scanner", "validator", "tier1", "tier_m2c", "tier2", "watchdog"]
 OK, WARN, FAIL = "ok", "warn", "fail"
 
 

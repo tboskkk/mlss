@@ -80,7 +80,11 @@ PROCESSES = {
     # existed: 90% of the queue unscored, and 63% of searches going to unscored
     # rows for one convergence in 210. A sweep is ~75s; every 5 minutes is
     # cheap and it never takes the repo lock.
-    "isoscore":  ("isolation_exact.py", ["--loop", "300", "--limit", "6000"], False),
+    # Key must match the script stem: health.py and restart.py check liveness
+    # by looking for the KEY in the process list, so "isoscore" against
+    # isolation_exact.py reported the worker permanently dead while it was
+    # running fine.
+    "isolation_exact": ("isolation_exact.py", ["--loop", "300", "--limit", "6000"], False),
     # Supervised rather than run by hand, because the failure it catches is
     # invisible to everything else here: the supervisor only restarts a
     # process that DIED, and tier2 can stop working while staying alive,
