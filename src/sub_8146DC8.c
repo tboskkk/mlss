@@ -24,19 +24,19 @@ void sub_8146DC8(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8146E40.s\"");
-#else
 s32 sub_8047F60(void *, s32, s32, s32, s32, s32); /* extern */
 extern s32 sub_8146C78;
-
-void sub_8146E40(s32 arg0, void *arg1, s32 **arg2) {
-    sub_8047F60(arg1, (*(s32 *)((s8 *)(arg1) + (0x1DC))), (*(s32 *)((s8 *)(arg1) + (0x1E0))), (*(s32 *)((s8 *)(arg1) + (0x1E4))) + (*(s32 *)((s8 *)(arg1) + (0x1E8))), 0, 0);
-    (*(s16 *)((s8 *)(arg1) + (0x2DC))) = 0x200;
-    (*(s16 *)((s8 *)(arg1) + (0x2DE))) = 0x3C;
-    *arg2 = &sub_8146C78;
+void sub_8146E40(s32 arg0, void *arg1, s32 **arg2)
+{
+  int new_var2;
+  s16 *new_var;
+  sub_8047F60(arg1, *((s32 *) (((s8 *) arg1) + 0x1DC)), *((s32 *) (((s8 *) arg1) + 0x1E0)), (*((s32 *) (((s8 *) arg1) + 0x1E4))) + (*((s32 *) (((s8 *) arg1) + 0x1E8))), 0, 0);
+  new_var = (s16 *) (((s8 *) arg1) + 0x2DC);
+  new_var2 = 0x200;
+  *new_var = new_var2;
+  *((s16 *) (((s8 *) arg1) + 0x2DE)) = 0x3C;
+  *arg2 = &sub_8146C78;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8146E9C.s\"");
