@@ -418,15 +418,43 @@ asm_unified(".include \"asm/nonmatching/sub_80D9378.s\"");
    counts this as unmatched. Write the C here, replacing this comment. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80D9420.s\"");
-#else
-/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
-   compiles a whole translation unit at a time, so an #error here fails
-   every OTHER function in this file under NONMATCHING=1. Guard intact, so
-   the real ROM still gets the verbatim retail bytes and progress.py still
-   counts this as unmatched. Write the C here, replacing this comment. */
-#endif
+extern s32 sub_80D94B8;
+void sub_80D9420(void *arg0)
+{
+  s32 **new_var;
+  s32 temp_r0_58;
+  s32 new_var2;
+  s32 temp_r1_62;
+  s32 var_r0_15;
+  s32 var_r0_29;
+  var_r0_15 = (*((s16 *) (((s8 *) arg0) + 0xAE))) * 0x104;
+  if (var_r0_15 < 0)
+  {
+    var_r0_15 += 0xFF;
+  }
+  *((s16 *) (((s8 *) arg0) + 0xAE)) = (s16) (var_r0_15 >> 8);
+  var_r0_29 = (*((s16 *) (((s8 *) arg0) + 0xB0))) * 0x104;
+  if (var_r0_29 < 0)
+  {
+    var_r0_29 += 0xFF;
+  }
+  new_var = (s32 **) (((s8 *) arg0) + 0x50);
+  *((s16 *) (((s8 *) arg0) + 0xB0)) = (s16) (var_r0_29 >> 8);
+  *((u16 *) (((s8 *) arg0) + 0xB2)) = (u16) ((*((u16 *) (((s8 *) arg0) + 0xB2))) + (*((s32 *) (((s8 *) arg0) + 0x94))));
+  *((s32 *) (((s8 *) arg0) + 0x10)) = (s32) ((*((s32 *) (((s8 *) arg0) + 0x38))) + (*((s16 *) (((s8 *) arg0) + 0xAE))));
+  *((s32 *) (((s8 *) arg0) + 0x14)) = (s32) ((*((s32 *) (((s8 *) arg0) + 0x3C))) + (*((s16 *) (((s8 *) arg0) + 0xB0))));
+  temp_r0_58 = (*((s32 *) (((s8 *) arg0) + 0x40))) + ((s16) (*((u16 *) (((s8 *) arg0) + 0xB2))));
+  *((s32 *) (((s8 *) arg0) + 0x18)) = temp_r0_58;
+  temp_r1_62 = *((s32 *) (((s8 *) arg0) + 0x98));
+  if (temp_r0_58 <= temp_r1_62)
+  {
+    *((s32 *) (((s8 *) arg0) + 0x18)) = temp_r1_62;
+    new_var2 = *((s32 *) (((s8 *) arg0) + 0x9C));
+    *((s16 *) (((s8 *) (arg0 + 0x9C)) + 0x10)) = (s16) new_var2;
+    sub_80873B8(arg0, 3, 0);
+    *new_var = &sub_80D94B8;
+  }
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80D94B8.s\"");
