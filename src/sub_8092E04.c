@@ -325,11 +325,12 @@ void sub_8093DBC(void *arg0) {
     (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8093580;
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8093E20.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+void sub_8093E20(void *arg0) {
+    if (0x38 & (*(u8 *)((s8 *)(arg0) + (0x76)))) {
+        sub_808DD2C(arg0);
+        return;
+    }
+    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+        sub_808DD2C(arg0);
+    }
+}
