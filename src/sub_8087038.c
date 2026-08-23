@@ -43,65 +43,80 @@ asm_unified(".include \"asm/nonmatching/sub_80870B4.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8087124.s\"");
-#else
 s32 sub_8086D80();                                  /* extern */
 s32 sub_810D738(void *, void *, s32, s32, s32);     /* extern */
 extern s32 sub_8087524;
-
-s32 sub_8087124(void *arg0, void *arg1) {
-    s32 var_r0_10;
-    s32 var_r0_21;
-    s32 var_r2_38;
-    void *temp_r1_35;
-    void *var_r0_43;
-
-    var_r0_10 = sub_8086D80();
-    if (var_r0_10 == 0) {
-        if (M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */) == -1) {
-            var_r0_21 = 0x08032012;
-        } else {
-            var_r0_21 = 0x08032013;
-        }
-        var_r0_10 = sub_810D738(arg1, arg0, 0, 0, var_r0_21);
-        if (var_r0_10 <= 0) {
-            temp_r1_35 = (*(void **)((s8 *)(arg0) + (0x28)));
-            if (temp_r1_35 != NULL) {
-                var_r2_38 = 0;
-                if (arg0 != (temp_r1_35 + 8)) {
-                    var_r0_43 = (*(void **)((s8 *)(temp_r1_35) + (0x38)));
-                    if (var_r0_43 != NULL) {
-                        if (arg0 != var_r0_43) {
-loop_9:
-                            var_r0_43 = (*(void **)((s8 *)(var_r0_43) + (0x30)));
-                            if (var_r0_43 != NULL) {
-                                if (arg0 == var_r0_43) {
-                                    var_r2_38 = 1;
-                                } else {
-                                    goto loop_9;
-                                }
-                            }
-                            goto block_12;
-                        }
-                        goto block_13;
-                    }
-block_12:
-                    if (var_r2_38 != 0) {
-                        goto block_13;
-                    }
-                } else {
-block_13:
-                    (*(s32 *)((s8 *)(arg0) + (0x80))) = 0;
-                    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8087524;
-                }
-            }
-            var_r0_10 = 0;
-        }
+s32 sub_8087124(void *arg0, void *arg1)
+{
+  s32 var_r0_10;
+  s32 var_r0_21;
+  s32 var_r2_38;
+  void *temp_r1_35;
+  void *var_r0_43;
+  var_r0_10 = sub_8086D80();
+  if (var_r0_10 == 0)
+  {
+    if ((*((s16 *) (((s8 *) (*((void **) (((s8 *) arg1) + 0x28)))) + 0xEC))) == (-1))
+    {
+      var_r0_21 = 0x08032012;
+      var_r0_43 = *((void **) (((s8 *) temp_r1_35) + 0x38));
     }
-    return var_r0_10;
+    else
+    {
+      var_r0_21 = 0x08032013;
+    }
+    var_r0_10 = sub_810D738(arg1, arg0, 0, 0, var_r0_21);
+    if (var_r0_10 <= 0)
+    {
+      temp_r1_35 = *((void **) (((s8 *) arg0) + 0x28));
+      if (temp_r1_35 != ((void *) 0))
+      {
+        var_r2_38 = 0;
+        if (arg0 != (temp_r1_35 + 8))
+        {
+          var_r0_43 = *((void **) (((s8 *) temp_r1_35) + 0x38));
+          if (var_r0_43 != ((void *) 0))
+          {
+            if (arg0 != var_r0_43)
+            {
+              loop_9:
+              var_r0_43 = *((void **) (((s8 *) var_r0_43) + 0x30));
+
+              if (var_r0_43 != ((void *) 0))
+              {
+                if (arg0 == var_r0_43)
+                {
+                  var_r2_38 = 1;
+                }
+                else
+                {
+                  goto loop_9;
+                }
+              }
+              goto block_12;
+            }
+            goto block_13;
+          }
+          block_12:
+          if (var_r2_38 != 0)
+          {
+            goto block_13;
+          }
+
+        }
+        else
+        {
+          block_13:
+          *((s32 *) (((s8 *) arg0) + 0x80)) = 0;
+
+          *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_8087524;
+        }
+      }
+      var_r0_10 = 0;
+    }
+  }
+  return var_r0_10;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80871A8.s\"");
