@@ -10,6 +10,9 @@ asm_unified(".include \"asm/macros.inc\"");
 
 
 
+
+void sub_806BC40(void *arg0);
+
 void sub_806BD00(void *arg0);
 s32 sub_8082E1C();
 
@@ -42,7 +45,7 @@ asm_unified(".include \"asm/nonmatching/sub_806BB48.s\"");
 #else
 void *sub_807BF34(s32, s32, s32, s32, s32, u32, s32); /* extern */
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
-extern s32 sub_806BFD4;
+void sub_806BFD4(void *arg0);
 extern s32 sub_8087540;
 
 void sub_806BB48(void *arg0) {
@@ -84,7 +87,7 @@ void sub_806BB48(void *arg0) {
             (*(s32 *)((s8 *)(temp_r0_70) + (0x6C))) = (s32) (*(s32 *)((s8 *)(arg0) + (0x6C)));
             (*(s32 *)((s8 *)(temp_r0_70) + (0x2C))) = (s32) (*(s32 *)((s8 *)(arg0) + (0x2C)));
             (*(s8 *)((s8 *)(temp_r0_70) + (0x75))) = (s8) ((*(u8 *)((s8 *)(arg0) + (0x75))) + 1);
-            (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_806BFD4;
+            (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_806BFD4;
         }
     }
 }
@@ -317,12 +320,6 @@ void sub_806BF70(void *arg0) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_806BFD4.s\"");
-#else
-s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
-extern s32 sub_806BC40;
-
 void sub_806BFD4(void *arg0) {
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
         if ((*(s32 *)((s8 *)(arg0) + (0xA8))) == 0) {
@@ -331,10 +328,9 @@ void sub_806BFD4(void *arg0) {
             sub_8082E1C(arg0, 0x10, 0, 0);
         }
         (*(s16 *)((s8 *)(arg0) + (0xAC))) = 8;
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_806BC40;
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_806BC40;
     }
 }
-#endif
 
 s32 sub_806C020(void *arg0)
 {
