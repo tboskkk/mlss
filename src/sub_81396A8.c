@@ -73,18 +73,11 @@ asm_unified(".include \"asm/nonmatching/sub_813980C.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8139880.s\"");
-#else
-s32 sub_81370C4(s32, s32);                      /* extern */
-s32 sub_81378CC(s32, s32, s32, s32);            /* extern */
-s32 sub_81381D4(s32);                           /* extern */
 extern s32 sub_813980C;
 
-void sub_8139880(s32 arg0, s32 arg1, s32 **arg2) {
+void sub_8139880(s32 arg0, void *arg1, s32 **arg2) {
     sub_81370C4(arg1, 0xFF);
-    sub_81378CC(arg1, 1, M2C_ERROR(/* unknown instruction: ldsh $r2, ($mem_loc_fictive_) */) << 8, M2C_ERROR(/* unknown instruction: ldsh $r3, ($mem_loc_fictive_) */) << 8);
+    sub_81378CC(arg1, 1, (*(s16 *)((s8 *)(arg1) + (0x1B8))) << 8, (*(s16 *)((s8 *)(arg1) + (0x1BA))) << 8);
     sub_81381D4(arg1);
     *arg2 = &sub_813980C;
 }
-#endif
