@@ -7,18 +7,18 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80F8254.s\"");
-#else
-s32 sub_80F8254(s32 arg0, s32 arg1, s32 *arg2) {
-    void *temp_r3_7;
-
-    temp_r3_7 = *(void **)0x03000FD8;
-    (*(s16 *)((s8 *)(temp_r3_7) + (0x2B4))) = (s16) *arg2;
-    (*(u8 *)((s8 *)(temp_r3_7) + (0x2C1))) = (u8) ((*(u8 *)((s8 *)(temp_r3_7) + (0x2C1))) | 8);
-    return 1;
+s32 sub_80F8254(s32 arg0, s32 arg1, s32 *arg2)
+{
+  s32 new_var2;
+  void *temp_r3_7;
+  void *new_var;
+  temp_r3_7 = *((void **) 0x03000FD8);
+  new_var2 = *arg2;
+  *((s16 *) (((s8 *) temp_r3_7) + 0x2B4)) = (s16) new_var2;
+  new_var = temp_r3_7;
+  *((u8 *) (((s8 *) temp_r3_7) + 0x2C1)) = (u8) ((*((u8 *) (((s8 *) new_var) + 0x2C1))) | 8);
+  return 1;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80F827C.s\"");
