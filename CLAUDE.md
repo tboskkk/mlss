@@ -2221,6 +2221,59 @@ That is now the third time in one session a corpus census killed a plausible
 permuter pass before it was built (bitfields 0/3,124, arrays 1/3,124, this
 3.2%). **Measure the corpus before writing a mutation for it.**
 
+**T.11 -- the extern lever is REAL here but not decisive: 5% closer, 0 matches.
+Measured, not assumed.** `tools/factory/extern_lever.py`.
+
+T.10 said the lever could not be applied because only 3.2% of the referenced
+addresses have names. The obvious next move is to mint the other 684 -- so
+before doing that, this measures whether the lever would pay if we did.
+
+**Minting is safe by construction**, which is the part worth keeping: we do NOT
+need to know where the underlying data object starts or how big it is, only
+that the symbol resolves to exactly the address the code already loads -- true
+by definition, because the address is taken FROM the load. 81% of these point
+into the 14MB `rodata081E2764` blob that has never been split, and that does
+not matter. The element type comes free too: m2c already emits the access width
+at each site, so `extern u8 X[];` vs `extern s32 X[];` is read off the seed.
+
+Over 250 candidates, 201 measurable, comparing the stored body against a
+minted-extern rewrite of the same body:
+
+| outcome | n |
+|---|---:|
+| identical | 187 |
+| **extern CLOSER** | **11** |
+| extern worse | 3 |
+| neither compiles | 49 |
+
+**Nothing reached 0.** The best was `sub_8021EA8` at 36 -> 4, then
+`init_heap` 243 -> 216 and `sub_819A9DC` 125 -> 100; most of the rest moved by
+1-5 bytes. So on this corpus the lever is worth roughly 5% "closer" and zero
+direct matches -- materially weaker than Klonoa, where it was "often the whole
+match."
+
+The reason is the same corpus-shape difference that killed the bitfield and
+array passes: Klonoa's wins are on data tables INDEXED IN LOOPS, where a
+symbol_ref survives in a callee-saved register and a CONST_INT gets
+strength-reduced. Our m2c seeds mostly STORE an address or do a single deref,
+which gives agbcc nothing to strength-reduce either way.
+
+**What it is actually good for.** 36 -> 4 is a near-match, and a permuter
+search starting from 4 converges far more readily than one starting from 36. So
+the lever belongs as a **seed improvement feeding the search**, applied per
+function ONLY where it measurably helps -- which is cheap, because
+`isolation_exact`-style measurement costs milliseconds. Minting all 684 symbols
+up front, on the other hand, is not justified by this measurement.
+
+**The measurement trap it had to avoid, and did not at first.** Retail bakes
+the address into the literal pool as a plain word with no relocation, while an
+`extern` emits `.word symbol` plus `R_ARM_ABS32` -- so the object's bytes there
+are ZERO and the address lives in the relocation. Comparing without resolving
+relocations reports the lever as harmful in every single case. And the first
+run DID report 29/30 "does not compile", which was the staging code silently
+dropping every rewritten twin, not a result. Both were caught only because the
+numbers were too clean. See T.7.
+
 **T.9 -- `declare_missing` can turn a fixable `-Werror` warning into an
 UNFIXABLE assembler error, and it is section S wearing different clothes.**
 
