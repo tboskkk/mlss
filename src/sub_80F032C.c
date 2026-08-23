@@ -24,26 +24,20 @@ asm_unified(".include \"asm/nonmatching/sub_80F034C.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80F03C8.s\"");
-#else
 s32 sub_8028E70(s32);                               /* extern */
 s32 sub_80EA778(void *, void *);                /* extern */
-
-void sub_80F03C8(void **arg0) {
-    void *temp_r0_9;
-    void *temp_r5_12;
-
-    temp_r0_9 = *(void **)0x03000FD0;
-    temp_r5_12 = temp_r0_9 + 0x1F8;
-    if ((0x100 & (*(u16 *)((s8 *)(temp_r0_9) + (0x298)))) && ((sub_8028E70((*(s32 *)((s8 *)(*arg0) + (0x14)))) << 0x18) == 0)) {
-        (*(u16 *)((s8 *)(temp_r0_9) + (0x298))) = (u16) (0x100 ^ (*(u16 *)((s8 *)(temp_r0_9) + (0x298))));
-    }
-    if (0x10 & (*(u16 *)((s8 *)(temp_r5_12) + (0xA0)))) {
-        sub_80EA778(*arg0 + 0x1C, temp_r5_12);
-    }
+void sub_80F03C8(void **arg0)
+{
+  void *temp_r0_9;
+  void *temp_r5_12;
+  temp_r0_9 = *((void **) 0x03000FD0);
+  temp_r5_12 = temp_r0_9 + 0x1F8;
+  if ((0x100 & (*((u16 *) (((s8 *) temp_r0_9) + 0x298)))) && ((sub_8028E70(*((s32 *) (((s8 *) (*arg0)) + 0x14))) << 0x18) == 0))
+  {
+    *((u16 *) (((s8 *) temp_r0_9) + 0x298)) = (u16) (0x100 ^ (*((u16 *) (((s8 *) temp_r0_9) + 0x298))));
+  }
+ do { if (0x10 & (*((u16 *) (((s8 *) temp_r5_12) + 0xA0)))) { sub_80EA778((*arg0) + 0x1C, temp_r5_12); } } while (0);
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80F0420.s\"");
