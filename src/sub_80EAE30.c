@@ -32,13 +32,9 @@ loop_2:
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80EAE70.s\"");
-#else
 s32 sub_80E9C4C(s32, s32, s32, s32, s32, s32);  /* extern */
 
-s32 sub_80EAE70(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
-    sub_80E9C4C(arg3, arg1 + 0x18, 0, 0, M2C_ERROR(/* unknown instruction: ldsh $r2, ($mem_loc_fictive_) */), (s32) (*(u8 *)((s8 *)(*(void **)0x03000FB8) + (0x30))));
+s32 sub_80EAE70(s32 arg0, s32 arg1, s16 *arg2, s32 arg3) {
+    sub_80E9C4C(arg3, arg1 + 0x18, 0, 0, (s32) *arg2, (s32) (*(u8 *)((s8 *)(*(void **)0x03000FB8) + (0x30))));
     return 1;
 }
-#endif
