@@ -193,11 +193,18 @@ def stage(rows, work: Path, ctx: Path, frag_owner: dict | None = None,
         (work / f"{r['name']}.body.c").write_text(
             '#include "global.h"\n#include "common.h"\n' + (decls or "") + body)
         staged.append(r["name"])
-    if missing and strict:
-        raise StagingError(
-            f"{len(missing)} of {len(rows)} row(s) have no retail fragment and "
-            f"were not staged, e.g. {', '.join(missing[:3])}. Pass frag_owner "
-            f"for variant rows, or strict=False to accept the loss.")
+    if missing:
+        if strict:
+            raise StagingError(
+                f"{len(missing)} of {len(rows)} row(s) have no retail fragment and "
+                f"were not staged, e.g. {', '.join(missing[:3])}. Pass frag_owner "
+                f"for variant rows, or strict=False to accept the loss.")
+        # strict=False is for broad sweeps where some loss is legitimate -- a
+        # row whose function matched since the query ran has no fragment any
+        # more. Still SAY SO. Accepting a loss silently is how the four
+        # earlier staging failures stayed invisible.
+        print(f"  note: {len(missing)} of {len(rows)} row(s) had no retail "
+              f"fragment and were skipped (e.g. {missing[0]})")
     return staged
 
 

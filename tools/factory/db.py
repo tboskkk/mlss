@@ -113,6 +113,16 @@ MIGRATIONS = [
     # score). iso_score has neither problem: no translation unit to poison, no
     # trailing content to diff against.
     ("iso_score", "INTEGER"),
+    # twins.fingerprint() of this function's retail assembly -- its structural
+    # shape, with immediates, labels and symbol names normalised away. Cached
+    # here because tier2 needs it on every claim and computing it means reading
+    # every fragment off disk.
+    #
+    # What it buys: 254 structural groups hold 785 unmatched functions, so
+    # searching each member separately is 531 redundant permuter searches on
+    # what is really 254 problems. twins.py has listed deduplication as its
+    # exploit #1 since it was written and nothing ever consumed it.
+    ("shape_hash", "TEXT"),
 ]
 
 

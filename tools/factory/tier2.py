@@ -598,14 +598,39 @@ def run_pool(jobs: int, stall_min: float, max_functions: int):
             order = ("escalation_count ASC, "
                      "iso_score IS NULL ASC, iso_score ASC, "
                      "best_score IS NULL ASC, best_score ASC")
+            # DEDUPLICATE. Do not start a search on a function whose
+            # structural twin is already being searched. twins.fingerprint()
+            # normalises immediates, labels and symbol names away, so two
+            # functions sharing a shape_hash differ only in constants -- and
+            # 254 such groups hold 787 unmatched functions here, which is 533
+            # redundant searches on what are really 254 problems. With 12 slots
+            # against a queue thousands deep, a wasted slot is the scarcest
+            # thing in the factory, and twins.py has listed this as its exploit
+            # #1 since it was written with nothing ever consuming it.
+            #
+            # No risk attached, which is why it is safe to do at claim time: if
+            # the twin converges, validator.propagate_to_twins() hands this
+            # function the same C for free; if it does not, this one is
+            # claimable again the moment the slot frees. Nothing is dropped,
+            # only deferred.
             row = db.claim_for_worker(
                 conn, "tier2_ready", WORKER_ID, order_by=order,
                 extra_where="(CASE WHEN iso_score IS NOT NULL THEN iso_score < ? "
-                            "ELSE (best_score IS NULL OR best_score < ?) END)",
+                            "ELSE (best_score IS NULL OR best_score < ?) END) "
+                            "AND (shape_hash IS NULL OR shape_hash NOT IN "
+                            "(SELECT shape_hash FROM functions "
+                            " WHERE state = 'permuting' AND shape_hash IS NOT NULL))",
                 params=(ISO_SCORE_CEILING, SEED_SCORE_CEILING))
             if row is not None:
                 return row
-            return db.claim_for_worker(conn, "tier2_ready", WORKER_ID, order_by=order)
+            # The fallback keeps the dedup guard -- without it a busy pool
+            # would fall through and search the twins anyway, which is exactly
+            # the waste this is here to remove.
+            return db.claim_for_worker(
+                conn, "tier2_ready", WORKER_ID, order_by=order,
+                extra_where="(shape_hash IS NULL OR shape_hash NOT IN "
+                            "(SELECT shape_hash FROM functions "
+                            " WHERE state = 'permuting' AND shape_hash IS NOT NULL))")
         finally:
             conn.close()
 

@@ -1,5 +1,39 @@
 # Plan: toolchain overhaul (2026-08-22)
 
+> **SUPERSEDED IN PART, 2026-08-23.** Read this header before acting on
+> anything below. Phases 0, 2 and 3 are DONE; Phase 1 was largely obsoleted by
+> a cheaper route; Phase 4 is half done; Phase 5 changed shape entirely once it
+> was measured. What actually happened, and what is left, is recorded in
+> CLAUDE.md sections **T.1 - T.15**, which are the authority. The phase text
+> below is kept because the *reasoning* is still worth reading, not because the
+> instructions are current.
+>
+> | phase | status |
+> |---|---|
+> | 0 requeue dead seeds | **done** -- 1,624 requeued, M2C_ERROR bodies 1,639 -> 5 |
+> | 1 scoring out of the shared TU | **obsoleted** -- `isolation_exact.py` measures one symbol alone at ~2,000/min and delivered the same artifact-free number without regenerating `expected/` or adopting objdiff. See T.8, T.13. |
+> | 2 compiler-variant hypothesis | **done, NEGATIVE** -- one configuration; agbcc closest for 54 of 58. T.5 |
+> | 3 permuter agbcc profile | **done** -- profile landed and is under a randomised A/B (`agbcc_ab.py`, still inconclusive). Two of the three proposed passes were killed by a corpus census: 0 of 3,124 bodies declare a bitfield, 1 declares an array. T.6 |
+> | 4 jump tables | **half done** -- 0 -> 49 rewritable, 6,637 instructions and 654 switch cases recovered. The residue needs `code_prefix` boundary work, not label emission. T.12 |
+> | 5 fuzzy similarity | **reframed** -- propagation is nearly exhausted (12 left); the real prize was exact-shape DEDUP, 533 redundant searches, now wired into tier2 |
+>
+> **What was NOT in this plan and mattered more than most of it:** the
+> measurement bugs. Sections T.1-T.4, T.9, T.14 and T.15 are all cases where
+> correct work was being discarded by plumbing. T.15 states the pattern -- in
+> this project a broken measurement always fails toward "this work is bad",
+> which is why they survive.
+>
+> **Current live levers**, in the order I would take them:
+> 1. `isolation_exact.py --apply` after any seed repair -- harvests byte-exact
+>    candidates AND refreshes the ranking. Cheapest yield in the repo.
+> 2. `asmlift_bridge.py` -- a second programmatic seeder that covers 24% of the
+>    pile m2c cannot seed, 9 byte-exact per 400. Needs Node installed.
+> 3. m2c's remaining type-inference failures: `invalid type argument` (102),
+>    `invalid use of void expression` (69). `fix_bare_deref.py` addresses part
+>    of this by enumerating widths against the byte oracle.
+> 4. The jump-table residue, which needs real code/data boundary work.
+
+
 Status: **proposed, not started.** Written while the factory was live and a
 `rescue_isolated_zeros.py --all-on-disk` harvest was draining, so nothing here
 has been applied. Every number below was measured on this repo on 2026-08-22

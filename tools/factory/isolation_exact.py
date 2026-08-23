@@ -105,7 +105,10 @@ def main() -> int:
     work.mkdir(parents=True, exist_ok=True)
     t0 = time.time()
     try:
-        staged = cv.stage(rows, work, ctx)
+        # strict=False: this sweeps the whole claimable pool, and a row whose
+        # function matched between the query and here legitimately has no
+        # fragment left. stage() reports the loss rather than hiding it.
+        staged = cv.stage(rows, work, ctx, strict=False)
         (work / "names.txt").write_text("\n".join(staged) + "\n")
         (work / "variants.txt").write_text("agbcc agbcc \n")
         print(f"testing {len(staged)} candidate(s) in isolation")
