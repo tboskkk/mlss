@@ -212,7 +212,7 @@ s16 sub_8082D50(s32);                               /* extern */
 s32 sub_8087CE4();                              /* extern */
 s32 sub_80880C4(void *, s32);                   /* extern */
 s32 sub_808843C(void *, s32, s32, s32, s32);    /* extern */
-extern s32 sub_809C3C8;
+void sub_809C3C8(void *arg0);
 void sub_809C214(void *arg0)
 {
   int new_var2;
@@ -229,7 +229,7 @@ void sub_809C214(void *arg0)
       sub_808843C(arg0, temp_r4_33, sub_8082D40(*((s32 *) (((s8 *) (*new_var)) + 0x24C))) + 0x5C, 0x18, -1);
       sub_80880C4(arg0, 0x180);
     }
-    *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_809C3C8;
+    *((s32 **) (((s8 *) arg0) + 0x4C)) = (s32 *) &sub_809C3C8;
   }
 }
 
