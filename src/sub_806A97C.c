@@ -202,19 +202,12 @@ void sub_806B3D0(void *arg0) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_806B400.s\"");
-#else
-s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
-extern s32 sub_806B56C;
-
 void sub_806B400(void *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0x30))) == 0) {
-        sub_8082E1C(arg0, 8, 0, 0);
+        sub_8082E1C(arg0, 0x08, 0, 0);
         (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_806B56C;
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_806B424.s\"");
