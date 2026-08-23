@@ -233,17 +233,13 @@ void sub_8094514(void *arg0) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8094538.s\"");
-#else
 s32 sub_8094320(void *);                        /* extern */
 s32 sub_80943C0(void *);                        /* extern */
-extern s32 sub_8087540;
 
 s32 sub_8094538(void *arg0) {
-    s32 temp_r1_11;
+    s16 temp_r1_11;
 
-    temp_r1_11 = M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */);
+    temp_r1_11 = (*(s16 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x28)))) + (0xEC)));
     if (temp_r1_11 == -1) {
         sub_8094320(arg0);
     } else if (temp_r1_11 == -2) {
@@ -252,7 +248,6 @@ s32 sub_8094538(void *arg0) {
     (*(s32 **)((s8 *)(arg0) + (0x68))) = &sub_8087540;
     return 1;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8094574.s\"");
