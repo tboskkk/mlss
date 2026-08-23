@@ -7,16 +7,12 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_803C508.s\"");
-#else
 s32 sub_803C508(void *arg0) {
-    if (((s32) M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */) <= 0xC) && ((s32) M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */) <= 0xC)) {
+    if (((s32) (*(s16 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x200)))) + (4))) <= 0xC) && ((s32) (*(s16 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x204)))) + (4))) <= 0xC)) {
         return 0;
     }
     return 1;
 }
-#endif
 
 s32 sub_802FAE4(s32, s32, s32);         /* extern */
 
