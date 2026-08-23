@@ -18,10 +18,6 @@ void sub_8065E4C(void *arg0) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8065E68.s\"");
-#else
-s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 extern s32 sub_8065D10;
 
 void sub_8065E68(void *arg0) {
@@ -36,7 +32,6 @@ void sub_8065E68(void *arg0) {
         }
     }
 }
-#endif
 
 s32 sub_807F47C(void *);                        /* extern */
 extern s32 sub_808750C;
