@@ -329,6 +329,24 @@ def build(name, vma):
     known = set(entries) | {a for a, _ in insns} | set(addr_of.values()) | existing
     labels = (known & wanted) | set(entries)
 
+    # A case target frequently lands INSIDE a leftover raw-.byte run rather
+    # than on a decoded instruction: code_prefix() stops at the first
+    # non-Thumb-1 instruction and leaves everything after it as raw bytes, but
+    # the switch still branches in there. Those addresses were in `labels`
+    # (every entry is) while nothing ever DEFINED them, so the rewrite emitted
+    # `.4byte _0805396E` against a label that did not exist and the assembler
+    # reported "unresolved symbol '_0805396E' (not defined in this fragment)".
+    #
+    # That message is what made this look like a cross-fragment problem, and
+    # section O.1's guardrail refuses those on sight -- but the target is not
+    # outside the fragment at all. Measured: 74 of the 84 "rewritten does not
+    # assemble" refusals are this, and for bclr_update_8053778 the "missing"
+    # _0805396E sits 502 bytes into its own fragment, which spans 1,338.
+    #
+    # Labels emit no bytes, so defining them is neutral by construction.
+    for _a, _raw in leftovers:
+        labels |= {w for w in wanted if _a < w < _a + len(_raw)}
+
     jt = f"lbl_{table_addr:08X}"
     run_lines = set(byte_lines)
     first_byte_line = byte_lines[0]
@@ -357,10 +375,16 @@ def build(name, vma):
                     out.append("\t" + symbolize(text, syms, labels))
                     emitted_addrs.add(a)
             for a, raw in leftovers:
-                out.append(f"_{a:08X}:")
-                for k in range(0, len(raw), 16):
-                    out.append("\t.byte " + ", ".join(
-                        f"0x{x:02X}" for x in raw[k:k + 16]))
+                # Split the run at every referenced address inside it, so each
+                # gets a real definition instead of only the run's start.
+                cuts = sorted({a} | {w for w in labels if a < w < a + len(raw)})
+                for ci, cut in enumerate(cuts):
+                    end = cuts[ci + 1] if ci + 1 < len(cuts) else a + len(raw)
+                    out.append(f"_{cut:08X}:")
+                    seg = raw[cut - a: end - a]
+                    for k in range(0, len(seg), 16):
+                        out.append("\t.byte " + ", ".join(
+                            f"0x{x:02X}" for x in seg[k:k + 16]))
             continue
 
         # Point the literal pool at the new symbol.
