@@ -79,14 +79,83 @@ asm_unified(".include \"asm/nonmatching/sub_81656D8.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8166164.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+s32 free_heap_memory_8018C68(s32);              /* extern */
+s32 process_enable(s32);                        /* extern */
+s32 process_remove(void *, s32);                /* extern */
+s32 sub_80E9A6C(s32, u16);                      /* extern */
+s32 sub_8150A38();                              /* extern */
+s32 sub_8163134(s32, s32);                      /* extern */
+s32 sub_8163280(s32, s32);                      /* extern */
+s32 sub_8163308(void *, s32);                   /* extern */
+s32 sub_81636C4(s32, s32);                      /* extern */
+s32 sub_8163804(s32, s32);                      /* extern */
+s32 sub_8165144(s32, s32);                      /* extern */
+s32 sub_8165454(s32, s32);                      /* extern */
+
+void sub_8166164(void *arg0, s32 arg1) {
+    s32 temp_r0_35;
+    s32 temp_r0_52;
+    s32 temp_r0_58;
+    s32 temp_r0_75;
+    s32 temp_r0_81;
+    void *temp_r1_44;
+    void *temp_r1_67;
+    void *temp_r1_90;
+    void *temp_r2_41;
+    void *temp_r2_64;
+    void *temp_r2_87;
+    void *temp_r4_24;
+
+    (*(s32 *)((s8 *)(arg0) + (0x18))) = 0x08CDD128;
+    sub_80E9A6C(0x1CDE, (u16) (*(s32 *)((s8 *)(arg0) + (0x5C))));
+    if ((s32) (*(s32 *)((s8 *)(arg0) + (0x5C))) > 1) {
+        sub_8163134(0x1F4, 1);
+    }
+    temp_r4_24 = (*(void **)((s8 *)(arg0) + (0x40)));
+    if (temp_r4_24 != NULL) {
+        free_heap_memory_8018C68((*(s32 *)((s8 *)(temp_r4_24) + (0x230))));
+        free_heap_8018DA8(temp_r4_24);
+    }
+    temp_r0_35 = (*(s32 *)((s8 *)(arg0) + (0x34)));
+    if (temp_r0_35 != 0) {
+        sub_81636C4(temp_r0_35, 3);
+    }
+    temp_r2_41 = (*(void **)((s8 *)(arg0) + (0x30)));
+    if (temp_r2_41 != NULL) {
+        temp_r1_44 = (*(void **)((s8 *)(temp_r2_41) + (0x10)));
+        (*(s32 (**)(void *, s32))((s8 *)(temp_r1_44) + (0xC)))(temp_r2_41 + (*(s16 *)((s8 *)(temp_r1_44) + (8))), 3);
+    }
+    temp_r0_52 = (*(s32 *)((s8 *)(arg0) + (0x3C)));
+    if (temp_r0_52 != 0) {
+        sub_8163280(temp_r0_52, 3);
+    }
+    temp_r0_58 = (*(s32 *)((s8 *)(arg0) + (0x38)));
+    if (temp_r0_58 != 0) {
+        sub_8163804(temp_r0_58, 3);
+    }
+    temp_r2_64 = (*(void **)((s8 *)(arg0) + (0x4C)));
+    if (temp_r2_64 != NULL) {
+        temp_r1_67 = (*(void **)((s8 *)(temp_r2_64) + (0x18)));
+        (*(s32 (**)(void *, s32))((s8 *)(temp_r1_67) + (0x14)))(temp_r2_64 + (*(s16 *)((s8 *)(temp_r1_67) + (0x10))), 3);
+    }
+    temp_r0_75 = (*(s32 *)((s8 *)(arg0) + (0x44)));
+    if (temp_r0_75 != 0) {
+        sub_8165454(temp_r0_75, 3);
+    }
+    temp_r0_81 = (*(s32 *)((s8 *)(arg0) + (0x48)));
+    if (temp_r0_81 != 0) {
+        sub_8165144(temp_r0_81, 3);
+    }
+    temp_r2_87 = (*(void **)((s8 *)(arg0) + (0x1C)));
+    if (temp_r2_87 != NULL) {
+        temp_r1_90 = (*(void **)((s8 *)(temp_r2_87) + (0xC)));
+        (*(s32 (**)(void *, s32))((s8 *)(temp_r1_90) + (0xC)))(temp_r2_87 + (*(s16 *)((s8 *)(temp_r1_90) + (8))), 3);
+    }
+    sub_8150A38();
+    process_enable((*(s32 *)((s8 *)(arg0) + (0x14))));
+    sub_8163308(arg0 + 0x50, 2);
+    process_remove(arg0, arg1);
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_816624C.s\"");
