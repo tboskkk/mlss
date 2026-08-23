@@ -83,31 +83,34 @@ void sub_8142C18(s32 arg0, void *arg1, void *arg2) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8142C88.s\"");
-#else
-void sub_8142C88(s32 arg0, void *arg1, void *arg2) {
-    s32 temp_r0_20;
-    s32 temp_r1_12;
-    u16 temp_r0_40;
-    void *temp_r0_10;
-
-    temp_r0_10 = arg1 + 0x58;
-    temp_r1_12 = (*(s32 *)((s8 *)(arg1) + (0x18)));
-    if (temp_r1_12 > 0) {
-        temp_r0_20 = temp_r1_12 - M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */);
-        (*(s32 *)((s8 *)(arg1) + (0x18))) = temp_r0_20;
-        if (temp_r0_20 <= 0) {
-            (*(s32 *)((s8 *)(arg1) + (0x18))) = 0;
-        } else {
-            (*(u16 *)((s8 *)(arg1) + (0x2DC))) = (u16) ((*(u16 *)((s8 *)(arg1) + (0x2DC))) + (*(s32 *)((s8 *)(arg1) + (0x248))));
-        }
+void sub_8142C88(s32 arg0, void *arg1, void *arg2)
+{
+  s32 temp_r0_20;
+  s32 temp_r1_12;
+  unsigned int temp_r0_40;
+  s8 *new_var;
+  void *temp_r0_10;
+  temp_r0_10 = arg1 + 0x58;
+  new_var = ((s8 *) arg1) + 0x18;
+  temp_r1_12 = *((s32 *) new_var);
+  if (temp_r1_12 > 0)
+  {
+    temp_r0_20 = temp_r1_12 - (*((s16 *) (((s8 *) arg1) + 0x2DC)));
+    *((s32 *) new_var) = temp_r0_20;
+    if (temp_r0_20 <= 0)
+    {
+      *((s32 *) new_var) = 0;
     }
-    temp_r0_40 = (*(u16 *)((s8 *)(temp_r0_10) + (0x17A))) - 1;
-    (*(u16 *)((s8 *)(temp_r0_10) + (0x17A))) = temp_r0_40;
-    if ((temp_r0_40 << 0x10) == 0) {
-        (*(u8 *)((s8 *)(arg1) + (0x33E))) = (u8) (-9 & (*(u8 *)((s8 *)(arg1) + (0x33E))));
-        (*(s32 *)((s8 *)(arg2) + (0))) = (s32) (*(s32 *)((s8 *)(arg2) + (4)));
+    else
+    {
+      *((s16 *) (((s8 *) arg1) + 0x2DC)) = (s16) (((u16) (*((s16 *) (((s8 *) arg1) + 0x2DC)))) + (*((s32 *) (0x248 + ((s8 *) arg1)))));
     }
+  }
+  temp_r0_40 = (*((u16 *) (((s8 *) temp_r0_10) + 0x17A))) - 1;
+  *((u16 *) (((s8 *) temp_r0_10) + 0x17A)) = temp_r0_40;
+  if ((temp_r0_40 << 0x10) == 0)
+  {
+    *((u8 *) (((s8 *) arg1) + 0x33E)) = (u8) ((-9) & (*(((s8 *) arg1) + 0x33E)));
+    *((s32 *) (((s8 *) arg2) + 0)) = (s32) (*((s32 *) (((s8 *) arg2) + 4)));
+  }
 }
-#endif
