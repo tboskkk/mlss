@@ -109,15 +109,9 @@ asm_unified(".include \"asm/nonmatching/sub_8106BB0.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8106BEC.s\"");
-#else
-s32 sub_810D3B8(s32, s32, s32, s32);    /* extern */
-
 void sub_8106BEC(void *arg0) {
-    sub_810D3B8((*(s32 *)((s8 *)(arg0) + (0xC))), M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */), M2C_ERROR(/* unknown instruction: ldsh $r2, ($mem_loc_fictive_) */), ((s32) ((*(u16 *)((s8 *)(arg0) + (0x10))) << 0x10) >> 0x1C) & 1);
+    sub_810D3B8((*(s32 *)((s8 *)(arg0) + (0xC))), (*(s16 *)((s8 *)(arg0) + (0x12))), (*(s16 *)((s8 *)(arg0) + (0x14))), ((s32) ((*(u16 *)((s8 *)(arg0) + (0x10))) << 0x10) >> 0x1C) & 1);
 }
-#endif
 
 s32 sub_807F6D0();                              /* extern */
 struct Sprite *sub_8084338(s32, s32, s32, s32);     /* extern */
