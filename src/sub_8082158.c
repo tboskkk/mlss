@@ -37,27 +37,31 @@ void sub_8082180(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80821C4.s\"");
-#else
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 extern s32 sub_8081F84;
-
-void sub_80821C4(void *arg0) {
-    void *temp_r2_24;
-    void *temp_r5_8;
-
-    temp_r5_8 = (*(void **)((s8 *)(arg0) + (8)));
-    if ((s32) M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */) > 0) {
-        (*(u16 *)((s8 *)(arg0) + (0x10))) = (u16) ((*(u16 *)((s8 *)(arg0) + (0x10))) - 1);
-        return;
+void sub_80821C4(void *arg0)
+{
+  void *temp_r2_24;
+  int new_var2;
+  void *temp_r5_8;
+  int new_var;
+  new_var2 = -7;
+  temp_r5_8 = *((void **) (((s8 *) arg0) + 8));
+  new_var = 0x12;
+  if (1)
+  {
+    if (((s32) ((s16) (*((u16 *) (((s8 *) arg0) + 0x10))))) > 0)
+    {
+      *((u16 *) (((s8 *) arg0) + 0x10)) = (u16) ((*((u16 *) (((s8 *) arg0) + 0x10))) - 1);
+      return;
     }
-    sub_8082E1C(temp_r5_8, 0, -1, 0);
-    temp_r2_24 = (*(void **)((s8 *)(temp_r5_8) + (8)));
-    (*(u8 *)((s8 *)(temp_r2_24) + (0x12))) = (u8) (-7 & (*(u8 *)((s8 *)(temp_r2_24) + (0x12))));
-    (*(s32 **)((s8 *)(arg0) + (4))) = &sub_8081F84;
+    sub_8082E1C(temp_r5_8, (*((u8 *) (((s8 *) temp_r2_24) + 0x12))) * 0, -1, 0);
+    temp_r2_24 = *((void **) (((s8 *) temp_r5_8) + 8));
+  }
+  temp_r5_8 = (s8 *) arg0;
+  *((u8 *) (((s8 *) temp_r2_24) + 0x12)) = (u8) (new_var2 & (*((u8 *) (((s8 *) temp_r2_24) + new_var))));
+  *((s32 **) (temp_r5_8 + 4)) = &sub_8081F84;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8082204.s\"");
