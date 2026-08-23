@@ -325,11 +325,43 @@ asm_unified(".include \"asm/nonmatching/sub_805F2D4.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_805F49C.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+void sub_805F49C(void *arg0)
+{
+  s32 sp0;
+  s32 sp4;
+  s32 sp8;
+  s32 temp_r2_17;
+  s32 temp_r3_23;
+  s32 var_r0_31;
+  s32 var_r0_38;
+  s32 var_r1_12;
+  var_r1_12 = *((s16 *) (((s8 *) arg0) + 0xAE));
+  var_r1_12 = var_r1_12 << 8;
+  *((s32 *) (((s8 *) arg0) + 0x10)) = var_r1_12;
+  temp_r2_17 = (*((s16 *) (((s8 *) (arg0 + 0xAE)) + 2))) << 8;
+  *((s32 *) (((s8 *) arg0) + 0x14)) = temp_r2_17;
+  temp_r3_23 = (*((s16 *) (((s8 *) arg0) + 0xB2))) << 8;
+  *((s32 *) (((s8 *) arg0) + 0x18)) = temp_r3_23;
+  if (var_r1_12 < 0)
+  {
+    var_r1_12 += 0xFF;
+  }
+  sp0 = var_r1_12 >> 8;
+  var_r0_31 = temp_r2_17;
+  if (var_r0_31 < 0)
+  {
+    var_r0_31 += 0xFF;
+  }
+  sp4 = var_r0_31 >> 8;
+  var_r0_38 = temp_r3_23;
+  if (var_r0_38 < 0)
+  {
+    var_r0_38 += 0xFF;
+  }
+  sp8 = var_r0_38 >> 8;
+  sub_807FC08(&sp0, &sp4, &sp8, 0);
+  if ((*((s32 *) (((s8 *) arg0) + 0x9C))) != 0)
+  {
+    sub_807C298(arg0);
+  }
+}
