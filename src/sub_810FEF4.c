@@ -13,8 +13,7 @@ extern s32 sub_81100B0;
 
 s32 sub_8082E1C();
 int sub_80883A0();
-extern s32 sub_8110078;
-
+void sub_8110078(void *arg0);
 extern s32 sub_8110034;
 
 void sub_810FEF4(void *arg0) {
@@ -30,7 +29,7 @@ void sub_810FF18(void *arg0)
   {
     sub_8082E1C(arg0, 0xE, 0, 0);
     sub_80883A0(arg0, 0x1E);
-    *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_8110078;
+    *((s32 **) (((s8 *) arg0) + 0x4C)) = (s32 *) &sub_8110078;
   }
 }
 

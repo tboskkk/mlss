@@ -7,37 +7,38 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80EE594.s\"");
-#else
 s32 get_fobj_screen_pos(s32, s32, s32 *, s32 *); /* extern */
 s32 sub_8028AFC(s32, s32, s32, s32, s32, s32);  /* extern */
-
-s32 sub_80EE594(void *arg0, void *arg1, void *arg2) {
-    s32 sp8;
-    s32 spC;
-    s32 temp_r1_29;
-    s32 var_r0_36;
-
-    if ((*(s32 *)((s8 *)(arg2) + (0))) & 1) {
-        (*(s32 *)((s8 *)(arg2) + (8))) = (s32) ((*(s32 *)((s8 *)(arg2) + (8))) * 0x10);
-        (*(s32 *)((s8 *)(arg2) + (0xC))) = (s32) ((*(s32 *)((s8 *)(arg2) + (0xC))) * 0x10);
+s32 sub_80EE594(void *arg0, void *arg1, void *arg2)
+{
+  s32 sp8;
+  s32 spC;
+  s32 temp_r1_29;
+  int new_var;
+  s32 var_r0_36;
+  if ((*((s32 *) (((s8 *) arg2) + 0))) & 1)
+  {
+    *((s32 *) (((s8 *) arg2) + 8)) = (s32) ((*((s32 *) (((s8 *) arg2) + 8))) * 0x10);
+    *((s32 *) (((s8 *) arg2) + 0xC)) = (s32) ((*((s32 *) (((s8 *) arg2) + 0xC))) * 0x10);
+  }
+  if (((((s32) (*((s32 *) (((s8 *) arg2) + 0)))) >> 1) & 3) == 1)
+  {
+    temp_r1_29 = *((s32 *) (((s8 *) arg2) + 0x10));
+    if (0x40 & temp_r1_29)
+    {
+      var_r0_36 = (temp_r1_29 & 0xF) * 0x10;
     }
-    if ((((s32) (*(s32 *)((s8 *)(arg2) + (0))) >> 1) & 3) == 1) {
-        temp_r1_29 = (*(s32 *)((s8 *)(arg2) + (0x10)));
-        if (0x40 & temp_r1_29) {
-            var_r0_36 = (temp_r1_29 & 0xF) * 0x10;
-        } else {
-            var_r0_36 = temp_r1_29 << 8;
-        }
-        (*(s32 *)((s8 *)(arg2) + (0x10))) = var_r0_36;
+    else
+    {
+      var_r0_36 = temp_r1_29 << 8;
     }
-    get_fobj_screen_pos((*(s32 *)((s8 *)(arg0) + (0x14))), (*(s32 *)((s8 *)(arg2) + (4))), &sp8, &spC);
-    sub_8028AFC((*(s32 *)((s8 *)(arg0) + (0x14))), ((s32) (*(s32 *)((s8 *)(arg2) + (0))) >> 1) & 3, 1, (sp8 + (*(s32 *)((s8 *)(arg2) + (8)))) - 0x78, (spC + (*(s32 *)((s8 *)(arg2) + (0xC)))) - 0x70, M2C_ERROR(/* unknown instruction: ldsh $r2, ($mem_loc_fictive_) */));
-    (*(u16 *)((s8 *)(arg1) + (0xA0))) = (u16) (0x100 | (*(u16 *)((s8 *)(arg1) + (0xA0))));
-    return 0;
+    *((s32 *) (((s8 *) arg2) + 0x10)) = var_r0_36;
+  }
+  get_fobj_screen_pos(*((s32 *) (((s8 *) arg0) + 0x14)), *((s32 *) (((s8 *) arg2) + 4)), &sp8, &spC);
+  sub_8028AFC(*((s32 *) (((s8 *) arg0) + 0x14)), (((s32) (*((s32 *) (((s8 *) arg2) + 0)))) >> 1) & 3, 1, (sp8 + (*((s32 *) (((s8 *) arg2) + 8)))) - 0x78, (spC + (*((s32 *) (((s8 *) arg2) + 0xC)))) - 0x70, (s32) ((s16) (*((s32 *) (((s8 *) arg2) + 0x10)))));
+  *((u16 *) (((s8 *) arg1) + 0xA0)) = (u16) (new_var = 0x100 | (*((u16 *) (((s8 *) arg1) + 0xA0))));
+  return 0;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80EE624.s\"");

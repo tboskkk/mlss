@@ -10,6 +10,10 @@ asm_unified(".include \"asm/macros.inc\"");
 
 
 
+
+s32 stop_sfx_80195A8();
+void sub_810FE44(void *arg0);
+
 u8 sub_8087CE4();
 void sub_810FE1C(void *arg0);
 
