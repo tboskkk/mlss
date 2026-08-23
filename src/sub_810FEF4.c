@@ -46,24 +46,21 @@ void sub_810FF4C(void *arg0)
   *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_81100B0;
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_810FF78.s\"");
-#else
-s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 s32 sub_80883F0();                                  /* extern */
 extern s32 sub_810F9FC;
-
-void sub_810FF78(void *arg0) {
-    void *temp_r2_17;
-
-    if ((sub_80883F0() << 0x18) == 0) {
-        sub_8082E1C(arg0, 7, 0, 0);
-        temp_r2_17 = (*(void **)((s8 *)(arg0) + (8)));
-        (*(u8 *)((s8 *)(temp_r2_17) + (0x12))) = (u8) ((-7 & (*(u8 *)((s8 *)(temp_r2_17) + (0x12)))) | 2);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_810F9FC;
-    }
+void sub_810FF78(void *arg0)
+{
+  void *temp_r2_17;
+  int new_var;
+  new_var = -7;
+  if ((sub_80883F0() << 0x18) == 0)
+  {
+    sub_8082E1C(arg0, 7, 0, 0);
+    temp_r2_17 = *((void **) (((s8 *) arg0) + 8));
+    *((u8 *) (((s8 *) temp_r2_17) + 0x12)) = (u8) ((new_var & (*((u8 *) (((s8 *) temp_r2_17) + 0x12)))) | 2);
+    *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_810F9FC;
+  }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_810FFB0.s\"");
