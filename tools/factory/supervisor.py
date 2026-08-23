@@ -134,8 +134,23 @@ REAP_STALE_MINUTES = 45      # only touch claims stuck well past tier2's own def
 # known from here -- safer for a human/Claude to look than to guess.
 REAP_RECOVERY = {
     "permuting": "tier2_ready",
-    "validating": "needs_human",
+    # NOT needs_human. A `validating` row carries a candidate_body and very
+    # often a permuter score of 0 -- it is FINISHED work waiting for the
+    # from-scratch gate. needs_human is a dead end nothing ever reclaims from
+    # (see CLAUDE.md section Q), so sending it there on a mere restart destroys
+    # the match. Measured: one factory restart during this session stranded 23
+    # rows that way, 22 of them permuter score-0 wins.
+    #
+    # Retried instead, with the crash-loop protection kept: a row that has been
+    # reaped from validating REAP_GIVE_UP times really is hanging the validator
+    # (a from-scratch build that never finishes) and only then becomes a human
+    # problem.
+    "validating": "validating",
 }
+
+# How many times a row may be reaped out of `validating` before it is treated
+# as a genuine anomaly rather than a casualty of a restart.
+REAP_GIVE_UP = 3
 
 
 def reap_stale_claims(stale_minutes: float) -> int:
@@ -168,9 +183,19 @@ def reap_stale_claims(stale_minutes: float) -> int:
         ).fetchall()
         for row in rows:
             recovery_state = REAP_RECOVERY.get(row["state"], row["state"])
+            note = (f"reaped: stuck in state={row['state']} with no live "
+                    f"worker for >{stale_minutes:.0f} min")
+            if row["state"] == "validating":
+                prior = conn.execute(
+                    "SELECT COUNT(*) c FROM events WHERE function_name = ? "
+                    "AND kind = 'reaped'", (row["name"],)).fetchone()["c"]
+                if prior + 1 >= REAP_GIVE_UP:
+                    recovery_state = "needs_human"
+                    note += (f" -- reaped {prior + 1}x, so this is the validator "
+                             f"genuinely hanging on it, not a restart")
             db.set_state(conn, row["name"], recovery_state, worker_id=None,
-                         notes=f"reaped: stuck in state={row['state']} with no live "
-                                f"worker for >{stale_minutes:.0f} min")
+                         notes=note)
+            db.log_event(conn, row["name"], "reaped", f"from state={row['state']}")
             n += 1
     conn.close()
     return n
