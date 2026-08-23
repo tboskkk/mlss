@@ -69,10 +69,11 @@ void sub_81634DC(void *arg0) {
     sub_8161C9C((*(s32 *)((s8 *)(arg0) + (0xC))), 0, 0);
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8163528.s\"");
-#else
 void sub_8163528(void *arg0, s32 arg1) {
+    void *temp_r1_12;
+    void *temp_r1_23;
+    void *temp_r1_34;
+    void *temp_r1_45;
     void *temp_r2_20;
     void *temp_r2_31;
     void *temp_r2_42;
@@ -80,22 +81,25 @@ void sub_8163528(void *arg0, s32 arg1) {
 
     temp_r2_9 = (*(void **)((s8 *)(arg0) + (0)));
     if (temp_r2_9 != NULL) {
-        (*(s32 (**)(void *, s32))((s8 *)((*(void **)((s8 *)(temp_r2_9) + (0xC)))) + (0xC)))(temp_r2_9 + M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */), 3);
+        temp_r1_12 = (*(void **)((s8 *)(temp_r2_9) + (0xC)));
+        (*(s32 (**)(void *, s32))((s8 *)(temp_r1_12) + (0xC)))(temp_r2_9 + (*(s16 *)((s8 *)(temp_r1_12) + (8))), 3);
     }
     temp_r2_20 = (*(void **)((s8 *)(arg0) + (4)));
     if (temp_r2_20 != NULL) {
-        (*(s32 (**)(void *, s32))((s8 *)((*(void **)((s8 *)(temp_r2_20) + (0xC)))) + (0xC)))(temp_r2_20 + M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */), 3);
+        temp_r1_23 = (*(void **)((s8 *)(temp_r2_20) + (0xC)));
+        (*(s32 (**)(void *, s32))((s8 *)(temp_r1_23) + (0xC)))(temp_r2_20 + (*(s16 *)((s8 *)(temp_r1_23) + (8))), 3);
     }
     temp_r2_31 = (*(void **)((s8 *)(arg0) + (8)));
     if (temp_r2_31 != NULL) {
-        (*(s32 (**)(void *, s32))((s8 *)((*(void **)((s8 *)(temp_r2_31) + (0xC)))) + (0xC)))(temp_r2_31 + M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */), 3);
+        temp_r1_34 = (*(void **)((s8 *)(temp_r2_31) + (0xC)));
+        (*(s32 (**)(void *, s32))((s8 *)(temp_r1_34) + (0xC)))(temp_r2_31 + (*(s16 *)((s8 *)(temp_r1_34) + (8))), 3);
     }
     temp_r2_42 = (*(void **)((s8 *)(arg0) + (0xC)));
     if (temp_r2_42 != NULL) {
-        (*(s32 (**)(void *, s32))((s8 *)((*(void **)((s8 *)(temp_r2_42) + (0xC)))) + (0xC)))(temp_r2_42 + M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */), 3);
+        temp_r1_45 = (*(void **)((s8 *)(temp_r2_42) + (0xC)));
+        (*(s32 (**)(void *, s32))((s8 *)(temp_r1_45) + (0xC)))(temp_r2_42 + (*(s16 *)((s8 *)(temp_r1_45) + (8))), 3);
     }
     if (1 & arg1) {
         free_heap_8018DA8(arg0);
     }
 }
-#endif
