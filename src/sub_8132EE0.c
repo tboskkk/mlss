@@ -10,23 +10,17 @@ asm_unified(".include \"asm/macros.inc\"");
 
 s32 sub_8082E1C();
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8132EE0.s\"");
-#else
-s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 extern s32 sub_8132678;
-
-void sub_8132EE0(void *arg0) {
-    u16 temp_r0_11;
-
-    temp_r0_11 = (*(u16 *)((s8 *)(arg0) + (0xAC))) - 1;
-    (*(u16 *)((s8 *)(arg0) + (0xAC))) = temp_r0_11;
-    if ((s32) (temp_r0_11 << 0x10) <= 0) {
-        sub_8082E1C(arg0, 6, 0, 0);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8132678;
-    }
+void sub_8132EE0(void *arg0)
+{
+  u16 temp_r0_11;
+  *((u16 *) (((s8 *) arg0) + 0xAC)) = (temp_r0_11 = (*((u16 *) (((s8 *) arg0) + 0xAC))) - 1);
+  if (((s32) (temp_r0_11 << 0x10)) <= 0)
+  {
+    sub_8082E1C(arg0, 6, 0, 0);
+    *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_8132678;
+  }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8132F10.s\"");
