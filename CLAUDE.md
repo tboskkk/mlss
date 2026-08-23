@@ -2229,6 +2229,21 @@ like a hard function, and this corpus has thousands of genuinely hard
 functions to hide among. That asymmetry, not carelessness, is why fourteen
 sections of this file are the same bug.
 
+**The fifth instance, and the one worth copying.** `compiler_variants.stage()`
+required every row to have its own `asm/nonmatching/<name>.s` and silently
+skipped any that did not. Correct for tools measuring real functions, wrong for
+every tool measuring VARIANTS of one -- `extern_lever` staging `sub_X__EXT`,
+`fix_bare_deref` staging `sub_X__u8`...`__s32`. Those names have no fragment, so
+their `body.c` was never written, and the tools reported a verdict on data they
+never had: "29 of 30 does not compile", then "nothing measured" twice.
+
+Fixed structurally rather than per-caller. `stage()` takes `frag_owner`, mapping
+a row to the function whose retail fragment it is measured against, so every
+staged row gets its own `<row>.frag.s` and callers compare
+`<row>.agbcc.bin` to `<row>.retail.bin` uniformly. And it now RAISES
+`StagingError` naming what it could not stage instead of returning a short list.
+**A tool that cannot stage its input should stop, not answer.**
+
 **Two habits follow, and they are cheap:**
 
 1. **Every measurement tool must refuse to answer when it cannot.** Not "return
