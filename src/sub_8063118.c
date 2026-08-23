@@ -10,7 +10,7 @@ asm_unified(".include \"asm/macros.inc\"");
 
 
 
-extern s32 sub_8063B80;
+s32 sub_8063B80(void *arg0);
 void sub_8063BA8(void *arg0);
 s32 sub_8086858();
 
@@ -259,7 +259,7 @@ void sub_8063AD4(void *arg0)
     {
       sub_8082E1C(arg0, 0xB, 0, 0);
       sub_8086858(arg0, 0x1471);
-      *((s32 **) (((s8 *) arg0) + 0x5C)) = &sub_8063B80;
+      *((s32 **) (((s8 *) arg0) + 0x5C)) = (s32 *) &sub_8063B80;
       play_sfx_80195B4(0x83, -1);
       *((s32 **) (((s8 *) arg0) + 0x4C)) = (s32 *) &sub_8063BA8;
     }
@@ -283,26 +283,30 @@ void sub_8063B58(void *arg0) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8063B80.s\"");
-#else
-/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
-   compiles a whole translation unit at a time, so an #error here fails
-   every OTHER function in this file under NONMATCHING=1. Guard intact, so
-   the real ROM still gets the verbatim retail bytes and progress.py still
-   counts this as unmatched. Write the C here, replacing this comment. */
-#endif
+s32 sub_8086C64();                                  /* extern */
+extern s32 sub_8063C24;
+
+s32 sub_8063B80(void *arg0) {
+    s32 temp_r0_8;
+
+    temp_r0_8 = sub_8086C64();
+    if (temp_r0_8 == 0) {
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8063C24;
+        (*(s32 *)((s8 *)(arg0) + (0x84))) = 0x10;
+    }
+    return temp_r0_8;
+}
 
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 s32 sub_8086858(void *, s32);                   /* extern */
-extern s32 sub_8063B80;
+s32 sub_8063B80(void *arg0);
 extern s32 sub_8063C8C;
 
 void sub_8063BA8(void *arg0) {
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
         sub_8082E1C(arg0, 0xC, 0, 0);
         sub_8086858(arg0, 0x1485);
-        (*(s32 **)((s8 *)(arg0) + (0x5C))) = &sub_8063B80;
+        (*(s32 **)((s8 *)(arg0) + (0x5C))) = (s32 *) &sub_8063B80;
         (*(s16 *)((s8 *)(arg0) + (0xAC))) = 3;
         (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8063C8C;
     }

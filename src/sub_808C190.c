@@ -679,14 +679,16 @@ void sub_808DCDC(void *arg0) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_808DD04.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+s32 sub_808CDD4(void *);                        /* extern */
+s32 sub_808D408(void *);                        /* extern */
+
+void sub_808DD04(void *arg0) {
+    if ((*(s16 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x28)))) + (0xEC))) == -1) {
+        sub_808CDD4(arg0);
+        return;
+    }
+    sub_808D408(arg0);
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_808DD2C.s\"");
