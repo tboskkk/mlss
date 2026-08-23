@@ -249,14 +249,40 @@ asm_unified(".include \"asm/nonmatching/sub_809A364.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_809A560.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+extern s32 sub_809A364;
+
+void sub_809A560(void *arg0) {
+    s32 temp_r1_81;
+    void *temp_r0_54;
+    void *temp_r1_39;
+
+    (*(u16 *)((s8 *)(arg0) + (0xB2))) = (u16) ((*(u16 *)((s8 *)(arg0) + (0xB2))) + (*(s32 *)((s8 *)(arg0) + (0x94))));
+    (*(s32 *)((s8 *)(arg0) + (0x10))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x10))) + (*(s16 *)((s8 *)(arg0) + (0xAE))));
+    (*(s32 *)((s8 *)(arg0) + (0x14))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x14))) + (*(s16 *)((s8 *)(arg0) + (0xB0))));
+    (*(s32 *)((s8 *)(arg0) + (0x18))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x18))) + (s16) (*(u16 *)((s8 *)(arg0) + (0xB2))));
+    if ((s32) (*(s32 *)((s8 *)(arg0) + (0x9C))) < 0) {
+        temp_r1_39 = (*(void **)((s8 *)(arg0) + (8)));
+        (*(u16 *)((s8 *)(temp_r1_39) + (0xC))) = (u16) ((*(u16 *)((s8 *)(temp_r1_39) + (0xC))) + 0xA00);
+    }
+    if ((s32) (*(s32 *)((s8 *)(arg0) + (0x8C))) >= (s32) (*(s32 *)((s8 *)(arg0) + (0x18)))) {
+        temp_r0_54 = (*(void **)((s8 *)(arg0) + (8)));
+        if (((*(u16 *)((s8 *)(temp_r0_54) + (0x16))) | ((u16) ((*(u8 *)((s8 *)(temp_r0_54) + (0x1E))) << 0xC) + 0x1000)) == 0x40D7) {
+            play_sfx_80195B4(0x6A, -1);
+        } else {
+            play_sfx_80195B4(0x6A, -1);
+        }
+        temp_r1_81 = (*(s32 *)((s8 *)(arg0) + (0x98)));
+        if (!(temp_r1_81 & 4)) {
+            (*(s32 *)((s8 *)(arg0) + (0x98))) = (s32) (temp_r1_81 | 4);
+            (*(s32 *)((s8 *)(arg0) + (0x10))) = (s32) (*(s32 *)((s8 *)(arg0) + (0x84)));
+            (*(s32 *)((s8 *)(arg0) + (0x14))) = (s32) (*(s32 *)((s8 *)(arg0) + (0x88)));
+            (*(s32 *)((s8 *)(arg0) + (0x18))) = (s32) (*(s32 *)((s8 *)(arg0) + (0x8C)));
+            (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_809A364;
+            return;
+        }
+        sub_807C298(arg0);
+    }
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_809A630.s\"");
