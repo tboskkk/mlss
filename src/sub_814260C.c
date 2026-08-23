@@ -30,17 +30,15 @@ void sub_814260C(s32 arg0, void *arg1, void *arg2)
   }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8142658.s\"");
-#else
-s32 sub_8046A90(void *, s32, s32, s32, s32); /* extern */
+s32 sub_8046A90(void *, s32, s32, s16, s32);    /* extern */
 s32 sub_8046D18(void *);                        /* extern */
 extern s32 sub_8142EFC;
-
-void sub_8142658(s32 arg0, void *arg1, s32 **arg2) {
-    sub_8046A90(arg1, 2, 0, M2C_ERROR(/* unknown instruction: ldsh $r3, ($mem_loc_fictive_) */), (s32) (*(u8 *)((s8 *)((*(void **)((s8 *)(arg1) + (0x1B0)))) + (0x26))));
-    sub_8046D18(arg1);
-    (*(u8 *)((s8 *)(arg1) + (0x1D6))) = (u8) (-2 & (*(u8 *)((s8 *)(arg1) + (0x1D6))));
-    *arg2 = &sub_8142EFC;
+void sub_8142658(s32 arg0, void *arg1, s32 **arg2)
+{
+  void *temp_r0_13;
+  temp_r0_13 = *((void **) (((s8 *) arg1) + 0x1B0));
+  sub_8046A90(arg1, 2, 0, *((s16 *) (((s8 *) temp_r0_13) + 0x24)), (s32) (*((u8 *) (((s8 *) temp_r0_13) + 0x26))));
+  sub_8046D18(arg1);
+  *((u8 *) (((s8 *) arg1) + 0x1D6)) = (u8) ((-2) & (*(((s8 *) arg1) + 0x1D6)));
+  *arg2 = &sub_8142EFC;
 }
-#endif
