@@ -19,13 +19,13 @@ int sub_810DD7C();
 
 extern s32 sub_808750C;
 
-void sub_8067A4C(void *arg0) {
+void sub_8067A4C(struct Entity *arg0) {
     (*(s32 *)((s8 *)(arg0) + (0x10))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x10))) + 0x200);
     (*(s32 *)((s8 *)(arg0) + (0x18))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x18))) - (*(s32 *)((s8 *)(arg0) + (0x8C))));
     (*(s32 *)((s8 *)(arg0) + (0x8C))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x8C))) + 0x66);
     if ((s32) (*(s32 *)((s8 *)(arg0) + (0x18))) <= 0) {
         (*(s32 *)((s8 *)(arg0) + (0x18))) = 0;
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_808750C;
+        arg0->handler = &sub_808750C;
     }
 }
 
@@ -114,9 +114,9 @@ asm_unified(".include \"asm/nonmatching/sub_806800C.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-s32 sub_8068058(void *arg0) {
+s32 sub_8068058(struct Entity *arg0) {
     sub_810DD7C(arg0, (*(s32 *)((s8 *)(arg0) + (0x2C))), 0xFF);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80681EC;
+    arg0->handler = &sub_80681EC;
     return 0;
 }
 

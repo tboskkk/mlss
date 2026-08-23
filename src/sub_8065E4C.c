@@ -11,15 +11,15 @@ asm_unified(".include \"asm/macros.inc\"");
 s32 sub_8082E1C();
 
 void sub_8065ED4(void *arg0);
-void sub_8065E4C(void *arg0) {
+void sub_8065E4C(struct Entity *arg0) {
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_8065ED4;
+        arg0->handler = (s32 *) &sub_8065ED4;
     }
 }
 
 extern s32 sub_8065D10;
 
-void sub_8065E68(void *arg0) {
+void sub_8065E68(struct Entity *arg0) {
     s32 temp_r0_17;
 
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
@@ -27,7 +27,7 @@ void sub_8065E68(void *arg0) {
         (*(s32 *)((s8 *)(arg0) + (0x9C))) = temp_r0_17;
         if (temp_r0_17 <= 0) {
             sub_8082E1C(arg0, 8, 0, 0);
-            (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8065D10;
+            arg0->handler = &sub_8065D10;
         }
     }
 }

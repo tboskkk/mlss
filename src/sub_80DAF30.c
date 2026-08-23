@@ -19,10 +19,10 @@ void sub_80DAF30(void *arg0) {
 s32 sub_8082B00();                                  /* extern */
 extern s32 sub_80DAFA8;
 
-void sub_80DAF48(void *arg0) {
+void sub_80DAF48(struct Entity *arg0) {
     if (sub_8082B00() == 0) {
         play_sfx_80195B4(0x8D, -1);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80DAFA8;
+        arg0->handler = &sub_80DAFA8;
     }
 }
 
@@ -34,10 +34,10 @@ void sub_80DAF6C(void *arg0) {
 
 extern s32 sub_80DB014;
 
-void sub_80DAF84(void *arg0) {
+void sub_80DAF84(struct Entity *arg0) {
     if (sub_8082B00() == 0) {
         play_sfx_80195B4(0x8D, -1);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80DB014;
+        arg0->handler = &sub_80DB014;
     }
 }
 

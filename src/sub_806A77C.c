@@ -22,14 +22,14 @@ s32 stop_sfx_80195A8();
 extern s32 sub_806A3F8;
 int sub_8082B00();
 s32 sub_8082E1C();
-void sub_806A77C(void *arg0) {
+void sub_806A77C(struct Entity *arg0) {
     s32 temp_r0_10;
 
     temp_r0_10 = (*(s32 *)((s8 *)(arg0) + (0x18))) + 0xFFFFFE00;
     (*(s32 *)((s8 *)(arg0) + (0x18))) = temp_r0_10;
     if (temp_r0_10 <= 0) {
         (*(s32 *)((s8 *)(arg0) + (0x18))) = 0;
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_808750C;
+        arg0->handler = &sub_808750C;
     }
 }
 
@@ -61,19 +61,19 @@ void sub_806A7CC(s32 arg0, s32 arg1, s32 arg2) {
 }
 #endif
 
-s32 sub_806A7EC(void *arg0, s32 arg1) {
+s32 sub_806A7EC(struct Entity *arg0, s32 arg1) {
     stop_sfx_80195A8(0x81);
     sub_810DD7C(arg0, arg1, 0xFF);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_808750C;
+    arg0->handler = &sub_808750C;
     return 0;
 }
 
 void sub_806A8B0(void *arg0);
-void sub_806A814(void *arg0) {
+void sub_806A814(struct Entity *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
         stop_sfx_80195A8(0x81);
         (*(s16 *)((s8 *)(arg0) + (0xAC))) = 0xFF;
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_806A8B0;
+        arg0->handler = (s32 *) &sub_806A8B0;
     }
 }
 

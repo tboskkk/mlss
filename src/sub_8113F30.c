@@ -40,7 +40,7 @@ s32 sub_80880C4(void *, s32);                   /* extern */
 s32 sub_808843C(void *, s16, s16, s16, s32);    /* extern */
 extern s32 sub_8114528;
 
-void sub_81140C0(void *arg0) {
+void sub_81140C0(struct Entity *arg0) {
     void *temp_r4_10;
 
     temp_r4_10 = (*(void **)((s8 *)((*(void **)((s8 *)(arg0) + (0x30)))) + (0x30)));
@@ -48,5 +48,5 @@ void sub_81140C0(void *arg0) {
     sub_80880C4(temp_r4_10, 0x400);
     sub_8082E1C(temp_r4_10, 7, 0, 0);
     sub_807F47C(temp_r4_10);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8114528;
+    arg0->handler = &sub_8114528;
 }

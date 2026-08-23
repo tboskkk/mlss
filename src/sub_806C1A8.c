@@ -21,10 +21,10 @@ extern s32 sub_806C2B0;
 s32 sub_8082E1C();
 extern s32 sub_806B7BC;
 
-void sub_806C1A8(void *arg0) {
+void sub_806C1A8(struct Entity *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
         (*(s16 *)((s8 *)(arg0) + (0xAC))) = 8;
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_806B7BC;
+        arg0->handler = &sub_806B7BC;
     }
 }
 
@@ -66,9 +66,9 @@ void sub_806C224(void *arg0) {
 }
 #endif
 
-void sub_806C294(void *arg0) {
+void sub_806C294(struct Entity *arg0) {
     sub_8082E1C(arg0, 0x02, 0, 0);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_806C2B0;
+    arg0->handler = &sub_806C2B0;
 }
 
 #ifndef NONMATCHING
@@ -414,9 +414,9 @@ void sub_806D30C(void *arg0) {
 
 extern s32 sub_806CD70;
 
-s32 sub_806D340(void *arg0, s32 arg1) {
+s32 sub_806D340(struct Entity *arg0, s32 arg1) {
     sub_810DD7C(arg0, arg1, 0xFF);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_806CD70;
+    arg0->handler = &sub_806CD70;
     return 0;
 }
 

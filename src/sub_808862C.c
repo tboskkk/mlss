@@ -19,15 +19,15 @@ extern s32 sub_808750C;
 
 s32 sub_8082E1C();
 
-void sub_808862C(void *arg0) {
-    (*(s32 **)((s8 *)(arg0) + (0x50))) = (s32 *) (*(s32 **)((s8 *)(arg0) + (0x4C)));
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_80886BC;
+void sub_808862C(struct Entity *arg0) {
+    (*(s32 **)((s8 *)(arg0) + (0x50))) = (s32 *) arg0->handler;
+    arg0->handler = (s32 *) &sub_80886BC;
 }
 
 extern s32 sub_80886E0;
 
-void sub_808863C(void *arg0) {
-    (*(s32 **)((s8 *)(arg0) + (0x50))) = (s32 *) (*(s32 **)((s8 *)(arg0) + (0x4C)));
+void sub_808863C(struct Entity *arg0) {
+    (*(s32 **)((s8 *)(arg0) + (0x50))) = (s32 *) arg0->handler;
     (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80886E0;
 }
 

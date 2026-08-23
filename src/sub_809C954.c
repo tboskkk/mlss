@@ -9,8 +9,8 @@ asm_unified(".include \"asm/macros.inc\"");
 
 extern s32 sub_809CA24;
 
-void sub_809C954(void *arg0) {
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_809CA24;
+void sub_809C954(struct Entity *arg0) {
+    arg0->handler = &sub_809CA24;
 }
 
 #ifndef NONMATCHING

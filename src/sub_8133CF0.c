@@ -11,10 +11,10 @@ asm_unified(".include \"asm/macros.inc\"");
 int sub_8082E1C();
 extern s32 sub_8133C7C;
 
-void sub_8133CF0(void *arg0) {
+void sub_8133CF0(struct Entity *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
         sub_8082E1C(arg0, 0x0A, 0, 0);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8133C7C;
+        arg0->handler = &sub_8133C7C;
     }
 }
 

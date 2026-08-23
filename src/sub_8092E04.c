@@ -284,7 +284,7 @@ asm_unified(".include \"asm/nonmatching/sub_8093CBC.s\"");
 
 extern s32 sub_8093B14;
 
-void sub_8093D0C(void *arg0) {
+void sub_8093D0C(struct Entity *arg0) {
     s32 temp_r0_20;
     void *temp_r1_27;
     void *temp_r2_42;
@@ -304,7 +304,7 @@ void sub_8093D0C(void *arg0) {
     sub_8082E1C(arg0, 2, 0, 0);
     temp_r2_42 = (*(void **)((s8 *)(arg0) + (8)));
     (*(u8 *)((s8 *)(temp_r2_42) + (0x12))) = (u8) ((*(u8 *)((s8 *)(temp_r2_42) + (0x12))) | 0x10);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8093B14;
+    arg0->handler = &sub_8093B14;
 }
 
 void sub_8093D6C(void *arg0)
@@ -335,7 +335,7 @@ void sub_8093D6C(void *arg0)
 
 extern s32 sub_8093580;
 
-void sub_8093DBC(void *arg0) {
+void sub_8093DBC(struct Entity *arg0) {
     s32 temp_r0_20;
     void *temp_r1_27;
     void *temp_r2_41;
@@ -355,7 +355,7 @@ void sub_8093DBC(void *arg0) {
     sub_8082E1C(arg0, 2, 0, 0);
     temp_r2_41 = (*(void **)((s8 *)(arg0) + (8)));
     (*(u8 *)((s8 *)(temp_r2_41) + (0x12))) = (u8) ((*(u8 *)((s8 *)(temp_r2_41) + (0x12))) | 0x10);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8093580;
+    arg0->handler = &sub_8093580;
 }
 
 void sub_8093E20(void *arg0) {

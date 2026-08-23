@@ -47,10 +47,10 @@ s32 sub_807FB64(s32);                           /* extern */
 s32 sub_8087CE4();                              /* extern */
 extern s32 sub_80B325C;
 
-void sub_80B30AC(void *arg0) {
+void sub_80B30AC(struct Entity *arg0) {
     sub_8087CE4();
     if (0x20 & (*(u8 *)((s8 *)(arg0) + (0x79)))) {
         sub_807FB64((*(s32 *)((s8 *)(arg0) + (8))));
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80B325C;
+        arg0->handler = &sub_80B325C;
     }
 }

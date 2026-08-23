@@ -20,7 +20,7 @@ s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 extern s32 sub_81334F4;
 extern s32 sub_8133BC0;
 
-void sub_8133B54(void *arg0) {
+void sub_8133B54(struct Entity *arg0) {
     s32 *var_r0_37;
 
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
@@ -34,6 +34,6 @@ void sub_8133B54(void *arg0) {
             sub_8082E1C(arg0, 0xE, 0, 0);
             var_r0_37 = &sub_81334F4;
         }
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = var_r0_37;
+        arg0->handler = var_r0_37;
     }
 }

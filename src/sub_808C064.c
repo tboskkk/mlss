@@ -9,8 +9,8 @@ asm_unified(".include \"asm/macros.inc\"");
 
 extern s32 sub_808C348;
 
-s32 sub_808C064(void *arg0) {
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_808C348;
+s32 sub_808C064(struct Entity *arg0) {
+    arg0->handler = &sub_808C348;
     return 1;
 }
 

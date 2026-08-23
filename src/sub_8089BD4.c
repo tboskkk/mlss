@@ -73,7 +73,7 @@ asm_unified(".include \"asm/nonmatching/sub_8089D10.s\"");
 
 extern s32 sub_8088F9C;
 
-void sub_8089D88(void *arg0) {
+void sub_8089D88(struct Entity *arg0) {
     void *temp_r5_8;
 
     temp_r5_8 = (*(void **)((s8 *)(arg0) + (0x2C)));
@@ -83,7 +83,7 @@ void sub_8089D88(void *arg0) {
     if ((*(s16 *)((s8 *)((*(void **)((s8 *)(temp_r5_8) + (0x28)))) + (0xEC))) == -2) {
         sub_8082E1C(arg0, 8, 0, 0);
     }
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8088F9C;
+    arg0->handler = &sub_8088F9C;
 }
 
 #ifndef NONMATCHING

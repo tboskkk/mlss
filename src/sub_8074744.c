@@ -254,11 +254,11 @@ s32 stop_sfx_80195A8(s32);                      /* extern */
 s32 sub_810DD7C(void *, s32, s32);              /* extern */
 extern s32 sub_80759E8;
 
-s32 sub_8075BB8(void *arg0, s32 arg1) {
+s32 sub_8075BB8(struct Entity *arg0, s32 arg1) {
     stop_sfx_80195A8(0x8C);
     sub_810DD7C(arg0, arg1, 0xFF);
     (*(s16 *)((s8 *)(arg0) + (0xAC))) = 0;
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80759E8;
+    arg0->handler = &sub_80759E8;
     return 0;
 }
 
@@ -280,9 +280,9 @@ asm_unified(".include \"asm/nonmatching/sub_8075C10.s\"");
 
 extern s32 sub_8075C8C;
 
-s32 sub_8075C48(void *arg0, s32 arg1) {
+s32 sub_8075C48(struct Entity *arg0, s32 arg1) {
     sub_810DD7C(arg0, arg1, 0xFF);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8075C8C;
+    arg0->handler = &sub_8075C8C;
     return 0;
 }
 
@@ -399,9 +399,9 @@ asm_unified(".include \"asm/nonmatching/sub_8075F4C.s\"");
 
 extern s32 sub_80758BC;
 
-void sub_807600C(void *arg0) {
+void sub_807600C(struct Entity *arg0) {
     sub_8082E1C(arg0, 0xA, 0, 0);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80758BC;
+    arg0->handler = &sub_80758BC;
     play_sfx_80195B4(0xAF, -1);
 }
 

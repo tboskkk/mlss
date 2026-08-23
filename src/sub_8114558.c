@@ -9,7 +9,7 @@ asm_unified(".include \"asm/macros.inc\"");
 
 extern s32 sub_81140C0;
 void sub_811458C(void *arg0);
-void sub_8114558(void *arg0) {
+void sub_8114558(struct Entity *arg0) {
     s32 *var_r1_21;
     s32 temp_r0_19;
 
@@ -20,7 +20,7 @@ void sub_8114558(void *arg0) {
         if (temp_r0_19 != 0) {
             var_r1_21 = (s32 *) &sub_811458C;
         }
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = var_r1_21;
+        arg0->handler = var_r1_21;
     }
 }
 

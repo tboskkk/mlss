@@ -9,13 +9,13 @@ asm_unified(".include \"asm/macros.inc\"");
 
 extern s32 sub_808750C;
 
-void sub_805F5E4(void *arg0) {
+void sub_805F5E4(struct Entity *arg0) {
     s32 temp_r0_11;
 
     temp_r0_11 = (*(s32 *)((s8 *)(arg0) + (0xA0))) - 1;
     (*(s32 *)((s8 *)(arg0) + (0xA0))) = temp_r0_11;
     if (temp_r0_11 < 0) {
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_808750C;
+        arg0->handler = &sub_808750C;
     }
 }
 
@@ -23,11 +23,11 @@ s32 sub_8082B00();                                  /* extern */
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 extern s32 sub_805F638;
 
-void sub_805F604(void *arg0) {
+void sub_805F604(struct Entity *arg0) {
     if (sub_8082B00() == 0) {
         sub_8082E1C(arg0, 2, 0, 0);
         play_sfx_80195B4(0x118, -1);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_805F638;
+        arg0->handler = &sub_805F638;
     }
 }
 

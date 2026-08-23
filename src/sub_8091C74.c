@@ -317,7 +317,7 @@ void sub_8092C70(void *arg0)
 
 extern s32 sub_8092AC8;
 
-void sub_8092CC0(void *arg0) {
+void sub_8092CC0(struct Entity *arg0) {
     s32 temp_r0_20;
     void *temp_r1_27;
     void *temp_r2_42;
@@ -337,7 +337,7 @@ void sub_8092CC0(void *arg0) {
     sub_8082E1C(arg0, 2, 0, 0);
     temp_r2_42 = (*(void **)((s8 *)(arg0) + (8)));
     (*(u8 *)((s8 *)(temp_r2_42) + (0x12))) = (u8) ((*(u8 *)((s8 *)(temp_r2_42) + (0x12))) | 0x10);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8092AC8;
+    arg0->handler = &sub_8092AC8;
 }
 
 void sub_8092D20(void *arg0)
@@ -366,7 +366,7 @@ void sub_8092D20(void *arg0)
 
 extern s32 sub_8092534;
 
-void sub_8092D70(void *arg0) {
+void sub_8092D70(struct Entity *arg0) {
     s32 temp_r0_20;
     void *temp_r1_27;
     void *temp_r2_41;
@@ -386,7 +386,7 @@ void sub_8092D70(void *arg0) {
     sub_8082E1C(arg0, 2, 0, 0);
     temp_r2_41 = (*(void **)((s8 *)(arg0) + (8)));
     (*(u8 *)((s8 *)(temp_r2_41) + (0x12))) = (u8) ((*(u8 *)((s8 *)(temp_r2_41) + (0x12))) | 0x10);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8092534;
+    arg0->handler = &sub_8092534;
 }
 
 void sub_8092DD4(void *arg0) {

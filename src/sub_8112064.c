@@ -13,10 +13,10 @@ extern s32 sub_811254C;
 
 extern s32 sub_8111CA8;
 
-void sub_8112064(void *arg0) {
+void sub_8112064(struct Entity *arg0) {
     if ((*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x28)))) + (0x113))) == 0) {
         (*(s16 *)((s8 *)(arg0) + (0xAC))) = 0x10;
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8111CA8;
+        arg0->handler = &sub_8111CA8;
     }
 }
 

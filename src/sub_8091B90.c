@@ -36,7 +36,7 @@ s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 s32 sub_808DD2C(void *);                        /* extern */
 extern s32 sub_80913A4;
 
-void sub_8091BE0(void *arg0) {
+void sub_8091BE0(struct Entity *arg0) {
     s32 temp_r0_20;
     void *temp_r1_27;
     void *temp_r2_41;
@@ -56,5 +56,5 @@ void sub_8091BE0(void *arg0) {
     sub_8082E1C(arg0, 2, 0, 0);
     temp_r2_41 = (*(void **)((s8 *)(arg0) + (8)));
     (*(u8 *)((s8 *)(temp_r2_41) + (0x12))) = (u8) ((*(u8 *)((s8 *)(temp_r2_41) + (0x12))) | 0x10);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80913A4;
+    arg0->handler = &sub_80913A4;
 }

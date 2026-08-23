@@ -32,15 +32,15 @@ asm_unified(".include \"asm/nonmatching/sub_8070CF0.s\"");
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 extern s32 sub_8071080;
 
-void sub_8070D60(void *arg0) {
+void sub_8070D60(struct Entity *arg0) {
     sub_8082E1C(arg0, 5, 0, 0);
     play_sfx_80195B4(0x46, -1);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8071080;
+    arg0->handler = &sub_8071080;
 }
 
 extern s32 sub_806F47C;
 
-void sub_8070D88(void *arg0) {
+void sub_8070D88(struct Entity *arg0) {
     s32 temp_r0_25;
 
     (*(s32 *)((s8 *)(arg0) + (0x18))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x18))) + (*(s32 *)((s8 *)(arg0) + (0x8C))));
@@ -53,6 +53,6 @@ void sub_8070D88(void *arg0) {
             (*(s32 *)((s8 *)(arg0) + (0x8C))) = 0x300;
             return;
         }
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_806F47C;
+        arg0->handler = &sub_806F47C;
     }
 }

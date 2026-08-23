@@ -34,10 +34,10 @@ void sub_8066550(void *arg0) {
 void sub_8066540(void *arg0, s32 arg1, s32 arg2, s32 arg3);
 extern s32 sub_8066334;
 
-void sub_806657C(void *arg0) {
+void sub_806657C(struct Entity *arg0) {
     sub_8066540((*(void **)((s8 *)(arg0) + (0x30))), (*(s32 *)((s8 *)(arg0) + (0x10))), (*(s32 *)((s8 *)(arg0) + (0x14))), (*(s32 *)((s8 *)(arg0) + (0x18))));
     if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
         (*(s16 *)((s8 *)(arg0) + (0xAC))) = 0x1E;
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8066334;
+        arg0->handler = &sub_8066334;
     }
 }

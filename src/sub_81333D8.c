@@ -14,17 +14,17 @@ extern s32 sub_8133424;
 
 extern s32 sub_808750C;
 
-void sub_81333D8(void *arg0) {
+void sub_81333D8(struct Entity *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0x30))) == 0) {
         sub_8082E1C(arg0, 0xD, 0, 0);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_808750C;
+        arg0->handler = &sub_808750C;
     }
 }
 
-void sub_81333FC(void *arg0) {
+void sub_81333FC(struct Entity *arg0) {
     if (sub_8082B00() == 0) {
         sub_8082E1C(arg0, 0x02, 0, 0);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8133424;
+        arg0->handler = &sub_8133424;
     }
 }
 

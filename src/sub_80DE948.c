@@ -12,9 +12,9 @@ s32 stop_sfx_80195A8();
 
 extern s32 sub_808750C;
 
-void sub_80DE948(void *arg0) {
+void sub_80DE948(struct Entity *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_808750C;
+        arg0->handler = &sub_808750C;
     }
 }
 

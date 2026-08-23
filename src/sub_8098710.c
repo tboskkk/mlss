@@ -150,9 +150,9 @@ asm_unified(".include \"asm/nonmatching/sub_8098C78.s\"");
    counts this as unmatched. Write the C here, replacing this comment. */
 #endif
 
-void sub_8098CA0(void *arg0) {
+void sub_8098CA0(struct Entity *arg0) {
     sub_8082E1C(arg0, 0x12, 0, 0);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8098CBC;
+    arg0->handler = &sub_8098CBC;
 }
 
 #ifndef NONMATCHING

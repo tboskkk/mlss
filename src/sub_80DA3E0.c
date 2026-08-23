@@ -8,9 +8,9 @@
 asm_unified(".include \"asm/macros.inc\"");
 
 void sub_80DA3FC(void *arg0);
-void sub_80DA3E0(void *arg0) {
+void sub_80DA3E0(struct Entity *arg0) {
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_80DA3FC;
+        arg0->handler = (s32 *) &sub_80DA3FC;
     }
 }
 

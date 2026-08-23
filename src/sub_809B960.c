@@ -108,7 +108,7 @@ asm_unified(".include \"asm/nonmatching/sub_809BC28.s\"");
    counts this as unmatched. Write the C here, replacing this comment. */
 #endif
 
-void sub_809BD98(void *arg0) {
+void sub_809BD98(struct Entity *arg0) {
     s32 temp_r0_20;
     s32 temp_r4_50;
 
@@ -125,7 +125,7 @@ void sub_809BD98(void *arg0) {
     }
     play_sfx_80195B4(0x88, -1);
     play_sfx_80195B4(0x8D, -1);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_809C214;
+    arg0->handler = (s32 *) &sub_809C214;
 }
 
 #ifndef NONMATCHING
@@ -140,7 +140,7 @@ asm_unified(".include \"asm/nonmatching/sub_809BE50.s\"");
 
 extern s32 sub_809C168;
 
-void sub_809BEE0(void *arg0) {
+void sub_809BEE0(struct Entity *arg0) {
     s32 temp_r0_20;
     s32 temp_r4_42;
 
@@ -156,7 +156,7 @@ void sub_809BEE0(void *arg0) {
     }
     play_sfx_80195B4(0x88, -1);
     play_sfx_80195B4(0x8D, -1);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_809C168;
+    arg0->handler = &sub_809C168;
 }
 
 #ifndef NONMATCHING

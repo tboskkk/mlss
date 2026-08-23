@@ -149,10 +149,10 @@ asm_unified(".include \"asm/nonmatching/sub_8074260.s\"");
 
 extern s32 sub_8072BE8;
 
-void sub_80742D4(void *arg0) {
+void sub_80742D4(struct Entity *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
         play_sfx_80195B4(0x10E, -1);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8072BE8;
+        arg0->handler = &sub_8072BE8;
     }
 }
 

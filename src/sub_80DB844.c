@@ -10,9 +10,9 @@ asm_unified(".include \"asm/macros.inc\"");
 s32 sub_8082B00();                                  /* extern */
 extern s32 sub_80DB1E4;
 
-void sub_80DB844(void *arg0) {
+void sub_80DB844(struct Entity *arg0) {
     if (sub_8082B00() == 0) {
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80DB1E4;
+        arg0->handler = &sub_80DB1E4;
     }
 }
 

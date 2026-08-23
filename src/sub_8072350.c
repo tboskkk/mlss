@@ -24,10 +24,10 @@ void sub_8072350(void *arg0)
   }
 }
 
-void sub_8072370(void *arg0) {
+void sub_8072370(struct Entity *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
         (*(s16 *)((s8 *)(arg0) + (0xAC))) = 0x1E;
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8071B14;
+        arg0->handler = &sub_8071B14;
     }
 }
 
@@ -94,9 +94,9 @@ asm_unified(".include \"asm/nonmatching/sub_807249C.s\"");
 
 extern s32 sub_8072550;
 
-void sub_8072500(void *arg0) {
+void sub_8072500(struct Entity *arg0) {
     sub_8082E1C((*(s32 *)((s8 *)(*(void **)0x03000FD8) + (0x58))) + 8, 0x2F, 0, 0);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8072550;
+    arg0->handler = &sub_8072550;
 }
 
 extern s32 sub_80725D0;

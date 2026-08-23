@@ -36,10 +36,10 @@ void sub_813326C(void *arg0) {
 
 extern s32 sub_808750C;
 
-void sub_81332BC(void *arg0) {
+void sub_81332BC(struct Entity *arg0) {
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
         sub_8082E1C(arg0, 0xD, 0, 0);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_808750C;
+        arg0->handler = &sub_808750C;
     }
 }
 

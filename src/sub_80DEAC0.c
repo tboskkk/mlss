@@ -66,12 +66,12 @@ void sub_80DEAE0(void *arg0) {
 
 extern s32 sub_80DDC8C;
 
-void sub_80DEB1C(void *arg0) {
+void sub_80DEB1C(struct Entity *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
         sub_8082E1C(arg0, 8, 0, 0);
         play_sfx_80195B4(0x126, -1);
         (*(s16 *)((s8 *)(arg0) + (0xAC))) = 0x30;
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80DDC8C;
+        arg0->handler = &sub_80DDC8C;
     }
 }
 
@@ -107,9 +107,9 @@ void sub_80DEB78(void *arg0) {
 
 extern s32 sub_80DE670;
 
-void sub_80DEC44(void *arg0) {
+void sub_80DEC44(struct Entity *arg0) {
     if (sub_8082B00() == 0) {
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80DE670;
+        arg0->handler = &sub_80DE670;
     }
 }
 

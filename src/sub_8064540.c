@@ -83,7 +83,7 @@ u8 sub_801B1C8(void *, s32, s32);                   /* extern */
 s32 sub_807FC08(s32 *, s32 *, s32 *, s32);      /* extern */
 extern s32 sub_806499C;
 
-void sub_8064908(void *arg0) {
+void sub_8064908(struct Entity *arg0) {
     s32 sp0;
     s32 sp4;
     s32 sp8;
@@ -119,7 +119,7 @@ void sub_8064908(void *arg0) {
     }
     free_heap_8018DA8(*(void **)0x03000E18);
     (*(s16 *)((s8 *)(arg0) + (0xAC))) = 0;
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_806499C;
+    arg0->handler = &sub_806499C;
 }
 
 #ifndef NONMATCHING

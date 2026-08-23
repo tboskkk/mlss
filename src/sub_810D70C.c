@@ -213,7 +213,7 @@ void sub_810FCE0(void *arg0)
 
 extern s32 sub_810F824;
 
-void sub_810FD10(void *arg0) {
+void sub_810FD10(struct Entity *arg0) {
     void *temp_r2_8;
 
     temp_r2_8 = (*(void **)((s8 *)(arg0) + (0x30)));
@@ -221,7 +221,7 @@ void sub_810FD10(void *arg0) {
         sub_8082E1C(temp_r2_8, 0, 0, 0);
         sub_80883A0(arg0, 0xC);
         play_sfx_80195B4(0x10F, -1);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_810F824;
+        arg0->handler = &sub_810F824;
     }
 }
 

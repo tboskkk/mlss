@@ -16,13 +16,13 @@ s32 sub_8082E1C();
 
 s32 sub_8086C64(void *);                            /* extern */
 void sub_80DBC60(void *arg0);
-s32 sub_80DBC3C(void *arg0) {
+s32 sub_80DBC3C(struct Entity *arg0) {
     s32 temp_r0_11;
 
-    (*(s32 **)((s8 *)(arg0) + (0x54))) = (s32 *) (*(s32 **)((s8 *)(arg0) + (0x4C)));
+    (*(s32 **)((s8 *)(arg0) + (0x54))) = (s32 *) arg0->handler;
     temp_r0_11 = sub_8086C64(arg0);
     if (temp_r0_11 == 0) {
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_80DBC60;
+        arg0->handler = (s32 *) &sub_80DBC60;
     }
     return temp_r0_11;
 }

@@ -13,15 +13,15 @@ void sub_80DA098(void *arg0);
 
 extern s32 sub_80DA0E0;
 
-void sub_80D9F34(void *arg0) {
+void sub_80D9F34(struct Entity *arg0) {
     if ((*(s16 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x28)))) + (0xF6))) != 0) {
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80DA0E0;
+        arg0->handler = &sub_80DA0E0;
     }
 }
 
 s32 sub_8086858(void *, s32);                   /* extern */
 extern s32 sub_80D9E34;
-void sub_80D9F50(void *arg0) {
+void sub_80D9F50(struct Entity *arg0) {
     s32 temp_r5_16;
 
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
@@ -35,7 +35,7 @@ void sub_80D9F50(void *arg0) {
             (*(s32 *)((s8 *)(arg0) + (0x54))) = temp_r5_16;
         }
         (*(s16 *)((s8 *)(arg0) + (0xAC))) = 0x18;
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_80DA098;
+        arg0->handler = (s32 *) &sub_80DA098;
     }
 }
 

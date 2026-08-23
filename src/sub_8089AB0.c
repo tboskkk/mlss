@@ -13,15 +13,15 @@ extern s32 sub_808750C;
 
 extern s32 sub_808942C;
 
-void sub_8089AB0(void *arg0) {
+void sub_8089AB0(struct Entity *arg0) {
     (*(s32 *)((s8 *)(arg0) + (0x80))) = 0;
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_808942C;
+    arg0->handler = &sub_808942C;
     (*(s16 *)((s8 *)(arg0) + (0xAC))) = 0;
 }
 
-void sub_8089AC8(void *arg0) {
+void sub_8089AC8(struct Entity *arg0) {
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_808750C;
+        arg0->handler = &sub_808750C;
     }
 }
 

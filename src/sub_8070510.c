@@ -16,10 +16,10 @@ int sub_8082E1C();
 
 extern s32 sub_8070534;
 
-void sub_8070510(void *arg0) {
+void sub_8070510(struct Entity *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
         (*(s32 *)((s8 *)(arg0) + (0xA8))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0xA8))) + 1);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8070534;
+        arg0->handler = &sub_8070534;
     }
 }
 
@@ -36,14 +36,14 @@ s32 sub_807F4FC(void *);                        /* extern */
 s32 sub_8199F30();                                  /* extern */
 extern s32 sub_8070424;
 
-void sub_80705B4(void *arg0) {
+void sub_80705B4(struct Entity *arg0) {
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
         sub_8082E1C(arg0, 0x1B, 0, 0);
         (*(s32 *)((s8 *)(arg0) + (0xA8))) = (s32) (1 & sub_8199F30());
         *(s32 *)0x03000E3C = 0;
         sub_807F4FC(arg0);
         (*(s32 **)((s8 *)(arg0) + (0x60))) = &sub_8070424;
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8070534;
+        arg0->handler = &sub_8070534;
     }
 }
 
@@ -58,13 +58,13 @@ asm_unified(".include \"asm/nonmatching/sub_8070604.s\"");
 
 extern s32 sub_80706B0;
 
-s32 sub_8070670(void *arg0, s32 arg1) {
+s32 sub_8070670(struct Entity *arg0, s32 arg1) {
     sub_810DD7C(arg0, arg1, 0xFF);
     sub_807F47C(arg0);
     (*(s32 *)((s8 *)(arg0) + (0x10))) = (s32) (*(s32 *)((s8 *)((*(void **)((s8 *)((*(void **)((s8 *)(arg0) + (0x2C)))) + (0x28)))) + (0xD8)));
     sub_8082E1C(arg0, 8, 0, 0);
     (*(s16 *)((s8 *)(arg0) + (0xAC))) = 2;
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80706B0;
+    arg0->handler = &sub_80706B0;
     return 0;
 }
 

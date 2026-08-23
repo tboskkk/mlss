@@ -9,12 +9,12 @@ asm_unified(".include \"asm/macros.inc\"");
 
 extern s32 sub_8086090;
 
-void sub_80875B8(void *arg0) {
+void sub_80875B8(struct Entity *arg0) {
     if ((s32) (s16) (*(u16 *)((s8 *)(arg0) + (0xAC))) > 0) {
         (*(u16 *)((s8 *)(arg0) + (0xAC))) = (u16) ((*(u16 *)((s8 *)(arg0) + (0xAC))) - 1);
         return;
     }
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8086090;
+    arg0->handler = &sub_8086090;
 }
 
 #ifndef NONMATCHING

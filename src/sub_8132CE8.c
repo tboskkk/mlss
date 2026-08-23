@@ -34,10 +34,10 @@ void sub_8132CE8(void *arg0)
   }
 }
 
-void sub_8132D4C(void *arg0) {
+void sub_8132D4C(struct Entity *arg0) {
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
         sub_8082E1C(arg0, 0, 0, 0);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_808750C;
+        arg0->handler = &sub_808750C;
     }
 }
 
@@ -66,10 +66,10 @@ s32 sub_8082B00();                                  /* extern */
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 extern s32 sub_8132E34;
 
-void sub_8132DE4(void *arg0) {
+void sub_8132DE4(struct Entity *arg0) {
     if (sub_8082B00() == 0) {
         sub_8082E1C(arg0, 8, 0, 0);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8132E34;
+        arg0->handler = &sub_8132E34;
     }
 }
 

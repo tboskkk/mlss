@@ -11,11 +11,11 @@ asm_unified(".include \"asm/macros.inc\"");
 s32 sub_8082E1C();
 void sub_8132EA8(void *arg0);
 
-void sub_8132E34(void *arg0) {
+void sub_8132E34(struct Entity *arg0) {
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
         sub_8082E1C(arg0, 9, 0, 0);
         (*(s16 *)((s8 *)(arg0) + (0xAC))) = 0x3C;
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_8132EA8;
+        arg0->handler = (s32 *) &sub_8132EA8;
     }
 }
 

@@ -10,11 +10,11 @@ asm_unified(".include \"asm/macros.inc\"");
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 extern s32 sub_80DABFC;
 
-void sub_80DB0FC(void *arg0) {
+void sub_80DB0FC(struct Entity *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
         sub_8082E1C(arg0, 3, 0, 0);
         (*(s16 *)((s8 *)(arg0) + (0xAC))) = 0x18;
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80DABFC;
+        arg0->handler = &sub_80DABFC;
     }
 }
 
@@ -25,7 +25,7 @@ extern s32 sub_80DB184;
 extern s32 sub_80DB1A4;
 extern s32 sub_80DB1C4;
 
-void sub_80DB12C(void *arg0) {
+void sub_80DB12C(struct Entity *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
         play_sfx_80195B4(0x2E, -1);
         sub_807F4FC(arg0);
@@ -34,6 +34,6 @@ void sub_80DB12C(void *arg0) {
         (*(s32 **)((s8 *)(arg0) + (0x60))) = &sub_80DB184;
         sub_8082E1C(arg0, 7, 0, 0);
         (*(s16 *)((s8 *)(arg0) + (0xAC))) = 0x10;
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80DAD00;
+        arg0->handler = &sub_80DAD00;
     }
 }

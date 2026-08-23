@@ -306,7 +306,7 @@ void sub_806BF0C(void *arg0) {
 }
 #endif
 
-void sub_806BF70(void *arg0) {
+void sub_806BF70(struct Entity *arg0) {
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
         if ((*(s32 *)((s8 *)(arg0) + (0xA8))) == 0) {
             sub_8082E1C(arg0, 0xA, 0, 0);
@@ -316,11 +316,11 @@ void sub_806BF70(void *arg0) {
             sub_8082E1C((*(void **)((s8 *)(arg0) + (0x30))), 0x12, 0, 0);
         }
         (*(s16 *)((s8 *)(arg0) + (0xAC))) = 8;
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_806BD00;
+        arg0->handler = (s32 *) &sub_806BD00;
     }
 }
 
-void sub_806BFD4(void *arg0) {
+void sub_806BFD4(struct Entity *arg0) {
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
         if ((*(s32 *)((s8 *)(arg0) + (0xA8))) == 0) {
             sub_8082E1C(arg0, 8, 0, 0);
@@ -328,7 +328,7 @@ void sub_806BFD4(void *arg0) {
             sub_8082E1C(arg0, 0x10, 0, 0);
         }
         (*(s16 *)((s8 *)(arg0) + (0xAC))) = 8;
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_806BC40;
+        arg0->handler = (s32 *) &sub_806BC40;
     }
 }
 

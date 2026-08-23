@@ -271,7 +271,7 @@ asm_unified(".include \"asm/nonmatching/sub_80D8CC0.s\"");
 s32 sub_8087DE4(void *);                        /* extern */
 extern s32 sub_80D69D8;
 
-void sub_80D8D18(void *arg0) {
+void sub_80D8D18(struct Entity *arg0) {
     void *temp_r1_15;
     void *temp_r4_12;
     void *temp_r5_10;
@@ -284,7 +284,7 @@ void sub_80D8D18(void *arg0) {
     (*(s32 *)((s8 *)(temp_r1_15) + (0x14))) = (s32) (*(s32 *)((s8 *)(temp_r4_12) + (0x14)));
     (*(s32 *)((s8 *)(temp_r1_15) + (0x18))) = (s32) (*(s32 *)((s8 *)(temp_r4_12) + (0x18)));
     if (0x20 & (*(u8 *)((s8 *)(temp_r5_10) + (0x81)))) {
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80D69D8;
+        arg0->handler = &sub_80D69D8;
     }
 }
 
@@ -599,9 +599,9 @@ asm_unified(".include \"asm/nonmatching/sub_80D99F0.s\"");
 s32 sub_8082B00();                                  /* extern */
 extern s32 sub_80D9B9C;
 
-void sub_80D9A7C(void *arg0) {
+void sub_80D9A7C(struct Entity *arg0) {
     if (sub_8082B00() == 0) {
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80D9B9C;
+        arg0->handler = &sub_80D9B9C;
     }
 }
 
