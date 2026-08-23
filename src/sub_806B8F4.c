@@ -9,6 +9,10 @@ asm_unified(".include \"asm/macros.inc\"");
 
 
 
+
+void sub_806BD00(void *arg0);
+s32 sub_8082E1C();
+
 s32 sub_807C298();
 extern s32 sub_806B824;
 int sub_8086D80();
@@ -92,8 +96,7 @@ asm_unified(".include \"asm/nonmatching/sub_806BC40.s\"");
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 s32 sub_8086858(void *, s32);                       /* extern */
 extern s32 sub_806BEA8;
-extern s32 sub_806BF70;
-
+void sub_806BF70(void *arg0);
 void sub_806BC40(void *arg0) {
     s32 var_r1_58;
     u16 temp_r0_17;
@@ -118,7 +121,7 @@ void sub_806BC40(void *arg0) {
             }
             *(s32 *)0x03000E3C = sub_8086858(arg0, var_r1_58);
             (*(s32 **)((s8 *)(arg0) + (0x58))) = &sub_806BEA8;
-            (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_806BF70;
+            (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_806BF70;
         }
     }
 }
@@ -230,8 +233,7 @@ asm_unified(".include \"asm/nonmatching/sub_806BEA8.s\"");
 s32 sub_80DF024(s32, s32, s32, s32, void *);    /* extern */
 s32 sub_810DD7C(void *, void *, s32);           /* extern */
 extern s32 sub_806BDA4;
-extern s32 sub_806BF70;
-
+void sub_806BF70(void *arg0);
 s32 sub_806BEA8(void *arg0, void *arg1) {
     s32 *var_r0_40;
     s32 var_r1_10;
@@ -253,7 +255,7 @@ s32 sub_806BEA8(void *arg0, void *arg1) {
     sub_80DF024(0x1C4A, var_r1_10 >> 8, var_r2_16 >> 8, var_r3_22 >> 8, arg0);
     sub_810DD7C(arg0, arg1, 0xFF);
     if ((*(s32 *)((s8 *)(arg0) + (0x84))) == 0) {
-        var_r0_40 = &sub_806BF70;
+        var_r0_40 = (s32 *) &sub_806BF70;
     } else {
         var_r0_40 = &sub_806BDA4;
     }
@@ -301,15 +303,19 @@ void sub_806BF0C(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_806BF70.s\"");
-#else
-/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
-   compiles a whole translation unit at a time, so an #error here fails
-   every OTHER function in this file under NONMATCHING=1. Guard intact, so
-   the real ROM still gets the verbatim retail bytes and progress.py still
-   counts this as unmatched. Write the C here, replacing this comment. */
-#endif
+void sub_806BF70(void *arg0) {
+    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+        if ((*(s32 *)((s8 *)(arg0) + (0xA8))) == 0) {
+            sub_8082E1C(arg0, 0xA, 0, 0);
+            sub_8082E1C((*(void **)((s8 *)(arg0) + (0x30))), 0xA, 0, 0);
+        } else {
+            sub_8082E1C(arg0, 0x12, 0, 0);
+            sub_8082E1C((*(void **)((s8 *)(arg0) + (0x30))), 0x12, 0, 0);
+        }
+        (*(s16 *)((s8 *)(arg0) + (0xAC))) = 8;
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_806BD00;
+    }
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_806BFD4.s\"");
