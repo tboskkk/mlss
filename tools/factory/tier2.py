@@ -39,6 +39,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import db  # noqa: E402
 import gitops  # noqa: E402
+import rescore_seeds  # noqa: E402
 
 REPO = gitops.REPO
 
@@ -444,10 +445,40 @@ def already_matches(name: str, candidate_body: str | None) -> bool:
     in the DB (resolve(..., body=...)) and the validator re-splices from
     there, and the permuter path re-splices for itself in
     ensure_isolated().
+
+    MEASURED IN A PLAIN BUILD, which is the whole point and was the bug.
+
+    This used to splice into the #else branch and call
+    gitops.asm_differ_matches(), which rebuilds with NONMATCHING=1 (see
+    diff_settings.py) and diffs OBJECTS. CLAUDE.md section P documents exactly
+    why that verdict is worthless: under NONMATCHING=1 every sibling still on
+    the empty "no C attempt yet" placeholder DOES NOT EXIST while expected/
+    holds all of them, so the score is dominated by whatever happens to follow
+    the function in its file. P measured the same candidate at 0 in a plain
+    build and 13,467 under NONMATCHING.
+
+    P fixed that on the VALIDATOR's promotion path and stopped there. This is
+    the OTHER promotion path -- a permuter win arrives here first, and if this
+    check says no, the row is filed "permuter reached score 0 in isolation but
+    no declaration prefix made it match in its real source file" and sent back
+    to be searched again from nothing. Measured after the iso_score re-ranking
+    started feeding the pool near-misses: 27 permuter zeros in two hours, 5
+    matched, and 12 filed under exactly that note. Section Q had reported that
+    failure count driven to zero; it was only ever driven to zero for the
+    validator.
     """
     if not candidate_body:
         return False
     with gitops.repo_lock(what=f"tier2 precheck {name}"):
+        try:
+            score = rescore_seeds.plain_score(name, candidate_body)
+        except Exception:
+            score = None
+        if score is not None:
+            return score == 0
+        # No readable plain-build verdict -- fall back to the legacy check
+        # rather than silently answering "no", which would throw the
+        # candidate away. Same defensive shape the validator uses.
         c_path = gitops.splice_into_else(name, candidate_body)
         if c_path is None:
             return False
