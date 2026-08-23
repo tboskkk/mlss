@@ -2310,10 +2310,33 @@ these two.
 declare what a spliced candidate references. Those candidates are correct C
 that this toolchain cannot build. They are NOT permuter work and NOT seed
 quality problems, and any sweep that files them as "does not compile" is
-mislabelling them. The tractable route, as in section S, is probably to stop
-emitting `-ffix-debug-line` for the affected object rather than to keep
-hunting for a safe insertion point -- untested, and it must be proven
-byte-identical before it could ship.
+mislabelling them.
+
+**CORRECTION, tested rather than assumed: `-ffix-debug-line` is NOT the
+villain, and dropping it makes things WORSE.** The obvious fix -- and what an
+earlier version of this entry proposed -- is to stop emitting the flag for the
+affected object. Measured with three from-scratch ROM builds under the repo
+lock:
+
+    A) normal flags                    -> mlss.gba: OK
+    B) CFLAGS without -ffix-debug-line  -> asm/macros.inc:1: junk at end of
+                                           line, on build/src/sub_801B748.o
+    C) normal flags again              -> restored
+
+So the flag is doing exactly what the Makefile comment says it does ("fixes
+debug lines so they are emitted properly"): it SUPPRESSES this failure in the
+general case, and removing it re-introduces the identical error on a different
+object. Section S's framing -- and T.9's own first draft -- treated the flag as
+the trigger. It is a partial fix for a deeper agbcc debug-line bug, and the
+`declare_missing` case is one the fix does not cover.
+
+That closes off the route this entry originally recommended. What has NOT been
+tried: dropping `-g` for the affected object (debug info should not reach
+`.text`, but that must be proven byte-identical, not assumed), and finding an
+insertion point for the declarations that the debug-line emitter survives.
+Test either on the single affected object, not the whole ROM -- three full
+builds cost about 40 minutes and a one-object compile answers the same
+question.
 
 **T.8 -- measuring ONE SYMBOL ALONE finds finished work by the hundred, in
 seconds.** `tools/factory/isolation_exact.py`.
