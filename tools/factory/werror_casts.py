@@ -38,6 +38,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import db  # noqa: E402
+import declare_missing  # noqa: E402
 import gitops  # noqa: E402
 
 # Warnings agbcc emits, with the side that needs the cast.
@@ -47,6 +48,18 @@ WARN_RE = re.compile(
 LAX_CFLAGS = ("CFLAGS=-O2 -mthumb-interwork -fno-common -Wparentheses "
               "-g -ffix-debug-line")
 MAX_ROUNDS = 6
+
+
+_ROM_SYMS: frozenset[str] | None = None
+
+
+def _rom_symbols() -> set[str]:
+    """Cached ROM symbol set for declare_missing. Same source as
+    rescore_seeds.known(), read directly to avoid an import cycle."""
+    global _ROM_SYMS
+    if _ROM_SYMS is None:
+        _ROM_SYMS = frozenset(declare_missing.rom_symbols())
+    return set(_ROM_SYMS)
 
 
 def _compile(stem: str, lax: bool) -> subprocess.CompletedProcess:
@@ -156,6 +169,37 @@ def apply(name: str, body: str) -> tuple[str | None, str]:
         return None, "no guard block"
     stem = c_path.stem
     try:
+        # DECLARE FIRST, THEN CAST. Order matters, and the wrong order turns
+        # this whole tool into a no-op on exactly the functions it exists for.
+        #
+        # The precondition below ("compiles with warnings allowed") is a test
+        # of whether the only thing standing between this candidate and a
+        # clean build is -Werror. But a spliced candidate routinely brings a
+        # reference to a sibling declared nowhere -- defined LATER in the same
+        # file, so agbcc reports `X undeclared` / `used prior to declaration`.
+        # That is a hard error, it survives LAX_CFLAGS, and the precondition
+        # then rejects the candidate with "fails even with warnings allowed (a
+        # real error, not -Werror)" -- which is TRUE as measured and false
+        # about the candidate.
+        #
+        # Measured on sub_805DE90 and sub_809A120, both of whose candidates
+        # compile instruction-for-instruction identical to retail in
+        # isolation: declare_missing supplies one line
+        # (`void sub_805DEB4(void *arg0);`), the hard error disappears, and
+        # what remains is a single `assignment from incompatible pointer type`
+        # warning -- precisely this tool's target class (CLAUDE.md section G:
+        # ~22% of the non-compiling pile is -Werror and nothing else).
+        #
+        # Same shape as section M's sequencing lesson ("unblock first, rescue
+        # second"): a repair that runs before its prerequisite measures the
+        # prerequisite's failure and blames the thing it was asked to fix.
+        #
+        # The declarations are reverted with the rest of the file by the
+        # `finally` below, which is correct -- this is a predicate, and
+        # rescore_seeds.plain_score() re-runs declare_missing itself on the
+        # promotion path. They only need to exist while we decide.
+        declare_missing.repair_in_place(stem, _rom_symbols(), nonmatching=True)
+
         lax = _compile(stem, lax=True)
         if lax.returncode != 0:
             return None, "fails even with warnings allowed (a real error, not -Werror)"

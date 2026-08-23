@@ -209,6 +209,7 @@ def splice_into_else(name: str, body: str) -> Path | None:
     c_path, block = find_guard_block(name)
     if c_path is None:
         return None
+    body = _repair_body_decls(c_path, body)
     text = c_path.read_text()
     needle = f"asm/nonmatching/{name}.s"
     new_block = re.sub(
@@ -239,6 +240,7 @@ def splice_candidate(name: str, body: str) -> Path | None:
     c_path, block = find_guard_block(name)
     if c_path is None:
         return None
+    body = _repair_body_decls(c_path, body)
     text = c_path.read_text()
     new_text = text.replace(block, _dedupe_decls(text, block, body).strip() + "\n", 1)
     if new_text == text:
@@ -246,6 +248,43 @@ def splice_candidate(name: str, body: str) -> Path | None:
     c_path.write_text(new_text)
     _repair_self_declaration(c_path, name, body)
     return c_path
+
+
+def _repair_body_decls(c_path: Path, body: str) -> str:
+    """Fix declarations INSIDE the candidate that contradict the file.
+
+    The fourth shape of the decl/defn conflict, and the one that blocked the
+    promotion path (CLAUDE.md T.4). m2c declares a symbol DATA when the body
+    takes its address:
+
+        extern s32 sub_805DEB4;              <- in the CANDIDATE
+        ...
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_805DEB4;
+
+    while the destination FILE defines the same symbol as a function
+    (`void sub_805DEB4(void *arg0) { ... }`, often already MATCHED). Splicing
+    the two together is `X redeclared as different kind of symbol` and the
+    whole object dies.
+
+    This is distinct from _repair_self_declaration below, which fixes a stale
+    declaration of the symbol being DEFINED, at FILE scope. Here the bad
+    declaration is in the candidate and names some OTHER symbol.
+
+    fix_decl_conflicts.repair() already implements exactly this -- derive a
+    prototype from the file's own definition and cast the address-taken site,
+    byte-neutral because the linker sets a function pointer's Thumb bit from
+    the SYMBOL's type. It was only ever called from rescue_isolated_zeros.py,
+    so nothing on the seed or validator path benefited. Doing it here means
+    every consumer of both splice primitives does.
+
+    Returns the (possibly repaired) body; never raises.
+    """
+    try:
+        import fix_decl_conflicts
+        repaired, _syms = fix_decl_conflicts.repair(body, c_path.read_text())
+    except Exception:
+        return body
+    return repaired if repaired else body
 
 
 def _repair_self_declaration(c_path: Path, name: str, body: str) -> bool:
