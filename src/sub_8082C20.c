@@ -7,15 +7,11 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8082C20.s\"");
-#else
-void sub_8082C20(s32 arg0, s32 *arg1, s32 *arg2, s32 *arg3) {
-    *arg1 -= M2C_ERROR(/* unknown instruction: ldsh $r5, ($mem_loc_fictive_) */);
-    *arg2 -= M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */);
+void sub_8082C20(void *arg0, s32 *arg1, s32 *arg2, s32 *arg3) {
+    *arg1 -= (*(s16 *)((s8 *)(arg0) + (0x774)));
+    *arg2 -= (*(s16 *)((s8 *)(arg0) + (0x776)));
     *arg3 += 0x1F0;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8082C58.s\"");
