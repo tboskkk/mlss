@@ -2197,6 +2197,47 @@ apply the same transformations the splice does, or it under-reports.
 four rows under "X redeclared" that the real path now fixes; simulating the
 repairs turned those into requeues.
 
+**T.9 -- `declare_missing` can turn a fixable `-Werror` warning into an
+UNFIXABLE assembler error, and it is section S wearing different clothes.**
+
+Section S records that adding a struct to `include/common.h` breaks the build
+with `asm/macros.inc:1: Error: junk at end of line, first unrecognized
+character is '@'` -- an error naming a file that is untouched and correct --
+and that the trigger is the struct's POSITION, with no stable position.
+
+**It is not limited to structs, and not limited to headers.** Adding ordinary
+declaration LINES to a `src/*.c` does it too. Measured on `sub_8106928`, A/B
+under the repo lock:
+
+    A) splice only                       -> 3x `implicit declaration of ...`
+                                            (a -Werror warning; fixable)
+    B) splice + declare_missing's 3 lines -> the C compiles CLEANLY, and the
+                                            ASSEMBLER dies with
+                                            asm/macros.inc:1: junk at end of line
+
+So `declare_missing` did its job correctly -- and converted a tractable
+problem into an intractable one. That is why 27 of the 61 candidates left
+after the batch drain report "clean under -Werror, object byte-identical" from
+`werror_casts` (which measures in a `NONMATCHING=1` build) while the plain
+build rejects them: N.1's "a repair measured in one build mode, gated in the
+other", stacked on top of an agbcc codegen bug.
+
+Tried and did NOT work: appending the declarations to an existing line so the
+file's line COUNT is unchanged. Picking that line automatically is the hard
+part -- the obvious heuristics land on a preprocessor directive (`extra tokens
+at end of '#include'`) or inside a function body (declarations end up in the
+wrong scope). Not pursued further; recorded so the next attempt starts past
+these two.
+
+**What this means practically:** for some files there is currently no way to
+declare what a spliced candidate references. Those candidates are correct C
+that this toolchain cannot build. They are NOT permuter work and NOT seed
+quality problems, and any sweep that files them as "does not compile" is
+mislabelling them. The tractable route, as in section S, is probably to stop
+emitting `-ffix-debug-line` for the affected object rather than to keep
+hunting for a safe insertion point -- untested, and it must be proven
+byte-identical before it could ship.
+
 **T.8 -- measuring ONE SYMBOL ALONE finds finished work by the hundred, in
 seconds.** `tools/factory/isolation_exact.py`.
 
