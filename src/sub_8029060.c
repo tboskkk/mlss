@@ -7,17 +7,9 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8029060.s\"");
-#else
-u8 sub_8029060(u8 param_1) {
-    u8* puVar1;
-    
-    puVar1 = &param_1;
-    *puVar1 = *puVar1 | 2;
-    return param_1;
+void sub_8029060(void *arg0) {
+    (*(u8 *)((s8 *)(arg0) + (0x12C))) = (u8) ((*(u8 *)((s8 *)(arg0) + (0x12C))) | 2);
 }
-#endif
 
 void sub_8029070(void *arg0) {
     (*(u8 *)((s8 *)(arg0) + (0x12C))) = (u8) ((*(u8 *)((s8 *)(arg0) + (0x12C))) | 1);
