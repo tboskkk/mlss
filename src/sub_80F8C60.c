@@ -7,15 +7,11 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80F8C60.s\"");
-#else
 void sub_80F8C60(void *arg0, void *arg1) {
     if ((*(s32 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x2C)))) + (0x1788))) & 0x4000) {
         (*(u16 *)((s8 *)(arg1) + (0xA0))) = (u16) (0xFDFF & (*(u16 *)((s8 *)(arg1) + (0xA0))));
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80F8C8C.s\"");

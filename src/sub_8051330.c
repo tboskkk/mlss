@@ -18,9 +18,6 @@ void sub_8051330(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8051368.s\"");
-#else
 s32 sub_8021ED8(s32);                           /* extern */
 
 void sub_8051368(void *arg0) {
@@ -28,7 +25,6 @@ void sub_8051368(void *arg0) {
     sub_8021ED8((*(s32 *)((s8 *)(arg0) + (0x294))));
     (*(s8 *)((s8 *)(arg0) + (0x23D))) = 7;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_805139C.s\"");

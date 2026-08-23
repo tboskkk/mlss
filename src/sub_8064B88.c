@@ -64,11 +64,6 @@ void sub_8064C00(void *arg0)
   }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8064C80.s\"");
-#else
-s32 sub_807C298(void *);                        /* extern */
-
 void sub_8064C80(void *arg0) {
     void *temp_r1_8;
 
@@ -79,7 +74,6 @@ void sub_8064C80(void *arg0) {
         sub_807C298(arg0);
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8064CB0.s\"");

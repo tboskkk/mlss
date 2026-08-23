@@ -21,9 +21,6 @@ void sub_80F75B4(s32 arg0) {
     (*(s32 *)((s8 *)(temp_r2_12) + (0x1788))) = (s32) ((*(s32 *)((s8 *)(temp_r2_12) + (0x1788))) | arg0);
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80F75D8.s\"");
-#else
 void sub_80F75D8(s32 arg0) {
     void *temp_r2_12;
 
@@ -31,7 +28,6 @@ void sub_80F75D8(s32 arg0) {
     (*(s32 *)((s8 *)(temp_r2_12) + (0x1788))) = (s32) ((*(s32 *)((s8 *)(temp_r2_12) + (0x1788))) | arg0);
     (*(s32 *)((s8 *)(temp_r2_12) + (0x1798))) = (s32) ((*(s32 *)((s8 *)(temp_r2_12) + (0x1798))) | arg0);
 }
-#endif
 
 s32 sub_810C950();                              /* extern */
 s32 sub_810CA30();                              /* extern */

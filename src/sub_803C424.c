@@ -16,9 +16,6 @@ void sub_803C424(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_803C440.s\"");
-#else
 s32 sub_803C440(void *arg0) {
     s32 var_r1_7;
     s8 temp_r0_17;
@@ -30,7 +27,6 @@ s32 sub_803C440(void *arg0) {
     }
     return var_r1_7;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_803C468.s\"");

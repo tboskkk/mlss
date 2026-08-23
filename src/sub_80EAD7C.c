@@ -23,14 +23,20 @@ u32 sub_80EAD7C(u32 param_1) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80EAD98.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+s32 sub_80EAD98(s32 arg0, s32 arg1, s32 *arg2) {
+    s8 *var_r0_12;
+    s8 var_r1_13;
+
+    if (*arg2 == 0) {
+        var_r0_12 = (void *)(*(s32 *)0x03000D44 + 0x29);
+        var_r1_13 = 1;
+    } else {
+        var_r0_12 = (void *)(*(u32 *)0x03000D44 + 0x29);
+        var_r1_13 = 0xFF;
+    }
+    *var_r0_12 = var_r1_13;
+    return 1;
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80EADC4.s\"");
