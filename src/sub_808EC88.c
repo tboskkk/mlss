@@ -21,17 +21,14 @@ s32 sub_808EC88(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_808ECDC.s\"");
-#else
 s32 sub_808ED40(void *);                        /* extern */
 s32 sub_808EDA8(void *);                        /* extern */
 extern s32 sub_8087540;
 
 s32 sub_808ECDC(void *arg0) {
-    s32 temp_r1_11;
+    s16 temp_r1_11;
 
-    temp_r1_11 = M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */);
+    temp_r1_11 = (*(s16 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x28)))) + (0xEC)));
     if (temp_r1_11 == -1) {
         sub_808EDA8(arg0);
     } else if (temp_r1_11 == -2) {
@@ -40,7 +37,6 @@ s32 sub_808ECDC(void *arg0) {
     (*(s32 **)((s8 *)(arg0) + (0x68))) = &sub_8087540;
     return 1;
 }
-#endif
 
 s32 sub_808E0F0(void *);                        /* extern */
 s32 sub_808E650(void *);                        /* extern */
