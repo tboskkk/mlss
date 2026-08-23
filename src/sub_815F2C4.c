@@ -144,13 +144,10 @@ void sub_815F56C(s32 arg0, s32 arg2) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_815F58C.s\"");
-#else
 s32 sub_815FAFC();                              /* extern */
-s32 sub_815FB14(void *, s32);                   /* extern */
 
 void sub_815F58C(void *arg0, s32 arg1) {
+    void *temp_r1_18;
     void *temp_r2_15;
 
     (*(s32 *)((s8 *)(arg0) + (0x30))) = 0x08CDCF10;
@@ -158,12 +155,12 @@ void sub_815F58C(void *arg0, s32 arg1) {
         sub_815FAFC();
         temp_r2_15 = (*(void **)((s8 *)(arg0) + (0x3C)));
         if (temp_r2_15 != NULL) {
-            (*(s32 (**)(void *, s32))((s8 *)((*(void **)((s8 *)(temp_r2_15) + (0x30)))) + (0xC)))(temp_r2_15 + M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */), 3);
+            temp_r1_18 = (*(void **)((s8 *)(temp_r2_15) + (0x30)));
+            (*(s32 (**)(void *, s32))((s8 *)(temp_r1_18) + (0xC)))(temp_r2_15 + (*(s16 *)((s8 *)(temp_r1_18) + (8))), 3);
         }
     }
     sub_815FB14(arg0, arg1);
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_815F5C8.s\"");
