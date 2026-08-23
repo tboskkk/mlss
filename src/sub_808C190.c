@@ -15,6 +15,9 @@ asm_unified(".include \"asm/macros.inc\"");
 
 
 
+
+void sub_808C83C(void *arg0);
+
 s32 sub_8082E1C();
 void sub_808C510(void *arg0);
 
@@ -177,12 +180,11 @@ void sub_808C3E4(void *arg0) {
 }
 
 s32 sub_80873B8(void *, s32, s32);              /* extern */
-extern s32 sub_808C6BC;
-
+void sub_808C6BC(void *arg0);
 void sub_808C408(void *arg0) {
     (*(s16 *)((s8 *)(arg0) + (0xAC))) = 5;
     sub_80873B8(arg0, 2, 5);
-    (*(s32 **)((s8 *)(arg0) + (0x50))) = &sub_808C6BC;
+    (*(s32 **)((s8 *)(arg0) + (0x50))) = (s32 *) &sub_808C6BC;
 }
 
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
