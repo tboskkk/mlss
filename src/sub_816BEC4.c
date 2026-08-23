@@ -216,14 +216,55 @@ asm_unified(".include \"asm/nonmatching/sub_816D538.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_816D580.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+s32 process_enable(s32);                        /* extern */
+s32 process_remove(void *, s32);                /* extern */
+s32 sub_8150A38();                              /* extern */
+s32 sub_8163280(s32, s32);                      /* extern */
+s32 sub_8163308(void *, s32);                   /* extern */
+s32 sub_8165144(s32, s32);                      /* extern */
+
+void sub_816D580(void *arg0, s32 arg1) {
+    s32 temp_r0_32;
+    s32 temp_r0_38;
+    void *temp_r0_11;
+    void *temp_r0_16;
+    void *temp_r1_24;
+    void *temp_r1_47;
+    void *temp_r2_21;
+    void *temp_r2_44;
+
+    (*(s32 *)((s8 *)(arg0) + (0x18))) = 0x08CDD208;
+    temp_r0_11 = (*(void **)((s8 *)(arg0) + (0x3C)));
+    if (temp_r0_11 != NULL) {
+        free_heap_8018DA8(temp_r0_11);
+    }
+    temp_r0_16 = (*(void **)((s8 *)(arg0) + (0x38)));
+    if (temp_r0_16 != NULL) {
+        free_heap_8018DA8(temp_r0_16);
+    }
+    temp_r2_21 = (*(void **)((s8 *)(arg0) + (0x20)));
+    if (temp_r2_21 != NULL) {
+        temp_r1_24 = (*(void **)((s8 *)(temp_r2_21) + (0x18)));
+        (*(s32 (**)(void *, s32))((s8 *)(temp_r1_24) + (0x14)))(temp_r2_21 + (*(s16 *)((s8 *)(temp_r1_24) + (0x10))), 3);
+    }
+    temp_r0_32 = (*(s32 *)((s8 *)(arg0) + (0x40)));
+    if (temp_r0_32 != 0) {
+        sub_8163280(temp_r0_32, 3);
+    }
+    temp_r0_38 = (*(s32 *)((s8 *)(arg0) + (0x28)));
+    if (temp_r0_38 != 0) {
+        sub_8165144(temp_r0_38, 3);
+    }
+    temp_r2_44 = (*(void **)((s8 *)(arg0) + (0x1C)));
+    if (temp_r2_44 != NULL) {
+        temp_r1_47 = (*(void **)((s8 *)(temp_r2_44) + (0xC)));
+        (*(s32 (**)(void *, s32))((s8 *)(temp_r1_47) + (0xC)))(temp_r2_44 + (*(s16 *)((s8 *)(temp_r1_47) + (8))), 3);
+    }
+    sub_8150A38();
+    process_enable((*(s32 *)((s8 *)(arg0) + (0x14))));
+    sub_8163308(arg0 + 0x4C, 2);
+    process_remove(arg0, arg1);
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_816D608.s\"");
