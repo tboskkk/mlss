@@ -144,15 +144,54 @@ asm_unified(".include \"asm/nonmatching/sub_80683C4.s\"");
    counts this as unmatched. Write the C here, replacing this comment. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80684B0.s\"");
-#else
-/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
-   compiles a whole translation unit at a time, so an #error here fails
-   every OTHER function in this file under NONMATCHING=1. Guard intact, so
-   the real ROM still gets the verbatim retail bytes and progress.py still
-   counts this as unmatched. Write the C here, replacing this comment. */
-#endif
+s32 stop_sfx_80195A8(s32);                      /* extern */
+extern s32 sub_80688B8;
+void sub_80684B0(void *arg0)
+{
+  s32 temp_r5_58;
+  long temp_r2_11;
+  void *temp_r1_82;
+  temp_r2_11 = (*((u16 *) (((s8 *) arg0) + 0xAC))) + 1;
+  *((u16 *) (((s8 *) arg0) + 0xAC)) = temp_r2_11;
+  if ((*((s32 *) (((s8 *) arg0) + 0xA8))) == 0)
+  {
+    if (((s16) temp_r2_11) == 0x1E)
+    {
+      play_sfx_80195B4(0x63, -1);
+    }
+  }
+  else
+    if (((s16) temp_r2_11) == 0xA)
+  {
+    play_sfx_80195B4(0x63, -1);
+  }
+  if (8 & (*((u8 *) (((s8 *) (*((void **) (((s8 *) arg0) + 8)))) + 0x12))))
+  {
+    if ((*((s32 *) (((s8 *) arg0) + 0xA8))) == 0)
+    {
+      stop_sfx_80195A8(0x11B);
+    }
+    else
+    {
+      stop_sfx_80195A8(0x11B);
+    }
+    temp_r5_58 = *((s32 *) (((s8 *) arg0) + 0xA8));
+    if (temp_r5_58 == 0)
+    {
+      sub_8082E1C(arg0, 3, 0, 0);
+      *((u16 *) (((s8 *) arg0) + 0xAC)) = (u16) temp_r5_58;
+    }
+    else
+    {
+      sub_8082E1C(arg0, 6, 0, 0);
+      *((u16 *) (((s8 *) arg0) + 0xAC)) = 3U;
+    }
+    temp_r1_82 = *((void **) (((s8 *) arg0) + 0x30));
+    *((s32 *) (((s8 *) temp_r1_82) + 0x10)) = (s32) ((*((s32 *) (((s8 *) arg0) + 0x38))) + 0x2200);
+    *((s32 *) (((s8 *) temp_r1_82) + 0x14)) = (s32) (*((s32 *) (((s8 *) arg0) + 0x3C)));
+    *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_80688B8;
+  }
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_806856C.s\"");
