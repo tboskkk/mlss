@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start sub_8057F60
-sub_8057F60:
 	push {lr}
 	mov r12, r0
 	lsls r1, r1, #0x18

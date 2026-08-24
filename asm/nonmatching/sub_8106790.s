@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start sub_8106790
-sub_8106790:
 	push {lr}
 	adds r2, r0, #0x0
 	ldr r0, _081067C8 @ =0x03000FD8
