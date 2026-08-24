@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start time_init
-time_init:
 	push {r4, r5, lr}
 	adds r5, r0, #0x0
 	lsls r1, r1, #0x18

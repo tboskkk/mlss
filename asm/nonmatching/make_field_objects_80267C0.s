@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start make_field_objects_80267C0
-make_field_objects_80267C0: @ 080267C0
 	push {r4, r5, r6, r7, lr}
 	mov r7, r8
 	push {r7}

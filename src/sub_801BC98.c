@@ -7,27 +7,8 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_801BC98.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
-
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/time_init.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
-
-s32 sub_801BC98(s32, s32);                      /* extern */
-
-void sub_801BD30(void) {
+ASM_FUNC("asm/nonmatching/sub_801BC98.s", s32 sub_801BC98(s32 arg0, s32 arg1));
+ASM_FUNC("asm/nonmatching/time_init.s", s32 time_init(void *arg0, u8 arg1, s32 arg2));void sub_801BD30(void) {
     s32 temp_r0_8;
 
     temp_r0_8 = *(s32 *)0x03000D44;
@@ -38,7 +19,6 @@ void sub_801BD30(void) {
 }
 
 s32 process_disable();                          /* extern */
-s32 time_init(void *, u8, s32);                     /* extern */
 void sub_801BD50(unsigned int arg0)
 {
   if ((*((s32 *) 0x03000D44)) == 0)
@@ -48,11 +28,4 @@ void sub_801BD50(unsigned int arg0)
   }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_801BD88.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+ASM_FUNC("asm/nonmatching/sub_801BD88.s", void * sub_801BD88(void *arg0, u16 arg1, u16 arg2, u8 arg3));
