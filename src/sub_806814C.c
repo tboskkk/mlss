@@ -27,14 +27,14 @@ void sub_806814C(struct Entity *arg0) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8068168.s\"");
 #else
-extern s32 sub_8067DC8;
+void sub_8067DC8(void *arg0);                       /* extern */
 
 s32 sub_8068168(void *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0x9C))) == 0) {
         (*(s32 *)((s8 *)(arg0) + (0x9C))) = 2;
         (*(s32 *)((s8 *)((arg0 + 0x9C)) + (4))) = 1;
     }
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8067DC8;
+    (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_8067DC8;
     return 1;
 }
 #endif
@@ -87,7 +87,7 @@ asm_unified(".include \"asm/nonmatching/sub_80681EC.s\"");
    counts this as unmatched. Write the C here, replacing this comment. */
 #endif
 
-extern s32 sub_8067E4C;
+void sub_8067E4C(void *arg0, s32 arg3);                       /* extern */
 void sub_806822C(void *arg0)
 {
   int temp_r0_17;
@@ -98,7 +98,7 @@ void sub_806822C(void *arg0)
     if (((s32) (temp_r0_17 << 0x10)) <= 0)
     {
       sub_8082E1C(arg0, 7, 0, 0);
-      *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_8067E4C;
+      *((s32 **) (((s8 *) arg0) + 0x4C)) = (s32 *) &sub_8067E4C;
     }
   }
 }
@@ -114,12 +114,12 @@ void sub_8068274(struct Entity *arg0) {
     }
 }
 
-extern s32 sub_8067A84;
+void sub_8067A84(void *arg0, s32 arg3);                       /* extern */
 
 void sub_806829C(struct Entity *arg0) {
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
         sub_8082E1C(arg0, 3, 0, 0);
-        arg0->handler = &sub_8067A84;
+        arg0->handler = (s32 *) &sub_8067A84;
     }
 }
 

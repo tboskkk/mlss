@@ -210,7 +210,7 @@ asm_unified(".include \"asm/nonmatching/sub_8112F40.s\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8112FFC.s\"");
 #else
-extern s32 sub_811308C;
+void sub_811308C(void *arg0);                       /* extern */
 
 void sub_8112FFC(void *arg0) {
     u16 temp_r0_50;
@@ -225,7 +225,7 @@ void sub_8112FFC(void *arg0) {
     if ((s32) M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */) <= (s32) (s16) temp_r0_50) {
         (*(s32 *)((s8 *)(arg0) + (0x10))) = (s32) (*(s32 *)((s8 *)(arg0) + (0x84)));
         (*(s32 *)((s8 *)(arg0) + (0x14))) = (s32) (*(s32 *)((s8 *)(arg0) + (0x88)));
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_811308C;
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_811308C;
     }
 }
 #endif

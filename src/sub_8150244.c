@@ -53,7 +53,7 @@ s32 sub_8139AA0(void *);                        /* extern */
 s32 sub_814FC88(void *);                        /* extern */
 extern s32 sub_813B360;
 extern s32 sub_813B380;
-extern s32 sub_814F06C;
+void sub_814F06C(s32 arg0, void *arg1, s32 **arg2);                       /* extern */
 
 void sub_81502A8(s32 arg0, void *arg1) {
     void *temp_r1_17;
@@ -68,7 +68,7 @@ void sub_81502A8(s32 arg0, void *arg1) {
     (*(u8 *)((s8 *)(arg1) + (0x1D6))) = (u8) (-2 & (*(u8 *)((s8 *)(arg1) + (0x1D6))));
     (*(s32 **)((s8 *)(arg1) + (0x198))) = &sub_813B380;
     (*(s32 **)((s8 *)(arg1) + (0x1A0))) = &sub_813B360;
-    (*(s32 **)((s8 *)(arg1) + (0x1A4))) = &sub_814F06C;
+    (*(s32 **)((s8 *)(arg1) + (0x1A4))) = (s32 *) &sub_814F06C;
 }
 #endif
 

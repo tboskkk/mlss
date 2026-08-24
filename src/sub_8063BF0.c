@@ -15,11 +15,11 @@ asm_unified(".include \"asm/macros.inc\"");
 
 s32 sub_807C298();
 
-extern s32 sub_8063CC8;
+void sub_8063CC8(void *arg0);                       /* extern */
 
-extern s32 sub_8063FC0;
+void sub_8063FC0(void *arg0, s32 arg3);                       /* extern */
 
-extern s32 sub_8064424;
+void sub_8064424(void *arg0);                       /* extern */
 int sub_8086D80();
 
 void sub_80643DC(void *arg0);
@@ -92,46 +92,10 @@ void sub_8063C8C(void *arg0)
   }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8063CC8.s\"");
-#else
-/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
-   compiles a whole translation unit at a time, so an #error here fails
-   every OTHER function in this file under NONMATCHING=1. Guard intact, so
-   the real ROM still gets the verbatim retail bytes and progress.py still
-   counts this as unmatched. Write the C here, replacing this comment. */
-#endif
-
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8063F30.s\"");
-#else
-/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
-   compiles a whole translation unit at a time, so an #error here fails
-   every OTHER function in this file under NONMATCHING=1. Guard intact, so
-   the real ROM still gets the verbatim retail bytes and progress.py still
-   counts this as unmatched. Write the C here, replacing this comment. */
-#endif
-
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8063FC0.s\"");
-#else
-/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
-   compiles a whole translation unit at a time, so an #error here fails
-   every OTHER function in this file under NONMATCHING=1. Guard intact, so
-   the real ROM still gets the verbatim retail bytes and progress.py still
-   counts this as unmatched. Write the C here, replacing this comment. */
-#endif
-
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8064184.s\"");
-#else
-/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
-   compiles a whole translation unit at a time, so an #error here fails
-   every OTHER function in this file under NONMATCHING=1. Guard intact, so
-   the real ROM still gets the verbatim retail bytes and progress.py still
-   counts this as unmatched. Write the C here, replacing this comment. */
-#endif
-
+ASM_FUNC("asm/nonmatching/sub_8063CC8.s", void sub_8063CC8(void *arg0));
+ASM_FUNC("asm/nonmatching/sub_8063F30.s", void sub_8063F30(void *arg0));
+ASM_FUNC("asm/nonmatching/sub_8063FC0.s", void sub_8063FC0(void *arg0, s32 arg3));
+ASM_FUNC("asm/nonmatching/sub_8064184.s", void sub_8064184(void *arg0));
 void sub_806432C(void *arg0);
 s32 sub_8064224(void *arg0)
 {
@@ -174,22 +138,13 @@ s32 sub_8064290(void *arg0)
   if (var_r0_8 == 0)
   {
     var_r0_8 = 0x4C;
-    *((s32 **) (arg0 + var_r0_8)) = &sub_8064424;
+    *((s32 **) (arg0 + var_r0_8)) = (s32 *) &sub_8064424;
     var_r0_8 = 0;
   }
   return var_r0_8;
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80642AC.s\"");
-#else
-/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
-   compiles a whole translation unit at a time, so an #error here fails
-   every OTHER function in this file under NONMATCHING=1. Guard intact, so
-   the real ROM still gets the verbatim retail bytes and progress.py still
-   counts this as unmatched. Write the C here, replacing this comment. */
-#endif
-
+ASM_FUNC("asm/nonmatching/sub_80642AC.s", void sub_80642AC(void *arg0));
 void sub_806432C(void *arg0) {
     s32 temp_r0_15;
 
@@ -203,19 +158,10 @@ void sub_806432C(void *arg0) {
 
 void sub_8064354(struct Entity *arg0) {
     sub_8082E1C(arg0, 0x06, 0, 0);
-    arg0->handler = &sub_8063FC0;
+    arg0->handler = (s32 *) &sub_8063FC0;
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8064370.s\"");
-#else
-/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
-   compiles a whole translation unit at a time, so an #error here fails
-   every OTHER function in this file under NONMATCHING=1. Guard intact, so
-   the real ROM still gets the verbatim retail bytes and progress.py still
-   counts this as unmatched. Write the C here, replacing this comment. */
-#endif
-
+ASM_FUNC("asm/nonmatching/sub_8064370.s", void sub_8064370(void *arg0));
 s32 sub_807C298(void *);                        /* extern */
 void sub_80643DC(void *arg0)
 {
@@ -255,19 +201,10 @@ void sub_80643DC(void *arg0)
   }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8064424.s\"");
-#else
-/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
-   compiles a whole translation unit at a time, so an #error here fails
-   every OTHER function in this file under NONMATCHING=1. Guard intact, so
-   the real ROM still gets the verbatim retail bytes and progress.py still
-   counts this as unmatched. Write the C here, replacing this comment. */
-#endif
-
+ASM_FUNC("asm/nonmatching/sub_8064424.s", void sub_8064424(void *arg0));
 void sub_806446C(struct Entity *arg0) {
     sub_8082E1C(arg0, 0x03, 0, 0);
-    arg0->handler = &sub_8063CC8;
+    arg0->handler = (s32 *) &sub_8063CC8;
 }
 
 s32 sub_8082B00();                                  /* extern */
@@ -295,19 +232,10 @@ void sub_8064488(void *arg0)
   }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80644DC.s\"");
-#else
-/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
-   compiles a whole translation unit at a time, so an #error here fails
-   every OTHER function in this file under NONMATCHING=1. Guard intact, so
-   the real ROM still gets the verbatim retail bytes and progress.py still
-   counts this as unmatched. Write the C here, replacing this comment. */
-#endif
-
+ASM_FUNC("asm/nonmatching/sub_80644DC.s", void sub_80644DC(void *arg0));
 void sub_8064514(void *arg0) {
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
         sub_8082E1C(arg0, 3, 0, 0);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8063CC8;
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_8063CC8;
     }
 }

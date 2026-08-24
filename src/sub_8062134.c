@@ -28,7 +28,7 @@ void sub_8062134(struct Entity *arg0) {
 
 s32 sub_8082B00();
 s32 sub_8082E1C(void *, s32, s32, s32);
-extern s32 sub_8061B8C;
+void sub_8061B8C(void *arg0, s32 arg3);                       /* extern */
 extern s32 sub_808750C;
 void sub_8062150(void *arg0)
 {
@@ -41,7 +41,7 @@ void sub_8062150(void *arg0)
   if (sub_8082B00() == 0)
   {
     sub_8082E1C(arg0, 0xA, 0, 0);
-    var_r0_11 = &sub_8061B8C;
+    var_r0_11 = (s32 *) &sub_8061B8C;
     block_4:
     *((s32 **) (((s8 *) arg0) + 0x4C)) = var_r0_11;
 
@@ -54,7 +54,7 @@ asm_unified(".include \"asm/nonmatching/sub_8062188.s\"");
 s32 sub_807C298();                              /* extern */
 s32 sub_8082B00();                                  /* extern */
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
-extern s32 sub_80618A4;
+void sub_80618A4(void *arg0);                       /* extern */
 
 void sub_8062188(void *arg0) {
     s32 temp_r1_20;
@@ -72,7 +72,7 @@ void sub_8062188(void *arg0) {
             sub_8082E1C(arg0, 6, 0, 0);
             break;
         }
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80618A4;
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_80618A4;
     }
 }
 #endif

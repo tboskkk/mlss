@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start sub_805C644
-sub_805C644:
 	push {r4, r5, lr}
 	ldr r0, _0805C694 @ =0x03000DD0
 	ldrb r1, [r0, #0x0B]

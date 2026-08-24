@@ -11,7 +11,7 @@ asm_unified(".include \"asm/macros.inc\"");
 asm_unified(".include \"asm/nonmatching/sub_8108BE0.s\"");
 #else
 s32 sub_8082AAC(s32);                           /* extern */
-extern s32 sub_8108B84;
+void sub_8108B84(void *arg0);                       /* extern */
 
 void sub_8108BE0(void *arg0) {
     s32 *var_r0_29;
@@ -25,7 +25,7 @@ void sub_8108BE0(void *arg0) {
             var_r2_22 = 0x202B;
         }
         sub_8082AAC(var_r2_22);
-        var_r0_29 = &sub_8108B84;
+        var_r0_29 = (s32 *) &sub_8108B84;
     } else {
         (*(u8 *)((s8 *)(temp_r2_8) + (0x122))) = (u8) (-0x21 & (*(u8 *)((s8 *)(temp_r2_8) + (0x122))));
         var_r0_29 = NULL;

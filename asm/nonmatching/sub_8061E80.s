@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start sub_8061E80
-sub_8061E80:
 	push {r4, r5, r6, lr}
 	adds r5, r0, #0x0
 	ldr r1, [r5, #0x08]

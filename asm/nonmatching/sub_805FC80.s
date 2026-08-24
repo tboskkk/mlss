@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start sub_805FC80
-sub_805FC80:
 	push {r4, lr}
 	adds r4, r0, #0x0
 	bl sub_80871A8

@@ -9,10 +9,10 @@ asm_unified(".include \"asm/macros.inc\"");
 
 
 
-extern s32 sub_806A638;
+void sub_806A638(void *arg0);                       /* extern */
 int sub_810DD7C();
 
-extern s32 sub_8069558;
+void sub_8069558(void *arg0);                       /* extern */
 int sub_8082E1C();
 int sub_8086858();
 
@@ -24,85 +24,31 @@ void sub_806A2FC(void *arg0)
   {
     sub_8082E1C(arg0, 5, 0, 0);
     *((s32 *) 0x03000E3C) = sub_8086858(arg0, 0x1810);
-    *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_8069558;
+    *((s32 **) (((s8 *) arg0) + 0x4C)) = (s32 *) &sub_8069558;
     play_sfx_80195B4(0xAF, -1);
   }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_806A348.s\"");
-#else
-/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
-   compiles a whole translation unit at a time, so an #error here fails
-   every OTHER function in this file under NONMATCHING=1. Guard intact, so
-   the real ROM still gets the verbatim retail bytes and progress.py still
-   counts this as unmatched. Write the C here, replacing this comment. */
-#endif
-
+ASM_FUNC("asm/nonmatching/sub_806A348.s", void sub_806A348(void *arg0));
 s32 sub_8082B00();                                  /* extern */
-extern s32 sub_80694B4;
+void sub_80694B4(void *arg0);                       /* extern */
 
 void sub_806A3C0(void *arg0) {
     if (sub_8082B00() == 0) {
         sub_8082E1C(arg0, 2, 0, 0);
         (*(s32 *)((s8 *)(arg0) + (0x8C))) = 0x300;
         (*(s32 *)((s8 *)((arg0 + 0x8C)) + (0x1C))) = 0x66;
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80694B4;
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_80694B4;
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_806A3F8.s\"");
-#else
-/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
-   compiles a whole translation unit at a time, so an #error here fails
-   every OTHER function in this file under NONMATCHING=1. Guard intact, so
-   the real ROM still gets the verbatim retail bytes and progress.py still
-   counts this as unmatched. Write the C here, replacing this comment. */
-#endif
-
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_806A47C.s\"");
-#else
-/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
-   compiles a whole translation unit at a time, so an #error here fails
-   every OTHER function in this file under NONMATCHING=1. Guard intact, so
-   the real ROM still gets the verbatim retail bytes and progress.py still
-   counts this as unmatched. Write the C here, replacing this comment. */
-#endif
-
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_806A510.s\"");
-#else
-/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
-   compiles a whole translation unit at a time, so an #error here fails
-   every OTHER function in this file under NONMATCHING=1. Guard intact, so
-   the real ROM still gets the verbatim retail bytes and progress.py still
-   counts this as unmatched. Write the C here, replacing this comment. */
-#endif
-
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_806A638.s\"");
-#else
-/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
-   compiles a whole translation unit at a time, so an #error here fails
-   every OTHER function in this file under NONMATCHING=1. Guard intact, so
-   the real ROM still gets the verbatim retail bytes and progress.py still
-   counts this as unmatched. Write the C here, replacing this comment. */
-#endif
-
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_806A730.s\"");
-#else
-/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
-   compiles a whole translation unit at a time, so an #error here fails
-   every OTHER function in this file under NONMATCHING=1. Guard intact, so
-   the real ROM still gets the verbatim retail bytes and progress.py still
-   counts this as unmatched. Write the C here, replacing this comment. */
-#endif
-
+ASM_FUNC("asm/nonmatching/sub_806A3F8.s", void sub_806A3F8(void *arg0));
+ASM_FUNC("asm/nonmatching/sub_806A47C.s", void sub_806A47C(void *arg0));
+ASM_FUNC("asm/nonmatching/sub_806A510.s", void sub_806A510(void *arg0));
+ASM_FUNC("asm/nonmatching/sub_806A638.s", void sub_806A638(void *arg0));
+ASM_FUNC("asm/nonmatching/sub_806A730.s", s32 sub_806A730(void *arg0, s32 arg1, s32 arg2));
 s32 sub_806A760(struct Entity *arg0) {
     sub_810DD7C(arg0, (*(s32 *)((s8 *)(arg0) + (0x2C))), 0xFF);
-    arg0->handler = &sub_806A638;
+    arg0->handler = (s32 *) &sub_806A638;
     return 0;
 }

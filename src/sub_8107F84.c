@@ -526,7 +526,7 @@ asm_unified(".include \"asm/nonmatching/sub_8108928.s\"");
 #else
 void *sub_807FFB8(s32 *);                       /* extern */
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
-extern s32 sub_8108A9C;
+void sub_8108A9C(void *arg0);                       /* extern */
 
 void sub_8108928(void *arg0) {
     u16 temp_r1_11;
@@ -537,7 +537,7 @@ void sub_8108928(void *arg0) {
         (*(u8 *)((s8 *)(arg0) + (0x121))) = (u8) (-0x71 & (*(u8 *)((s8 *)(arg0) + (0x121))));
         if ((s32) M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */) < 0) {
             if (!(0x20 & (*(u8 *)((s8 *)(arg0) + (0x122))))) {
-                (*(void **)((s8 *)(sub_807FFB8(&sub_8108A9C)) + (8))) = arg0;
+                (*(void **)((s8 *)(sub_807FFB8((s32 *) &sub_8108A9C)) + (8))) = arg0;
                 (*(u8 *)((s8 *)(arg0) + (0x122))) = (u8) ((*(u8 *)((s8 *)(arg0) + (0x122))) | 0x20);
             }
         } else {

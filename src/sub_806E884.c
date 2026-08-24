@@ -10,7 +10,7 @@ asm_unified(".include \"asm/macros.inc\"");
 
 
 
-extern s32 sub_806E414;
+void sub_806E414(void *arg0);                       /* extern */
 
 void sub_806EADC(void *arg0);
 s32 sub_8082E1C();
@@ -27,7 +27,7 @@ void sub_806E8E8(struct Entity *arg0) {
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
         sub_8082E1C(arg0, 0x05, 0, 0);
         (*(s16 *)((s8 *)(arg0) + (0xAC))) = 0x0A;
-        arg0->handler = &sub_806E414;
+        arg0->handler = (s32 *) &sub_806E414;
     }
 }
 

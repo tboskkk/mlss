@@ -7,47 +7,8 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_805C8A4.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
-
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_805C908.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
-
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_805C9A4.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
-
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_805C9DC.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
-
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_805CB54.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+ASM_FUNC("asm/nonmatching/sub_805C8A4.s", void sub_805C8A4(s32 arg0, u16 arg1));
+ASM_FUNC("asm/nonmatching/sub_805C908.s", void sub_805C908(s32 arg0, u16 arg1));
+ASM_FUNC("asm/nonmatching/sub_805C9A4.s", void sub_805C9A4(s32 arg0, s32 arg1, s32 arg2, s32 arg3));
+ASM_FUNC("asm/nonmatching/sub_805C9DC.s", s32 sub_805C9DC(void *arg0, u8 arg1, s32 arg3));
+ASM_FUNC("asm/nonmatching/sub_805CB54.s", s32 sub_805CB54(void *arg0));
