@@ -2,22 +2,37 @@
 """Structural twins: functions whose assembly is IDENTICAL except for
 immediates and symbol names.
 
-Measured, not assumed: 86 unmatched functions fall into 31 such groups,
-the largest holding 8 members. The factory was spending a separate
-decomp-permuter search on each twin as though it were a novel problem, so
-those 86 functions are really 31 problems being solved up to 8 times each.
+**NUMBERS UPDATED 2026-08-24.** This docstring long claimed "86 unmatched
+functions in 31 groups, largest holding 8" and called DEDUPLICATE the #1
+exploit. Both were stale by a wide margin, and the ranking was wrong.
+Re-measured live against the `shape_hash` column:
 
-Two exploits, in increasing power:
+    multi-member groups with >=1 unmatched   249
+    unmatched functions in them              746
+    largest group (unmatched members)         21
+    groups that already have a solved twin     7
 
-  1. DEDUPLICATE -- work one representative per group instead of every
-     member. Pure waste elimination, no correctness risk.
+Two exploits, and PROPAGATE is the one that has actually paid:
 
-  2. PROPAGATE -- once one member matches, its twins differ only in
+  1. PROPAGATE -- once one member matches, its twins differ only in
      constants, so a candidate can be generated mechanically by
      substituting immediates and symbols positionally. This is a guess,
      but a cheap and well-founded one, and it is gated by exactly the same
      validator (from-scratch build, byte-identical ROM) as everything
      else. A wrong substitution simply fails and costs one build.
+     **This is where the value is**: `twin_backfill.py`'s retroactive sweep
+     produced 130 matches, and only 7 groups still hold an unmatched twin
+     of an already-solved function -- i.e. propagation has already
+     harvested nearly all of the reachable win.
+
+  2. DEDUPLICATE -- work one representative per group instead of every
+     member. Pure waste elimination, no correctness risk, and still not
+     wired into tier2's claim logic. Worth roughly 746 - 249 = ~497
+     avoidable searches, which is real but far smaller than this docstring
+     used to imply, and much smaller than PROPAGATE has already delivered.
+     Most of the corpus is structurally UNIQUE (the overwhelming majority
+     of shape groups have exactly one member), so dedup can never be the
+     headline lever it was once described as.
 
 Substitution is deliberately conservative: it only fires when every
 distinct immediate maps CONSISTENTLY between the two functions (one value

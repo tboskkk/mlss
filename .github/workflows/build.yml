@@ -37,6 +37,20 @@ jobs:
       - name: Verify ROM is byte-identical to retail
         run: sha1sum -c rom.sha1
 
+      # Closes CLAUDE.md's standing "no CI job runs tools/progress.py" item.
+      # gen_readme_progress.py --check exits 1 when README.md's progress
+      # block no longer matches what progress.py actually classifies, so a
+      # commit that changes the match count without regenerating the README
+      # fails here instead of silently leaving a stale number in the
+      # project's most-read file. It reuses progress.py's own classifier
+      # rather than parsing printed output, so the two cannot disagree.
+      #
+      # Runs in the container for the same Python the rest of the build
+      # uses, and needs no network, no baserom and no build output -- it
+      # only reads src/ and asm/.
+      - name: Verify README progress block is current
+        run: docker run --rm -v "${{ github.workspace }}:/workspace" mlss-toolchain:ci tools/gen_readme_progress.py --check
+
       - name: Upload build artifacts
         if: always()
         uses: actions/upload-artifact@v4
