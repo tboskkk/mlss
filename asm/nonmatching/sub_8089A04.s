@@ -1,3 +1,8 @@
+@ WARNING -- DO NOT DELETE THIS FRAGMENT WHEN sub_8089A04 MATCHES.
+@ The trailing 12 bytes after this function's `bx r1` are a real, never-labeled
+@ function Luvdis missed (ldr r1,[pc,#4] / str r1,[r0,#0x4C] / movs r0,#1 / bx lr,
+@ plus a .4byte 0x08089D11 literal), not padding. See CLAUDE.md's trailing-data
+@ landmine. Split it out before this fragment is ever removed.
 	.syntax unified
 	.text
 
