@@ -675,8 +675,39 @@ def run_pool(jobs: int, stall_min: float, max_functions: int):
             # floor is treated as a near-certain match and searched before
             # anything ranked only by iso_score/best_score, even if this
             # process has never scored it with iso_score at all.
-            order = ("escalation_count ASC, "
-                     "CASE WHEN objdiff_score >= " + repr(OBJDIFF_ADMIT_FLOOR) + " THEN 0 ELSE 1 END ASC, "
+            # CLOSENESS PICKS THE BAND, escalation orders WITHIN it. The
+            # order of these first two keys is the whole scheduling policy,
+            # and having them the other way round starved every near-match
+            # in the pool -- measured 2026-08-24, before this was swapped:
+            # 414 rows sat at objdiff 90-100% (iso_score 1-3, i.e. one to
+            # three bytes from retail) and received ZERO of the 122 searches
+            # launched in three hours, while rows at objdiff 30-85% with
+            # iso_score ~140 were searched continuously.
+            #
+            # The cause was that `escalation_count ASC` came first: every one
+            # of those 414 was at escalation 2, and 863 rows sat at
+            # escalation 1 and therefore sorted ahead of ALL of them no
+            # matter how far away they were. The objdiff CASE below could
+            # only ever act as a tiebreaker *inside* one escalation band, so
+            # it never got to run while any lower-escalation row remained --
+            # and that low band refills continuously as new seeds arrive and
+            # failed searches escalate. Every health check read green
+            # throughout (queue deep, workers alive, searches running).
+            #
+            # This does NOT reintroduce the closest-first spin loop CLAUDE.md
+            # records under "Throughput". That spin came from *pure*
+            # closest-first immediately re-claiming the same single closest
+            # row after each failure. Here `escalation_count ASC` still
+            # orders within the near-miss band, so a row that fails is bumped
+            # and sorts behind its ~413 band-peers -- with 12 slots against
+            # 414 rows the same row cannot come back around immediately.
+            #
+            # Far rows do not starve: extra_where below still admits them on
+            # iso_score/best_score, so they are claimed whenever the
+            # near-miss band is exhausted or fully in flight, and the band
+            # drains as its rows either match or escalate.
+            order = ("CASE WHEN objdiff_score >= " + repr(OBJDIFF_ADMIT_FLOOR) + " THEN 0 ELSE 1 END ASC, "
+                     "escalation_count ASC, "
                      "iso_score IS NULL ASC, iso_score ASC, "
                      "best_score IS NULL ASC, best_score ASC")
             # DEDUPLICATE. Do not start a search on a function whose
