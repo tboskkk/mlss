@@ -8,7 +8,7 @@
 asm_unified(".include \"asm/macros.inc\"");
 
 s32 sub_807F6D0();                              /* extern */
-extern s32 sub_81063A8;
+void sub_81063A8(void *arg0);                   /* extern */
 void sub_81066DC(void *arg0)
 {
   void *temp_r1_18;
@@ -24,7 +24,7 @@ void sub_81066DC(void *arg0)
   {
     sub_807F6D0();
     *((u16 *) (((s8 *) arg0) + 0x10)) = 0x20U;
-    *((s32 **) (((s8 *) arg0) + 4)) = &sub_81063A8;
+    *((s32 **) (((s8 *) arg0) + 4)) = (s32 *) &sub_81063A8;
   }
 }
 

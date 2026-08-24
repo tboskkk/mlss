@@ -20,7 +20,7 @@ void sub_815F2C4(void *arg0, s32 arg1)
   *((s16 *) (new_var + 0x18)) = 0x64;
   *((s16 *) (new_var + 0x20)) = (s16) (new_var2 - arg1);
   *((s16 *) (new_var + 0x38)) = 0;
-  *((s16 *) (((s8 *) sub_815FA3C(arg0)) + 0xC)) = 0;
+  *((s16 *) (((s8 *) sub_815FA3C((void *) arg0)) + 0xC)) = 0;
   *((s8 *) (new_var + 0x24)) = 3;
 }
 
@@ -62,14 +62,14 @@ asm_unified(".include \"asm/nonmatching/sub_815F380.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_815F3CC.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+s32 sub_815F97C(s32, s32);                      /* extern */
+void *sub_815FA3C(void *);                      /* extern */
+
+void sub_815F3CC(s32 arg0) {
+    sub_815F97C(arg0, 0);
+    (*(s16 *)((s8 *)(sub_815FA3C((void *) arg0)) + (4))) = 0xC0;
+    (*(s16 *)((s8 *)(sub_815FA3C((void *) arg0)) + (6))) = 0xC0;
+}
 
 void sub_815F3F0(void *arg0, s32 arg1) {
     (*(s32 *)((s8 *)(arg0) + (0x30))) = 0x08CDCDD0;
