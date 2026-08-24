@@ -353,9 +353,12 @@ Each looked obviously right. Re-deriving them costs a session.
   from its file** — check the fragment's tail for bytes after the real
   `bx lr`/`pop {..., pc}`. `gitops.finish_match()` refuses to delete a fragment
   carrying real trailing data; that guard is load-bearing.
-  ⚠️ **`sub_81C0F7E` is a 2-byte interworking veneer with 104,208 bytes of data
-  glued to its fragment.** If it matches and the fragment is deleted, that
-  deletes 104KB of ROM.
+  **SOLVED 2026-08-24 for `sub_81C0F7E` and `sub_819BABC`**, the two
+  functions this note used to warn about by name — both had their trailing
+  data split into a separate labeled `unk_ADDR:` region (same technique as
+  the 84KB blob), so neither function's fragment carries trailing data any
+  more and the guard above is no longer load-bearing for them specifically.
+  It stays load-bearing in general — the next one hasn't been found yet.
 
 **Build system**
 
@@ -449,12 +452,22 @@ the ROM. Confirmed and renamed: `_lshrdi3`, `_muldi3`, `_negdi2`, `memcpy`,
 The `_call_via_rX` veneer matches were **not** applied — likely spurious
 matches of a low-entropy repeating pattern.
 
+**SOLVED 2026-08-24: `sub_819BABC` was NOT actually a gradual code/data
+transition needing days of instruction reading** — that estimate turned out
+to be pessimistic once actually checked. It's a complete, clean 112-byte
+Thumb function (56 real instructions + a 2-word literal pool, ends in a
+normal `pop {r4,r5,r6}; pop {r1}; bx r1` epilogue) immediately followed by
+152,658 bytes of data running right up to `sub_81C0F7E`'s own address — one
+continuous `.byte` run the whole way, no code resuming anywhere inside it.
+Confirmed as real data, not misaligned code, via `probe_code_region.py`:
+ARM disassembly 20-40% bad throughout (no clean stretch anywhere) and Thumb
+function-prologue density 0.604/KB, far below real Thumb code's measured
+3.4-6.9/KB in this ROM. Both this function and `sub_81C0F7E` (104KB, flat
+~16% bad-instruction rate at every alignment phase — same signature) had
+their trailing data split into a labeled `unk_ADDR:` region; see the
+landmine note above.
+
 **Still open:**
-- `asm/nonmatching/sub_819BABC.s` (152KB) — a genuine **mix**: real code at the
-  front transitioning into repeating-record data. The last big chunk of missed
-  code in the game proper.
-- `asm/nonmatching/sub_81C0F7E.s` (104KB) — data, flat ~16% bad-instruction
-  rate at every alignment phase (the signature of real data). See the landmine.
 - `0x08000000`-`~0x08002E00` is clean ARM crt0 and is solid.
 - 18 refused trailing regions (~2KB) that don't end in a return — real
   unlabeled code, needs a human. `split_trailing.py` declines rather than
