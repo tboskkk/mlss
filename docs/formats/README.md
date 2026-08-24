@@ -19,27 +19,26 @@ default - pass `--show-huffman-candidates` if you want the noise.
 
 Run: `./container.sh tools/find_compressed_blocks.py`
 
-**75 raw hits, 63 confirmed after correction** (>= 32 decompressed bytes)
+**70 confirmed BIOS blocks** (69 RLE + 1 LZ77, >= 32 decompressed bytes)
 across `0x081DD790`-`0x08F50000`, overwhelmingly RLE rather than LZ77 -
 worth knowing before assuming "GBA game" defaults to LZ77 for this one.
-**12 of the original 75 turned out to be false positives** - a different,
-custom (non-BIOS) LZ codec's real streams that happen to also satisfy this
-decoder's termination check often enough to look like a clean RLE hit. Full
-finding, evidence and the corrected address list: "Custom sprite
-compression" section below. `assets/manifest.json` reflects the corrected
-63. Several of the real ones are large enough to be major assets, not
-incidental data:
+Plus **1,309 confirmed streams of this game's own custom, non-BIOS LZ
+codec**, 4.4MB decompressed - see "Custom sprite compression" below for what
+that is and how the two get told apart. `assets/manifest.json` (1,379
+entries total) reflects both. Several of the BIOS blocks are large enough
+to be major assets, not incidental data:
 
 | Address | Compressed | Decompressed |
 |---|---:|---:|
-| `0x08A6BCB0` | 543,945 B | 1,017,728 B |
-| `0x088D217A` | 199,184 B | 1,023,785 B |
 | `0x08826426` | 519,639 B | 852,018 B |
 | `0x0825A709` | 441,173 B | 814,624 B |
 | `0x083BF3F0` | 381,183 B | 539,634 B |
+| `0x084EAAD4` | 249,493 B | 540,878 B |
+| `0x087052C1` | 240,817 B | 798,755 B |
 
 (full list from a live run - re-run the tool rather than trusting this
-snapshot as it ages)
+snapshot as it ages; `0x084EAAD4` is one of the two addresses flagged as a
+genuinely open custom-LZ-vs-RLE question below, not a settled classification)
 
 The decompressor moved to `tools/gba_compress.py` (shared with the
 extraction tool below, so the two can't drift out of sync).
@@ -53,8 +52,8 @@ Run: `./container.sh tools/extract_assets.py` (writes to `assets/` -
 gitignored, like `baserom.gba`: this is decompressed copyrighted game
 data, regenerate it locally, never commit it)
 
-- `assets/raw/<addr>_<type>.bin` - every one of the 75 confirmed blocks,
-  decompressed for real.
+- `assets/raw/<addr>_<type>.bin` - every one of the 1,379 confirmed blocks
+  (BIOS and custom-LZ alike), decompressed for real.
 - `assets/png/<addr>_<w>x<h>[_synth].png` - a rendered preview for every
   block whose decompressed size is a clean multiple of 32 bytes (one 4bpp
   GBA tile), on the reasoning that a real tile-graphics asset almost
@@ -75,7 +74,7 @@ is). That render shows a clearly structured, dithered texture, not noise
 - confirms the nibble order (low nibble = left pixel) and byte layout are
 right.
 
-**What's *not* verified: which of the 75 confirmed compressed blocks are
+**What's *not* verified: which of the confirmed compressed blocks are
 actually tile graphics at all.** "Decompressed size is a multiple of 32"
 is a weak classifier on its own - plenty of non-graphics data (event
 tables, that sort of thing) will coincidentally satisfy it. Tried both
@@ -491,19 +490,76 @@ for how much of it is actually accounted for by valid custom-LZ streams):
 
 (coverage over 100% means the streams found extend slightly past the
 manifest's claimed compressed_size - consistent with the claimed size
-itself being wrong, not just the classification.) **These 12 entries were
-removed from `assets/manifest.json`** (75 -> 63 confirmed BIOS blocks);
-1,792,617 of the manifest's 5,753,989 total claimed compressed bytes
-(31.2%) were affected. The underlying ROM bytes are untouched - only the
-classification was wrong - and re-extracting them with the corrected
-`mlcomp.py` decoder is real, concrete follow-up work (see the work plan
-below), not done this pass.
+itself being wrong, not just the classification.) These 12 entries were
+first removed from `assets/manifest.json` by hand as an immediate fix.
+
+**SOLVED FOR REAL, 2026-08-24: the fix is now permanent, not a one-off hand
+edit.** `mlcomp.py`'s corrected algorithm (all three bugs from above fixed)
+is promoted into `tools/gba_compress.py` as `decompress_custom_lz`, a
+first-class codec alongside the two BIOS formats, verified against all
+1,169 previously-cached streams (1,167 match byte-for-byte on both
+consumed and decompressed length; the 2 that don't turn out to be
+`mlcomp.py`'s OWN bugs - it never bounds-checked a back-reference, so
+Python's negative-index wraparound silently produced *something* instead of
+correctly rejecting an out-of-range reference the way `gba_compress.py`'s
+strict version does) and against all 4 addresses `src/title_screen.c`
+calls the real decompressor on directly (decisive - these decode cleanly
+to exact multiples of 32, the right shape for 4bpp tile data).
+
+`gba_compress.py`'s shared `scan()` (used by both `find_compressed_blocks.py`
+and `extract_assets.py`, so `assets/manifest.json` is now generated
+correctly rather than hand-patched) disqualifies an LZ77/RLE hit whose
+claimed span is mostly independently covered by real custom-LZ streams -
+measured directly against this corpus's own 75 raw LZ77/RLE hits: every
+one of 11 of the 12 known false positives had >=32.0% coverage (up to
+102%), every genuine hit had <=3.0%, a clean gap the 30% threshold sits in.
+The 12th (`0x0838E18F`, the code-decisive one) sits at only 7.8% coverage -
+too low for the threshold to catch reliably, so it's named explicitly in
+`gba_compress.KNOWN_FALSE_POSITIVE_ADDRS` instead, with the code-reference
+evidence recorded there.
+
+Re-running the corrected scan surfaced the full picture: not 63 BIOS
+blocks but **70** (69 RLE + 1 LZ77) once the false positives are removed
+*and* the genuine blocks the old code's early-exit skipped past are found -
+plus **1,309 individual custom-LZ streams**, not just the 1,169 already
+cached from the earlier manual sweep. `assets/manifest.json` (gitignored,
+regenerate with `tools/extract_assets.py`) now has 1,379 total entries.
+
+**Two addresses remain a genuinely open question, found by this same
+coverage check and NOT resolved:**
+
+| address | claimed compressed | custom-LZ coverage | verdict |
+|---|---:|---:|---|
+| `0x084EAAD4` | 249,493 B | 11.1% | left classified RLE - no decisive evidence either way |
+| `0x081ED420` | 177,299 B | 10.6% | left classified RLE - no decisive evidence either way |
+
+Both sit above every confirmed genuine RLE block (<=3.0%) but below the
+30% threshold that reliably separates the other 11 known false positives,
+and neither has a `0x0838E18F`-style decisive code cross-reference (no
+disassembled code anywhere currently loads an address inside either span
+and passes it to the real decompressor - checked directly, not assumed).
+Left classified as RLE, the conservative default, rather than reclassified
+on coverage alone - the exact same "coverage isn't trustworthy this low"
+lesson `0x0838E18F` itself already taught this pass. A third candidate
+found the same way, `0x08A6BCB0` (15.4% coverage measured in isolation),
+turned out to need no decision at all: in the full corpus-wide scan
+(as opposed to checking its span in isolation) an earlier disqualified hit
+nearby already reshapes the scan to find its bytes as genuine custom-LZ
+streams directly, so it was never actually a live ambiguity - a reminder
+that a per-candidate coverage check and a full-scan trace can disagree, and
+the full-scan trace is the one that matters.
+
+`tools/try_custom_decomp.py`, the original experimental port with the
+three bugs, is superseded by `gba_compress.decompress_custom_lz` and left
+in place only as a labeled historical artifact (see its own docstring).
 
 **Bottom line, corrected:** this format is not a dead end - it explains a
 meaningful share of what was previously misclassified, and the remaining
-5.1MB "genuinely unclassified" figure is now known to be an overestimate by
-at least the 31.2% above. The actual still-open question is what covers the
-REST of that figure, not whether this codec matters.
+rodata "genuinely unclassified" figure is now known to be an overestimate.
+Re-extracting the 1,309 real custom-LZ streams with real bytes on disk
+(`assets/raw/*.bin`, `assets/png/*.png` previews) is done as of this pass;
+the open questions now are the two addresses above, and what covers
+whatever's left after this classification (`tools/map_assets.py`).
 
 ## Room properties and the solidity/collision pipeline
 

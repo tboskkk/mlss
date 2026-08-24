@@ -1,5 +1,17 @@
 #!/usr/bin/env python3
-"""EXPERIMENTAL: try the custom LZ-style decompressor found via web research
+"""SUPERSEDED 2026-08-24 - kept only as a labeled historical artifact, not
+maintained. This was the first, experimental port of the custom LZ codec
+and had three real bugs (off-by-one header skip, a too-small iteration cap,
+no declared-size validation - see docs/formats/README.md's "Custom sprite
+compression" section for the full story of how that made a genuine format
+look like a dead end). The corrected, bug-fixed, verified decoder is
+`tools/gba_compress.py`'s `decompress_custom_lz` - use that instead of
+anything in this file. `tools/find_compressed_blocks.py` and
+`tools/extract_assets.py` both already use it via the shared `scan()`.
+
+Original docstring, for the record:
+
+EXPERIMENTAL: try the custom LZ-style decompressor found via web research
 into the community Yoshi Magic editor's `Sprite Viewer.vb` (`decomp()` sub) -
 NOT a GBA BIOS format (LZ77/RLE/Huffman), a game-specific scheme
 `gba_compress.py` doesn't implement. Ported here to test the hypothesis
