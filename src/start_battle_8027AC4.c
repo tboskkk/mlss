@@ -34,14 +34,59 @@ asm_unified(".include \"asm/nonmatching/sub_8027E90.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_802814C.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+s32 make_fldm_801AF5C(s32);                     /* extern */
+s32 process_disable(void *);                    /* extern */
+s32 sub_8022554(void *, s32);                   /* extern */
+s32 sub_80273E4(void *);                        /* extern */
+s32 sub_8054378(void *, s32, s32, u8);          /* extern */
+s32 sub_8057B58(s32, s32);                      /* extern */
+u8 sub_80E99E0(s32);                                /* extern */
+s32 sub_80FC198();                              /* extern */
+s32 sub_8123340();                              /* extern */
+s32 sub_812335C();                              /* extern */
+s32 sub_81251F0();                                  /* extern */
+void sub_802814C(void *arg0)
+{
+  s32 temp_r0_21;
+  u8 temp_r5_41;
+  sub_801A6B0();
+  if (0x10 & (*((u8 *) (((s8 *) arg0) + 0x12D))))
+  {
+    sub_80273E4(arg0);
+    temp_r0_21 = *((s32 *) (((s8 *) arg0) + 0x304));
+    if (temp_r0_21 != 0)
+    {
+      sub_8057B58(temp_r0_21, 3);
+      *((s32 *) (((s8 *) arg0) + 0x304)) = 0;
+    }
+    sub_8018B78(2, (void *) 0);
+    temp_r0_21 = (u8) ((-0x11) & (*(((s8 *) arg0) + 0x12D)));
+    *((u8 *) (((s8 *) arg0) + 0x12D)) = temp_r0_21;
+  }
+  temp_r5_41 = sub_80E99E0(0x1BE5);
+  if (temp_r5_41 != 0)
+  {
+    process_disable(arg0);
+    *((s8 *) (((s8 *) arg0) + 0)) = 2;
+    sub_8054378(alloc_Zero(0x68U, 0U, (s8 *) 0x081E2684, 0U), 8, 0x081E2684, temp_r5_41);
+    return;
+  }
+  if (arg0 != ((void *) 0))
+  {
+    sub_8022554(arg0, 3);
+  }
+  sub_8123340();
+  (*((s32 (**)(s32, s32, s32)) 0x03001034))(0, *((s32 *) 0x03000FC0), 0x570);
+  if ((sub_81251F0() << 0x18) != 0)
+  {
+    *((u8 *) 0x03000D40) |= 2;
+    sub_80FC198();
+    sub_812335C();
+    make_fldm_801AF5C(1);
+    return;
+  }
+  load_init_812538C(alloc_Zero(0x164U, 0U, (s8 *) 0x081E268C, 0U), 8U, (s8 *) 0x081E268C, 0);
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8028248.s\"");
