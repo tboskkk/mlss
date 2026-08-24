@@ -30,4 +30,4 @@ sub_8167D50:
 	pop {r4}
 	pop {r0}
 	bx r0
-_08167D88: .4byte 0x0821422C
+_08167D88: .4byte dword_821422C @ =0x0821422C

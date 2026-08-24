@@ -54,5 +54,5 @@ _080F0478:
 	pop {r4, r5, r6, r7}
 	pop {r0}
 	bx r0
-_080F0484: .4byte 0x08CDC308
+_080F0484: .4byte word_8CDC308 @ =0x08CDC308
 _080F0488: .4byte 0x08CDBD68

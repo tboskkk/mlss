@@ -107,5 +107,5 @@ _0809156C:
 	pop {r0}
 	bx r0
 	.byte 0x00, 0x00
-_08091618: .4byte 0x084FE8B4
+_08091618: .4byte dword_84FE8B4 @ =0x084FE8B4
 _0809161C: .4byte sub_8087540

@@ -156,4 +156,4 @@ _080E5A8E:
 	pop {r0}
 	bx r0
 	.byte 0x00, 0x00
-_080E5A9C: .4byte 0x083B9512
+_080E5A9C: .4byte dword_83B9512 @ =0x083B9512

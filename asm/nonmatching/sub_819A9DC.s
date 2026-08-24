@@ -43,6 +43,6 @@ sub_819A9DC:
 	strb r0, [r3, #0x00]
 	bx lr
 	.byte 0x00, 0x00
-_0819AA2C: .4byte 0x0821DB5E
+_0819AA2C: .4byte dword_821DB5E @ =0x0821DB5E
 _0819AA30: .4byte 0x04000070
 _0819AA34: .4byte 0x04000090

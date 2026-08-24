@@ -55,7 +55,7 @@ _0805830C:
 	.byte 0x00, 0x00
 _0805833C: .4byte room_solidity_index_table
 _08058340: .4byte 0x0000FFFF
-_08058344: .4byte 0x08754D74
+_08058344: .4byte dword_8754D74 @ =0x08754D74
 _08058348:
 	ldr r5, [sp, #0x000]
 	lsls r2, r5, #0x01

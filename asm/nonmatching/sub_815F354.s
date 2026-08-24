@@ -21,4 +21,4 @@ sub_815F354:
 	pop {r4, r5}
 	pop {r1}
 	bx r1
-_0815F37C: .4byte 0x08CDCD90
+_0815F37C: .4byte dword_8CDCD90 @ =0x08CDCD90

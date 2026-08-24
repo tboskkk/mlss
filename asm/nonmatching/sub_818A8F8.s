@@ -154,8 +154,8 @@ _0818AA0C:
 	subs r0, r1, r0
 	b _0818AA2C
 	.byte 0x00, 0x00
-_0818AA14: .4byte 0x08198584
-_0818AA18: .4byte 0x08198504
+_0818AA14: .4byte word_8198584 @ =0x08198584
+_0818AA18: .4byte word_8198504 @ =0x08198504
 _0818AA1C:
 	movs r5, #0x12
 	ldsh r1, [r6, r5]

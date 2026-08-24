@@ -29,7 +29,7 @@ sub_801B870:
 	movs r1, #0x03
 	bl sub_801B85C
 	b _0801B8BC
-_0801B8AC: .4byte 0x08CDBD98
+_0801B8AC: .4byte dword_8CDBD98 @ =0x08CDBD98
 _0801B8B0:
 	movs r1, #0x00
 	strh r5, [r4, #0x1C]

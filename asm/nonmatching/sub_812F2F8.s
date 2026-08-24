@@ -105,8 +105,8 @@ _0812F39A:
 	b _0812F41C
 _0812F3C8: .4byte 0x05000040
 _0812F3CC: .4byte 0x05000080
-_0812F3D0: .4byte 0x083BBDD0
-_0812F3D4: .4byte 0x083BD844
+_0812F3D0: .4byte byte_83BBDD0 @ =0x083BBDD0
+_0812F3D4: .4byte dword_83BD844 @ =0x083BD844
 _0812F3D8:
 	adds r2, r6, #0x0
 	adds r2, #0xAE
@@ -150,7 +150,7 @@ _0812F41C:
 	adds r4, r6, #0x0
 	adds r4, #0xA8
 	b _0812F486
-_0812F42C: .4byte 0x083BE67C
+_0812F42C: .4byte byte_83BE67C @ =0x083BE67C
 _0812F430:
 	mov r0, r8
 	ldrh r1, [r0, #0x00]

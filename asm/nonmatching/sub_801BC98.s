@@ -20,4 +20,4 @@ _0801BCAC:
 	pop {r0}
 	bx r0
 	.byte 0x00, 0x00
-_0801BCBC: .4byte 0x08CDBDA8
+_0801BCBC: .4byte dword_8CDBDA8 @ =0x08CDBDA8

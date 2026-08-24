@@ -50,5 +50,5 @@ _0819B272:
 	pop {r4, r5, r6, r7}
 	pop {r0}
 	bx r0
-_0819B288: .4byte 0x0821CC40
+_0819B288: .4byte dword_821CC40 @ =0x0821CC40
 _0819B28C: .4byte 0x03007FF0

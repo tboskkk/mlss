@@ -81,7 +81,7 @@ _0815CFEE:
 	orrs r1, r2
 	b _0815D02A
 	.byte 0x00, 0x00
-_0815D018: .4byte 0x08198584
+_0815D018: .4byte word_8198584 @ =0x08198584
 _0815D01C:
 	adds r0, r4, #0x0
 	bl sub_815FA3C

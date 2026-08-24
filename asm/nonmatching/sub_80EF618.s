@@ -37,7 +37,7 @@ _080EF64C:
 	bge _080EF664
 	movs r5, #0x0A
 	b _080EF670
-_080EF65C: .4byte 0x083BA4B4
+_080EF65C: .4byte word_83BA4B4 @ =0x083BA4B4
 _080EF660: .4byte 0x03000FCC
 _080EF664:
 	lsls r1, r6, #0x03
@@ -114,7 +114,7 @@ _080EF69A:
 	pop {r4, r5, r6, r7}
 	pop {r0}
 	bx r0
-_080EF6F4: .4byte 0x083B8F24
+_080EF6F4: .4byte dword_83B8F24 @ =0x083B8F24
 _080EF6F8: .4byte 0x0300034C
 _080EF6FC: .4byte 0x00000888
 _080EF700: .4byte 0x02000260

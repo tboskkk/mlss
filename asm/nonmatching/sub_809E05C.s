@@ -66,6 +66,6 @@ _0809E0D8:
 	pop {r0}
 	bx r0
 	.byte 0x00, 0x00
-_0809E0E0: .4byte 0x083B8996
+_0809E0E0: .4byte byte_83B8996 @ =0x083B8996
 _0809E0E4: .4byte sub_809E410
-_0809E0E8: .4byte 0x083B899C
+_0809E0E8: .4byte dword_83B899C @ =0x083B899C

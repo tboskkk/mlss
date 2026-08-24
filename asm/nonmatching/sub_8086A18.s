@@ -102,7 +102,7 @@ _08086ABC:
 	pop {r4, r5, r6, r7}
 	pop {r0}
 	bx r0
-_08086AE0: .4byte 0x084FB814
+_08086AE0: .4byte word_84FB814 @ =0x084FB814
 _08086AE4: .4byte 0x03001038
 _08086AE8: .4byte 0x0819832C
 _08086AEC: .4byte 0x08198220

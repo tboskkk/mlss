@@ -115,5 +115,5 @@ _080540A0:
 	pop {r0}
 	bx r0
 	.byte 0x00, 0x00
-_080540A8: .4byte 0x08CDC1C8
-_080540AC: .4byte 0x081E2714
+_080540A8: .4byte dword_8CDC1C8 @ =0x08CDC1C8
+_080540AC: .4byte dword_81E2714 @ =0x081E2714

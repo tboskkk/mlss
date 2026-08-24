@@ -66,10 +66,10 @@ _081DD52A:
 	bl nullsub_6
 	movs r0, #0x00
 	b _081DD560
-_081DD534: .4byte 0x08CDB634
+_081DD534: .4byte dword_8CDB634 @ =0x08CDB634
 _081DD538: .4byte 0x00000FEF
-_081DD53C: .4byte 0x08CDBA50
-_081DD540: .4byte 0x08CDBA44
+_081DD53C: .4byte dword_8CDBA50 @ =0x08CDBA50
+_081DD540: .4byte dword_8CDBA44 @ =0x08CDBA44
 _081DD544:
 	mov r1, r8
 	ldr r2, [r1, #0x08]
@@ -89,4 +89,4 @@ _081DD560:
 	mov r8, r3
 	pop {r4, r5, r6, r7, pc}
 	.byte 0x00, 0x00
-_081DD568: .4byte 0x08CDBA50
+_081DD568: .4byte dword_8CDBA50 @ =0x08CDBA50

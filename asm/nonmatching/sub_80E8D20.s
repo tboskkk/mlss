@@ -25,7 +25,7 @@ sub_80E8D20:
 	ldr r0, [r0, #0x00]
 	adds r2, r3, #0x0
 	b _080E8D5A
-_080E8D4C: .4byte 0x083BBDD0
+_080E8D4C: .4byte byte_83BBDD0 @ =0x083BBDD0
 _080E8D50: .4byte 0x0300034C
 _080E8D54:
 	strb r1, [r2, #0x00]

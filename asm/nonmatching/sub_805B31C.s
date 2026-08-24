@@ -93,7 +93,7 @@ _0805B3A4:
 	b _0805B466
 	.byte 0x00, 0x00
 _0805B3C8: .4byte 0x03000DD0
-_0805B3CC: .4byte 0x083B283C
+_0805B3CC: .4byte dword_83B283C @ =0x083B283C
 _0805B3D0:
 	movs r1, #0x4C
 	adds r0, r7, #0x0

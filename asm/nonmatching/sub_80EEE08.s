@@ -60,7 +60,7 @@ sub_80EEE08:
 	.byte 0x00, 0x00
 _080EEE78: .4byte 0x000003FF
 _080EEE7C: .4byte room_props_table
-_080EEE80: .4byte 0x083D6C58
+_080EEE80: .4byte dword_83D6C58 @ =0x083D6C58
 _080EEE84:
 	ldr r0, _080EEEC4 @ =0x03000FC0
 	ldr r4, [r0, #0x00]

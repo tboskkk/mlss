@@ -99,5 +99,5 @@ sub_8153F5C:
 	pop {r4, r5, r6}
 	pop {r1}
 	bx r1
-_08154028: .4byte 0x08CDC9B0
+_08154028: .4byte dword_8CDC9B0 @ =0x08CDC9B0
 _0815402C: .4byte 0x00005008

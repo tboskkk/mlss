@@ -122,5 +122,5 @@ _080DFADC:
 	pop {r4, r5, r6, r7}
 	pop {r0}
 	bx r0
-_080DFB00: .4byte 0x08198584
-_080DFB04: .4byte 0x08198504
+_080DFB00: .4byte word_8198584 @ =0x08198584
+_080DFB04: .4byte word_8198504 @ =0x08198504

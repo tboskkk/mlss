@@ -21,7 +21,7 @@ sub_8158E18:
 	ldrh r0, [r0, #0x1C]
 	b _08158E5A
 	.byte 0x00, 0x00
-_08158E3C: .4byte 0x083CB0F0
+_08158E3C: .4byte dword_83CB0F0 @ =0x083CB0F0
 _08158E40: .4byte 0x03001018
 _08158E44:
 	ldr r1, _08158E68 @ =0x083CB0F0
@@ -43,5 +43,5 @@ _08158E5A:
 	strb r0, [r1, #0x00]
 	pop {r0}
 	bx r0
-_08158E68: .4byte 0x083CB0F0
+_08158E68: .4byte dword_83CB0F0 @ =0x083CB0F0
 _08158E6C: .4byte 0x03001018

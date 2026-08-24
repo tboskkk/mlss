@@ -110,7 +110,7 @@ _08147CDA:
 	strb r0, [r2, #0x12]
 	b _08147DA4
 	.byte 0x00, 0x00
-_08147D6C: .4byte 0x083A05EC
+_08147D6C: .4byte dword_83A05EC @ =0x083A05EC
 _08147D70: .4byte 0x00000216
 _08147D74:
 	bl sub_8199F30

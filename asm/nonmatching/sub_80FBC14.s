@@ -41,7 +41,7 @@ sub_80FBC14:
 	cmp r0, #0x00
 	beq _080FBC6E
 	b _080FBC8C
-_080FBC60: .4byte 0x083A05EC
+_080FBC60: .4byte dword_83A05EC @ =0x083A05EC
 _080FBC64: .4byte 0x00000216
 _080FBC68:
 	cmp r0, #0x02

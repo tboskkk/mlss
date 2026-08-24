@@ -107,7 +107,7 @@ _080DF746:
 	bge _080DF760
 	movs r0, #0x00
 	b _080DF76C
-_080DF75C: .4byte 0x0838F8B2
+_080DF75C: .4byte dword_838F8B2 @ =0x0838F8B2
 _080DF760:
 	movs r2, #0x04
 	ldsh r0, [r1, r2]
@@ -131,7 +131,7 @@ _080DF76E:
 	movs r0, #0x00
 	b _080DF798
 	.byte 0x00, 0x00
-_080DF788: .4byte 0x0838F8B2
+_080DF788: .4byte dword_838F8B2 @ =0x0838F8B2
 _080DF78C:
 	movs r1, #0x04
 	ldsh r0, [r2, r1]
@@ -159,7 +159,7 @@ _080DF79A:
 	movs r0, #0x00
 	strh r0, [r5, #0x16]
 	b _080DF7E8
-_080DF7BC: .4byte 0x0838F8B2
+_080DF7BC: .4byte dword_838F8B2 @ =0x0838F8B2
 _080DF7C0:
 	ldrh r0, [r5, #0x16]
 	adds r0, #0x02

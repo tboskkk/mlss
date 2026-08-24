@@ -39,7 +39,7 @@ sub_8061794:
 	movs r0, #0x88
 	bl play_sfx_80195B4
 	b _080617F8
-_080617E4: .4byte 0x083B869C
+_080617E4: .4byte dword_83B869C @ =0x083B869C
 _080617E8:
 	movs r0, #0xD9
 	bl stop_sfx_80195A8

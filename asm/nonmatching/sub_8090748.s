@@ -31,6 +31,6 @@ sub_8090748:
 	movs r0, #0x01
 	bx lr
 	.byte 0x00, 0x00
-_08090780: .4byte 0x084FE9A4
+_08090780: .4byte dword_84FE9A4 @ =0x084FE9A4
 _08090784: .4byte 0x03000FF4
 _08090788: .4byte sub_80907CC

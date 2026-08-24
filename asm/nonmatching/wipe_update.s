@@ -50,7 +50,7 @@ _08079F68:
 	bl process_remove
 	b _0807A648
 	.byte 0x00, 0x00
-_08079F74: .4byte 0x08CDC2D8
+_08079F74: .4byte dword_8CDC2D8 @ =0x08CDC2D8
 _08079F78:
 	mov r0, r8
 	adds r0, #0x33

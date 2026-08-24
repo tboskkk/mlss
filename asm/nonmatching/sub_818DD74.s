@@ -200,8 +200,8 @@ _0818DED8:
 	subs r0, r1, r0
 	b _0818DEFA
 	.byte 0x00, 0x00
-_0818DEE0: .4byte 0x08198584
-_0818DEE4: .4byte 0x08198504
+_0818DEE0: .4byte word_8198584 @ =0x08198584
+_0818DEE4: .4byte word_8198504 @ =0x08198504
 _0818DEE8:
 	mov r3, r8
 	movs r4, #0x12

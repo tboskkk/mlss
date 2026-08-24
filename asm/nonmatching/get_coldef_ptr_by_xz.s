@@ -28,7 +28,7 @@ get_coldef_ptr_by_xz: @ 0805A118
 _0805A144:
 	ldr r0, _0805A148 @ =0x083A75D8
 	b _0805A168
-_0805A148: .4byte 0x083A75D8
+_0805A148: .4byte dword_83A75D8 @ =0x083A75D8
 _0805A14C:
 	mov r3, r12
 	ldrh r0, [r3, #0x26]

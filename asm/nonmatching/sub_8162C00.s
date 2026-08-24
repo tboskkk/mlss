@@ -93,5 +93,5 @@ _08162C18:
 	pop {r4, r5, r6, r7}
 	pop {r0}
 	bx r0
-_08162CB8: .4byte 0x0821291E
-_08162CBC: .4byte 0x083CC284
+_08162CB8: .4byte dword_821291E @ =0x0821291E
+_08162CBC: .4byte dword_83CC284 @ =0x083CC284

@@ -58,5 +58,5 @@ sub_815041C:
 	pop {r0}
 	bx r0
 	.byte 0x00, 0x00
-_08150490: .4byte 0x083A05EC
+_08150490: .4byte dword_83A05EC @ =0x083A05EC
 _08150494: .4byte 0x00000216

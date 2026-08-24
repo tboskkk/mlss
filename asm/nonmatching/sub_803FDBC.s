@@ -38,7 +38,7 @@ _0803FDF0:
 	lsls r4, r4, #0x01
 	b _0803FE3C
 	.byte 0x00, 0x00
-_0803FE00: .4byte 0x0839EE60
+_0803FE00: .4byte dword_839EE60 @ =0x0839EE60
 _0803FE04:
 	adds r0, r4, #0x0
 	cmp r4, #0x00
@@ -90,7 +90,7 @@ _0803FE3C:
 	strb r1, [r0, #0x00]
 	b _0803FE66
 	.byte 0x00, 0x00
-_0803FE5C: .4byte 0x083A05EC
+_0803FE5C: .4byte dword_83A05EC @ =0x083A05EC
 _0803FE60:
 	strb r4, [r7, #0x00]
 	mov r2, r12

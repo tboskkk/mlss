@@ -47,7 +47,7 @@ time_init:
 	pop {r1}
 	bx r1
 	.byte 0x00, 0x00
-_0801BD20: .4byte 0x08CDBDA8
-_0801BD24: .4byte 0x081E23CD
-_0801BD28: .4byte 0x081E23C8
+_0801BD20: .4byte dword_8CDBDA8 @ =0x08CDBDA8
+_0801BD24: .4byte dword_81E23CD @ =0x081E23CD
+_0801BD28: .4byte dword_81E23C8 @ =0x081E23C8
 _0801BD2C: .4byte 0x03000C84

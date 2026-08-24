@@ -114,7 +114,7 @@ sub_8048064:
 	pop {r4, r5, r6}
 	pop {r1}
 	bx r1
-_08048144: .4byte 0x08CDBE88
+_08048144: .4byte dword_8CDBE88 @ =0x08CDBE88
 _08048148: .4byte 0x00000355
 _0804814C: .4byte 0x0000033D
 _08048150: .4byte 0x0000033E

@@ -109,8 +109,8 @@ _08058206:
 	b _08058256
 _08058214: .4byte room_solidity_index_table
 _08058218: .4byte 0x0000FFFF
-_0805821C: .4byte 0x083A75DC
-_08058220: .4byte 0x083A75EC
+_0805821C: .4byte dword_83A75DC @ =0x083A75DC
+_08058220: .4byte dword_83A75EC @ =0x083A75EC
 _08058224:
 	mov r0, r9
 	lsls r3, r0, #0x01

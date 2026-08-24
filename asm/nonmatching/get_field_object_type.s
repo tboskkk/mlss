@@ -29,7 +29,7 @@ get_field_object_type: @ 080FB738
 	ands r0, r1
 	b _080FB772
 	.byte 0x00, 0x00
-_080FB76C: .4byte 0x083D6C58
+_080FB76C: .4byte dword_83D6C58 @ =0x083D6C58
 _080FB770:
 	movs r0, #0x00
 _080FB772:

@@ -70,5 +70,5 @@ _0810FB0C:
 	pop {r0}
 	bx r0
 _0810FB14: .4byte 0x00001830
-_0810FB18: .4byte 0x0810FBBD
+_0810FB18: .4byte dword_810FBBD @ =0x0810FBBD
 _0810FB1C: .4byte sub_810FB20

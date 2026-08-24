@@ -30,6 +30,6 @@ sub_810CB84:
 	add sp, #0x008
 	pop {r0}
 	bx r0
-_0810CBBC: .4byte 0x084FB588
-_0810CBC0: .4byte 0x089F808C
+_0810CBBC: .4byte word_84FB588 @ =0x084FB588
+_0810CBC0: .4byte dword_89F808C @ =0x089F808C
 _0810CBC4: .4byte 0x03000FD8

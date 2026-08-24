@@ -172,7 +172,7 @@ _08117EC2:
 	pop {r4, r5, r6, r7}
 	pop {r0}
 	bx r0
-_08117ED0: .4byte 0x08CDC398
+_08117ED0: .4byte dword_8CDC398 @ =0x08CDC398
 _08117ED4: .4byte 0x03000FC0
 _08117ED8: .4byte 0x00000225
 _08117EDC: .4byte 0x00000151

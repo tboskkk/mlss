@@ -21,5 +21,5 @@ sub_8163394:
 	str r0, [r2, #0x40]
 	bx lr
 	.byte 0x00, 0x00
-_081633B8: .4byte 0x083CC29C
+_081633B8: .4byte dword_83CC29C @ =0x083CC29C
 _081633BC: .4byte 0x0300034C

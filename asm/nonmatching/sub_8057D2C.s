@@ -27,7 +27,7 @@ _08057D5A:
 	adds r0, r0, r1
 	ldr r0, [r0, #0x00]
 	mov pc, r0
-_08057D64: .4byte 0x086527F4
+_08057D64: .4byte dword_86527F4 @ =0x086527F4
 _08057D68: .4byte 0x03000DD0
 _08057D6C: .4byte 0x00000599
 _08057D70: .4byte lbl_08057D74

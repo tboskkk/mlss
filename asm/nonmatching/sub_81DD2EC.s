@@ -61,9 +61,9 @@ _081DD356:
 	bl nullsub_6
 	b _081DD4A2
 	.byte 0x00, 0x00
-_081DD360: .4byte 0x08CDB634
-_081DD364: .4byte 0x08CDBA3C
-_081DD368: .4byte 0x08CDBA40
+_081DD360: .4byte dword_8CDB634 @ =0x08CDB634
+_081DD364: .4byte dword_8CDBA3C @ =0x08CDBA3C
+_081DD368: .4byte dword_8CDBA40 @ =0x08CDBA40
 _081DD36C:
 	str r4, [r7, #0x04]
 	movs r0, #0x00
@@ -111,7 +111,7 @@ _081DD398:
 	str r1, [r5, #0x08]
 	b _081DD3D0
 	.byte 0x00, 0x00
-_081DD3C4: .4byte 0x08CDB63C
+_081DD3C4: .4byte dword_8CDB63C @ =0x08CDB63C
 _081DD3C8:
 	ldr r3, [r7, #0x0C]
 	adds r2, r1, #0x0
@@ -143,7 +143,7 @@ _081DD3D0:
 	ldr r2, [r3, #0x08]
 	b _081DD494
 _081DD400: .4byte 0x000001FF
-_081DD404: .4byte 0x08CDB634
+_081DD404: .4byte dword_8CDB634 @ =0x08CDB634
 _081DD408:
 	lsrs r1, r6, #0x09
 	cmp r1, #0x00
@@ -207,7 +207,7 @@ _081DD45A:
 	str r0, [r7, #0x04]
 	b _081DD494
 	.byte 0x00, 0x00
-_081DD478: .4byte 0x08CDB634
+_081DD478: .4byte dword_8CDB634 @ =0x08CDB634
 _081DD47C:
 	ldr r0, [r2, #0x04]
 	movs r1, #0x04

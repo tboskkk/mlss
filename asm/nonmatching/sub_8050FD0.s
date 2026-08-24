@@ -168,7 +168,7 @@ _08051114:
 	pop {r4, r5, r6, r7}
 	pop {r0}
 	bx r0
-_08051120: .4byte 0x083A0CF8
+_08051120: .4byte dword_83A0CF8 @ =0x083A0CF8
 _08051124: .4byte 0x03000FC0
 _08051128: .4byte 0xFFFFFC3F
 _0805112C: .4byte 0x0000023B

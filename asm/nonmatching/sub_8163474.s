@@ -49,4 +49,4 @@ sub_8163474:
 	pop {r4, r5, r6}
 	pop {r0}
 	bx r0
-_081634D8: .4byte 0x08212ABA
+_081634D8: .4byte dword_8212ABA @ =0x08212ABA

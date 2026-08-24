@@ -133,13 +133,13 @@ _0807ADE8:
 	b _0807AE98
 	.byte 0x00, 0x00
 _0807AE28: .4byte 0x03001034
-_0807AE2C: .4byte 0x08198154
-_0807AE30: .4byte 0x081980D8
+_0807AE2C: .4byte dword_8198154 @ =0x08198154
+_0807AE30: .4byte dword_81980D8 @ =0x081980D8
 _0807AE34: .4byte 0x03000BD4
-_0807AE38: .4byte 0x089F808C
+_0807AE38: .4byte dword_89F808C @ =0x089F808C
 _0807AE3C: .4byte 0x03000FD8
 _0807AE40: .4byte 0x02000280
-_0807AE44: .4byte 0x084FB588
+_0807AE44: .4byte word_84FB588 @ =0x084FB588
 _0807AE48:
 	movs r0, #0x01
 	ands r0, r1
@@ -159,7 +159,7 @@ _0807AE48:
 	movs r1, #0x30
 	b _0807AE98
 	.byte 0x00, 0x00
-_0807AE6C: .4byte 0x084FB588
+_0807AE6C: .4byte word_84FB588 @ =0x084FB588
 _0807AE70:
 	movs r2, #0x8F
 	lsls r2, r2, #0x01
@@ -193,7 +193,7 @@ _0807AE98:
 	bl _call_via_r3
 	b _0807AEE8
 	.byte 0x00, 0x00
-_0807AEB0: .4byte 0x084FB588
+_0807AEB0: .4byte word_84FB588 @ =0x084FB588
 _0807AEB4:
 	movs r0, #0x01
 	ands r0, r1
@@ -234,7 +234,7 @@ _0807AEE8:
 	adds r0, r1, #0x0
 	b _0807AF48
 	.byte 0x00, 0x00
-_0807AF00: .4byte 0x084FB588
+_0807AF00: .4byte word_84FB588 @ =0x084FB588
 _0807AF04: .4byte 0x0000214A
 _0807AF08:
 	cmp r5, #0x02

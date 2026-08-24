@@ -63,7 +63,7 @@ _0816BE74:
 	subs r0, r0, r1
 	b _0816BEB0
 	.byte 0x00, 0x00
-_0816BE84: .4byte 0x08198504
+_0816BE84: .4byte word_8198504 @ =0x08198504
 _0816BE88: .4byte 0xFFFFD800
 _0816BE8C:
 	ldr r1, _0816BEBC @ =0x08198504
@@ -92,5 +92,5 @@ _0816BEB0:
 	pop {r0}
 	bx r0
 	.byte 0x00, 0x00
-_0816BEBC: .4byte 0x08198504
+_0816BEBC: .4byte word_8198504 @ =0x08198504
 _0816BEC0: .4byte 0xFFFFD800

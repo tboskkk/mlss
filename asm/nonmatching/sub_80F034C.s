@@ -58,6 +58,6 @@ _080F03B0:
 	pop {r4, r5, r6, r7}
 	pop {r0}
 	bx r0
-_080F03BC: .4byte 0x08CDC2F8
+_080F03BC: .4byte word_8CDC2F8 @ =0x08CDC2F8
 _080F03C0: .4byte 0x03000FD0
 _080F03C4: .4byte 0x08CDBD68

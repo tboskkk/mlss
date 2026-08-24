@@ -29,6 +29,6 @@ sub_8090420:
 	str r1, [r0, #0x4C]
 	movs r0, #0x01
 	bx lr
-_08090454: .4byte 0x084FE8A8
+_08090454: .4byte dword_84FE8A8 @ =0x084FE8A8
 _08090458: .4byte 0x03000FF4
 _0809045C: .4byte sub_80904C4

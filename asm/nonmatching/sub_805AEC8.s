@@ -108,10 +108,10 @@ _0805AF6E:
 	strb r4, [r0, #0x00]
 	adds r6, r7, #0x1
 	b _0805B03E
-_0805AF94: .4byte 0x083AFC5C
+_0805AF94: .4byte dword_83AFC5C @ =0x083AFC5C
 _0805AF98: .4byte 0x000002B2
 _0805AF9C: .4byte 0x000002D2
-_0805AFA0: .4byte 0x083B283C
+_0805AFA0: .4byte dword_83B283C @ =0x083B283C
 _0805AFA4:
 	movs r0, #0x4C
 	adds r2, r7, #0x0

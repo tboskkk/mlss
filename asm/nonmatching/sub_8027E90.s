@@ -337,4 +337,4 @@ _08028100:
 	pop {r0}
 	bx r0
 	.byte 0x00, 0x00
-_08028148: .4byte 0x08CDBDC8
+_08028148: .4byte dword_8CDBDC8 @ =0x08CDBDC8

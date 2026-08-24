@@ -25,5 +25,5 @@ _0807125A:
 	pop {r1}
 	bx r1
 	.byte 0x00, 0x00
-_08071274: .4byte 0x080712AD
+_08071274: .4byte dword_80712AD @ =0x080712AD
 _08071278: .4byte sub_806EDBC

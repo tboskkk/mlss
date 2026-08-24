@@ -131,7 +131,7 @@ _08050CA0:
 	adds r1, r1, r0
 	ldrh r7, [r1, #0x00]
 	b _08050CCA
-_08050CC0: .4byte 0x083A0CF8
+_08050CC0: .4byte dword_83A0CF8 @ =0x083A0CF8
 _08050CC4:
 	movs r2, #0x80
 	lsls r2, r2, #0x08

@@ -233,7 +233,7 @@ _08076738:
 	pop {r4, r5, r6, r7}
 	pop {r0}
 	bx r0
-_08076740: .4byte 0x083B876C
-_08076744: .4byte 0x083B878C
+_08076740: .4byte dword_83B876C @ =0x083B876C
+_08076744: .4byte dword_83B878C @ =0x083B878C
 _08076748: .4byte 0xFFFFC000
 _0807674C: .4byte sub_80771D8

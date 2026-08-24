@@ -90,7 +90,7 @@ sub_813F6CC:
 	pop {r4, r5, r6, r7}
 	pop {r0}
 	bx r0
-_0813F780: .4byte 0x083A05EC
+_0813F780: .4byte dword_83A05EC @ =0x083A05EC
 _0813F784: .4byte 0x00000216
 _0813F788: .4byte 0x0000033E
 _0813F78C: .4byte sub_8142C88

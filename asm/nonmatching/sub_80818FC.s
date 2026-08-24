@@ -171,7 +171,7 @@ _08081A26:
 	pop {r4, r5, r6, r7}
 	pop {r0}
 	bx r0
-_08081A4C: .4byte 0x084FB814
+_08081A4C: .4byte word_84FB814 @ =0x084FB814
 _08081A50: .4byte 0x03000FD8
 _08081A54: .4byte 0x000002BE
 _08081A58: .4byte 0x03001038

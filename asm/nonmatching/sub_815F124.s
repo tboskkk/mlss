@@ -29,6 +29,6 @@ sub_815F124:
 	pop {r1}
 	bx r1
 	.byte 0x00, 0x00
-_0815F15C: .4byte 0x08CDCE50
+_0815F15C: .4byte dword_8CDCE50 @ =0x08CDCE50
 _0815F160: .4byte 0x000001FF
 	.byte 0x00, 0x20, 0x70, 0x47

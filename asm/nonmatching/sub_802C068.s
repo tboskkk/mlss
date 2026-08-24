@@ -67,7 +67,7 @@ _0802C0C0:
 	.byte 0x00, 0x00
 _0802C0DC: .4byte 0x000002B5
 _0802C0E0: .4byte 0x00000351
-_0802C0E4: .4byte 0x0839F910
+_0802C0E4: .4byte dword_839F910 @ =0x0839F910
 _0802C0E8:
 	movs r6, #0x04
 	ldsh r0, [r2, r6]

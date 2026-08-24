@@ -35,7 +35,7 @@ _081172AA:
 	lsrs r0, r0, #0x18
 	b _081172BE
 	.byte 0x00, 0x00
-_081172B4: .4byte 0x083BBDD0
+_081172B4: .4byte byte_83BBDD0 @ =0x083BBDD0
 _081172B8: .4byte 0x03000FF4
 _081172BC:
 	ldrb r0, [r5, #0x00]

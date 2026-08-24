@@ -64,5 +64,5 @@ _08110F0A:
 	pop {r0}
 	bx r0
 	.byte 0x00, 0x00
-_08110F54: .4byte 0x08110FC5
+_08110F54: .4byte dword_8110FC5 @ =0x08110FC5
 _08110F58: .4byte sub_8110FC8

@@ -381,7 +381,7 @@ _0812C292:
 	bl play_sfx_80195B4
 	b _0812C33A
 	.byte 0x00, 0x00
-_0812C2A0: .4byte 0x083BBDD0
+_0812C2A0: .4byte byte_83BBDD0 @ =0x083BBDD0
 _0812C2A4:
 	mov r0, r9
 	ands r0, r1
@@ -471,4 +471,4 @@ _0812C33C:
 	pop {r1}
 	bx r1
 	.byte 0x00, 0x00
-_0812C34C: .4byte 0x083BBDD0
+_0812C34C: .4byte byte_83BBDD0 @ =0x083BBDD0

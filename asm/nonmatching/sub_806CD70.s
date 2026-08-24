@@ -101,7 +101,7 @@ _0806CE10:
 	b _0806CE54
 	.byte 0x00, 0x00
 _0806CE24: .4byte 0x000020EC
-_0806CE28: .4byte 0x08198584
+_0806CE28: .4byte word_8198584 @ =0x08198584
 _0806CE2C:
 	ldr r2, _0806CEA4 @ =0x08198584
 	adds r1, r4, #0x0
@@ -167,8 +167,8 @@ _0806CE96:
 	movs r0, #0xF0
 	lsls r0, r0, #0x07
 	b _0806CEB0
-_0806CEA4: .4byte 0x08198584
-_0806CEA8: .4byte 0x08198504
+_0806CEA4: .4byte word_8198584 @ =0x08198584
+_0806CEA8: .4byte word_8198504 @ =0x08198504
 _0806CEAC:
 	movs r0, #0xB0
 	lsls r0, r0, #0x07

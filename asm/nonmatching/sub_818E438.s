@@ -204,8 +204,8 @@ _0818E5A4:
 	subs r0, r1, r0
 	b _0818E5C6
 	.byte 0x00, 0x00
-_0818E5AC: .4byte 0x08198584
-_0818E5B0: .4byte 0x08198504
+_0818E5AC: .4byte word_8198584 @ =0x08198584
+_0818E5B0: .4byte word_8198504 @ =0x08198504
 _0818E5B4:
 	mov r0, r8
 	movs r2, #0x12

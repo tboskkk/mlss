@@ -23,7 +23,7 @@ sub_80E1880:
 	subs r0, r0, r1
 	b _080E18B2
 	.byte 0x00, 0x00
-_080E18A8: .4byte 0x0838F8B2
+_080E18A8: .4byte dword_838F8B2 @ =0x0838F8B2
 _080E18AC:
 	ldrh r0, [r2, #0x00]
 	ldrh r1, [r3, #0x00]
@@ -48,4 +48,4 @@ _080E18CE:
 	pop {r4}
 	pop {r0}
 	bx r0
-_080E18D4: .4byte 0x0838F8B2
+_080E18D4: .4byte dword_838F8B2 @ =0x0838F8B2

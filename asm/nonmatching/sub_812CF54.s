@@ -62,7 +62,7 @@ _0812CF98:
 	adds r4, r1, #0x0
 	b _0812CFF4
 	.byte 0x00, 0x00
-_0812CFC8: .4byte 0x083BE67C
+_0812CFC8: .4byte byte_83BE67C @ =0x083BE67C
 _0812CFCC:
 	ldr r3, _0812D17C @ =0x083BBDD0
 	ldr r0, [sp, #0x02C]
@@ -278,7 +278,7 @@ _0812D168:
 	str r6, [sp, #0x014]
 	str r6, [sp, #0x018]
 	b _0812D2F6
-_0812D17C: .4byte 0x083BBDD0
+_0812D17C: .4byte byte_83BBDD0 @ =0x083BBDD0
 _0812D180: .4byte 0x03001038
 _0812D184: .4byte 0x0819832C
 _0812D188: .4byte 0x08198220
@@ -308,7 +308,7 @@ _0812D190:
 	ldr r4, [sp, #0x02C]
 	ldr r0, [r4, #0x40]
 	b _0812D1D4
-_0812D1C0: .4byte 0x083BD844
+_0812D1C0: .4byte dword_83BD844 @ =0x083BD844
 _0812D1C4:
 	ldr r3, _0812D204 @ =0x083BE67C
 	ldr r2, [sp, #0x02C]
@@ -342,7 +342,7 @@ _0812D1D4:
 	bl sub_8121B5C
 	adds r7, r0, #0x0
 	b _0812D242
-_0812D204: .4byte 0x083BE67C
+_0812D204: .4byte byte_83BE67C @ =0x083BE67C
 _0812D208:
 	ldr r3, _0812D344 @ =0x083BBDD0
 	ldr r4, [sp, #0x02C]
@@ -501,7 +501,7 @@ _0812D31C:
 	movs r1, #0xA0
 	movs r2, #0x18
 	b _0812D43E
-_0812D344: .4byte 0x083BBDD0
+_0812D344: .4byte byte_83BBDD0 @ =0x083BBDD0
 _0812D348: .4byte 0x0000025E
 _0812D34C:
 	cmp r0, #0x03
@@ -851,7 +851,7 @@ _0812D5C0:
 	adds r0, r2, #0x0
 	ldrb r1, [r1, #0x02]
 	b _0812D644
-_0812D5E8: .4byte 0x083BBDD0
+_0812D5E8: .4byte byte_83BBDD0 @ =0x083BBDD0
 _0812D5EC:
 	ldr r4, [sp, #0x02C]
 	adds r4, #0xAE
@@ -904,7 +904,7 @@ _0812D644:
 	str r0, [sp, #0x030]
 	b _0812D6A2
 	.byte 0x00, 0x00
-_0812D64C: .4byte 0x083BE67C
+_0812D64C: .4byte byte_83BE67C @ =0x083BE67C
 _0812D650:
 	ldrh r0, [r5, #0x00]
 	ldrh r1, [r4, #0x00]
@@ -1268,7 +1268,7 @@ _0812D882:
 	movs r0, #0xF1
 	b _0812D92A
 	.byte 0x00, 0x00
-_0812D90C: .4byte 0x083BE67C
+_0812D90C: .4byte byte_83BE67C @ =0x083BE67C
 _0812D910:
 	mov r0, r8
 	adds r0, #0x01
@@ -1481,7 +1481,7 @@ _0812DA94:
 	cmp r9, r0
 	blt _0812D9DE
 	b _0812DAAE
-_0812DAA4: .4byte 0x083BBDD0
+_0812DAA4: .4byte byte_83BBDD0 @ =0x083BBDD0
 _0812DAA8:
 	mov r1, r9
 	cmp r1, #0x05
@@ -1623,7 +1623,7 @@ _0812DB70:
 	movs r0, #0x09
 	movs r1, #0x00
 	b _0812DD42
-_0812DBBC: .4byte 0x083BE67C
+_0812DBBC: .4byte byte_83BE67C @ =0x083BE67C
 _0812DBC0:
 	ldrb r1, [r1, #0x00]
 	movs r0, #0x30
@@ -1693,7 +1693,7 @@ _0812DBD4:
 	movs r0, #0x09
 	movs r1, #0x00
 	b _0812DD42
-_0812DC48: .4byte 0x083BBDD0
+_0812DC48: .4byte byte_83BBDD0 @ =0x083BBDD0
 _0812DC4C:
 	ldrb r1, [r2, #0x00]
 	movs r0, #0x30
@@ -1736,7 +1736,7 @@ _0812DC5C:
 	adds r0, #0x8A
 	b _0812DD0A
 	.byte 0x00, 0x00
-_0812DC9C: .4byte 0x083BBDD0
+_0812DC9C: .4byte byte_83BBDD0 @ =0x083BBDD0
 _0812DCA0:
 	ldr r4, [sp, #0x02C]
 	adds r4, #0xAE
@@ -1764,7 +1764,7 @@ _0812DCA0:
 	ldr r0, [r4, #0x00]
 	adds r0, #0xF2
 	b _0812DD0A
-_0812DCD4: .4byte 0x083BE67C
+_0812DCD4: .4byte byte_83BE67C @ =0x083BE67C
 _0812DCD8:
 	ldrh r0, [r5, #0x00]
 	ldrh r1, [r4, #0x00]

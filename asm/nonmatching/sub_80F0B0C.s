@@ -30,5 +30,5 @@ sub_80F0B0C:
 	movs r0, #0x01
 	pop {r1}
 	bx r1
-_080F0B44: .4byte 0x083B7108
+_080F0B44: .4byte dword_83B7108 @ =0x083B7108
 _080F0B48: .4byte 0x03000DD0

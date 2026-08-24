@@ -399,6 +399,6 @@ _0815E620:
 	pop {r4, r5, r6, r7}
 	pop {r1}
 	bx r1
-_0815E630: .4byte 0x082127A8
-_0815E634: .4byte 0x08CDCAF0
+_0815E630: .4byte dword_82127A8 @ =0x082127A8
+_0815E634: .4byte dword_8CDCAF0 @ =0x08CDCAF0
 _0815E638: .4byte 0x00001E94

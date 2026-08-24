@@ -51,7 +51,7 @@ _080E9D9E:
 	movs r2, #0x0A
 	b _080E9DC0
 	.byte 0x00, 0x00
-_080E9DB0: .4byte 0x083BA4B4
+_080E9DB0: .4byte word_83BA4B4 @ =0x083BA4B4
 _080E9DB4:
 	lsls r1, r4, #0x03
 	movs r0, #0xE8

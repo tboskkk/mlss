@@ -30,7 +30,7 @@ sub_8083E84:
 	adds r2, r7, #0x0
 	bl _call_via_r3
 	b _08083EDA
-_08083EBC: .4byte 0x0838F8B4
+_08083EBC: .4byte dword_838F8B4 @ =0x0838F8B4
 _08083EC0: .4byte 0x03001034
 _08083EC4:
 	ldr r2, _08083EE0 @ =0x03001034
@@ -48,5 +48,5 @@ _08083EDA:
 	pop {r0}
 	bx r0
 _08083EE0: .4byte 0x03001034
-_08083EE4: .4byte 0x08198154
-_08083EE8: .4byte 0x081980D8
+_08083EE4: .4byte dword_8198154 @ =0x08198154
+_08083EE8: .4byte dword_81980D8 @ =0x081980D8

@@ -311,7 +311,7 @@ _080EFE5E:
 	pop {r4, r5, r6, r7}
 	pop {r0}
 	bx r0
-_080EFE6C: .4byte 0x083BA4BC
+_080EFE6C: .4byte dword_83BA4BC @ =0x083BA4BC
 _080EFE70: .4byte 0x03000FD0
 _080EFE74: .4byte 0x0000054A
 _080EFE78: .4byte 0x0000F3FF

@@ -10,4 +10,4 @@ sub_8158AEC:
 	pop {r0}
 	bx r0
 	.byte 0x00, 0x00
-_08158AFC: .4byte 0x08CDC870
+_08158AFC: .4byte dword_8CDC870 @ =0x08CDC870

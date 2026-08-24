@@ -24,4 +24,4 @@ _08127EEA:
 	pop {r1}
 	bx r1
 	.byte 0x00, 0x00
-_08127EF4: .4byte 0x08A57994
+_08127EF4: .4byte dword_8A57994 @ =0x08A57994

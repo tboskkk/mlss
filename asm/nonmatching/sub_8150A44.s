@@ -66,4 +66,4 @@ _08150A8A:
 	pop {r1}
 	bx r1
 _08150AC0: .4byte 0xFFFF9C00
-_08150AC4: .4byte 0x082125C8
+_08150AC4: .4byte dword_82125C8 @ =0x082125C8

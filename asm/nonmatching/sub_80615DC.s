@@ -94,7 +94,7 @@ sub_80615DC:
 	bl play_sfx_80195B4
 	b _080616A6
 	.byte 0x00, 0x00
-_08061698: .4byte 0x083B869C
+_08061698: .4byte dword_83B869C @ =0x083B869C
 _0806169C:
 	movs r1, #0x01
 	negs r1, r1

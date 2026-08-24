@@ -131,5 +131,5 @@ _0804A568:
 	pop {r4, r5}
 	pop {r0}
 	bx r0
-_0804A5CC: .4byte 0x083A086C
+_0804A5CC: .4byte dword_83A086C @ =0x083A086C
 _0804A5D0: .4byte 0x00000352

@@ -57,5 +57,5 @@ sub_8161C28:
 	adds r0, r2, #0x0
 	bx lr
 	.byte 0x00, 0x00
-_08161C94: .4byte 0x08CDD0F8
-_08161C98: .4byte 0x0821282C
+_08161C94: .4byte dword_8CDD0F8 @ =0x08CDD0F8
+_08161C98: .4byte dword_821282C @ =0x0821282C

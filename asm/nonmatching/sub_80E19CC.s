@@ -17,4 +17,4 @@ sub_80E19CC:
 	pop {r1}
 	bx r1
 	.byte 0x00, 0x00
-_080E19E8: .4byte 0x0838F8B0
+_080E19E8: .4byte dword_838F8B0 @ =0x0838F8B0

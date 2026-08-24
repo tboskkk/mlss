@@ -45,7 +45,7 @@ _0816DFCE:
 	ldr r0, _0816DFD4 @ =0x0821ABF2
 	b _0816DFDA
 	.byte 0x00, 0x00
-_0816DFD4: .4byte 0x0821ABF2
+_0816DFD4: .4byte dword_821ABF2 @ =0x0821ABF2
 _0816DFD8:
 	ldr r0, _0816DFE8 @ =0x0821ABFA
 _0816DFDA:
@@ -57,7 +57,7 @@ _0816DFE0:
 	adds r7, #0xE4
 	b _0816E002
 	.byte 0x00, 0x00
-_0816DFE8: .4byte 0x0821ABFA
+_0816DFE8: .4byte dword_821ABFA @ =0x0821ABFA
 _0816DFEC:
 	adds r2, r5, #0x0
 	adds r2, #0xE4
@@ -218,4 +218,4 @@ _0816E0C6:
 	pop {r4, r5, r6, r7}
 	pop {r0}
 	bx r0
-_0816E110: .4byte 0x0821AC02
+_0816E110: .4byte dword_821AC02 @ =0x0821AC02

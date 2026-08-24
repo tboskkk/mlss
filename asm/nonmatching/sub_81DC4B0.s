@@ -10,5 +10,5 @@ sub_81DC4B0:
 	bl _call_via_r0
 	pop {pc}
 	.byte 0x00, 0x00
-_081DC4C0: .4byte 0x08CDB630
+_081DC4C0: .4byte dword_8CDB630 @ =0x08CDB630
 _081DC4C4: .4byte sub_81DC4C8

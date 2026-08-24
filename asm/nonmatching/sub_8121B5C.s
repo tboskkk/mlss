@@ -86,7 +86,7 @@ _08121BC8:
 	adds r0, r6, r3
 	b _08121C04
 	.byte 0x00, 0x00
-_08121BFC: .4byte 0x08202F64
+_08121BFC: .4byte dword_8202F64 @ =0x08202F64
 _08121C00:
 	ldr r4, [sp, #0x020]
 	adds r0, r6, r4

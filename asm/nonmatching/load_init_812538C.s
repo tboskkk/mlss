@@ -95,8 +95,8 @@ load_init_812538C:
 	pop {r4, r5, r6}
 	pop {r1}
 	bx r1
-_08125450: .4byte 0x08CDC3B8
+_08125450: .4byte dword_8CDC3B8 @ =0x08CDC3B8
 _08125454: .4byte 0x03000388
-_08125458: .4byte 0x08210F18
-_0812545C: .4byte 0x08210F1C
+_08125458: .4byte dword_8210F18 @ =0x08210F18
+_0812545C: .4byte dword_8210F1C @ =0x08210F1C
 _08125460: .4byte 0x0000084C

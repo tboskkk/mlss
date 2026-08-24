@@ -11,7 +11,7 @@ sub_81166AC:
 	ldr r4, [r5, #0x2C]
 	movs r6, #0x00
 	b _081166F0
-_081166BC: .4byte 0x08CDC368
+_081166BC: .4byte dword_8CDC368 @ =0x08CDC368
 _081166C0:
 	ldrb r1, [r4, #0x00]
 	movs r0, #0x03

@@ -208,8 +208,8 @@ _0818AC54:
 	subs r0, r1, r0
 	b _0818AC76
 	.byte 0x00, 0x00
-_0818AC5C: .4byte 0x08198584
-_0818AC60: .4byte 0x08198504
+_0818AC5C: .4byte word_8198584 @ =0x08198584
+_0818AC60: .4byte word_8198504 @ =0x08198504
 _0818AC64:
 	mov r0, r8
 	movs r3, #0x12

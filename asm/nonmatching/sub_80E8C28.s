@@ -93,7 +93,7 @@ _080E8CBE:
 	mov r12, r1
 	b _080E8CDA
 	.byte 0x00, 0x00
-_080E8CCC: .4byte 0x083B9538
+_080E8CCC: .4byte dword_83B9538 @ =0x083B9538
 _080E8CD0:
 	movs r0, #0x20
 	strb r0, [r4, #0x00]

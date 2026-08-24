@@ -154,8 +154,8 @@ _0818AE44:
 	subs r0, r1, r0
 	b _0818AE64
 	.byte 0x00, 0x00
-_0818AE4C: .4byte 0x08198584
-_0818AE50: .4byte 0x08198504
+_0818AE4C: .4byte word_8198584 @ =0x08198584
+_0818AE50: .4byte word_8198504 @ =0x08198504
 _0818AE54:
 	movs r5, #0x12
 	ldsh r1, [r6, r5]
