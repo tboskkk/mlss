@@ -44,20 +44,5 @@ u32 sub_819AC14(s32 arg0)
   return (u32) ((u8) var_r4_37);
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_819AC84.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
-
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_819AF18.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+ASM_FUNC("asm/nonmatching/sub_819AC84.s", void sub_819AC84(s32 arg0));
+ASM_FUNC("asm/nonmatching/sub_819AF18.s", void sub_819AF18(void));
