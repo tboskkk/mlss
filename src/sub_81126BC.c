@@ -14,11 +14,11 @@ int sub_8112350();
 s32 stop_sfx_80195A8();
 s32 sub_8082E1C();
 s32 sub_8087CE4();
-extern s32 sub_8111234;
+void sub_8111234(void *arg0);                       /* extern */
 
 void sub_81126BC(struct Entity *arg0) {
     sub_8082E1C(arg0, 9, 0, 0);
-    arg0->handler = &sub_8111234;
+    arg0->handler = (s32 *) &sub_8111234;
     play_sfx_80195B4(0x86, -1);
 }
 

@@ -67,7 +67,7 @@ asm_unified(".include \"asm/nonmatching/sub_810B7EC.s\"");
 #else
 void *sub_807D2D0(s32 *, s32, s32 *);       /* extern */
 void *sub_807FF48(s32 *, s32);                  /* extern */
-extern s32 sub_810AB34;
+void sub_810AB34(void *arg0);                       /* extern */
 extern s32 sub_810B884;
 extern s32 sub_810CDFC;
 extern s32 sub_810CEC0;
@@ -83,7 +83,7 @@ void sub_810B7EC(void) {
             temp_r2_22 = *(void **)0x03000FD8;
             (*(void **)((s8 *)(temp_r2_22) + (0x290))) = sub_807FF48(&sub_810CEC0, 0);
             (*(u8 *)((s8 *)(temp_r2_22) + (0xB))) = (u8) ((*(u8 *)((s8 *)(temp_r2_22) + (0xB))) | 0x40);
-            temp_r0_34 = sub_807D2D0(&sub_810CDFC, 0x86, &sub_810AB34);
+            temp_r0_34 = sub_807D2D0(&sub_810CDFC, 0x86, (s32 *) &sub_810AB34);
             (*(void **)((s8 *)((*(void **)((s8 *)(*(void **)0x03000FD8) + (0x290)))) + (0xC))) = temp_r0_34;
             (*(u16 *)((s8 *)(temp_r0_34) + (0x16))) = (u16) *(u16 *)0x0200001A;
             (*(s16 *)((s8 *)((void *)0x02000048) + (0))) = 0x3F3F;

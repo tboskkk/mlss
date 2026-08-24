@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start sub_8116654
-sub_8116654:
 	push {lr}
 	lsls r1, r1, #0x18
 	lsrs r1, r1, #0x18

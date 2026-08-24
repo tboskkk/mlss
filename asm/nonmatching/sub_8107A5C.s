@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start sub_8107A5C
-sub_8107A5C:
 	push {r4, r5, r6, r7, lr}
 	mov r7, r8
 	push {r7}

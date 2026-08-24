@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start sub_80FAD2C
-sub_80FAD2C:
 	push {lr}
 	ldr r3, [r2, #0x04]
 	movs r1, #0xA8

@@ -11,8 +11,8 @@ asm_unified(".include \"asm/macros.inc\"");
 asm_unified(".include \"asm/nonmatching/sub_81070B8.s\"");
 #else
 s32 sub_8082B00();                                  /* extern */
-extern s32 sub_80FD44C;
-extern s32 sub_810124C;
+void sub_80FD44C(void *arg0);                       /* extern */
+void sub_810124C(void *arg0);                       /* extern */
 
 void sub_81070B8(void *arg0) {
     s32 *var_r0_37;
@@ -27,11 +27,11 @@ void sub_81070B8(void *arg0) {
     }
     if (M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */) != 0) {
         if (!(0x38 & (*(u8 *)((s8 *)((*(void **)((s8 *)(temp_r1_9) + (0x7C)))) + (0x7E))))) {
-            var_r0_37 = &sub_80FD44C;
+            var_r0_37 = (s32 *) &sub_80FD44C;
             goto block_7;
         }
     } else if ((sub_8082B00() << 0x18) == 0) {
-        var_r0_37 = &sub_810124C;
+        var_r0_37 = (s32 *) &sub_810124C;
 block_7:
         (*(s32 **)((s8 *)(arg0) + (4))) = var_r0_37;
     }

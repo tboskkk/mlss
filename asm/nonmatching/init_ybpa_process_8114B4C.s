@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start init_ybpa_process_8114B4C
-init_ybpa_process_8114B4C: @ 08114B4C
 	push {r4, r5, r6, r7, lr}
 	add sp, #-0x004
 	adds r7, r0, #0x0

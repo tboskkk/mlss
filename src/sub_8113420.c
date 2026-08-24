@@ -55,8 +55,8 @@ s32 stop_sfx_80195A8(s32);                      /* extern */
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 s32 sub_8086858(void *, s32);                   /* extern */
 s32 sub_80DF024(s32, s32, s32, s32, void *);    /* extern */
-extern s32 sub_8113EA0;
-extern s32 sub_8113F30;
+s32 sub_8113EA0(void *arg0, void *arg1);                       /* extern */
+s32 sub_8113F30(void *arg0, void *arg1);                       /* extern */
 extern s32 sub_8114110;
 
 void sub_81135C0(void *arg0) {
@@ -91,8 +91,8 @@ void sub_81135C0(void *arg0) {
     }
     sub_80DF024(0x2ABF, var_r1_50 >> 8, var_r2_56 >> 8, var_r3_62 >> 8, temp_r4_29);
     sub_8086858(temp_r4_29, 0x18CE);
-    (*(s32 **)((s8 *)(temp_r4_29) + (0x58))) = &sub_8113F30;
-    (*(s32 **)((s8 *)(temp_r4_29) + (0x60))) = &sub_8113EA0;
+    (*(s32 **)((s8 *)(temp_r4_29) + (0x58))) = (s32 *) &sub_8113F30;
+    (*(s32 **)((s8 *)(temp_r4_29) + (0x60))) = (s32 *) &sub_8113EA0;
     stop_sfx_80195A8(0x120);
 }
 #endif

@@ -33,8 +33,8 @@ asm_unified(".include \"asm/nonmatching/sub_811416C.s\"");
 s32 sub_807F4FC(void *);                        /* extern */
 s32 sub_80880C4(void *, s32);                   /* extern */
 s32 sub_808843C(void *, s32, s32, s32, s32);    /* extern */
-extern s32 sub_8113EA0;
-extern s32 sub_8113F30;
+s32 sub_8113EA0(void *arg0, void *arg1);                       /* extern */
+s32 sub_8113F30(void *arg0, void *arg1);                       /* extern */
 extern s32 sub_81145C8;
 
 void sub_811416C(void *arg0) {
@@ -48,8 +48,8 @@ void sub_811416C(void *arg0) {
     temp_r4_12 = (*(void **)((s8 *)((*(void **)((s8 *)(arg0) + (0x30)))) + (0x30)));
     temp_r5_14 = (*(void **)((s8 *)((*(void **)((s8 *)(temp_r4_12) + (0x2C)))) + (0x28)));
     sub_807F4FC(temp_r4_12);
-    (*(s32 **)((s8 *)(temp_r4_12) + (0x58))) = &sub_8113F30;
-    (*(s32 **)((s8 *)(temp_r4_12) + (0x60))) = &sub_8113EA0;
+    (*(s32 **)((s8 *)(temp_r4_12) + (0x58))) = (s32 *) &sub_8113F30;
+    (*(s32 **)((s8 *)(temp_r4_12) + (0x60))) = (s32 *) &sub_8113EA0;
     var_r0_23 = (*(s32 *)((s8 *)(temp_r5_14) + (0xD8)));
     if (var_r0_23 < 0) {
         var_r0_23 += 0xFF;

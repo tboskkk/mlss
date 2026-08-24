@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start sub_810CB84
-sub_810CB84:
 	push {lr}
 	add sp, #-0x008
 	ldr r0, _0810CBBC @ =0x084FB588

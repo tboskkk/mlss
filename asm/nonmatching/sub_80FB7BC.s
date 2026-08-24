@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start sub_80FB7BC
-sub_80FB7BC:
 	lsls r0, r0, #0x10
 	lsrs r0, r0, #0x0E
 	ldr r2, _080FB7DC @ =0x083D6C58
