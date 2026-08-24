@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start stage_room_solidity_grid
-stage_room_solidity_grid:
 	push {r4, r5, r6, r7, lr}
 	adds r3, r0, #0x0
 	ldr r2, _0805A028 @ =solidity_grid_offset_table

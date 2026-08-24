@@ -20,24 +20,8 @@ void sub_8081E74(void) {
     sub_8082AAC(0x2089);
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8081EAC.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
-
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8081F34.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
-
+ASM_FUNC("asm/nonmatching/sub_8081EAC.s", void sub_8081EAC(void));
+ASM_FUNC("asm/nonmatching/sub_8081F34.s", void sub_8081F34(s32 arg0));
 s32 process_enable(s32);                        /* extern */
 s32 sub_80FC9A4(void *);                        /* extern */
 

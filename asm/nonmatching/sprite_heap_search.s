@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start sprite_heap_search
-sprite_heap_search:
 	push {r4, lr}
 	adds r4, r0, #0x0
 	lsls r1, r1, #0x18

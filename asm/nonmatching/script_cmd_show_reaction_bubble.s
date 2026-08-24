@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start script_cmd_show_reaction_bubble
-script_cmd_show_reaction_bubble: @ 080EEB80
 	push {r4, r5, r6, r7, lr}
 	add sp, #-0x014
 	adds r5, r2, #0x0
