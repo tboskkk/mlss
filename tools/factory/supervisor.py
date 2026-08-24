@@ -85,6 +85,14 @@ PROCESSES = {
     # isolation_exact.py reported the worker permanently dead while it was
     # running fine.
     "isolation_exact": ("isolation_exact.py", ["--loop", "300", "--limit", "6000"], False),
+    # Same staleness argument as isolation_exact.py above, for the SAME
+    # tier2-ranking reason (OBJDIFF_ADMIT_FLOOR) - built and measured
+    # (2,444-candidate sweep) but never actually wired in as a continuous
+    # worker until now, so the column was only ever as fresh as the last
+    # manual sweep. Runs on the HOST directly (objdiff-cli is not part of
+    # the container image) - see CLAUDE.md's "Matching tools" section for
+    # where that binary needs to live.
+    "objdiff_score": ("objdiff_score.py", ["--loop", "300", "--limit", "6000"], False),
     # Supervised rather than run by hand, because the failure it catches is
     # invisible to everything else here: the supervisor only restarts a
     # process that DIED, and tier2 can stop working while staying alive,

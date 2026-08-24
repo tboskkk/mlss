@@ -197,8 +197,21 @@ emits no `.size`, so a diff runs past the function's end and the score is
 dominated by however many functions follow it in the file. This caused a large
 family of bugs. Prefer `tools/factory/isolation_exact.py` (byte-exact, one
 symbol alone, ~2,000/min, read-only) or a plain-build score
-(`rescore_seeds.plain_score`). **objdiff adoption is planned** and fixes this
-by construction — see the master plan §2.2.
+(`rescore_seeds.plain_score`).
+
+**objdiff** (`tools/factory/objdiff_score.py`) fixes the above by
+construction: it reads real ELF symbol boundaries, so it scores ONE symbol
+inside a multi-symbol object, and its per-instruction match percentage
+(0-100) is a normalized signal `iso_score`'s raw byte count doesn't give.
+Wired into `tier2.py`'s claim ordering (`OBJDIFF_ADMIT_FLOOR`). **Runs on
+the HOST directly, not inside the container** (unlike every other factory
+tool) — `objdiff-cli` needs to be on the host `PATH` or pointed to via
+`OBJDIFF=/path/to/objdiff-cli`. Install: build from
+[`encounter/objdiff`](https://github.com/encounter/objdiff) with
+`cargo build --release -p objdiff-cli`, then put the binary somewhere on
+`PATH` (`~/.local/bin/objdiff-cli` is where the running factory expects
+it). `./container.sh` never builds this — it's a host-side Rust binary,
+not part of the agbcc toolchain image.
 
 **decomp-permuter** (`tools/decomp-permuter`, fork
 `WhenGryphonsFly/decomp-permuter-agbcc` — mainline doesn't target ARMv4T+agbcc).
