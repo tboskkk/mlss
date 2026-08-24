@@ -694,7 +694,23 @@ UNTYPED_HEAD_TOKEN = r"[A-Za-z_]\w*"
 # fix_uncast_address_dereference above does, and expand_macros() does),
 # with this regex only used to VALIDATE an already-extracted, already-
 # balanced span's shape once found.
+CTYPE_KEYWORDS = {
+    "void", "u8", "s8", "u16", "s16", "u32", "s32", "u64", "s64", "int",
+    "char", "short", "long", "unsigned", "signed", "float", "double",
+    "struct", "bool32", "size_t",
+}
+
 UNTYPED_EXPR_SHAPE_RE = re.compile(rf"^\s*{UNTYPED_HEAD_TOKEN}(?:\s*[+\-]\s*.+)?\s*$", re.DOTALL)
+# The other shape this rule needs to recognize: a value that IS already
+# correctly typed by its own cast (`*(s32 *)ADDR`), plus/minus more
+# arithmetic, used as a CALL target with no further cast at all - e.g.
+# `(*(s32 *)0x03001038 + 0x10C)(args)`, a real, repeated idiom (an IWRAM
+# function-pointer-table lookup). This is a different defect from the
+# "untyped identifier" shape above: the value itself is fine (a plain
+# s32), it just needs a FUNCTION POINTER cast to be callable - no
+# _local_types() lookup needed, the leading cast already settles it.
+TYPED_DEREF_HEAD_RE = re.compile(
+    rf"^\s*\*\(\s*(?:{'|'.join(sorted(CTYPE_KEYWORDS - {'struct'}, key=len, reverse=True))})\s*\*\s*\)")
 UNTYPED_CAST_HEAD_RE = re.compile(r"\*\)\s*$")
 UNTYPED_HEX_RE = re.compile(r"^\s*0[xX]")
 UNTYPED_IDENT_RE = re.compile(rf"^({UNTYPED_HEAD_TOKEN})")
@@ -716,13 +732,6 @@ def _balanced_span(s: str, open_idx: int) -> int | None:
     return None
 
 
-CTYPE_KEYWORDS = {
-    "void", "u8", "s8", "u16", "s16", "u32", "s32", "u64", "s64", "int",
-    "char", "short", "long", "unsigned", "signed", "float", "double",
-    "struct", "bool32", "size_t",
-}
-
-
 def _classify_untyped_head(head: str, local_types: dict) -> str | None:
     """None if `head`'s own leading identifier is already a real pointer
     type (dereferencing/calling it needs no cast - this rule only adds
@@ -734,6 +743,15 @@ def _classify_untyped_head(head: str, local_types: dict) -> str | None:
     a second time, producing `((s32 (*)())(u8))(y)`, a real syntax error
     caught by an actual agbcc compile, not by review. Returns the
     width/cast to apply otherwise."""
+    if TYPED_DEREF_HEAD_RE.match(head.strip()):
+        # Already a definite, correctly-typed scalar (its own cast settles
+        # it) - no local-variable lookup needed, it just needs the OUTER
+        # cast (a data-pointer width for a deref, a function-pointer type
+        # for a call) to be usable. Measured: 18/300 (6%) of a broad sample
+        # of still-undraftable seeds hit exactly this shape, most commonly
+        # `(*(s32 *)0x03001038 + OFFSET)(args)` - an IWRAM function-pointer-
+        # table lookup idiom repeated across many handler dispatchers.
+        return "s32"
     m = UNTYPED_IDENT_RE.match(head.strip())
     if not m:
         return None
@@ -793,7 +811,7 @@ def fix_untyped_address_access(c: str, name: str) -> str:
         if close_idx is None:
             return None
         inner = s[open_idx + 1 : close_idx - 1]
-        if not UNTYPED_EXPR_SHAPE_RE.match(inner):
+        if not (UNTYPED_EXPR_SHAPE_RE.match(inner) or TYPED_DEREF_HEAD_RE.match(inner)):
             return None
         if UNTYPED_HEX_RE.match(inner):
             return None  # fix_uncast_address_dereference's job
