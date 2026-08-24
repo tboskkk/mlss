@@ -142,14 +142,19 @@ void stop_sfx_80195A8(void) {
     sub_819B9E8();
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/play_sfx_80195B4.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+void sub_819B9D0(s32);
+void sub_8019508(u8, u8);
+
+void play_sfx_80195B4(s32 arg0, s32 arg1) {
+    sub_819B9D0(arg0);
+    if (arg1 == -1 && gGameState.field_890 != 0) {
+        return;
+    }
+    if (gGameState.field_890 == 0) {
+        arg1 = 0xFF;
+    }
+    sub_8019508((u8) arg1, 0);
+}
 
 s32 sub_819BA2C();
 s32 sub_80195F8(s32 arg0)

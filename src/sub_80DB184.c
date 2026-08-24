@@ -7,35 +7,25 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80DB184.s\"");
-#else
-/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
-   compiles a whole translation unit at a time, so an #error here fails
-   every OTHER function in this file under NONMATCHING=1. Guard intact, so
-   the real ROM still gets the verbatim retail bytes and progress.py still
-   counts this as unmatched. Write the C here, replacing this comment. */
-#endif
+s32 stop_sfx_80195A8();
+s32 sub_8086C64();
+s32 sub_8087124();
+s32 sub_810DD7C();
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80DB1A4.s\"");
-#else
-/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
-   compiles a whole translation unit at a time, so an #error here fails
-   every OTHER function in this file under NONMATCHING=1. Guard intact, so
-   the real ROM still gets the verbatim retail bytes and progress.py still
-   counts this as unmatched. Write the C here, replacing this comment. */
-#endif
+s32 sub_80DB184(s32 arg0, s32 arg1, s32 arg2) {
+    stop_sfx_80195A8(0x81);
+    return sub_8087124(arg0, arg1, arg2);
+}
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80DB1C4.s\"");
-#else
-/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
-   compiles a whole translation unit at a time, so an #error here fails
-   every OTHER function in this file under NONMATCHING=1. Guard intact, so
-   the real ROM still gets the verbatim retail bytes and progress.py still
-   counts this as unmatched. Write the C here, replacing this comment. */
-#endif
+s32 sub_80DB1A4(s32 arg0, s32 arg1, s32 arg2) {
+    stop_sfx_80195A8(0x81);
+    return sub_8086C64(arg0, arg1, arg2);
+}
+
+s32 sub_80DB1C4(s32 arg0, s32 arg1, s32 arg2) {
+    stop_sfx_80195A8(0x81);
+    return sub_810DD7C(arg0, arg1, arg2);
+}
 
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 s32 sub_808552C(void *, void *, void *, s32, s32, s32, s32, s32, s32, s32); /* extern */

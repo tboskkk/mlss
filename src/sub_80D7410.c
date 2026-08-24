@@ -7,6 +7,10 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
+s32 stop_sfx_80195A8();
+s32 sub_8087124();
+s32 sub_810DD7C();
+
 
 
 
@@ -20,63 +24,10 @@ int sub_8087540();
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80D7410.s\"");
 #else
-extern void sub_80D7488();
-
-void sub_80D7410(void* p0) {
-    u32* r0;
-    u32* r4;
-    u8 r1;
-    u32* r2;
-    u32 r0_2;
-    u8 r0_3;
-    u16 r0_4;
-    u16 r1_2;
-    u16 r0_5;
-    u8 r1_3;
-    u8 r0_6;
-    
-    r0 = (u32*)0x03000FD8;
-    r0 = (u32*)*(r0);
-    r4 = (u32*)*(r0 + 0x74 / 4);
-    r0 = (u32*)*(r4 + 0x10 / 4);
-    r1 = *(r0 + 0x12);
-    if ((r1 & 0x08) == 0) {
-        goto _080D746C;
-    }
-    r0 = (u32*)((u8*)r4 + 0x7E);
-    r0_3 = *(r0);
-    r1_2 = r0_3 & 0x06;
-    if (r1_2 == 0x02) {
-        goto _080D7438;
-    }
-    if (r1_2 != 0x04) {
-        goto _080D7468;
-    }
-_080D7438:
-    r2 = (u32*)0x03001038;
-    r0 = (u32*)0x0819832C;
-    r1 = (u32*)0x08198220;
-    r0_2 = r0 - r1;
-    r2 = (u32*)*(r2);
-    r2 = (u32*)((u8*)r2 + r0_2);
-    r0_4 = 0x80 << 7;
-    r1_2 = 0x10;
-    r0_5 = ((u16 (*)(u32, u32))r2)(r0_4, r1_2);
-    r2 = (u32*)((u8*)r4 + 0x82);
-    *(u16*)r2 = r0_5;
-    r0 = (u32*)((u8*)r4 + 0x86);
-    *(u16*)r0 = 0x0000;
-    r2 = (u32*)((u8*)r4 + 0x81);
-    r1_3 = *(u8*)r2;
-    r0_6 = 0x21;
-    r0_6 = -r0_6;
-    r1_3 = r0_6 & r1_3;
-    *(u8*)r2 = r1_3;
-_080D7468:
-    *(u32*)((u8*)p0 + 0x4C) = (u32)sub_80D7488;
-_080D746C:
-    return;
-}
+/* Quarantined: this draft was raw register-style pseudo-C (`r2 = (u32*)*(r2);`)
+   that does not compile, and it was failing the WHOLE translation unit under
+   NONMATCHING=1 -- CLAUDE.md section M.3. Emptied so its siblings can be
+   compiled and diffed. The #ifndef branch is untouched. */
 #endif
 
 #ifndef NONMATCHING
@@ -393,8 +344,8 @@ asm_unified(".include \"asm/nonmatching/sub_80D8FA0.s\"");
 #endif
 
 s32 stop_sfx_80195A8(s32);                      /* extern */
-extern s32 sub_80D909C;
-extern s32 sub_80D90BC;
+s32 sub_80D909C(s32, s32, s32);
+s32 sub_80D90BC(s32, s32, s32);
 
 void sub_80D9018(void *arg0) {
     s32 temp_r5_10;
@@ -406,31 +357,21 @@ void sub_80D9018(void *arg0) {
         (*(s32 *)((s8 *)(arg0) + (0x94))) = sub_808552C(arg0 + 0xAE, arg0 + 0xB0, arg0 + 0xB2, 0, temp_r5_10, temp_r5_10, 0x1400, 0x4CC, 0x104, temp_r5_10);
         sub_8082E1C(arg0, 3, 0, 0);
         sub_807F4FC(arg0);
-        (*(s32 **)((s8 *)(arg0) + (0x58))) = &sub_80D90BC;
-        (*(s32 **)((s8 *)(arg0) + (0x60))) = &sub_80D909C;
+        (*(s32 **)((s8 *)(arg0) + (0x58))) = (s32 *) &sub_80D90BC;
+        (*(s32 **)((s8 *)(arg0) + (0x60))) = (s32 *) &sub_80D909C;
         (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_80D8DC4;
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80D909C.s\"");
-#else
-/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
-   compiles a whole translation unit at a time, so an #error here fails
-   every OTHER function in this file under NONMATCHING=1. Guard intact, so
-   the real ROM still gets the verbatim retail bytes and progress.py still
-   counts this as unmatched. Write the C here, replacing this comment. */
-#endif
+s32 sub_80D909C(s32 arg0, s32 arg1, s32 arg2) {
+    stop_sfx_80195A8(0x81);
+    return sub_8087124(arg0, arg1, arg2);
+}
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80D90BC.s\"");
-#else
-/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
-   compiles a whole translation unit at a time, so an #error here fails
-   every OTHER function in this file under NONMATCHING=1. Guard intact, so
-   the real ROM still gets the verbatim retail bytes and progress.py still
-   counts this as unmatched. Write the C here, replacing this comment. */
-#endif
+s32 sub_80D90BC(s32 arg0, s32 arg1, s32 arg2) {
+    stop_sfx_80195A8(0x81);
+    return sub_810DD7C(arg0, arg1, arg2);
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80D90DC.s\"");

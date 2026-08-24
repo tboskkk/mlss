@@ -49,17 +49,13 @@ void sub_806A7A0(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_806A7CC.s\"");
-#else
 s32 stop_sfx_80195A8(s32);                      /* extern */
 s32 sub_8086C64(s32, s32, s32);                 /* extern */
 
-void sub_806A7CC(s32 arg0, s32 arg1, s32 arg2) {
+s32 sub_806A7CC(s32 arg0, s32 arg1, s32 arg2) {
     stop_sfx_80195A8(0x81);
-    sub_8086C64(arg0, arg1, arg2);
+    return sub_8086C64(arg0, arg1, arg2);
 }
-#endif
 
 s32 sub_806A7EC(struct Entity *arg0, s32 arg1) {
     stop_sfx_80195A8(0x81);
