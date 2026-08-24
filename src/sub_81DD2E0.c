@@ -11,29 +11,6 @@ s32 sub_81DD2E0(void) {
     return *(s32 *)0x08CDBD64;
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_81DD2EC.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
-
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_81DD4AC.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
-
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/strlen.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+ASM_FUNC("asm/nonmatching/sub_81DD2EC.s", void sub_81DD2EC(s32 arg0, s32 arg1, s32 arg3));
+ASM_FUNC("asm/nonmatching/sub_81DD4AC.s", s32 sub_81DD4AC(s32 arg0, s32 arg1));
+ASM_FUNC("asm/nonmatching/strlen.s", size_t strlen(const char *arg0));

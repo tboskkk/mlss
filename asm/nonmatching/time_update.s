@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start time_update
-time_update: @ 0801B8D8
 	push {r4, r5, r6, r7, lr}
 	mov r7, r10
 	mov r6, r9

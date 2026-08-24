@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start strlen
-strlen:
 	push {r4, r5, lr}
 	adds r1, r0, #0x0
 	adds r5, r1, #0x0

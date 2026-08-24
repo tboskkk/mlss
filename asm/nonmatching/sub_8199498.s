@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start sub_8199498
-sub_8199498:
 	push {r4, r5, lr}
 	cmp r0, #0x00
 	beq _081994D4

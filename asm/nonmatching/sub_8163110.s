@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start sub_8163110
-sub_8163110:
 	lsls r0, r0, #0x10
 	movs r2, #0xF8
 	lsls r2, r2, #0x0D

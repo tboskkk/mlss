@@ -75,8 +75,8 @@ void sub_81502A8(s32 arg0, void *arg1) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_815033C.s\"");
 #else
-extern s32 sub_814EC48;
-extern s32 sub_814ECE0;
+void sub_814EC48(s32 arg0, void *arg1, s32 **arg2);                       /* extern */
+void sub_814ECE0(s32 arg0, void *arg1, s32 **arg2);                       /* extern */
 
 void sub_815033C(void *arg0, s32 arg1) {
     s32 **var_r1_24;
@@ -86,10 +86,10 @@ void sub_815033C(void *arg0, s32 arg1) {
     (*(s8 *)((s8 *)(arg0) + (0x2B4))) = 0;
     if ((arg1 << 0x18) == 0) {
         var_r1_24 = arg0 + 0x1A0;
-        var_r0_25 = &sub_814EC48;
+        var_r0_25 = (s32 *) &sub_814EC48;
     } else {
         var_r1_24 = arg0 + 0x1A0;
-        var_r0_25 = &sub_814ECE0;
+        var_r0_25 = (s32 *) &sub_814ECE0;
     }
     *var_r1_24 = var_r0_25;
 }

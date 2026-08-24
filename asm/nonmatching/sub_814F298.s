@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start sub_814F298
-sub_814F298:
 	push {r4, r5, lr}
 	adds r3, r0, #0x0
 	mov r12, r1

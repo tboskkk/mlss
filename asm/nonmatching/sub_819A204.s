@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start sub_819A204
-sub_819A204:
 	mov r12, r0
 	add r3, pc, #0x068
 	ldrb r1, [r1, r3]

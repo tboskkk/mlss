@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start sub_8163650
-sub_8163650:
 	subs r2, #0x01
 	lsls r3, r1, #0x01
 	adds r3, r3, r1

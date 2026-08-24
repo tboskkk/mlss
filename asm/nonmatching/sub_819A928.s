@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start sub_819A928
-sub_819A928:
 	ldr r1, _0819A958 @ =0x04000080
 	movs r0, #0x77
 	strb r0, [r1, #0x00]
