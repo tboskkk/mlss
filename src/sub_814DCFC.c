@@ -8,11 +8,11 @@
 asm_unified(".include \"asm/macros.inc\"");
 
 s32 sub_814DB34();                              /* extern */
-extern s32 sub_814D838;
+void sub_814D838(s32, void *, s32 **);          /* extern */
 
 void sub_814DCFC(s32 arg0, s32 arg1, s32 **arg2) {
     sub_814DB34();
-    *arg2 = &sub_814D838;
+    *arg2 = (s32 *) &sub_814D838;
 }
 
 #ifndef NONMATCHING
