@@ -19,10 +19,16 @@ default - pass `--show-huffman-candidates` if you want the noise.
 
 Run: `./container.sh tools/find_compressed_blocks.py`
 
-**75 confirmed blocks** (>= 32 decompressed bytes) across
-`0x081DD790`-`0x08F50000`, overwhelmingly RLE rather than LZ77 - worth
-knowing before assuming "GBA game" defaults to LZ77 for this one. Several
-are large enough to be major assets, not incidental data:
+**75 raw hits, 63 confirmed after correction** (>= 32 decompressed bytes)
+across `0x081DD790`-`0x08F50000`, overwhelmingly RLE rather than LZ77 -
+worth knowing before assuming "GBA game" defaults to LZ77 for this one.
+**12 of the original 75 turned out to be false positives** - a different,
+custom (non-BIOS) LZ codec's real streams that happen to also satisfy this
+decoder's termination check often enough to look like a clean RLE hit. Full
+finding, evidence and the corrected address list: "Custom sprite
+compression" section below. `assets/manifest.json` reflects the corrected
+63. Several of the real ones are large enough to be major assets, not
+incidental data:
 
 | Address | Compressed | Decompressed |
 |---|---:|---:|
@@ -403,32 +409,101 @@ since it's a live-build-affecting change and the factory daemon was
 running an unattended commit loop at the time; a natural next step
 whenever that's convenient.
 
-**Custom sprite compression, ported and empirically tested - result:
-does not explain this project's biggest unclassified gaps.**
-`Sprite Viewer.vb`'s `decomp()` sub implements a genuine custom LZ-style
-scheme (NOT a GBA BIOS format `gba_compress.py` already handles) - a
-control byte's top 3 bits select one of five behaviors (sliding-window
+**CORRECTED 2026-08-23/24. The "dead end" conclusion below was itself
+wrong** - measured with a decoder that had three real bugs and could not
+actually decode this format, not a genuine negative result. Left in place
+with the correction inline rather than deleted, because the wrong
+conclusion and why it happened are both worth keeping: CLAUDE.md's own
+recurring law (T.15) is that a broken measurement always fails toward
+"this work is bad," and this is another instance of exactly that.
+
+The original claim (kept for the record): *"Custom sprite compression,
+ported and empirically tested - result: does not explain this project's
+biggest unclassified gaps... zero clean decodes found... this specific
+format, as ported, isn't the answer for the 5.1MB of genuinely
+unclassified rodata - worth recording so nobody re-tries the same dead
+end."* `Sprite Viewer.vb`'s `decomp()` sub implements a genuine custom
+LZ-style scheme (NOT a GBA BIOS format `gba_compress.py` already handles)
+- a control byte's top 3 bits select one of five behaviors (sliding-window
 back-reference copy from up to 1024 bytes back, literal copy, zero/literal
 pairs, byte-repeat run, zero-fill with an extended-run special case),
-terminated by the literal two-byte sequence `0x7F 0xFF`. Ported to
-`tools/try_custom_decomp.py` and tested directly against this project's
-own top unclassified gaps from the ROM map above (`0x08C754C4`, the
-single largest one) - **zero clean decodes found**, the most directly
-relevant negative result available. A broader scan elsewhere did find 25
-"clean" decodes, but cross-referencing every one against `assets/rom_map.json`
-showed most sit *inside* byte ranges this project already confirmed as
-something else entirely (BIOS RLE-compressed blocks, text) - a strong tell
-that the hits are coincidental terminator matches, not real structure,
-since a byte range can't genuinely be both formats at once. Confirmed via
-two negative controls: scanning 400KB of definitely-real Thumb/ARM code
-still produced 2 tiny spurious hits (a nonzero baseline false-positive
-rate for short outputs), while scanning the confirmed 100%-zero padding
-region and the confirmed-real Game Boy Player logo tile data both came
-back with **zero** hits, matching expectations either way. Bottom line:
-this specific format, as ported, isn't the answer for the 5.1MB of
-genuinely unclassified rodata - worth recording so nobody re-tries the
-same dead end, but the actual unclassified-gap mystery (see the ROM map
-section above) is still open.
+terminated by the literal two-byte sequence `0x7F 0xFF`.
+
+**What was actually wrong with `tools/try_custom_decomp.py`,** found by
+comparing it directly against the real ARM decompressor at ROM `0x08000534`
+(the boot blob's decoder, copied to heap and called through IWRAM function
+pointer `0x03000C84` - see the room-properties/coldef section and
+`tools/mint_data_symbols.py`'s pass for how that address was traced):
+
+1. **Header skip is off by one.** The port computed
+   `pos = off + 1; skip = (data[off] >> 6) + 1; pos += skip` = `off + 2 +
+   (b0>>6)`. The real ARM does `ldrb r2,[r0],#1` then `add r0,r0,r2` =
+   `off + 1 + (b0>>6)` - every stream was being decoded starting one byte
+   late.
+2. **`max_iters` capped the decode at 4,096 control ops**, so anything
+   larger than a small stream returned `None` even with the off-by-one
+   fixed (`0x0800AF20`, 7,909 compressed bytes, is a real example).
+3. **No declared-size validation.** The header carries the true
+   decompressed size and the port never checked output length against it -
+   the exact check that makes a hit trustworthy rather than a coincidental
+   terminator match. Without it, "clean terminator" is a weak signal, which
+   is exactly why the original pass saw hits landing inside known-RLE
+   blocks and (reasonably, given what it could check) dismissed them as
+   noise.
+
+A corrected transcription (`mlcomp.py`, ported directly from the ARM
+instructions rather than from the VB tool, WITH the declared-size check)
+found **1,169 genuine streams, ~4.5MB decompressed**, verified against
+already-working committed code: `src/title_screen.c` calls the real
+decompressor (via `dword_3000C84`/`sub_80198B0`) on four addresses, and all
+four decode cleanly to their exact declared size with this corrected
+decoder.
+
+**That, in turn, found a real problem in `assets/manifest.json`: 12 of the
+75 "confirmed" BIOS-RLE entries are false positives**, not just the one this
+session found first. `find_compressed_blocks.py`'s RLE decoder does require
+clean termination at a declared size, so this isn't a weak heuristic being
+wrong in the usual way - somewhere in a 14MB scan, real custom-LZ stream
+bytes apparently also satisfy the RLE decoder's own termination condition
+often enough to produce a "confirmed" hit over a span that is mostly (in 11
+of the 12 cases, 50-100%+) covered by genuine custom-LZ streams instead.
+Decisive tiebreaker for the first one, `0x0838E18F`: real code reaches
+directly into the middle of its claimed 168KB span via the custom-LZ
+decompressor, which is only possible if the span isn't one opaque BIOS
+block. The other 11 were found by the same coverage test at scale (every
+manifest entry's claimed byte range, checked against the 1,169-stream list
+for how much of it is actually accounted for by valid custom-LZ streams):
+
+| address | claimed compressed | custom-LZ streams inside | coverage |
+|---|---:|---:|---:|
+| `0x0838E18F` | 168,162 B | 9 | 7.8% (code-referenced - decisive on its own) |
+| `0x08587CA9` | 175,704 B | 103 | 98.5% |
+| `0x085E14DC` | 192,327 B | 123 | 96.6% |
+| `0x0868FEEF` | 206,634 B | 46 | 99.0% |
+| `0x0865347F` | 161,539 B | 42 | 102.1% |
+| `0x089C9C10` | 18,362 B | 12 | 102.2% |
+| `0x089D608E` | 119,041 B | 80 | 92.7% |
+| `0x0861EB56` | 95,660 B | 59 | 84.2% |
+| `0x086D8E85` | 216,749 B | 36 | 72.6% |
+| `0x08A04B33` | 210,208 B | 33 | 66.7% |
+| `0x0898AC48` | 180,733 B | 39 | 50.2% |
+| `0x089BBED0` | 47,498 B | 8 | 31.6% |
+
+(coverage over 100% means the streams found extend slightly past the
+manifest's claimed compressed_size - consistent with the claimed size
+itself being wrong, not just the classification.) **These 12 entries were
+removed from `assets/manifest.json`** (75 -> 63 confirmed BIOS blocks);
+1,792,617 of the manifest's 5,753,989 total claimed compressed bytes
+(31.2%) were affected. The underlying ROM bytes are untouched - only the
+classification was wrong - and re-extracting them with the corrected
+`mlcomp.py` decoder is real, concrete follow-up work (see the work plan
+below), not done this pass.
+
+**Bottom line, corrected:** this format is not a dead end - it explains a
+meaningful share of what was previously misclassified, and the remaining
+5.1MB "genuinely unclassified" figure is now known to be an overestimate by
+at least the 31.2% above. The actual still-open question is what covers the
+REST of that figure, not whether this codec matters.
 
 ## Room properties and the solidity/collision pipeline
 

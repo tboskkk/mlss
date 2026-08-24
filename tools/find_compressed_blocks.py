@@ -23,6 +23,30 @@ codecs.
 
 Defaults to scanning both rodata blobs' address range; pass --start/--end
 to scan anywhere else (e.g. inside asm/text0801A548.s's sprite data).
+
+KNOWN FALSE-POSITIVE CLASS, found 2026-08-23/24 (docs/formats/README.md,
+"Custom sprite compression" section): a real, DIFFERENT, non-BIOS custom-LZ
+codec is also used extensively in this ROM (boot/title/menu graphics,
+decompressor at ROM 0x08000534, called via IWRAM function pointer
+0x03000C84 -- see tools/mint_data_symbols.py). Its streams can coincidentally
+satisfy the RLE decoder's own termination check often enough to be reported
+here as a "confirmed" hit, even though the RLE decoder genuinely does
+require clean termination at the declared size -- it isn't a weak-heuristic
+bug, it's a real ambiguity between two real formats. Measured impact last
+time this ran: 12 of 75 "confirmed" hits were this false positive (one of
+them, 0x0838E18F, proven decisively via code that calls the real decoder on
+addresses INSIDE the claimed span), 31.2% of total claimed compressed
+bytes. assets/manifest.json has been hand-corrected to remove those 12, but
+manifest.json is gitignored/regenerated -- re-running this tool WILL bring
+them back unless this docstring's fix has landed by then. Before trusting a
+fresh run's output, cross-check every hit's address range against a custom-LZ
+stream scan (scratchpad/dataside/rodata_hits.json from that session, or
+regenerate with the corrected tools/mint_data_symbols.py-adjacent decoder --
+see docs/formats/README.md for exactly how the audit was done). The real
+fix -- promoting the custom-LZ decoder into tools/gba_compress.py and having
+THIS tool disqualify an RLE hit that's mostly covered by a valid custom-LZ
+stream -- is scoped but not done; see docs/review-2026-08-23-data-symbols.md
+section 8's work plan, item 2.
 """
 from __future__ import annotations
 
