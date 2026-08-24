@@ -540,7 +540,24 @@ disassembled code anywhere currently loads an address inside either span
 and passes it to the real decompressor - checked directly, not assumed).
 Left classified as RLE, the conservative default, rather than reclassified
 on coverage alone - the exact same "coverage isn't trustworthy this low"
-lesson `0x0838E18F` itself already taught this pass. A third candidate
+lesson `0x0838E18F` itself already taught this pass.
+
+**Re-checked 2026-08-24 with a stricter test, still empty.** A first check
+just looked for any address literal anywhere within the claimed span (too
+loose for a 177-249KB span - it found matches, but manual inspection showed
+they were unrelated addresses sitting in a scratch register near a real,
+unrelated decompressor call, not the value actually passed to it). A
+second, register-tracing check requires the SAME register that loads the
+address to still hold it in `r0` at the actual `sub_80198B0`/`_call_via_r2`
+call site, with no clobber in between - validated against a known-genuine
+case first (`bclr_init.s:81`'s load of `0x083A0E94`, correctly caught) to
+confirm the check isn't just too strict to ever match anything. Found
+**zero** matches for either `0x084EAAD4` or `0x081ED420`. This doesn't
+prove either is genuinely RLE - many real decompressor calls take their
+source pointer as a parameter passed down from a caller rather than a
+literal at the call site itself (`sub_8163DB8.s` is an example), which
+this kind of single-function trace can't see - but it's real negative
+evidence from the strictest check tried so far. Left classified RLE. A third candidate
 found the same way, `0x08A6BCB0` (15.4% coverage measured in isolation),
 turned out to need no decision at all: in the full corpus-wide scan
 (as opposed to checking its span in isolation) an earlier disqualified hit
