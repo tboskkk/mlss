@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start sub_80F80C4
-sub_80F80C4:
 	push {lr}
 	ldr r0, _080F80F8 @ =0x03000FD8
 	ldr r1, [r0, #0x00]

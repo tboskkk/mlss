@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start sub_80ECDA4
-sub_80ECDA4:
 	push {r4, r5, r6, r7, lr}
 	adds r2, r0, #0x0
 	adds r6, r1, #0x0

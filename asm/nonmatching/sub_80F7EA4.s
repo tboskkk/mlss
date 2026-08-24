@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start sub_80F7EA4
-sub_80F7EA4:
 	push {lr}
 	ldm r2!, {r0}
 	subs r0, #0x06

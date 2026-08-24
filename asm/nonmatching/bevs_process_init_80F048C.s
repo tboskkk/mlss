@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start bevs_process_init_80F048C
-bevs_process_init_80F048C: @ 080F048C
 	push {r4, r5, r6, r7, lr}
 	add sp, #-0x010
 	adds r5, r0, #0x0

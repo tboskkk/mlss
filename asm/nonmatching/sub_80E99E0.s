@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start sub_80E99E0
-sub_80E99E0:
 	push {lr}
 	lsls r0, r0, #0x10
 	lsrs r1, r0, #0x10

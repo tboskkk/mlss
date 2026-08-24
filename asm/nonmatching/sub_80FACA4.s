@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start sub_80FACA4
-sub_80FACA4:
 	ldr r0, [r0, #0x14]
 	ldr r1, [r2, #0x00]
 	movs r3, #0xAC

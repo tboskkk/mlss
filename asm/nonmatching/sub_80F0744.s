@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start sub_80F0744
-sub_80F0744:
 	push {lr}
 	ldm r2!, {r3}
 	cmp r3, #0x01
