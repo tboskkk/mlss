@@ -240,19 +240,13 @@ asm_unified(".include \"asm/nonmatching/sub_8110948.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8110988.s\"");
-#else
-s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 extern s32 sub_8110A30;
-
-void sub_8110988(void *arg0) {
-    void *temp_r2_19;
-
-    sub_8082E1C(arg0, (0 - M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */)) + 0xD, 0, 0);
-    temp_r2_19 = (*(void **)((s8 *)(arg0) + (8)));
-    (*(u8 *)((s8 *)(temp_r2_19) + (0x12))) = (u8) ((-7 & (*(u8 *)((s8 *)(temp_r2_19) + (0x12)))) | 2);
-    play_sfx_80195B4(0x119, -1);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8110A30;
+void sub_8110988(void *arg0)
+{
+  void *temp_r2_19;
+  sub_8082E1C(arg0, (0 - (*((s16 *) (((s8 *) (*((void **) (((s8 *) (*((void **) (((s8 *) arg0) + 0x2C)))) + 0x28)))) + 0xEC)))) + 0xD, 0, 0);
+  temp_r2_19 = *((void **) (((s8 *) arg0) + 8));
+  *((u8 *) (((s8 *) temp_r2_19) + 0x12)) = (u8) (((-7) & (*(((s8 *) temp_r2_19) + 0x12))) | 2);
+  play_sfx_80195B4(0x119, -1);
+  *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_8110A30;
 }
-#endif
