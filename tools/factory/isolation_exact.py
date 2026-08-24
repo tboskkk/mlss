@@ -186,10 +186,48 @@ def main() -> int:
 
         if exact and args.apply:
             routed = 0
+            stuck = 0
             for n in exact:
                 r = conn.execute("SELECT state, worker_id FROM functions WHERE name=?",
                                  (n,)).fetchone()
                 if r["worker_id"] is not None or r["state"] not in CLAIMABLE:
+                    continue
+                # DO NOT re-promote what the validator has definitively
+                # rejected. validator._validate_claimed() files a candidate to
+                # needs_human with "N rejections -- not retrying" once it has
+                # failed the real-file check 3 times (its `prior >= 2` guard) --
+                # but needs_human is in this tool's own CLAIMABLE, so without
+                # this check the two tiers fight forever: isolation_exact says
+                # byte-exact and routes to validating, the validator rejects
+                # and files back to needs_human, repeat.
+                #
+                # Measured live 2026-08-24 before this existed: 14 rows had
+                # accumulated 1,088 rejection events between them (worst:
+                # sub_80515DC at 102, sub_801BC98 at 101), each cycle costing a
+                # splice + plain build + asm-differ + revert at ~13s. That is
+                # hours of validator capacity spent re-deciding the same 14
+                # rows, while the rest of the queue waited.
+                #
+                # NEITHER TIER IS BROKEN -- this was checked authoritatively
+                # rather than assumed, by splicing sub_80515DC's candidate for
+                # real and running a from-scratch build: it fails with "too few
+                # arguments to function sub_80515DC" at a call site in its own
+                # file. Compiled ALONE (what this tool measures) it genuinely is
+                # byte-exact; compiled in its REAL file it genuinely does not
+                # build. That is CLAUDE.md's isolation/real-file gap (M/N.4a),
+                # and the loop is the only defect here.
+                #
+                # Scoring is deliberately NOT skipped for these rows -- iso_score
+                # above is still recorded, because the measurement stays useful
+                # for ranking. Only the promotion is withheld, so nothing is
+                # hidden: the row keeps its score, its candidate_body, and its
+                # rejection history, and a real fix (reconciling the signature
+                # the call site expects) makes it promotable again immediately.
+                rejects = conn.execute(
+                    "SELECT COUNT(*) c FROM events WHERE function_name = ? "
+                    "AND kind = 'rejected'", (n,)).fetchone()["c"]
+                if rejects >= 3:
+                    stuck += 1
                     continue
                 with db.tx(conn):
                     db.set_state(conn, n, "validating", worker_id=None,
@@ -199,6 +237,9 @@ def main() -> int:
                     db.log_event(conn, n, "isolation_exact", "routed to the validator")
                 routed += 1
             print(f"\nrouted {routed} row(s) to validating.")
+            if stuck:
+                print(f"withheld {stuck} byte-exact-in-isolation row(s) the validator "
+                      f"has already rejected 3+ times (real-file gap, not a new verdict)")
         elif exact:
             print("\npass --apply to route these to the validator.")
         return 0
