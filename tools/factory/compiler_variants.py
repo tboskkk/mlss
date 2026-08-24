@@ -153,6 +153,16 @@ def stage(rows, work: Path, ctx: Path, frag_owner: dict | None = None,
             missing.append(f"{r['name']} (fragment {owner}.s)")
             continue
         body = frag.read_text()
+        if not body.lstrip().startswith(".syntax"):
+            # ASM_FUNC/NONMATCH-format fragment (CLAUDE.md's "NONMATCHING
+            # convention" section): its header (.syntax unified/.text/
+            # thumb_func_start/label) was stripped at conversion time, since
+            # the real build's NAKED C wrapper supplies that context. Staging
+            # it standalone here has no such wrapper, so synthesize the same
+            # header an old-format fragment already carries - verified a true
+            # no-op across every real fragment (an old-format one already
+            # starts with .syntax and this never fires for it).
+            body = f'\t.syntax unified\n\t.text\n\n\tthumb_func_start {owner}\n{owner}:\n' + body
         if ".include" not in body:
             body = '\t.include "asm/macros.inc"\n' + body
         (work / f"{r['name']}.frag.s").write_text(body)

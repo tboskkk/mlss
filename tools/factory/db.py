@@ -123,6 +123,14 @@ MIGRATIONS = [
     # what is really 254 problems. twins.py has listed deduplication as its
     # exploit #1 since it was written and nothing ever consumed it.
     ("shape_hash", "TEXT"),
+    # Per-symbol instruction-match percentage (0-100) from objdiff-cli,
+    # artifact-free like iso_score (no shared translation unit to poison)
+    # but a normalized signal iso_score's raw byte count doesn't give.
+    # Correlates with but is distinct from iso_score (Spearman -0.792,
+    # measured on a 2,444-candidate sweep). Wired into tier2's claim
+    # ordering as an OR'd admission path alongside ISO_SCORE_CEILING, not
+    # a replacement.
+    ("objdiff_score", "REAL"),
 ]
 
 

@@ -530,6 +530,7 @@ def generate(name: str) -> str | None:
     c = fix_void_dereference(c)
     c = fix_uncast_address_dereference(c)
     c = fix_indirect_call_precedence(c)
+    c = fix_untyped_address_access(c, name)
     return restore_omitted_leading_params(c, name)
 
 
@@ -663,6 +664,187 @@ def fix_void_dereference(c: str) -> str:
     # Any remaining read-side `*(void *)` has no value to infer from;
     # u32 is the safe default rather than leaving uncompilable C.
     return VOID_DEREF_RE.sub("*(u32 *)", c)
+
+
+LOCAL_DECL_RE = re.compile(
+    r"^\s*(void\s*\*|u8|s8|u16|s16|u32|s32|u64|s64)\s*\*?\s*(\w+)\s*;", re.MULTILINE)
+
+
+def _local_types(c: str) -> dict:
+    """name -> declared C type (bare, e.g. 's32' or 'void *') for every
+    m2c-declared local in this candidate. m2c always declares its locals
+    up front, one per line, before the first executable statement."""
+    types = {}
+    for m in LOCAL_DECL_RE.finditer(c):
+        types[m.group(2)] = m.group(1).replace(" ", "")
+    return types
+
+
+UNTYPED_HEAD_TOKEN = r"[A-Za-z_]\w*"
+# An address reconstructed as untyped arithmetic: a bare identifier (a
+# local, a symbol like dword_XXX/sub_XXX), optionally +/- an offset -
+# NOT already behind a cast (no `TYPE *)` immediately before it) and NOT
+# a raw hex literal (fix_uncast_address_dereference above already casts
+# that shape). Deliberately conservative about the HEAD (only a leading
+# identifier or `0x`, never an arbitrary expression, to keep this a
+# mechanical certainty rather than a guess at operator precedence) but
+# not about the offset's own shape - `ident + (a * b)` is common m2c
+# output and its offset legitimately nests parens, so the span itself is
+# found by hand-parsing balanced parens (same reason
+# fix_uncast_address_dereference above does, and expand_macros() does),
+# with this regex only used to VALIDATE an already-extracted, already-
+# balanced span's shape once found.
+UNTYPED_EXPR_SHAPE_RE = re.compile(rf"^\s*{UNTYPED_HEAD_TOKEN}(?:\s*[+\-]\s*.+)?\s*$", re.DOTALL)
+UNTYPED_CAST_HEAD_RE = re.compile(r"\*\)\s*$")
+UNTYPED_HEX_RE = re.compile(r"^\s*0[xX]")
+UNTYPED_IDENT_RE = re.compile(rf"^({UNTYPED_HEAD_TOKEN})")
+
+
+def _balanced_span(s: str, open_idx: int) -> int | None:
+    """Index just past the ')' matching the '(' at open_idx, or None if
+    the string ends before it balances (should not happen on real C, but
+    never assume - see CLAUDE.md's own "must refuse when it cannot")."""
+    depth, i = 0, open_idx
+    while i < len(s):
+        if s[i] == "(":
+            depth += 1
+        elif s[i] == ")":
+            depth -= 1
+            if depth == 0:
+                return i + 1
+        i += 1
+    return None
+
+
+CTYPE_KEYWORDS = {
+    "void", "u8", "s8", "u16", "s16", "u32", "s32", "u64", "s64", "int",
+    "char", "short", "long", "unsigned", "signed", "float", "double",
+    "struct", "bool32", "size_t",
+}
+
+
+def _classify_untyped_head(head: str, local_types: dict) -> str | None:
+    """None if `head`'s own leading identifier is already a real pointer
+    type (dereferencing/calling it needs no cast - this rule only adds
+    one where m2c genuinely omitted it) OR is itself a bare C type
+    keyword. The latter is load-bearing, not an edge case: `(u8)(x)` is an
+    ORDINARY CAST, syntactically indistinguishable by regex alone from
+    `(some_func_ptr)(x)`, a call this rule is meant to fix - found live
+    when a first draft of this rule wrapped existing casts like `(u8)(y)`
+    a second time, producing `((s32 (*)())(u8))(y)`, a real syntax error
+    caught by an actual agbcc compile, not by review. Returns the
+    width/cast to apply otherwise."""
+    m = UNTYPED_IDENT_RE.match(head.strip())
+    if not m:
+        return None
+    ident = m.group(1)
+    if ident in CTYPE_KEYWORDS:
+        return None
+    t = local_types.get(ident)
+    # void* is syntactically a pointer but semantically untyped - it still
+    # cannot be dereferenced or called without a width cast, unlike a real
+    # typed pointer (struct Sprite *, s32 *, ...). Found live: a local
+    # m2c declares `void *temp_r0_36;` from `*(void **)ADDR`, then
+    # dereferences `temp_r0_36 + offset` with no further cast - the same
+    # `void value not ignored`/`invalid use of void expression` class this
+    # rule exists to fix, missed by an earlier version of this check that
+    # treated ANY trailing `*` as "already a real pointer, done".
+    if t and t.endswith("*") and t != "void*":
+        return None  # already a real, non-void pointer, nothing to fix
+    return "s32"
+
+
+def fix_untyped_address_access(c: str, name: str) -> str:
+    """Generalizes fix_uncast_address_dereference/fix_void_dereference/
+    fix_indirect_call_precedence above: those three each patch one NARROW
+    shape (a bare 0x-literal dereference, a void*-cast dereference, a
+    dereferenced function-pointer call's operator precedence). The larger
+    pattern behind all three is one defect, not many: m2c reconstructs an
+    address as untyped arithmetic - a bare identifier (a local, or a ROM
+    symbol like dword_XXX/sub_XXX) plus/minus an offset - and then
+    dereferences or CALLS it with no cast at all. Four agbcc error classes
+    (`invalid type argument of unary *`, `called object is not a
+    function`, `void value not ignored`, `invalid use of void expression`)
+    are this one root cause wearing different diagnostics depending on how
+    the untyped result gets used.
+
+    Only touches a head that is genuinely untyped (not already a real
+    pointer-typed local, checked via _local_types()/_classify_untyped_head())
+    - dereferencing/calling an already-correctly-typed pointer needs no
+    cast, and adding one there would be a no-op at best.
+
+    Purely a cast insertion, same as the three narrower rules above: the
+    operand and its arithmetic are never altered, only wrapped in a cast,
+    so this can only turn uncompilable C into compilable C (or leave
+    already-fine C untouched) - never change what a successfully-produced
+    seed means. A wrong width guess costs a worse asm-differ score, exactly
+    like the existing rules already accept; it can never become a wrong
+    committed MATCH, because finish_match()'s from-scratch build + ROM
+    sha1 check is what actually gates that, independent of seed quality.
+    """
+    local_types = _local_types(c)
+
+    def try_fix_at(s: str, open_idx: int, is_call: bool):
+        """s[open_idx] is '(' immediately after either a bare '*' (a
+        dereference) or nothing/an operator (a potential call target).
+        Returns (replacement_text, end_idx) or None if this span isn't a
+        genuinely untyped address access."""
+        close_idx = _balanced_span(s, open_idx)
+        if close_idx is None:
+            return None
+        inner = s[open_idx + 1 : close_idx - 1]
+        if not UNTYPED_EXPR_SHAPE_RE.match(inner):
+            return None
+        if UNTYPED_HEX_RE.match(inner):
+            return None  # fix_uncast_address_dereference's job
+        if is_call:
+            # Must actually be called: a real '(' right after (skipping
+            # whitespace), not just any parenthesized expression.
+            j = close_idx
+            while j < len(s) and s[j] in " \t\n":
+                j += 1
+            if j >= len(s) or s[j] != "(":
+                return None
+            before = s[:open_idx].rstrip()
+            if UNTYPED_CAST_HEAD_RE.search(before):
+                return None  # already cast (fix_indirect_call_precedence's shape)
+        width = _classify_untyped_head(inner, local_types)
+        if width is None:
+            return None
+        inner_stripped = inner.strip()
+        if is_call:
+            # Old-style (unspecified-args) function pointer cast - the same
+            # K&R idiom this project's own src/*.c already uses throughout
+            # for a call whose real parameter types aren't independently
+            # known; valid C, and syntactically safe regardless of arity.
+            return f"((s32 (*)())({inner_stripped}))", close_idx
+        return f"*({width} *)({inner_stripped})", close_idx
+
+    out = []
+    i, n = 0, len(c)
+    while i < n:
+        if c[i] == "*" and i + 1 < n and c[i + 1] == "(" and (
+            i == 0 or (c[i - 1] not in "_" and not c[i - 1].isalnum() and c[i - 1] != ")")
+        ):
+            r = try_fix_at(c, i + 1, is_call=False)
+            if r:
+                repl, end = r
+                out.append(repl)
+                i = end
+                continue
+        elif c[i] == "(" and (i == 0 or (c[i - 1] not in "_" and not c[i - 1].isalnum() and c[i - 1] != ")")):
+            r = try_fix_at(c, i, is_call=True)
+            if r:
+                repl, end = r
+                out.append(repl)
+                i = end
+                continue
+        out.append(c[i])
+        i += 1
+    return "".join(out)
+
+    c = UNTYPED_FNPTR_CAST_RE.sub(call_repl, c)
+    return c
 
 
 FUNC_DEF_RE = re.compile(r"^(.*?\b)(\w+)\s*\(([^)]*)\)(\s*\{)", re.MULTILINE)

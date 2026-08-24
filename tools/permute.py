@@ -26,6 +26,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import splitlib
+sys.path.insert(0, str(Path(__file__).resolve().parent / "factory"))
+import gitops
 
 PERMUTER_DIR = splitlib.ROOT / "tools" / "decomp-permuter"
 WORKDIRS = splitlib.ROOT / "tools" / "permute-work"
@@ -57,11 +59,29 @@ def resolve_local_includes(c_path: Path, include_lines: list) -> list:
 
 def find_stub_block(name: str):
     """Search src/*.c for the split_func.py-style stub for `name`, return
-    (c_path, includes_text, else_body_text)."""
+    (c_path, includes_text, else_body_text).
+
+    Tries the old #ifndef NONMATCHING/#else/#endif form first (unchanged
+    behavior). Falls back to the sa2/tmc-style NONMATCH(...){...}END_NONMATCH
+    convention (CLAUDE.md's "NONMATCHING convention" section) via
+    gitops.find_new_format_guard() - ASM_FUNC has no draft to permute at all
+    (matches this function's own "already has a real #else C attempt
+    already written" requirement above), so only the "nonmatch" kind is
+    ever usable here; an ASM_FUNC-only function raises the same "nothing to
+    permute yet" style error as an old-format function with no #else."""
     needle = f'asm/nonmatching/{name}.s'
     for c_path in sorted((splitlib.ROOT / "src").glob("*.c")):
         text = c_path.read_text()
-        if needle not in text:
+        # The needle also appears inside an ASM_FUNC(...)/NONMATCH(...) call's
+        # own string argument (same path, new format) - only treat this as an
+        # old-format candidate when it's the OLD macro's exact shape
+        # (asm_unified(".include ...")), not just any line mentioning the
+        # path, or a new-format file with no #else/#endif anywhere raises the
+        # wrong ("nothing to permute yet") error and never reaches the
+        # new-format fallback below.
+        if needle not in text or not re.search(
+            re.escape('asm_unified(".include \\"') + re.escape(needle), text
+        ):
             continue
         lines = text.splitlines(keepends=True)
         include_lines = resolve_local_includes(c_path, [l for l in lines if INCLUDE_RE.match(l)])
@@ -82,6 +102,23 @@ def find_stub_block(name: str):
                 f"#error placeholder - write a real C attempt before permuting."
             )
         return c_path, "".join(include_lines), body
+
+    c_path, block, kind = gitops.find_new_format_guard(name)
+    if c_path is not None:
+        if kind != "nonmatch":
+            raise SystemExit(
+                f"{name} in {c_path.relative_to(splitlib.ROOT)} is still ASM_FUNC (no draft) - "
+                f"write a real C attempt (NONMATCH) before permuting."
+            )
+        text = c_path.read_text()
+        lines = text.splitlines(keepends=True)
+        include_lines = resolve_local_includes(c_path, [l for l in lines if INCLUDE_RE.match(l)])
+        m = re.search(r"\{.*\}(?=\s*END_NONMATCH\s*$)", block, re.DOTALL)
+        if not m:
+            raise SystemExit(f"{name}: could not find the draft body inside its NONMATCH block.")
+        body = m.group(0)
+        return c_path, "".join(include_lines), body
+
     raise SystemExit(f"no src/*.c references asm/nonmatching/{name}.s - run split_func.py {name} first.")
 
 
@@ -112,8 +149,20 @@ def main() -> None:
     # frag_path deliberately has no .include "asm/macros.inc" of its own -
     # split_func.py centralizes that in the owning .c file instead (see
     # CLAUDE.md "Landmines already hit"). Standalone assembly needs it back.
+    #
+    # An ASM_FUNC/NONMATCH-format fragment also has its OWN header
+    # (.syntax unified/.text/thumb_func_start/label) stripped, since the
+    # real build's NAKED C wrapper supplies that context - standalone
+    # assembly here has no such wrapper and fails with "instruction not
+    # supported in Thumb16 mode" without it (found via a real assembler
+    # error). Detect and synthesize the same way compiler_variants.py does.
     expected_asm = WORKDIRS / f"{name}.expected.s"
-    expected_asm.write_text(f'.include "asm/macros.inc"\n.include "{frag_path.relative_to(splitlib.ROOT)}"\n')
+    header = ""
+    if not frag_path.read_text().lstrip().startswith(".syntax"):
+        header = f'.syntax unified\n.text\n\nthumb_func_start {name}\n{name}:\n'
+    expected_asm.write_text(
+        f'.include "asm/macros.inc"\n{header}.include "{frag_path.relative_to(splitlib.ROOT)}"\n'
+    )
 
     expected_obj = WORKDIRS / f"{name}.expected.o"
     subprocess.run(

@@ -189,6 +189,83 @@ def find_guard_block(name: str):
     return None, None
 
 
+NEW_FORMAT_START_RE = re.compile(r"\b(ASM_FUNC|NONMATCH)\s*\(")
+
+
+def _balanced_paren(text: str, open_idx: int) -> int:
+    """Index just past the ')' matching the '(' at open_idx."""
+    depth, i = 0, open_idx
+    while i < len(text):
+        if text[i] == "(":
+            depth += 1
+        elif text[i] == ")":
+            depth -= 1
+            if depth == 0:
+                return i + 1
+        i += 1
+    raise ValueError("unbalanced parens")
+
+
+def find_new_format_guard(name: str):
+    """Locate an ASM_FUNC(...)/NONMATCH(...){...}END_NONMATCH block for
+    `name` (the sa2/tmc-style convention -- see CLAUDE.md's "NONMATCHING
+    convention" section) in whichever src/*.c currently references it.
+    Returns (c_path, full_match_text, kind) or (None, None, None); kind is
+    "asm_func" or "nonmatch". Deliberately separate from find_guard_block()
+    above rather than folded into it -- several other callers of that
+    function (audit_instruments.py, fix_decl_conflicts.py, m2c_sweep.py,
+    tier3.py, split_trailing.py, rescue_isolated_zeros.py) expect its exact
+    2-tuple return and are only ever used against old-format files; changing
+    its signature would touch all of them for no benefit. splice_into_else()
+    and splice_candidate() below fall back to this when the old-format
+    search finds nothing.
+
+    Verified 0 false positives scanning every real name/file pair in the
+    corpus (asm/nonmatching/*.s stems against every src/*.c)."""
+    needle = f"asm/nonmatching/{name}.s"
+    for c_path in sorted(SRC_DIR.glob("*.c")):
+        text = c_path.read_text()
+        if needle not in text:
+            continue
+        for m in NEW_FORMAT_START_RE.finditer(text):
+            kind_word = m.group(1)
+            paren_open = text.index("(", m.start())
+            args_end = _balanced_paren(text, paren_open)
+            if needle not in text[m.start():args_end]:
+                continue
+            if kind_word == "ASM_FUNC":
+                semi = text.index(";", args_end)
+                return c_path, text[m.start() : semi + 1], "asm_func"
+            brace_open = text.index("{", args_end)
+            depth, i = 0, brace_open
+            while i < len(text):
+                if text[i] == "{":
+                    depth += 1
+                elif text[i] == "}":
+                    depth -= 1
+                    if depth == 0:
+                        break
+                i += 1
+            end_nm = text.index("END_NONMATCH", i)
+            return c_path, text[m.start() : end_nm + len("END_NONMATCH")], "nonmatch"
+    return None, None, None
+
+
+def _new_format_decl(block: str, kind: str) -> str:
+    """Pull the `decl` argument back out of an ASM_FUNC/NONMATCH block's own
+    text -- both macros take (path, decl), and decl is the real, already-
+    correct signature (from the batch-conversion tooling or a prior NONMATCH
+    draft), which a fresh candidate should be checked against/reuse rather
+    than trusting the candidate's own signature guess."""
+    paren_open = block.index("(")
+    args_end = _balanced_paren(block, paren_open)
+    args = block[paren_open + 1 : args_end - 1]
+    # args is `"path", decl` -- split on the first top-level comma after the
+    # closing quote of the path string.
+    path_end = args.index('"', args.index('"') + 1) + 1
+    return args[path_end:].lstrip(", \n")
+
+
 def splice_into_else(name: str, body: str) -> Path | None:
     """Write a candidate into the #else branch, KEEPING the guard --
     different from splice_candidate() below, which removes the guard
@@ -205,10 +282,19 @@ def splice_into_else(name: str, body: str) -> Path | None:
     the split_func.py #error placeholder), so permute.py correctly and
     consistently refused every single one. 100% of a 21-minute soak
     test's 189 needs_human landings turned out to be exactly this, not 189
-    different real problems."""
+    different real problems.
+
+    Falls back to the sa2/tmc-style ASM_FUNC/NONMATCH convention when the
+    old-format search finds nothing: an ASM_FUNC(path, decl); call is
+    REPLACED with NONMATCH(path, decl){candidate}END_NONMATCH (its first
+    draft -- ASM_FUNC has no slot to hold one), and an existing
+    NONMATCH(...){...}END_NONMATCH block has just its {...} draft body
+    swapped for the new candidate's, keeping the established decl. See
+    find_new_format_guard()'s docstring for why this is a separate code
+    path rather than folded into find_guard_block()."""
     c_path, block = find_guard_block(name)
     if c_path is None:
-        return None
+        return _splice_into_else_new_format(name, body)
     body = _repair_body_decls(c_path, body)
     text = c_path.read_text()
     needle = f"asm/nonmatching/{name}.s"
@@ -238,13 +324,53 @@ def splice_into_else(name: str, body: str) -> Path | None:
     return c_path
 
 
+def _splice_into_else_new_format(name: str, body: str) -> Path | None:
+    c_path, block, kind = find_new_format_guard(name)
+    if c_path is None:
+        return None
+    body = _repair_body_decls(c_path, body)
+    text = c_path.read_text()
+    body_braces = body[body.find("{") :] if "{" in body else "{\n}"
+    if kind == "asm_func":
+        decl = _new_format_decl(block, "asm_func")
+        needle = f"asm/nonmatching/{name}.s"
+        new_block = f'NONMATCH("{needle}", {decl})\n{body_braces.strip()}\nEND_NONMATCH'
+    else:  # nonmatch -- swap just the existing draft body
+        m = re.search(r"\{.*\}(?=\s*END_NONMATCH\s*$)", block, re.DOTALL)
+        if not m:
+            return None
+        new_block = block[: m.start()] + body_braces.strip() + block[m.end() :]
+    new_text = text.replace(block, new_block, 1)
+    if new_text != text:
+        c_path.write_text(new_text)
+    _repair_self_declaration(c_path, name, body)
+    return c_path
+
+
 def splice_candidate(name: str, body: str) -> Path | None:
     """Replace the #ifndef NONMATCHING/#else/#endif guard for `name` with a
     plain function body (no guard -- this is the FINAL form, used once a
     candidate is believed to match). `body` should be the bare function
     definition text (e.g. 'void foo(void) {\\n}' or a full multi-line
-    attempt from a permuter/LLM candidate)."""
+    attempt from a permuter/LLM candidate).
+
+    Falls back to the ASM_FUNC/NONMATCH convention when the old-format
+    search finds nothing -- see splice_into_else()'s docstring."""
     c_path, block = find_guard_block(name)
+    if c_path is None:
+        return _splice_candidate_new_format(name, body)
+    body = _repair_body_decls(c_path, body)
+    text = c_path.read_text()
+    new_text = text.replace(block, _dedupe_decls(text, block, body).strip() + "\n", 1)
+    if new_text == text:
+        return None
+    c_path.write_text(new_text)
+    _repair_self_declaration(c_path, name, body)
+    return c_path
+
+
+def _splice_candidate_new_format(name: str, body: str) -> Path | None:
+    c_path, block, _kind = find_new_format_guard(name)
     if c_path is None:
         return None
     body = _repair_body_decls(c_path, body)
