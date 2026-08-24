@@ -43,7 +43,15 @@ def spliced_text(name, body):
     """
     c_path, block = gitops.find_guard_block(name)
     if c_path is None:
-        return None, None
+        # sa2/tmc-style ASM_FUNC/NONMATCH convention. After the 2026-08-24
+        # migration this is MOST of the corpus, and without this fallback
+        # this tool reports "no guard block found" for all of it -- i.e. it
+        # silently stops answering the question it exists to answer, which is
+        # the exact shape of failure CLAUDE.md's own law warns about. Mirrors
+        # gitops.splice_candidate()'s own fallback.
+        c_path, block, _kind = gitops.find_new_format_guard(name)
+        if c_path is None:
+            return None, None
     # 1. declarations inside the candidate that contradict the file
     body = gitops._repair_body_decls(c_path, body)
     text = c_path.read_text().replace(block, body.rstrip() + "\n")
