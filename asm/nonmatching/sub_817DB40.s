@@ -218,8 +218,8 @@ _0817DCCA:
 	asrs r0, r0, #0x08
 	subs r0, r1, r0
 	b _0817DCEA
-_0817DCD0: .4byte word_8198584 @ =0x08198584
-_0817DCD4: .4byte word_8198504 @ =0x08198504
+_0817DCD0: .4byte 0x08198584
+_0817DCD4: .4byte 0x08198504
 _0817DCD8:
 	mov r0, r9
 	movs r2, #0x12

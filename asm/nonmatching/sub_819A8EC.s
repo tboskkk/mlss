@@ -26,7 +26,7 @@ _0819A908:
 	blt _0819A91C
 	adds r0, r1, #0x0
 	b _0819A924
-_0819A918: .4byte dword_821D1CC @ =0x0821D1CC
+_0819A918: .4byte 0x0821D1CC
 _0819A91C:
 	adds r1, #0x08
 	cmp r1, r2

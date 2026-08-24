@@ -73,7 +73,7 @@ _080FA322:
 	mov r10, r1
 	b _080FA38E
 	.byte 0x00, 0x00
-_080FA378: .4byte word_83BA4B4 @ =0x083BA4B4
+_080FA378: .4byte 0x083BA4B4
 _080FA37C:
 	mov r0, r10
 	adds r0, #0x01

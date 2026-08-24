@@ -77,7 +77,7 @@ _08147EB2:
 	strb r0, [r6, #0x00]
 	b _08148024
 	.byte 0x00, 0x00
-_08147F10: .4byte dword_83A05EC @ =0x083A05EC
+_08147F10: .4byte 0x083A05EC
 _08147F14:
 	movs r0, #0xE9
 	lsls r0, r0, #0x01
@@ -225,6 +225,6 @@ _08148024:
 	pop {r4, r5, r6, r7}
 	pop {r0}
 	bx r0
-_0814802C: .4byte dword_83A05EC @ =0x083A05EC
+_0814802C: .4byte 0x083A05EC
 _08148030: .4byte 0x00000216
 _08148034: .4byte sub_8148038

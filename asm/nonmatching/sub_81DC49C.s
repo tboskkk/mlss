@@ -10,4 +10,4 @@ sub_81DC49C:
 	adds r0, #0x08
 	pop {pc}
 	.byte 0x00, 0x00
-_081DC4AC: .4byte dword_8CDB630 @ =0x08CDB630
+_081DC4AC: .4byte 0x08CDB630

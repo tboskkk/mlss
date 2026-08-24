@@ -35,7 +35,7 @@ _08079D54:
 	bl sub_807A658
 	b _08079F06
 	.byte 0x00, 0x00
-_08079D60: .4byte dword_8CDC2D8 @ =0x08CDC2D8
+_08079D60: .4byte 0x08CDC2D8
 _08079D64:
 	movs r0, #0x00
 	str r0, [r6, #0x1C]

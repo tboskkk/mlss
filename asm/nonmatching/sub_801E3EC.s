@@ -244,8 +244,8 @@ _0801E5B0:
 	adds r0, r0, r1
 	ldr r0, [r0, #0x00]
 	mov pc, r0
-_0801E5C0: .4byte dword_81E25A4 @ =0x081E25A4
-_0801E5C4: .4byte dword_839EE58 @ =0x0839EE58
+_0801E5C0: .4byte 0x081E25A4
+_0801E5C4: .4byte 0x0839EE58
 _0801E5C8: .4byte lbl_0801E5CC
 lbl_0801E5CC:
 	.4byte _0801E5E4

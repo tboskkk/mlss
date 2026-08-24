@@ -61,5 +61,5 @@ _08087260:
 	pop {r0}
 	bx r0
 	.byte 0x00, 0x00
-_080872A0: .4byte word_84FB814 @ =0x084FB814
+_080872A0: .4byte 0x084FB814
 _080872A4: .4byte sub_8087B34

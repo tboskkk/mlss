@@ -98,4 +98,4 @@ _080FA6A6:
 	pop {r1}
 	bx r1
 	.byte 0x00, 0x00
-_080FA6B8: .4byte byte_83B950C @ =0x083B950C
+_080FA6B8: .4byte 0x083B950C

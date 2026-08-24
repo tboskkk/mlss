@@ -118,6 +118,6 @@ _0813F8A6:
 	pop {r0}
 	bx r0
 	.byte 0x00, 0x00
-_0813F948: .4byte dword_83A05EC @ =0x083A05EC
+_0813F948: .4byte 0x083A05EC
 _0813F94C: .4byte 0x00000216
 _0813F950: .4byte sub_8142BCC

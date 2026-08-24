@@ -26,4 +26,4 @@ sub_80F8D6C:
 	pop {r4, r5, r6, r7}
 	pop {r1}
 	bx r1
-_080F8DA0: .4byte dword_82001D0 @ =0x082001D0
+_080F8DA0: .4byte 0x082001D0

@@ -36,7 +36,7 @@ sub_8070990:
 	pop {r0}
 	bx r0
 	.byte 0x00, 0x00
-_080709D4: .4byte dword_83B873C @ =0x083B873C
+_080709D4: .4byte 0x083B873C
 _080709D8: .4byte 0x03000E7D
 _080709DC: .4byte 0x03000E7C
 _080709E0: .4byte sub_806F034

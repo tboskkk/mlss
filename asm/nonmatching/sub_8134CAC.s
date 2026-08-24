@@ -493,4 +493,4 @@ sub_8134CAC:
 	pop {r4, r5, r6, r7}
 	pop {r1}
 	bx r1
-_08135080: .4byte dword_8CDC470 @ =0x08CDC470
+_08135080: .4byte 0x08CDC470

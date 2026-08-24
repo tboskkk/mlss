@@ -23,4 +23,4 @@ sub_815EE44:
 	pop {r1}
 	bx r1
 	.byte 0x00, 0x00
-_0815EE70: .4byte dword_8CDCB50 @ =0x08CDCB50
+_0815EE70: .4byte 0x08CDCB50

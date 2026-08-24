@@ -10,4 +10,4 @@ sub_815F27C:
 	pop {r0}
 	bx r0
 	.byte 0x00, 0x00
-_0815F28C: .4byte dword_8CDCD50 @ =0x08CDCD50
+_0815F28C: .4byte 0x08CDCD50

@@ -94,7 +94,7 @@ sub_811D4F8:
 	.byte 0x00, 0x00
 _0811D5AC: .4byte 0x03000FF4
 _0811D5B0: .4byte 0x0000019F
-_0811D5B4: .4byte byte_83BE67C @ =0x083BE67C
+_0811D5B4: .4byte 0x083BE67C
 _0811D5B8:
 	cmp r1, #0x01
 	bne _0811D5C2
@@ -181,7 +181,7 @@ _0811D648:
 	str r1, [sp, #0x030]
 	ldrb r0, [r0, #0x0A]
 	b _0811D6DA
-_0811D65C: .4byte byte_83BE67C @ =0x083BE67C
+_0811D65C: .4byte 0x083BE67C
 _0811D660:
 	ldr r0, _0811D684 @ =0x03000FF4
 	ldr r2, [r0, #0x00]
@@ -214,7 +214,7 @@ _0811D68C:
 	str r1, [sp, #0x030]
 	ldrb r0, [r0, #0x0A]
 	b _0811D6DA
-_0811D6A0: .4byte dword_83BD844 @ =0x083BD844
+_0811D6A0: .4byte 0x083BD844
 _0811D6A4:
 	movs r2, #0xFF
 	str r2, [sp, #0x030]
@@ -276,7 +276,7 @@ _0811D6DC:
 	movs r1, #0x60
 	movs r2, #0x00
 	b _0811D7EC
-_0811D718: .4byte dword_83BEBB8 @ =0x083BEBB8
+_0811D718: .4byte 0x083BEBB8
 _0811D71C:
 	ldr r3, _0811D830 @ =0x03000FC0
 	mov r8, r3
@@ -524,7 +524,7 @@ _0811D8C0:
 	mov r8, r2
 	b _0811D9A2
 	.byte 0x00, 0x00
-_0811D914: .4byte byte_83BE67C @ =0x083BE67C
+_0811D914: .4byte 0x083BE67C
 _0811D918: .4byte 0x03000FF4
 _0811D91C:
 	adds r0, #0x6E
@@ -965,7 +965,7 @@ _0811DC5E:
 	bl sub_812290C
 	b _0811DDF2
 	.byte 0x00, 0x00
-_0811DC8C: .4byte dword_83BEBB8 @ =0x083BEBB8
+_0811DC8C: .4byte 0x083BEBB8
 _0811DC90:
 	lsls r0, r2, #0x18
 	lsrs r5, r0, #0x18

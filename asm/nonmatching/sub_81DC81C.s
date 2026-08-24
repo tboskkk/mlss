@@ -62,12 +62,12 @@ _081DC876:
 	orrs r2, r0
 	str r2, [r1, #0x04]
 	b _081DC948
-_081DC890: .4byte dword_8CDB634 @ =0x08CDB634
-_081DC894: .4byte dword_8CDBA40 @ =0x08CDBA40
-_081DC898: .4byte dword_8CDBA44 @ =0x08CDBA44
+_081DC890: .4byte 0x08CDB634
+_081DC894: .4byte 0x08CDBA40
+_081DC898: .4byte 0x08CDBA44
 _081DC89C: .4byte 0x0000100F
 _081DC8A0: .4byte 0xFFFFF000
-_081DC8A4: .4byte dword_8CDBA50 @ =0x08CDBA50
+_081DC8A4: .4byte 0x08CDBA50
 _081DC8A8:
 	mov r3, r10
 	ldr r0, [r3, #0x00]
@@ -128,8 +128,8 @@ _081DC8D0:
 	str r3, [r5, #0x04]
 	b _081DC960
 	.byte 0x00, 0x00
-_081DC918: .4byte dword_8CDBA50 @ =0x08CDBA50
-_081DC91C: .4byte dword_8CDB634 @ =0x08CDB634
+_081DC918: .4byte 0x08CDBA50
+_081DC91C: .4byte 0x08CDB634
 _081DC920:
 	subs r7, #0x0C
 	movs r0, #0x08
@@ -171,6 +171,6 @@ _081DC960:
 	mov r9, r4
 	mov r10, r5
 	pop {r4, r5, r6, r7, pc}
-_081DC96C: .4byte dword_8CDBA50 @ =0x08CDBA50
-_081DC970: .4byte dword_8CDBA48 @ =0x08CDBA48
-_081DC974: .4byte dword_8CDBA4C @ =0x08CDBA4C
+_081DC96C: .4byte 0x08CDBA50
+_081DC970: .4byte 0x08CDBA48
+_081DC974: .4byte 0x08CDBA4C

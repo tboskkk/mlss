@@ -85,4 +85,4 @@ _08040CE8:
 	pop {r4, r5, r6}
 	pop {r0}
 	bx r0
-_08040CF0: .4byte dword_83A05EC @ =0x083A05EC
+_08040CF0: .4byte 0x083A05EC

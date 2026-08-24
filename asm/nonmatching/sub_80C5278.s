@@ -47,7 +47,7 @@ sub_80C5278:
 	.byte 0x00, 0x00
 _080C52CC: .4byte 0x03000FD8
 _080C52D0: .4byte 0x00000FFF
-_080C52D4: .4byte dword_83B89F8 @ =0x083B89F8
+_080C52D4: .4byte 0x083B89F8
 _080C52D8:
 	ldr r5, _080C5300 @ =0x083B8A00
 	movs r1, #0x00
@@ -67,7 +67,7 @@ _080C52D8:
 	ldsb r1, [r5, r1]
 	b _080C531E
 	.byte 0x00, 0x00
-_080C5300: .4byte byte_83B8A00 @ =0x083B8A00
+_080C5300: .4byte 0x083B8A00
 _080C5304:
 	movs r4, #0x00
 	ldsb r4, [r5, r4]

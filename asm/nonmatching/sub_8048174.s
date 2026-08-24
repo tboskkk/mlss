@@ -36,7 +36,7 @@ _080481A4:
 	adds r0, r0, r1
 	ldr r0, [r0, #0x00]
 	mov pc, r0
-_080481B4: .4byte dword_83A09DC @ =0x083A09DC
+_080481B4: .4byte 0x083A09DC
 _080481B8: .4byte lbl_080481BC
 lbl_080481BC:
 	.4byte _080481D8

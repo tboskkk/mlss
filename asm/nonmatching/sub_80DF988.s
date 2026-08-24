@@ -83,5 +83,5 @@ _080DFA0C:
 	pop {r4}
 	pop {r0}
 	bx r0
-_080DFA1C: .4byte word_8198584 @ =0x08198584
-_080DFA20: .4byte word_8198504 @ =0x08198504
+_080DFA1C: .4byte 0x08198584
+_080DFA20: .4byte 0x08198504

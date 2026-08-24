@@ -206,8 +206,8 @@ _08177CCC:
 	subs r0, r1, r0
 	b _08177CEE
 	.byte 0x00, 0x00
-_08177CD4: .4byte word_8198584 @ =0x08198584
-_08177CD8: .4byte word_8198504 @ =0x08198504
+_08177CD4: .4byte 0x08198584
+_08177CD8: .4byte 0x08198504
 _08177CDC:
 	mov r0, r8
 	movs r2, #0x12

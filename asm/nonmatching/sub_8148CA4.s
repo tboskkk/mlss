@@ -44,4 +44,4 @@ _08148CEC:
 	pop {r0}
 	bx r0
 	.byte 0x00, 0x00
-_08148CF4: .4byte dword_8148C61 @ =0x08148C61
+_08148CF4: .4byte 0x08148C61

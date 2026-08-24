@@ -34,4 +34,4 @@ _0815F270:
 	pop {r4, r5}
 	pop {r1}
 	bx r1
-_0815F278: .4byte dword_8CDCD10 @ =0x08CDCD10
+_0815F278: .4byte 0x08CDCD10

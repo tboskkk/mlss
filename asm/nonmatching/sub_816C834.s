@@ -91,7 +91,7 @@ _0816C8CC:
 	movs r0, #0x01
 	str r0, [r1, #0x50]
 	b _0816C956
-_0816C8DC: .4byte byte_8218EB6 @ =0x08218EB6
+_0816C8DC: .4byte 0x08218EB6
 _0816C8E0: .4byte 0x000003E7
 _0816C8E4:
 	ldr r1, [r5, #0x38]

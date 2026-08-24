@@ -228,8 +228,8 @@ _08182DEC:
 	subs r0, r1, r0
 	b _08182E0E
 	.byte 0x00, 0x00
-_08182DF4: .4byte word_8198584 @ =0x08198584
-_08182DF8: .4byte word_8198504 @ =0x08198504
+_08182DF4: .4byte 0x08198584
+_08182DF8: .4byte 0x08198504
 _08182DFC:
 	mov r5, r9
 	movs r0, #0x12

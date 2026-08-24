@@ -152,8 +152,8 @@ _0817C7D6:
 	asrs r0, r0, #0x08
 	subs r0, r1, r0
 	b _0817C7F6
-_0817C7DC: .4byte word_8198584 @ =0x08198584
-_0817C7E0: .4byte word_8198504 @ =0x08198504
+_0817C7DC: .4byte 0x08198584
+_0817C7E0: .4byte 0x08198504
 _0817C7E4:
 	mov r3, r8
 	movs r4, #0x12

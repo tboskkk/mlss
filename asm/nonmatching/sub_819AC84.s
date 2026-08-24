@@ -54,9 +54,9 @@ _0819ACE6:
 	adds r0, r0, r1
 	ldr r0, [r0, #0x00]
 	mov pc, r0
-_0819ACF0: .4byte dword_821CB20 @ =0x0821CB20
-_0819ACF4: .4byte dword_821CB30 @ =0x0821CB30
-_0819ACF8: .4byte dword_821CB40 @ =0x0821CB40
+_0819ACF0: .4byte 0x0821CB20
+_0819ACF4: .4byte 0x0821CB30
+_0819ACF8: .4byte 0x0821CB40
 _0819ACFC: .4byte 0x03007FF0
 _0819AD00: .4byte lbl_0819AD04
 lbl_0819AD04:

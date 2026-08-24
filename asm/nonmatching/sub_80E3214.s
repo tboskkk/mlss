@@ -213,8 +213,8 @@ _080E3396:
 	ands r0, r3
 	b _080E33F6
 	.byte 0x00, 0x00
-_080E33AC: .4byte word_8198504 @ =0x08198504
-_080E33B0: .4byte word_8198584 @ =0x08198584
+_080E33AC: .4byte 0x08198504
+_080E33B0: .4byte 0x08198584
 _080E33B4: .4byte 0xFFFFFF00
 _080E33B8: .4byte 0x03001038
 _080E33BC: .4byte 0x0819832C
@@ -588,7 +588,7 @@ _080E368C:
 	.byte 0x00, 0x00
 _080E3694: .4byte 0x0300034C
 _080E3698: .4byte 0x00000888
-_080E369C: .4byte dword_8200100 @ =0x08200100
+_080E369C: .4byte 0x08200100
 _080E36A0:
 	movs r3, #0xFF
 	lsls r3, r3, #0x08
@@ -802,7 +802,7 @@ _080E3836:
 	asrs r0, r0, #0x08
 	strh r0, [r1, #0x1E]
 	b _080E387E
-_080E383C: .4byte dword_8200100 @ =0x08200100
+_080E383C: .4byte 0x08200100
 _080E3840:
 	movs r4, #0xFF
 	lsls r4, r4, #0x08

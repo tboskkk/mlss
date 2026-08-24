@@ -77,7 +77,7 @@ sub_813E618:
 	ldrb r0, [r0, #0x00]
 	b _0813E6C8
 	.byte 0x00, 0x00
-_0813E6B4: .4byte dword_83A05EC @ =0x083A05EC
+_0813E6B4: .4byte 0x083A05EC
 _0813E6B8: .4byte 0x00000216
 _0813E6BC:
 	movs r0, #0x82

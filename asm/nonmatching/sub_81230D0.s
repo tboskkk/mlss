@@ -61,9 +61,9 @@ sub_81230D0:
 	ldrb r0, [r0, #0x0A]
 	strb r0, [r2, #0x03]
 	b _0812315C
-_08123144: .4byte byte_83BE67C @ =0x083BE67C
+_08123144: .4byte 0x083BE67C
 _08123148: .4byte 0x03000FF4
-_0812314C: .4byte dword_83BD844 @ =0x083BD844
+_0812314C: .4byte 0x083BD844
 _08123150:
 	mov r1, sp
 	movs r0, #0xFF
@@ -120,7 +120,7 @@ _0812315C:
 	ldrh r0, [r0, #0x0C]
 	b _081231C2
 	.byte 0x00, 0x00
-_081231BC: .4byte dword_83BD844 @ =0x083BD844
+_081231BC: .4byte 0x083BD844
 _081231C0:
 	strh r0, [r3, #0x04]
 _081231C2:

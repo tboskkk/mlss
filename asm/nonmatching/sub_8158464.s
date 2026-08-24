@@ -21,4 +21,4 @@ sub_8158464:
 	pop {r4, r5}
 	pop {r1}
 	bx r1
-_0815848C: .4byte dword_8CDC5B0 @ =0x08CDC5B0
+_0815848C: .4byte 0x08CDC5B0

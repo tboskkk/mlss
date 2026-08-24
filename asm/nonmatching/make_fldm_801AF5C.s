@@ -34,4 +34,4 @@ _0801AF7E:
 	pop {r4, r5}
 	pop {r0}
 	bx r0
-_0801AF9C: .4byte dword_81E23B0 @ =0x081E23B0
+_0801AF9C: .4byte 0x081E23B0

@@ -29,8 +29,8 @@ sub_805A438:
 	cmp r3, r0
 	beq _0805A484
 	b _0805A536
-_0805A46C: .4byte dword_89FC058 @ =0x089FC058
-_0805A470: .4byte dword_83AFC5C @ =0x083AFC5C
+_0805A46C: .4byte 0x089FC058
+_0805A470: .4byte 0x083AFC5C
 _0805A474:
 	movs r0, #0x02
 	negs r0, r0
@@ -59,7 +59,7 @@ _0805A484:
 	bl sub_8019808
 	b _0805A52E
 _0805A4A8: .4byte 0x03000DC0
-_0805A4AC: .4byte dword_83AFE48 @ =0x083AFE48
+_0805A4AC: .4byte 0x083AFE48
 _0805A4B0:
 	ldr r6, _0805A4F4 @ =0x03000DC0
 	ldr r4, [r6, #0x00]
@@ -95,7 +95,7 @@ _0805A4BA:
 	b _0805A60E
 	.byte 0x00, 0x00
 _0805A4F4: .4byte 0x03000DC0
-_0805A4F8: .4byte dword_83AFE48 @ =0x083AFE48
+_0805A4F8: .4byte 0x083AFE48
 _0805A4FC:
 	ldr r0, _0805A514 @ =0x03000DC0
 	ldr r0, [r0, #0x00]
@@ -202,8 +202,8 @@ _0805A54C:
 	strb r0, [r6, #0x00]
 	b _0805A5FC
 	.byte 0x00, 0x00
-_0805A5D0: .4byte dword_83A75DC @ =0x083A75DC
-_0805A5D4: .4byte dword_83A75EC @ =0x083A75EC
+_0805A5D0: .4byte 0x083A75DC
+_0805A5D4: .4byte 0x083A75EC
 _0805A5D8:
 	movs r2, #0x32
 	ldsh r1, [r5, r2]

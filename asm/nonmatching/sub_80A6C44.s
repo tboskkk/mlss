@@ -51,5 +51,5 @@ _080A6C9C:
 	pop {r0}
 	bx r0
 _080A6CA4: .4byte 0x03000FD8
-_080A6CA8: .4byte dword_8018005 @ =0x08018005
+_080A6CA8: .4byte 0x08018005
 _080A6CAC: .4byte sub_80A64C4

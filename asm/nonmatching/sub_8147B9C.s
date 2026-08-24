@@ -114,6 +114,6 @@ _08147BE0:
 	pop {r4, r5, r6, r7}
 	pop {r0}
 	bx r0
-_08147C80: .4byte dword_83A05EC @ =0x083A05EC
+_08147C80: .4byte 0x083A05EC
 _08147C84: .4byte 0x00000216
 _08147C88: .4byte sub_8147C8C

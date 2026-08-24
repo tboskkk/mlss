@@ -29,7 +29,7 @@ sub_81DD6B0:
 	str r4, [r4, #0x04]
 	b _081DD6FA
 	.byte 0x00, 0x00
-_081DD6E8: .4byte dword_8212804 @ =0x08212804
+_081DD6E8: .4byte 0x08212804
 _081DD6EC:
 	ldr r0, [r5, #0x04]
 	str r4, [r0, #0x04]

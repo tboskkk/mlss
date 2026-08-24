@@ -60,7 +60,7 @@ _081DC9C6:
 	b _081DCD1E
 	.byte 0x00, 0x00
 _081DC9E4: .4byte 0x000001F7
-_081DC9E8: .4byte dword_8CDB634 @ =0x08CDB634
+_081DC9E8: .4byte 0x08CDB634
 _081DC9EC:
 	movs r0, #0x02
 	add r12, r0
@@ -138,7 +138,7 @@ _081DCA50:
 	adds r0, #0x03
 	add r12, r0
 	b _081DCA9A
-_081DCA74: .4byte dword_8CDB634 @ =0x08CDB634
+_081DCA74: .4byte 0x08CDB634
 _081DCA78:
 	cmp r3, #0x00
 	blt _081DCA7E
@@ -194,7 +194,7 @@ _081DCAAA:
 	str r3, [r0, #0x00]
 	b _081DCD1E
 	.byte 0x00, 0x00
-_081DCADC: .4byte dword_8CDB63C @ =0x08CDB63C
+_081DCADC: .4byte 0x08CDB63C
 _081DCAE0:
 	mov r7, r10
 	str r7, [r7, #0x0C]
@@ -287,7 +287,7 @@ _081DCB6A:
 	orrs r0, r1
 	str r0, [r7, #0x04]
 	b _081DCBA4
-_081DCB88: .4byte dword_8CDB634 @ =0x08CDB634
+_081DCB88: .4byte 0x08CDB634
 _081DCB8C:
 	ldr r0, [r4, #0x04]
 	movs r2, #0x04
@@ -333,7 +333,7 @@ _081DCBB4:
 	adds r0, #0x04
 	mov r12, r0
 	b _081DCBE0
-_081DCBD8: .4byte dword_8CDB634 @ =0x08CDB634
+_081DCBD8: .4byte 0x08CDB634
 _081DCBDC:
 	movs r3, #0x04
 	add r12, r3
@@ -414,7 +414,7 @@ _081DCC58:
 	cmp r0, #0x00
 	beq _081DCC58
 	b _081DCBEE
-_081DCC68: .4byte dword_8CDB634 @ =0x08CDB634
+_081DCC68: .4byte 0x08CDB634
 _081DCC6C:
 	mov r1, r9
 	ldr r0, [r1, #0x04]
@@ -453,7 +453,7 @@ _081DCCAA:
 	bl nullsub_6
 	movs r0, #0x00
 	b _081DCD28
-_081DCCB4: .4byte dword_8CDB634 @ =0x08CDB634
+_081DCCB4: .4byte 0x08CDB634
 _081DCCB8:
 	ldr r6, [r5, #0x0C]
 	ldr r4, [r5, #0x08]
@@ -521,4 +521,4 @@ _081DCD28:
 	mov r9, r4
 	mov r10, r5
 	pop {r4, r5, r6, r7, pc}
-_081DCD34: .4byte dword_8CDB634 @ =0x08CDB634
+_081DCD34: .4byte 0x08CDB634

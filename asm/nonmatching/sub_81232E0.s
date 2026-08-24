@@ -19,5 +19,5 @@ sub_81232E0:
 	ldr r0, [r0, #0x00]
 	bx lr
 	.byte 0x00, 0x00
-_08123300: .4byte dword_83C03E8 @ =0x083C03E8
+_08123300: .4byte 0x083C03E8
 _08123304: .4byte 0x0300034C

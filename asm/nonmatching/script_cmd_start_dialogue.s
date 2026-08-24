@@ -58,7 +58,7 @@ script_cmd_start_dialogue: @ 080EE7D4
 	mov r8, r1
 	b _080EE85A
 	.byte 0x00, 0x00
-_080EE844: .4byte word_83BA4B4 @ =0x083BA4B4
+_080EE844: .4byte 0x083BA4B4
 _080EE848:
 	mov r0, r8
 	adds r0, #0x01

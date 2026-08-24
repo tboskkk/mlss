@@ -125,7 +125,7 @@ _08027E1C:
 	negs r0, r0
 	b _08027E50
 	.byte 0x00, 0x00
-_08027E48: .4byte dword_839F610 @ =0x0839F610
+_08027E48: .4byte 0x0839F610
 _08027E4C:
 	movs r0, #0x02
 	negs r0, r0

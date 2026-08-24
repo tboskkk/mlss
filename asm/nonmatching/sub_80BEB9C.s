@@ -50,7 +50,7 @@ _080BEBBC:
 	b _080BEC92
 _080BEBF4: .4byte 0x03000FD8
 _080BEBF8: .4byte 0x00000FFF
-_080BEBFC: .4byte dword_83B89DC @ =0x083B89DC
+_080BEBFC: .4byte 0x083B89DC
 _080BEC00:
 	ldr r5, _080BEC28 @ =0x083B89E4
 	movs r1, #0x00
@@ -70,7 +70,7 @@ _080BEC00:
 	ldsb r1, [r5, r1]
 	b _080BEC46
 	.byte 0x00, 0x00
-_080BEC28: .4byte byte_83B89E4 @ =0x083B89E4
+_080BEC28: .4byte 0x083B89E4
 _080BEC2C:
 	movs r4, #0x00
 	ldsb r4, [r5, r4]

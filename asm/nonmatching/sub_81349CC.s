@@ -35,5 +35,5 @@ sub_81349CC:
 	strb r2, [r0, #0x00]
 	bx lr
 	.byte 0x00, 0x00
-_08134A0C: .4byte dword_821253C @ =0x0821253C
-_08134A10: .4byte dword_8212544 @ =0x08212544
+_08134A0C: .4byte 0x0821253C
+_08134A10: .4byte 0x08212544

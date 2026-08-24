@@ -47,7 +47,7 @@ sub_80C724C:
 	b _080C733E
 _080C72A0: .4byte 0x03000FD8
 _080C72A4: .4byte 0x00000FFF
-_080C72A8: .4byte dword_83B89F8 @ =0x083B89F8
+_080C72A8: .4byte 0x083B89F8
 _080C72AC:
 	ldr r5, _080C72D4 @ =0x083B8A00
 	movs r1, #0x00
@@ -67,7 +67,7 @@ _080C72AC:
 	ldsb r1, [r5, r1]
 	b _080C72F2
 	.byte 0x00, 0x00
-_080C72D4: .4byte byte_83B8A00 @ =0x083B8A00
+_080C72D4: .4byte 0x083B8A00
 _080C72D8:
 	movs r4, #0x00
 	ldsb r4, [r5, r4]

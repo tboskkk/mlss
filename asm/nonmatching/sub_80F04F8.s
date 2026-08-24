@@ -37,4 +37,4 @@ _080F0530:
 	pop {r1}
 	bx r1
 _080F0538: .4byte 0x03000FD0
-_080F053C: .4byte dword_83BA4BC @ =0x083BA4BC
+_080F053C: .4byte 0x083BA4BC

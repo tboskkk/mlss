@@ -32,4 +32,4 @@ _0819B0A0:
 	pop {r0}
 	bx r0
 	.byte 0x00, 0x00
-_0819B0A8: .4byte dword_8A80688 @ =0x08A80688
+_0819B0A8: .4byte 0x08A80688

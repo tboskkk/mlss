@@ -62,4 +62,4 @@ sub_80F7DFC:
 	bx r1
 	.byte 0x00, 0x00
 _080F7E78: .4byte 0x03000FD8
-_080F7E7C: .4byte dword_8502B14 @ =0x08502B14
+_080F7E7C: .4byte 0x08502B14

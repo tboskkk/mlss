@@ -27,4 +27,4 @@ sub_8158F28:
 	pop {r1}
 	bx r1
 	.byte 0x00, 0x00
-_08158F5C: .4byte dword_8CDC9F0 @ =0x08CDC9F0
+_08158F5C: .4byte 0x08CDC9F0

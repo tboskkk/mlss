@@ -17,5 +17,5 @@ _081593F2:
 	pop {r0}
 	bx r0
 	.byte 0x00, 0x00
-_081593F8: .4byte dword_8CDCA30 @ =0x08CDCA30
+_081593F8: .4byte 0x08CDCA30
 	.byte 0x70, 0x47, 0x00, 0x00

@@ -88,7 +88,7 @@ _080F64FC:
 	b _080F656E
 	.byte 0x00, 0x00
 _080F6554: .4byte 0x03000FDC
-_080F6558: .4byte word_83BA4B4 @ =0x083BA4B4
+_080F6558: .4byte 0x083BA4B4
 _080F655C:
 	mov r0, r8
 	adds r0, #0x01

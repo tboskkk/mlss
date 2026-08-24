@@ -19,4 +19,4 @@ sub_80FB7BC:
 	subs r0, r0, r1
 	bx lr
 	.byte 0x00, 0x00
-_080FB7DC: .4byte dword_83D6C58 @ =0x083D6C58
+_080FB7DC: .4byte 0x083D6C58

@@ -25,4 +25,4 @@ _08021EC0:
 	pop {r1}
 	bx r1
 _08021ED0: .4byte 0x00000FFF
-_08021ED4: .4byte dword_839EE60 @ =0x0839EE60
+_08021ED4: .4byte 0x0839EE60

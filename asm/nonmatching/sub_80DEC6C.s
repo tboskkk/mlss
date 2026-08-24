@@ -44,6 +44,6 @@ _080DECB4:
 	pop {r4, r5}
 	pop {r0}
 	bx r0
-_080DECBC: .4byte byte_83BBDD0 @ =0x083BBDD0
+_080DECBC: .4byte 0x083BBDD0
 _080DECC0: .4byte 0x00004188
 _080DECC4: .4byte sub_80DED4C

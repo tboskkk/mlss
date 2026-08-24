@@ -144,7 +144,7 @@ _0812C420:
 	strb r4, [r0, #0x00]
 	adds r3, r0, #0x0
 	b _0812C476
-_0812C45C: .4byte byte_83BE67C @ =0x083BE67C
+_0812C45C: .4byte 0x083BE67C
 _0812C460:
 	subs r1, #0x01
 	adds r0, r5, #0x0
@@ -427,7 +427,7 @@ _0812C684:
 	mov r6, r8
 	strb r0, [r6, #0x00]
 	b _0812C6C2
-_0812C68C: .4byte byte_83BE67C @ =0x083BE67C
+_0812C68C: .4byte 0x083BE67C
 _0812C690:
 	ldr r0, [sp, #0x010]
 	ldrb r4, [r0, #0x00]
@@ -666,7 +666,7 @@ _0812C7AC:
 	bl sprite_hide_8021F20
 	b _0812CCBC
 	.byte 0x00, 0x00
-_0812C864: .4byte byte_83BE67C @ =0x083BE67C
+_0812C864: .4byte 0x083BE67C
 _0812C868:
 	movs r0, #0x80
 	ldr r1, [sp, #0x010]
@@ -1006,7 +1006,7 @@ _0812CAC8:
 	adds r1, #0xB4
 	strh r0, [r1, #0x00]
 	b _0812CB3C
-_0812CAF4: .4byte dword_83BD844 @ =0x083BD844
+_0812CAF4: .4byte 0x083BD844
 _0812CAF8:
 	ldr r3, _0812CB60 @ =0x083BE67C
 	ldrb r0, [r7, #0x00]
@@ -1060,7 +1060,7 @@ _0812CB3C:
 	adds r0, #0x01
 	strb r1, [r0, #0x00]
 	b _0812CD32
-_0812CB60: .4byte byte_83BE67C @ =0x083BE67C
+_0812CB60: .4byte 0x083BE67C
 _0812CB64:
 	.byte 0xEB, 0x6B, 0x59, 0x88, 0x02, 0x20, 0x08, 0x40, 0x00, 0x28, 0x06, 0xD0, 0x01, 0x21, 0x49, 0x42
 	.byte 0x61, 0x20, 0xEC, 0xF6, 0x1D, 0xFD, 0x02, 0x20, 0x05, 0xE1, 0x01, 0x26, 0x01, 0x22, 0x0A, 0x40

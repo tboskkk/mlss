@@ -198,8 +198,8 @@ _0817DF12:
 	asrs r0, r0, #0x08
 	subs r0, r1, r0
 	b _0817DF32
-_0817DF18: .4byte word_8198584 @ =0x08198584
-_0817DF1C: .4byte word_8198504 @ =0x08198504
+_0817DF18: .4byte 0x08198584
+_0817DF1C: .4byte 0x08198504
 _0817DF20:
 	mov r3, r8
 	movs r4, #0x12

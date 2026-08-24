@@ -65,7 +65,7 @@ _08059D5A:
 	pop {r4, r5, r6, r7}
 	pop {r0}
 	bx r0
-_08059D7C: .4byte dword_86FFC20 @ =0x086FFC20
+_08059D7C: .4byte 0x086FFC20
 _08059D80: .4byte 0x03000DE8
-_08059D84: .4byte dword_83AAC4C @ =0x083AAC4C
+_08059D84: .4byte 0x083AAC4C
 _08059D88: .4byte 0x000007FF

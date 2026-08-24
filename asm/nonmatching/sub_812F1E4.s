@@ -37,7 +37,7 @@ sub_812F1E4:
 	adds r5, r3, #0x0
 	adds r3, r1, #0x0
 	b _0812F2D4
-_0812F228: .4byte byte_83BBDD0 @ =0x083BBDD0
+_0812F228: .4byte 0x083BBDD0
 _0812F22C:
 	adds r5, r4, #0x0
 	adds r5, #0xAE
@@ -79,7 +79,7 @@ _0812F22C:
 	adds r5, r2, #0x0
 	adds r3, r1, #0x0
 	b _0812F2D4
-_0812F27C: .4byte byte_83BE67C @ =0x083BE67C
+_0812F27C: .4byte 0x083BE67C
 _0812F280:
 	adds r0, r4, #0x0
 	adds r0, #0xAA
@@ -139,4 +139,4 @@ _0812F2D4:
 	pop {r0}
 	bx r0
 	.byte 0x00, 0x00
-_0812F2F4: .4byte dword_83BD844 @ =0x083BD844
+_0812F2F4: .4byte 0x083BD844

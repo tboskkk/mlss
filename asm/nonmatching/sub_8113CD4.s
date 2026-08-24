@@ -115,7 +115,7 @@ _08113DA4:
 	pop {r4, r5}
 	pop {r1}
 	bx r1
-_08113DAC: .4byte dword_820114C @ =0x0820114C
+_08113DAC: .4byte 0x0820114C
 _08113DB0: .4byte 0x00000113
 _08113DB4: .4byte sub_8113DC0
 _08113DB8: .4byte 0x00002AFB

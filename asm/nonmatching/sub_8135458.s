@@ -70,4 +70,4 @@ sub_8135458:
 	pop {r4, r5, r6}
 	pop {r0}
 	bx r0
-_081354E0: .4byte dword_8CDC470 @ =0x08CDC470
+_081354E0: .4byte 0x08CDC470

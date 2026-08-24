@@ -9,4 +9,4 @@ sub_8059EF0:
 	adds r0, r0, r1
 	ldr r0, [r0, #0x00]
 	bx lr
-_08059EFC: .4byte dword_83AF418 @ =0x083AF418
+_08059EFC: .4byte 0x083AF418

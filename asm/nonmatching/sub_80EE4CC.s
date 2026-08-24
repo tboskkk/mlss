@@ -59,7 +59,7 @@ _080EE502:
 	ands r0, r1
 	strb r0, [r2, #0x00]
 	b _080EE550
-_080EE540: .4byte dword_83C9FC0 @ =0x083C9FC0
+_080EE540: .4byte 0x083C9FC0
 _080EE544:
 	mov r2, r12
 	adds r2, #0xA0

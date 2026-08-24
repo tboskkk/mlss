@@ -152,8 +152,8 @@ _0817AB30:
 	subs r0, r1, r0
 	b _0817AB50
 	.byte 0x00, 0x00
-_0817AB38: .4byte word_8198584 @ =0x08198584
-_0817AB3C: .4byte word_8198504 @ =0x08198504
+_0817AB38: .4byte 0x08198584
+_0817AB3C: .4byte 0x08198504
 _0817AB40:
 	movs r6, #0x12
 	ldsh r1, [r5, r6]

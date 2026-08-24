@@ -248,7 +248,7 @@ _080E8784:
 	adds r0, r4, r0
 	b _080E87B0
 _080E87A4: .4byte 0x03000F8C
-_080E87A8: .4byte dword_83B9530 @ =0x083B9530
+_080E87A8: .4byte 0x083B9530
 _080E87AC:
 	adds r0, r3, #0x0
 	adds r0, #0x0C

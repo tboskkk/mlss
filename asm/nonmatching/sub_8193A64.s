@@ -204,8 +204,8 @@ _08193BD2:
 	asrs r0, r0, #0x08
 	subs r0, r1, r0
 	b _08193BF2
-_08193BD8: .4byte word_8198584 @ =0x08198584
-_08193BDC: .4byte word_8198504 @ =0x08198504
+_08193BD8: .4byte 0x08198584
+_08193BDC: .4byte 0x08198504
 _08193BE0:
 	mov r3, r8
 	movs r4, #0x12

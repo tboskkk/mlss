@@ -143,5 +143,5 @@ sub_815B820:
 	pop {r4, r5, r6}
 	pop {r1}
 	bx r1
-_0815B948: .4byte dword_8CDCE10 @ =0x08CDCE10
+_0815B948: .4byte 0x08CDCE10
 _0815B94C: .4byte 0x00005008

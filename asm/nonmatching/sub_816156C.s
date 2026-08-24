@@ -9,5 +9,5 @@ sub_816156C:
 	str r1, [r0, #0x04]
 	bx lr
 	.byte 0x00, 0x00
-_08161578: .4byte dword_8CDD060 @ =0x08CDD060
+_08161578: .4byte 0x08CDD060
 	.byte 0x70, 0x47, 0x00, 0x00

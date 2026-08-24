@@ -30,7 +30,7 @@ _080E8F58:
 	bl stop_sfx_80195A8
 	b _080E8FAC
 	.byte 0x00, 0x00
-_080E8F6C: .4byte dword_83B9512 @ =0x083B9512
+_080E8F6C: .4byte 0x083B9512
 _080E8F70:
 	cmp r5, #0x00
 	beq _080E8FAC
@@ -43,7 +43,7 @@ _080E8F70:
 	bl play_sfx_80195B4
 	b _080E8FAC
 	.byte 0x00, 0x00
-_080E8F88: .4byte dword_83B9512 @ =0x083B9512
+_080E8F88: .4byte 0x083B9512
 _080E8F8C:
 	cmp r5, #0x00
 	beq _080E8FAC
@@ -64,4 +64,4 @@ _080E8FAC:
 	pop {r0}
 	bx r0
 	.byte 0x00, 0x00
-_080E8FB4: .4byte dword_83B9512 @ =0x083B9512
+_080E8FB4: .4byte 0x083B9512

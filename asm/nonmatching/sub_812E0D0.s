@@ -103,13 +103,13 @@ _0812E162:
 	adds r1, r1, r2
 	ldr r1, [r1, #0x00]
 	b _0812E2E8
-_0812E198: .4byte dword_83C0D48 @ =0x083C0D48
+_0812E198: .4byte 0x083C0D48
 _0812E19C: .4byte 0x0300034C
-_0812E1A0: .4byte dword_83C0D70 @ =0x083C0D70
-_0812E1A4: .4byte dword_83C0D5C @ =0x083C0D5C
-_0812E1A8: .4byte dword_83C0D84 @ =0x083C0D84
+_0812E1A0: .4byte 0x083C0D70
+_0812E1A4: .4byte 0x083C0D5C
+_0812E1A8: .4byte 0x083C0D84
 _0812E1AC: .4byte 0x03001034
-_0812E1B0: .4byte byte_83BBDD0 @ =0x083BBDD0
+_0812E1B0: .4byte 0x083BBDD0
 _0812E1B4:
 	adds r4, r7, #0x0
 	adds r4, #0xAE
@@ -143,7 +143,7 @@ _0812E1B4:
 	str r1, [sp, #0x004]
 	b _0812E2F0
 	.byte 0x00, 0x00
-_0812E1F4: .4byte byte_83BE67C @ =0x083BE67C
+_0812E1F4: .4byte 0x083BE67C
 _0812E1F8:
 	ldrh r0, [r1, #0x00]
 	ldrh r1, [r4, #0x00]
@@ -194,7 +194,7 @@ _0812E224:
 	str r1, [sp, #0x004]
 	b _0812E2F0
 	.byte 0x00, 0x00
-_0812E254: .4byte dword_83BD844 @ =0x083BD844
+_0812E254: .4byte 0x083BD844
 _0812E258: .4byte 0x0300034C
 _0812E25C:
 	adds r0, r7, #0x0
@@ -243,7 +243,7 @@ _0812E25C:
 	mov r5, r9
 	str r5, [sp, #0x004]
 	b _0812E2F0
-_0812E2B8: .4byte dword_83BD844 @ =0x083BD844
+_0812E2B8: .4byte 0x083BD844
 _0812E2BC:
 	ldr r0, [r7, #0x5C]
 	ldr r3, _0812E2FC @ =0x083BE67C
@@ -278,7 +278,7 @@ _0812E2F0:
 	movs r3, #0x06
 	bl sub_8083860
 	b _0812E33C
-_0812E2FC: .4byte byte_83BE67C @ =0x083BE67C
+_0812E2FC: .4byte 0x083BE67C
 _0812E300:
 	ldr r0, [r7, #0x5C]
 	ldr r4, _0812E3B0 @ =0x083BBDD0
@@ -370,7 +370,7 @@ _0812E3A4:
 	mov r10, r1
 	b _0812E4B0
 	.byte 0x00, 0x00
-_0812E3B0: .4byte byte_83BBDD0 @ =0x083BBDD0
+_0812E3B0: .4byte 0x083BBDD0
 _0812E3B4: .4byte 0x03001034
 _0812E3B8: .4byte 0x03000C0C
 _0812E3BC:
@@ -406,7 +406,7 @@ _0812E3BC:
 	ldr r1, [r1, #0x00]
 	b _0812E438
 	.byte 0x00, 0x00
-_0812E3FC: .4byte byte_83BBDD0 @ =0x083BBDD0
+_0812E3FC: .4byte 0x083BBDD0
 _0812E400:
 	adds r4, r7, #0x0
 	adds r4, #0xAE
@@ -446,7 +446,7 @@ _0812E438:
 	bl sub_8083860
 	b _0812E4A0
 	.byte 0x00, 0x00
-_0812E44C: .4byte byte_83BE67C @ =0x083BE67C
+_0812E44C: .4byte 0x083BE67C
 _0812E450:
 	ldrh r0, [r1, #0x00]
 	ldrh r1, [r4, #0x00]
@@ -509,7 +509,7 @@ _0812E4B0:
 _0812E4C0:
 	b _0812E818
 	.byte 0x00, 0x00
-_0812E4C4: .4byte dword_83BD844 @ =0x083BD844
+_0812E4C4: .4byte 0x083BD844
 _0812E4C8:
 	mov r1, r9
 	cmp r1, #0x05
@@ -636,7 +636,7 @@ _0812E576:
 	b _0812E62A
 	.byte 0x00, 0x00
 _0812E5B0: .4byte 0x03000FF4
-_0812E5B4: .4byte dword_83BD844 @ =0x083BD844
+_0812E5B4: .4byte 0x083BD844
 _0812E5B8: .4byte 0x0300034C
 _0812E5BC:
 	ldr r0, [r7, #0x58]
@@ -718,7 +718,7 @@ _0812E63A:
 _0812E64A:
 	b _0812E6A2
 _0812E64C: .4byte 0x03000FF4
-_0812E650: .4byte byte_83BE67C @ =0x083BE67C
+_0812E650: .4byte 0x083BE67C
 _0812E654: .4byte 0x0300034C
 _0812E658:
 	mov r4, r9
@@ -792,7 +792,7 @@ _0812E6C8:
 	adds r1, r1, r4
 	b _0812E714
 _0812E6E0: .4byte 0x03000FF4
-_0812E6E4: .4byte dword_83BD844 @ =0x083BD844
+_0812E6E4: .4byte 0x083BD844
 _0812E6E8: .4byte 0x0300034C
 _0812E6EC:
 	ldr r0, [r7, #0x60]
@@ -831,7 +831,7 @@ _0812E714:
 	bl sub_8083860
 	b _0812E818
 	.byte 0x00, 0x00
-_0812E734: .4byte byte_83BE67C @ =0x083BE67C
+_0812E734: .4byte 0x083BE67C
 _0812E738: .4byte 0x03000FF4
 _0812E73C: .4byte 0x0300034C
 _0812E740:
@@ -942,7 +942,7 @@ _0812E7F8:
 	blt _0812E768
 	b _0812E818
 _0812E808: .4byte 0x03000FF4
-_0812E80C: .4byte byte_83BBDD0 @ =0x083BBDD0
+_0812E80C: .4byte 0x083BBDD0
 _0812E810: .4byte 0x0300034C
 _0812E814:
 	cmp r6, #0x05
@@ -1292,7 +1292,7 @@ _0812EA82:
 	str r1, [sp, #0x004]
 	movs r1, #0x1A
 	b _0812ECB4
-_0812EABC: .4byte byte_83BE67C @ =0x083BE67C
+_0812EABC: .4byte 0x083BE67C
 _0812EAC0:
 	movs r0, #0xC4
 	adds r0, r0, r7
@@ -1444,8 +1444,8 @@ _0812EB22:
 	ldrb r5, [r1, #0x0A]
 	b _0812EC1C
 _0812EBF0: .4byte 0x03000FF4
-_0812EBF4: .4byte byte_83BE67C @ =0x083BE67C
-_0812EBF8: .4byte dword_83BD844 @ =0x083BD844
+_0812EBF4: .4byte 0x083BE67C
+_0812EBF8: .4byte 0x083BD844
 _0812EBFC:
 	cmp r0, #0x01
 	bne _0812EC1C
@@ -1546,7 +1546,7 @@ _0812ECB4:
 	movs r3, #0x12
 	bl sub_8083860
 	b _0812ECF0
-_0812ECBC: .4byte dword_83BF370 @ =0x083BF370
+_0812ECBC: .4byte 0x083BF370
 _0812ECC0: .4byte 0x0300034C
 _0812ECC4:
 	adds r0, r7, #0x0

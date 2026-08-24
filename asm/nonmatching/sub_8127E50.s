@@ -22,7 +22,7 @@ sub_8127E50:
 	adds r1, r7, #0x0
 	bl _call_via_r2
 	b _08127EBC
-_08127E7C: .4byte dword_8210F64 @ =0x08210F64
+_08127E7C: .4byte 0x08210F64
 _08127E80: .4byte 0x03000C84
 _08127E84:
 	ldr r2, _08127EC4 @ =0x08210F64
@@ -55,5 +55,5 @@ _08127EBC:
 	pop {r4, r5, r6, r7}
 	pop {r1}
 	bx r1
-_08127EC4: .4byte dword_8210F64 @ =0x08210F64
+_08127EC4: .4byte 0x08210F64
 _08127EC8: .4byte 0x03000C84

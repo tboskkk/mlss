@@ -51,5 +51,5 @@ _080A5B14:
 	pop {r0}
 	bx r0
 _080A5B1C: .4byte 0x03000FD8
-_080A5B20: .4byte dword_8014104 @ =0x08014104
+_080A5B20: .4byte 0x08014104
 _080A5B24: .4byte sub_80A5790

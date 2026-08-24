@@ -165,7 +165,7 @@ _0814FF00:
 	ldrb r1, [r1, #0x00]
 	adds r1, #0x04
 	b _0814FF7A
-_0814FF24: .4byte dword_83A05EC @ =0x083A05EC
+_0814FF24: .4byte 0x083A05EC
 _0814FF28: .4byte 0x00000216
 _0814FF2C:
 	ldr r2, _0814FF50 @ =0x083A05EC
@@ -186,7 +186,7 @@ _0814FF2C:
 	ldrb r1, [r1, #0x00]
 	adds r1, #0x08
 	b _0814FF7A
-_0814FF50: .4byte dword_83A05EC @ =0x083A05EC
+_0814FF50: .4byte 0x083A05EC
 _0814FF54: .4byte 0x00000216
 _0814FF58:
 	ldr r2, _0814FFA4 @ =0x083A05EC
@@ -228,5 +228,5 @@ _0814FF98:
 	pop {r4, r5, r6, r7}
 	pop {r0}
 	bx r0
-_0814FFA4: .4byte dword_83A05EC @ =0x083A05EC
+_0814FFA4: .4byte 0x083A05EC
 _0814FFA8: .4byte 0x00000216

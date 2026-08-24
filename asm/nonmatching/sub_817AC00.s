@@ -150,8 +150,8 @@ _0817AD0E:
 	asrs r0, r0, #0x08
 	subs r0, r1, r0
 	b _0817AD2C
-_0817AD14: .4byte word_8198584 @ =0x08198584
-_0817AD18: .4byte word_8198504 @ =0x08198504
+_0817AD14: .4byte 0x08198584
+_0817AD18: .4byte 0x08198504
 _0817AD1C:
 	movs r6, #0x12
 	ldsh r1, [r5, r6]

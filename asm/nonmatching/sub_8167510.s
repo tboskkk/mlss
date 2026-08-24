@@ -77,9 +77,9 @@ _0816759C:
 	ldr r0, [r0, #0x00]
 	mov pc, r0
 	.byte 0x00, 0x00
-_081675A8: .4byte dword_82146E6 @ =0x082146E6
-_081675AC: .4byte dword_82146F6 @ =0x082146F6
-_081675B0: .4byte dword_82154F0 @ =0x082154F0
+_081675A8: .4byte 0x082146E6
+_081675AC: .4byte 0x082146F6
+_081675B0: .4byte 0x082154F0
 _081675B4: .4byte lbl_081675B8
 lbl_081675B8:
 	.4byte _081675F0

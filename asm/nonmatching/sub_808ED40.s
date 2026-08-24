@@ -46,7 +46,7 @@ sub_808ED40:
 	pop {r1}
 	bx r1
 	.byte 0x00, 0x00
-_0808ED98: .4byte dword_84FE9A4 @ =0x084FE9A4
+_0808ED98: .4byte 0x084FE9A4
 _0808ED9C: .4byte 0x03000FF4
 _0808EDA0: .4byte 0x0000204D
 _0808EDA4: .4byte sub_808EE0C

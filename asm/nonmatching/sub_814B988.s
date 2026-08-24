@@ -71,4 +71,4 @@ _0814BA04:
 	pop {r4, r5}
 	pop {r0}
 	bx r0
-_0814BA0C: .4byte dword_814BDFD @ =0x0814BDFD
+_0814BA0C: .4byte 0x0814BDFD

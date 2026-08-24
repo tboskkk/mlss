@@ -88,6 +88,6 @@ _08111B22:
 	pop {r4, r5, r6, r7}
 	pop {r1}
 	bx r1
-_08111B2C: .4byte dword_83BA9A8 @ =0x083BA9A8
+_08111B2C: .4byte 0x083BA9A8
 _08111B30: .4byte 0x00002661
 _08111B34: .4byte sub_8112174

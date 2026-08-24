@@ -10,4 +10,4 @@ sub_815EDF4:
 	pop {r0}
 	bx r0
 	.byte 0x00, 0x00
-_0815EE04: .4byte dword_8CDCB90 @ =0x08CDCB90
+_0815EE04: .4byte 0x08CDCB90

@@ -28,7 +28,7 @@ _0805CE9C:
 	ldr r0, [r0, #0x00]
 	mov pc, r0
 	.byte 0x00, 0x00
-_0805CEA8: .4byte dword_86527F4 @ =0x086527F4
+_0805CEA8: .4byte 0x086527F4
 _0805CEAC: .4byte 0x03000DD0
 _0805CEB0: .4byte lbl_0805CEB4
 lbl_0805CEB4:

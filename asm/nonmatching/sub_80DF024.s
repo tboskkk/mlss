@@ -133,7 +133,7 @@ _080DF0FC:
 	adds r0, r5, #0x0
 	bl _call_via_r4
 	b _080DF2A2
-_080DF120: .4byte dword_83B8A18 @ =0x083B8A18
+_080DF120: .4byte 0x083B8A18
 _080DF124: .4byte 0x00000FFF
 _080DF128:
 	lsls r1, r4, #0x01
@@ -157,7 +157,7 @@ _080DF144:
 	ldr r0, [r0, #0x00]
 	mov pc, r0
 	.byte 0x00, 0x00
-_080DF150: .4byte dword_838F8B0 @ =0x0838F8B0
+_080DF150: .4byte 0x0838F8B0
 _080DF154: .4byte lbl_080DF158
 lbl_080DF158:
 	.4byte _080DF2A2

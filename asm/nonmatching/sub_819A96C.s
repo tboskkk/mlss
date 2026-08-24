@@ -33,7 +33,7 @@ sub_819A96C:
 	lsrs r0, r0, #0x10
 	b _0819A9AE
 	.byte 0x00, 0x00
-_0819A9A8: .4byte dword_821C9A8 @ =0x0821C9A8
+_0819A9A8: .4byte 0x0821C9A8
 _0819A9AC:
 	movs r0, #0x00
 _0819A9AE:

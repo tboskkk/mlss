@@ -21,7 +21,7 @@ sub_803DC88:
 	adds r0, r4, #0x0
 	ands r0, r1
 	b _0803DCE2
-_0803DCAC: .4byte word_839FD40 @ =0x0839FD40
+_0803DCAC: .4byte 0x0839FD40
 _0803DCB0: .4byte 0x00000359
 _0803DCB4:
 	ldrh r0, [r2, #0x02]

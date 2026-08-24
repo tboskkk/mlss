@@ -35,7 +35,7 @@ _0819AF3C:
 	adds r0, #0x01
 	b _0819AF7C
 _0819AF60: .4byte 0x04000074
-_0819AF64: .4byte dword_821CB50 @ =0x0821CB50
+_0819AF64: .4byte 0x0821CB50
 _0819AF68:
 	ldr r1, _0819AF70 @ =0x04000074
 	ldrh r0, [r3, #0x08]

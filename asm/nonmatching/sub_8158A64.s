@@ -25,4 +25,4 @@ sub_8158A64:
 	pop {r4, r5}
 	pop {r1}
 	bx r1
-_08158A94: .4byte dword_8CDC830 @ =0x08CDC830
+_08158A94: .4byte 0x08CDC830

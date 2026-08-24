@@ -18,7 +18,7 @@ _0819A9C0:
 	ldrb r0, [r1, #0x00]
 	b _0819A9D6
 	.byte 0x00, 0x00
-_0819A9D0: .4byte dword_821CA74 @ =0x0821CA74
+_0819A9D0: .4byte 0x0821CA74
 _0819A9D4:
 	movs r0, #0x00
 _0819A9D6:

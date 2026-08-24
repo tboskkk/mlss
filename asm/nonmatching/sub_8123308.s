@@ -25,6 +25,6 @@ sub_8123308:
 	ldr r0, [r0, #0x00]
 	ldr r0, [r0, #0x00]
 	bx lr
-_08123334: .4byte dword_83C03E8 @ =0x083C03E8
+_08123334: .4byte 0x083C03E8
 _08123338: .4byte room_props_table
 _0812333C: .4byte 0x0300034C
