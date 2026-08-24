@@ -636,41 +636,42 @@ asm_unified(".include \"asm/nonmatching/sub_80DE4A4.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80DE5E4.s\"");
-#else
 s32 sub_807C298(void *);                        /* extern */
-
-void sub_80DE5E4(void *arg0) {
-    s32 temp_r0_68;
-    s32 temp_r1_60;
-    s32 var_r0_16;
-    s32 var_r0_31;
-
-    var_r0_16 = M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */) * 0xFD;
-    if (var_r0_16 < 0) {
-        var_r0_16 += 0xFF;
+void sub_80DE5E4(void *arg0)
+{
+  s32 temp_r0_68;
+  s32 temp_r1_60;
+  s32 var_r0_16;
+  int new_var;
+  s32 var_r0_31;
+  var_r0_16 = (*((s16 *) (((s8 *) arg0) + 0xAE))) * 0xFD;
+  new_var = 0;
+  if (var_r0_16 < new_var)
+  {
+    var_r0_16 += 0xFF;
+  }
+  *((s16 *) (((s8 *) arg0) + 0xAE)) = (s16) (var_r0_16 >> 8);
+  var_r0_31 = (*((s16 *) (((s8 *) arg0) + 0xB0))) * 0xFD;
+  if (var_r0_31 < new_var)
+  {
+    var_r0_31 += 0xFF;
+  }
+  *((s16 *) (((s8 *) arg0) + 0xB0)) = (s16) (var_r0_31 >> 8);
+  *((u16 *) (((s8 *) arg0) + 0xB2)) = (u16) ((*((u16 *) (((s8 *) arg0) + 0xB2))) + (*((s32 *) (((s8 *) arg0) + 0x94))));
+  *((s32 *) (((s8 *) arg0) + 0x10)) = (s32) ((*((s32 *) (((s8 *) arg0) + 0x38))) + (*((s16 *) (((s8 *) arg0) + 0xAE))));
+  *((s32 *) (((s8 *) arg0) + 0x14)) = (s32) ((*((s32 *) (((s8 *) arg0) + 0x3C))) + (*((s16 *) (((s8 *) arg0) + 0xB0))));
+  temp_r1_60 = (*((s32 *) (((s8 *) arg0) + 0x40))) + ((s16) (*((u16 *) (((s8 *) arg0) + 0xB2))));
+  *((s32 *) (((s8 *) arg0) + 0x18)) = temp_r1_60;
+  if (((s32) ((s16) (*((u16 *) (((s8 *) arg0) + 0xB2))))) <= new_var)
+  {
+    temp_r0_68 = *((s32 *) (((s8 *) arg0) + 0x98));
+    if (temp_r1_60 <= temp_r0_68)
+    {
+      *((s32 *) (((s8 *) arg0) + 0x18)) = temp_r0_68;
+      sub_807C298(arg0);
     }
-    (*(s16 *)((s8 *)(arg0) + (0xAE))) = (s16) (var_r0_16 >> 8);
-    var_r0_31 = M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */) * 0xFD;
-    if (var_r0_31 < 0) {
-        var_r0_31 += 0xFF;
-    }
-    (*(s16 *)((s8 *)(arg0) + (0xB0))) = (s16) (var_r0_31 >> 8);
-    (*(u16 *)((s8 *)(arg0) + (0xB2))) = (u16) ((*(u16 *)((s8 *)(arg0) + (0xB2))) + (*(s32 *)((s8 *)(arg0) + (0x94))));
-    (*(s32 *)((s8 *)(arg0) + (0x10))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x38))) + M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */));
-    (*(s32 *)((s8 *)(arg0) + (0x14))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x3C))) + M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */));
-    temp_r1_60 = (*(s32 *)((s8 *)(arg0) + (0x40))) + M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */);
-    (*(s32 *)((s8 *)(arg0) + (0x18))) = temp_r1_60;
-    if ((s32) M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */) <= 0) {
-        temp_r0_68 = (*(s32 *)((s8 *)(arg0) + (0x98)));
-        if (temp_r1_60 <= temp_r0_68) {
-            (*(s32 *)((s8 *)(arg0) + (0x18))) = temp_r0_68;
-            sub_807C298(arg0);
-        }
-    }
+  }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80DE670.s\"");
