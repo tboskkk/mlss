@@ -7,6 +7,9 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
+
+s32 stop_sfx_80195A8();
+
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8103900.s\"");
 #else
@@ -93,7 +96,7 @@ asm_unified(".include \"asm/nonmatching/sub_8104350.s\"");
 #endif
 
 s32 sub_8104350(s32, u8, s32, s32, s32, s32);   /* extern */
-extern s32 sub_8104980;
+void sub_8104980(void *arg0);
 void sub_8104800(void *arg0)
 {
   unsigned int temp_r5_25;
@@ -111,7 +114,7 @@ void sub_8104800(void *arg0)
     sub_8104350(temp_r3_33 + 0x8E34, *((u8 *) (new_var + 0x30)), temp_r3_33 + 0x8E1C, temp_r3_33 + 0x8E28, (s32) (*((u8 *) (((s8 *) temp_r4_12) + 0x342))), (s32) temp_r5_25);
     sub_8082E1C(temp_r0_16, 7, 0, 0);
     *((s16 *) (((s8 *) arg0) + 0x10)) = 0;
-    *((s32 **) (((s8 *) arg0) + 4)) = &sub_8104980;
+    *((s32 **) (((s8 *) arg0) + 4)) = (s32 *) &sub_8104980;
     play_sfx_80195B4(0x123, -1);
   }
 }
@@ -125,14 +128,33 @@ asm_unified(".include \"asm/nonmatching/sub_810489C.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8104980.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+s16 sub_810489C(void *, s32);                       /* extern */
+extern s32 sub_8106A88;
+void sub_8104980(void *arg0)
+{
+  u16 temp_r1_18;
+  void *temp_r5_16;
+  s8 *new_var2;
+  int new_var;
+  *((s16 *) (((s8 *) arg0) + 0x10)) = sub_810489C(arg0, 3);
+  temp_r5_16 = *((void **) (((s8 *) (*((void **) 0x03000FD8))) + 0x278));
+  temp_r1_18 = *((u16 *) (((s8 *) ((void *) 0x0300034C)) + 0x3E));
+  new_var2 = (s8 *) ((void *) 0x0300034C);
+  if ((1 & (*((u16 *) (new_var2 + 0x3E)))) != 0)
+  {
+    *((s16 *) (((s8 *) arg0) + 0x14)) = 1;
+    play_sfx_80195B4(0x60, -1);
+    *((s32 **) (((s8 *) arg0) + 4)) = &sub_8106A88;
+    return;
+  }
+  new_var = 0xF0;
+  if (2 & (*((u16 *) (new_var2 + 0x3E))))
+  {
+    sub_8082E1C(temp_r5_16, 6, 0, 0xB);
+    *((s8 *) (((s8 *) (*((void **) (((s8 *) temp_r5_16) + 8)))) + 0x20)) = new_var;
+ do { play_sfx_80195B4(0x61, -1); *((s32 **) (((s8 *) arg0) + 4)) = &sub_8106AC8; stop_sfx_80195A8(0x123); } while ((*((u16 *) (new_var2 + 0x3E))) * 0);
+  }
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8104A00.s\"");
