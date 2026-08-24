@@ -37,15 +37,105 @@ ELSE_RE = re.compile(r"^\s*#else\b")
 ENDIF_RE = re.compile(r"^\s*#endif\b")
 INCLUDE_ASM_RE = re.compile(r'asm/nonmatching/(\S+?)\.s')
 
+# sa2/tmc-style convention (CLAUDE.md's "NONMATCHING convention" section):
+# ASM_FUNC(path, decl); is a plain wrapper with no draft attempt at all -
+# not_started, same as an empty #else. NONMATCH(path, decl){ ... }
+# END_NONMATCH carries a real if(0){draft} body - in_progress, same as a
+# #ifndef/#else block with real content. A prior version of this tool
+# silently dropped every function using this convention from every count
+# instead of classifying it (caught once already, 5,996 -> 5,994 with
+# nothing to explain it - see CLAUDE.md T.9); this recognizes both forms
+# explicitly rather than falling through.
+NEW_FORMAT_START_RE = re.compile(r"\b(ASM_FUNC|NONMATCH)\s*\(")
+
+
+def _balanced(text: str, open_idx: int) -> int:
+    """Index just past the ')' matching the '(' at open_idx."""
+    depth = 0
+    i = open_idx
+    while i < len(text):
+        if text[i] == '(':
+            depth += 1
+        elif text[i] == ')':
+            depth -= 1
+            if depth == 0:
+                return i + 1
+        i += 1
+    raise ValueError("unbalanced parens")
+
+
+def find_new_format_spans(text: str):
+    """-> list of (start_idx, end_idx, kind, name) for every ASM_FUNC(...)
+    / NONMATCH(...){...}END_NONMATCH occurrence in `text`, kind is
+    "asm_func" (not_started, no draft) or "nonmatch" (in_progress, has a
+    draft body)."""
+    spans = []
+    for m in NEW_FORMAT_START_RE.finditer(text):
+        kind_word = m.group(1)
+        paren_open = text.index('(', m.start())
+        args_end = _balanced(text, paren_open)
+        if kind_word == "ASM_FUNC":
+            semi = text.index(';', args_end)
+            frag = text[m.start():semi]
+            fm = INCLUDE_ASM_RE.search(frag)
+            name = fm.group(1) if fm else f"<unknown at offset {m.start()}>"
+            spans.append((m.start(), semi + 1, "asm_func", name))
+        else:  # NONMATCH
+            brace_open = text.index('{', args_end)
+            depth, i = 0, brace_open
+            while i < len(text):
+                if text[i] == '{':
+                    depth += 1
+                elif text[i] == '}':
+                    depth -= 1
+                    if depth == 0:
+                        break
+                i += 1
+            end_nm = text.index("END_NONMATCH", i)
+            frag = text[m.start():args_end]
+            fm = INCLUDE_ASM_RE.search(frag)
+            name = fm.group(1) if fm else f"<unknown at offset {m.start()}>"
+            spans.append((m.start(), end_nm + len("END_NONMATCH"), "nonmatch", name))
+    return spans
+
 
 def classify_c_file(path: Path):
     """-> (matched_names, in_progress_names, not_started_names)"""
-    lines = path.read_text().splitlines()
+    text = path.read_text()
+    lines = text.splitlines()
     matched, in_progress, not_started = [], [], []
+
+    new_format_spans = find_new_format_spans(text)
+    # Map each span to its starting line number so the old line-by-line
+    # walk below can skip over it (same shape as the #ifndef handling).
+    line_offsets = [0]
+    for l in lines:
+        line_offsets.append(line_offsets[-1] + len(l) + 1)
+
+    def line_for_offset(off):
+        lo, hi = 0, len(line_offsets) - 1
+        while lo < hi:
+            mid = (lo + hi + 1) // 2
+            if line_offsets[mid] <= off:
+                lo = mid
+            else:
+                hi = mid - 1
+        return lo
+
+    new_format_by_line = {}
+    for start, end, kind, name in new_format_spans:
+        start_line = line_for_offset(start)
+        end_line = line_for_offset(end - 1)
+        new_format_by_line[start_line] = (end_line, kind, name)
+        (not_started if kind == "asm_func" else in_progress).append(name)
 
     i = 0
     n = len(lines)
     while i < n:
+        if i in new_format_by_line:
+            end_line, _kind, _name = new_format_by_line[i]
+            i = end_line + 1
+            continue
         line = lines[i]
         if IFNDEF_RE.match(line):
             block_start = i

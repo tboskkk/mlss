@@ -26,4 +26,26 @@
 #define asm_unified(x) __asm__(".syntax unified\n" x "\n.syntax divided")
 #define NAKED          __attribute__((naked))
 
+// sa2/tmc-style convention (see CLAUDE.md's "NONMATCHING convention"
+// section): a broken draft fails the SHIPPING build immediately instead of
+// silently poisoning every sibling in the translation unit the way the old
+// `#ifndef NONMATCHING` guard does. Inert until a file actually uses it.
+#ifdef NON_MATCHING
+#define ASM_FUNC(path, decl) decl
+#else
+#define ASM_FUNC(path, decl) \
+    NAKED decl { asm_unified(".include \"" path "\""); }
+#endif
+
+#ifdef NON_MATCHING
+#define NONMATCH(path, decl) decl
+#define END_NONMATCH
+#else
+#define NONMATCH(path, decl)                        \
+    NAKED decl {                                     \
+        asm_unified(".include \"" path "\"");        \
+        if (0)
+#define END_NONMATCH }
+#endif
+
 #endif
