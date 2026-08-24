@@ -37,7 +37,7 @@ asm_unified(".include \"asm/nonmatching/sub_80A0844.s\"");
 #else
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 s32 sub_80DF024(s32, s32, s32, s32, void *);    /* extern */
-extern s32 sub_809FF4C;
+void sub_809FF4C(void *arg0, s32 arg3);                       /* extern */
 
 void sub_80A0844(void *arg0) {
     s32 var_r1_21;
@@ -62,7 +62,7 @@ void sub_80A0844(void *arg0) {
     }
     sub_80DF024(0x2AC7, var_r1_21 >> 8, var_r2_27 >> 8, var_r3_33 >> 8, arg0);
     play_sfx_80195B4(0xD5, -1);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_809FF4C;
+    (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_809FF4C;
 }
 #endif
 
@@ -71,7 +71,7 @@ asm_unified(".include \"asm/nonmatching/sub_80A08A8.s\"");
 #else
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 s32 sub_80DF024(s32, s32, s32, s32, void *);    /* extern */
-extern s32 sub_809F1EC;
+void sub_809F1EC(void *arg0, s32 arg3);                       /* extern */
 
 void sub_80A08A8(void *arg0) {
     s32 var_r1_19;
@@ -95,7 +95,7 @@ void sub_80A08A8(void *arg0) {
         var_r3_31 += 0xFF;
     }
     sub_80DF024(0x2AAF, var_r1_19 >> 8, var_r2_25 >> 8, var_r3_31 >> 8, arg0);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_809F1EC;
+    (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_809F1EC;
 }
 #endif
 

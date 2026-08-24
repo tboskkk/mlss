@@ -47,7 +47,7 @@ asm_unified(".include \"asm/nonmatching/sub_80DB95C.s\"");
 asm_unified(".include \"asm/nonmatching/sub_80DB9DC.s\"");
 #else
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
-extern s32 sub_80DBA98;
+void sub_80DBA98(void *arg0);                       /* extern */
 
 void sub_80DB9DC(void *arg0) {
     s32 temp_r0_60;
@@ -81,7 +81,7 @@ void sub_80DB9DC(void *arg0) {
         (*(u8 *)((s8 *)(temp_r3_73) + (0x11))) = (u8) ((-0x41 & temp_r2_74) | ((((u32) (temp_r2_74 << 0x19) >> 0x1F) ^ 1) << 6));
         play_sfx_80195B4(0x11A, -1);
         (*(s16 *)((s8 *)(arg0) + (0xAC))) = 0x20;
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80DBA98;
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_80DBA98;
     }
 }
 #endif

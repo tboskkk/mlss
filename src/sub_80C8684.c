@@ -34,7 +34,7 @@ void sub_80C8684(void *arg0)
 
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 s32 sub_8087CE4(void *);                        /* extern */
-extern s32 sub_80C2F18;
+void sub_80C2F18(void *arg0);                       /* extern */
 void sub_80C86E4(void *arg0)
 {
   s32 temp_r1_25;
@@ -55,6 +55,6 @@ void sub_80C86E4(void *arg0)
       temp_r2_36 = *((void **) (((s8 *) temp_r4_12) + 8));
       *((u8 *) (((s8 *) temp_r2_36) + 0x12)) = (u8) (new_var & (*((u8 *) (((s8 *) temp_r2_36) + 0x12))));
     }
-    *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_80C2F18;
+    *((s32 **) (((s8 *) arg0) + 0x4C)) = (s32 *) &sub_80C2F18;
   }
 }

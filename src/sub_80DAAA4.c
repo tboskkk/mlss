@@ -67,7 +67,7 @@ void sub_80DAAEC(void *arg0) {
 
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 s32 sub_808552C(s32, s32, s32, s32, s32, s32, s32, s32, s32, s32); /* extern */
-extern s32 sub_80DA6D0;
+void sub_80DA6D0(void *arg0);                       /* extern */
 void sub_80DAB64(void *arg0)
 {
   void *temp_r2_39;
@@ -76,5 +76,5 @@ void sub_80DAB64(void *arg0)
   sub_8082E1C(arg0, 4, 0, 0);
   temp_r2_39 = *((void **) (((s8 *) arg0) + 8));
   *((u8 *) (((s8 *) temp_r2_39) + 0x12)) = (u8) (((-7) & (*(((s8 *) temp_r2_39) + 0x12))) | 2);
-  *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_80DA6D0;
+  *((s32 **) (((s8 *) arg0) + 0x4C)) = (s32 *) &sub_80DA6D0;
 }

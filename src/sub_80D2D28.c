@@ -48,7 +48,7 @@ void sub_80D2D6C(void *arg0)
   }
 }
 
-extern s32 sub_80CFB38;
+void sub_80CFB38(void *arg0);                       /* extern */
 void sub_80D2DA4(void *arg0)
 {
   s32 temp_r3_16;
@@ -65,7 +65,7 @@ void sub_80D2DA4(void *arg0)
     return;
   }
   play_sfx_80195B4(0x9C, -1);
-  *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_80CFB38;
+  *((s32 **) (((s8 *) arg0) + 0x4C)) = (s32 *) &sub_80CFB38;
 }
 
 #ifndef NONMATCHING
@@ -73,7 +73,7 @@ asm_unified(".include \"asm/nonmatching/sub_80D2E08.s\"");
 #else
 s32 sub_807C298(s32);                           /* extern */
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
-extern s32 sub_80CEDC0;
+void sub_80CEDC0(void);                       /* extern */
 
 void sub_80D2E08(void *arg0) {
     s32 temp_r1_32;
@@ -94,7 +94,7 @@ void sub_80D2E08(void *arg0) {
             temp_r2_43 = (*(void **)((s8 *)(temp_r4_15) + (8)));
             (*(u8 *)((s8 *)(temp_r2_43) + (0x12))) = (u8) ((-7 & (*(u8 *)((s8 *)(temp_r2_43) + (0x12)))) | 2);
         }
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80CEDC0;
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_80CEDC0;
     }
 }
 #endif
@@ -104,7 +104,7 @@ asm_unified(".include \"asm/nonmatching/sub_80D2E7C.s\"");
 #else
 s32 sub_807C298(s32);                           /* extern */
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
-extern s32 sub_80CDFBC;
+void sub_80CDFBC(void);                       /* extern */
 
 void sub_80D2E7C(void *arg0) {
     s32 temp_r1_32;
@@ -125,7 +125,7 @@ void sub_80D2E7C(void *arg0) {
             temp_r2_43 = (*(void **)((s8 *)(temp_r4_15) + (8)));
             (*(u8 *)((s8 *)(temp_r2_43) + (0x12))) = (u8) ((-7 & (*(u8 *)((s8 *)(temp_r2_43) + (0x12)))) | 2);
         }
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80CDFBC;
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_80CDFBC;
     }
 }
 #endif
@@ -135,7 +135,7 @@ asm_unified(".include \"asm/nonmatching/sub_80D2EF0.s\"");
 #else
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 s32 sub_8087CE4(void *);                        /* extern */
-extern s32 sub_80CD18C;
+void sub_80CD18C(void *arg0);                       /* extern */
 
 void sub_80D2EF0(void *arg0) {
     s32 temp_r1_26;
@@ -156,7 +156,7 @@ void sub_80D2EF0(void *arg0) {
             temp_r2_44 = (*(void **)((s8 *)(temp_r5_12) + (8)));
             (*(u8 *)((s8 *)(temp_r2_44) + (0x12))) = (u8) (-7 & (*(u8 *)((s8 *)(temp_r2_44) + (0x12))));
         }
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80CD18C;
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_80CD18C;
     }
 }
 #endif

@@ -10,7 +10,7 @@ asm_unified(".include \"asm/macros.inc\"");
 
 
 s32 sub_8082E1C();
-extern s32 sub_80AC950;
+void sub_80AC950(void *arg0);                       /* extern */
 
 s32 sub_8087CE4();
 
@@ -28,7 +28,7 @@ asm_unified(".include \"asm/nonmatching/sub_80B3170.s\"");
 #else
 s32 sub_8087CE4(void *);                        /* extern */
 s32 sub_80DF024(s32, s32, s32, s32, void *);    /* extern */
-extern s32 sub_80AD188;
+void sub_80AD188(void *arg0);                       /* extern */
 
 void sub_80B3170(void *arg0) {
     s32 temp_r0_51;
@@ -65,7 +65,7 @@ void sub_80B3170(void *arg0) {
         temp_r0_54 = (*(s32 *)((s8 *)(temp_r7_14) + (0x14)));
         (*(s32 *)((s8 *)(temp_r5_13) + (0x14))) = temp_r0_54;
         (*(s32 *)((s8 *)(temp_r5_13) + (0x3C))) = temp_r0_54;
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80AD188;
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_80AD188;
     }
 }
 #endif
@@ -93,7 +93,7 @@ void sub_80B31F0(void *arg0)
       temp_r2_44 = *((void **) (((s8 *) temp_r5_12) + 8));
       *((u8 *) (((s8 *) temp_r2_44) + 0x12)) = (u8) (new_var & (*((u8 *) (((s8 *) temp_r2_44) + 0x12))));
     }
-    *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_80AC950;
+    *((s32 **) (((s8 *) arg0) + 0x4C)) = (s32 *) &sub_80AC950;
   }
 }
 
@@ -117,7 +117,7 @@ void sub_80B325C(s32 arg0)
 }
 
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
-extern s32 sub_80B1508;
+void sub_80B1508(void *arg0);                       /* extern */
 void sub_80B328C(void *arg0)
 {
   s32 temp_r1_30;
@@ -141,7 +141,7 @@ void sub_80B328C(void *arg0)
       temp_r2_41 = *((void **) (((s8 *) temp_r4_12) + 8));
       *((u8 *) (((s8 *) temp_r2_41) + 0x12)) = (u8) ((new_var & (*((u8 *) (((s8 *) temp_r2_41) + 0x12)))) | 2);
     }
-    *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_80B1508;
+    *((s32 **) (((s8 *) arg0) + 0x4C)) = (s32 *) &sub_80B1508;
   }
 }
 

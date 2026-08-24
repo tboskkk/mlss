@@ -10,7 +10,7 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80E13B4.s\"");
 #else
-extern s32 sub_80E0BF8;
+void sub_80E0BF8(void *arg0);                       /* extern */
 
 void sub_80E13B4(void *arg0) {
     s32 *var_r0_17;
@@ -31,7 +31,7 @@ void sub_80E13B4(void *arg0) {
         (*(s16 *)((s8 *)(arg0) + (0x14))) = (s16) temp_r3_14;
         (*(u16 *)((s8 *)(arg0) + (0x10))) = (u16) *temp_r1_25;
         (*(u16 **)((s8 *)(arg0) + (0xC))) = (u16 *) (temp_r1_25 + 2);
-        var_r0_17 = &sub_80E0BF8;
+        var_r0_17 = (s32 *) &sub_80E0BF8;
     }
     (*(s32 **)((s8 *)(arg0) + (4))) = var_r0_17;
 }

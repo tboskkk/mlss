@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start sub_80E122C
-sub_80E122C:
 	push {r4, r5, r6, r7, lr}
 	cmp r0, #0x00
 	beq _080E127A

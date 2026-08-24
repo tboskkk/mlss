@@ -11,7 +11,7 @@ asm_unified(".include \"asm/macros.inc\"");
 s32 sub_8082E1C();
 s32 sub_8087CE4();
 
-extern s32 sub_80AC610;
+void sub_80AC610(void *arg0);                       /* extern */
 void sub_80AC4F8(void *arg0)
 {
   s32 temp_r1_16;
@@ -22,7 +22,7 @@ void sub_80AC4F8(void *arg0)
   temp_r1_16 = 6 & (*((u8 *) (((s8 *) temp_r0_10) + 0x7E)));
   if ((temp_r1_16 == 2) || (temp_r1_16 == 4))
   {
-    *((s32 **) (((s8 *) new_var) + 0x4C)) = &sub_80AC610;
+    *((s32 **) (((s8 *) new_var) + 0x4C)) = (s32 *) &sub_80AC610;
   }
   *((s32 *) (((s8 *) arg0) + 0x4C)) = 0x080AC685;
 }
@@ -83,38 +83,7 @@ void sub_80AC5A4(void *arg0)
   }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80AC610.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
-
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80AC688.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
-
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80AC71C.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
-
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80AC950.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+ASM_FUNC("asm/nonmatching/sub_80AC610.s", void sub_80AC610(void *arg0));
+ASM_FUNC("asm/nonmatching/sub_80AC688.s", s32 sub_80AC688(void *arg0));
+ASM_FUNC("asm/nonmatching/sub_80AC71C.s", void sub_80AC71C(void *arg0));
+ASM_FUNC("asm/nonmatching/sub_80AC950.s", void sub_80AC950(void *arg0));

@@ -26,11 +26,4 @@ void sub_80E12F8(unsigned int arg0, int arg1)
   *((void **) new_var) = var_r1_14;
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80E1348.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+ASM_FUNC("asm/nonmatching/sub_80E1348.s", void sub_80E1348(void *arg0));

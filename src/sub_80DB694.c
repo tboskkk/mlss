@@ -38,7 +38,7 @@ void sub_80DB694(void *arg0) {
 }
 #endif
 
-extern s32 sub_80DB330;
+void sub_80DB330(void *arg0);                       /* extern */
 void sub_80DB720(void *arg0)
 {
   s32 temp_r1_60;
@@ -66,6 +66,6 @@ void sub_80DB720(void *arg0)
   if ((new_var <= 0) && (temp_r1_60 <= ((s32) (*((s32 *) (((s8 *) arg0) + 0x98))))))
   {
     *((s16 *) (((s8 *) arg0) + 0xAC)) = 8;
-    *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_80DB330;
+    *((s32 **) (((s8 *) arg0) + 0x4C)) = (s32 *) &sub_80DB330;
   }
 }

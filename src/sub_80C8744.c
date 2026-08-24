@@ -10,7 +10,7 @@ asm_unified(".include \"asm/macros.inc\"");
 
 s32 sub_8082E1C();
 
-extern s32 sub_80C26E4;
+void sub_80C26E4(void *arg0);                       /* extern */
 void sub_80C8744(void *arg0)
 {
   int new_var2;
@@ -33,11 +33,11 @@ void sub_80C8744(void *arg0)
       temp_r2_10 = ((s8 *) temp_r2_34) + 0x12;
       *((u8 *) (((s8 *) temp_r2_34) + 0x12)) = (u8) ((new_var2 & (*((u8 *) temp_r2_10))) | 2);
     }
-    *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_80C26E4;
+    *((s32 **) (((s8 *) arg0) + 0x4C)) = (s32 *) &sub_80C26E4;
   }
 }
 
-extern s32 sub_80C1CE4;
+void sub_80C1CE4(void);                       /* extern */
 void sub_80C87A4(void *arg0)
 {
   s32 temp_r1_23;
@@ -55,7 +55,7 @@ void sub_80C87A4(void *arg0)
       temp_r2_34 = *((void **) (((s8 *) temp_r4_12) + 8));
       *((u8 *) (((s8 *) temp_r2_34) + 0x12)) = (u8) (((-7) & (*(((s8 *) temp_r2_34) + 0x12))) | 2);
     }
-    *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_80C1CE4;
+    *((s32 **) (((s8 *) arg0) + 0x4C)) = (s32 *) &sub_80C1CE4;
   }
 }
 

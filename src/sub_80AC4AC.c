@@ -8,7 +8,7 @@
 asm_unified(".include \"asm/macros.inc\"");
 
 s32 sub_80884AC(void *);                        /* extern */
-extern s32 sub_80A99A8;
+void sub_80A99A8(void *arg0);                       /* extern */
 
 void sub_80AC4AC(void) {
     s32 temp_r1_27;
@@ -27,7 +27,7 @@ void sub_80AC4AC(void) {
     if (0x20 & (*(u8 *)((s8 *)(temp_r4_12) + (0x81)))) {
         temp_r1_27 = 6 & (*(u8 *)((s8 *)(temp_r5_9) + (0x7E)));
         if ((temp_r1_27 == 2) || (temp_r1_27 == 4)) {
-            (*(s32 **)((s8 *)(temp_r7_11) + (0x4C))) = &sub_80A99A8;
+            (*(s32 **)((s8 *)(temp_r7_11) + (0x4C))) = (s32 *) &sub_80A99A8;
         }
         (*(s32 *)((s8 *)(temp_r6_14) + (0x4C))) = 0;
     }

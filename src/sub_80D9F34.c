@@ -20,7 +20,7 @@ void sub_80D9F34(struct Entity *arg0) {
 }
 
 s32 sub_8086858(void *, s32);                   /* extern */
-extern s32 sub_80D9E34;
+s32 sub_80D9E34(void *arg0);                       /* extern */
 void sub_80D9F50(struct Entity *arg0) {
     s32 temp_r5_16;
 
@@ -31,7 +31,7 @@ void sub_80D9F50(struct Entity *arg0) {
         } else {
             sub_8082E1C(arg0, 0xB, 0, 0);
             sub_8086858(arg0, 0x13CA);
-            (*(s32 **)((s8 *)(arg0) + (0x5C))) = &sub_80D9E34;
+            (*(s32 **)((s8 *)(arg0) + (0x5C))) = (s32 *) &sub_80D9E34;
             (*(s32 *)((s8 *)(arg0) + (0x54))) = temp_r5_16;
         }
         (*(s16 *)((s8 *)(arg0) + (0xAC))) = 0x18;
