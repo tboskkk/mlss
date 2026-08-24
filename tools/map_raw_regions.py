@@ -17,6 +17,10 @@ Reads asm/*.s directly and tracks address by decoding each line's size
 (thumb_func_start/arm_func_start switch mode and 4-byte-align, matching
 asm/macros.inc's actual .macro bodies) rather than trusting any prior
 build - this has to work even on files with zero real instructions yet.
+
+A bare Luvdis-style label (`_0XXXXXXX:`, or any other plain label) does NOT
+close a run - see the comment on CLASSIFIED_DATA_LABEL_RE below for the one
+exception, and why a generic label still isn't enough on its own even then.
 """
 from __future__ import annotations
 
@@ -33,6 +37,28 @@ FUNC_START_RE = re.compile(
     r"^\s*(thumb_func_start|arm_func_start|non_word_aligned_thumb_func_start)\s+(\S+)\s*$"
 )
 LABEL_RE = re.compile(r"^(\w+):")
+
+# A label DOES close a run when it uses one of this project's IDA-style
+# classified-data prefixes (mint_data_symbols.py's byte_/word_/dword_
+# convention, plus unk_ for "real structure, content not yet interpreted"
+# and custom_lz_ for a proven compressed-stream boundary - see
+# tools/gba_compress.py). Unlike a bare Luvdis label (a jump/reference
+# target Luvdis found automatically, carrying no claim about what's there),
+# one of these prefixes is only ever placed by a human/tool that actually
+# determined a real boundary exists at that address - see
+# docs/formats/README.md's "Custom sprite compression" section for the
+# 84KB-blob pass that first needed this. Luvdis's own emitted labels are
+# always `_0XXXXXXX:` and never collide with these prefixes.
+CLASSIFIED_DATA_LABEL_RE = re.compile(
+    r"^(?:byte|word|dword|off|unk|custom_lz)_[0-9A-Fa-f]+:"
+)
+# The label alone only proves a boundary exists, not how much of what
+# follows it belongs to that classified item - a gap or the next raw
+# stretch can sit right after with no label of its own. So the label's
+# OWN comment must also carry `len=N` (bytes) for the exemption to apply;
+# without it this is treated as an ordinary label (conservative default,
+# not a guess - CLAUDE.md's "a tool must refuse to answer when it cannot").
+CLASSIFIED_DATA_LEN_RE = re.compile(r"\blen=(\d+)\b")
 BYTE_RE = re.compile(r"^\s*\.byte\s+(.*)$")
 WORD_RE = re.compile(r"^\s*\.(2byte|4byte|short|hword|word|long)\s+(.*)$")
 DIRECTIVE_SKIP_RE = re.compile(r"^\s*\.(include|syntax|text|section|global)\b")
@@ -58,6 +84,7 @@ def scan_file(path: Path, base_addr: int, obj_name: str) -> list:
     addr = base_addr
     mode = "thumb"
     run_start = None
+    classified_until = None  # addr below which .byte lines are NOT raw
 
     def close_run(end_addr: int):
         nonlocal run_start
@@ -81,6 +108,12 @@ def scan_file(path: Path, base_addr: int, obj_name: str) -> list:
         if DIRECTIVE_SKIP_RE.match(line):
             continue
 
+        if CLASSIFIED_DATA_LABEL_RE.match(line):
+            close_run(addr)
+            lm = CLASSIFIED_DATA_LEN_RE.search(raw_line)
+            classified_until = addr + int(lm.group(1)) if lm else None
+            continue
+
         if LABEL_RE.match(line):
             # A plain label doesn't by itself mean disassembled code - Luvdis
             # labels data reference targets inside raw blobs too. Don't close
@@ -91,9 +124,20 @@ def scan_file(path: Path, base_addr: int, obj_name: str) -> list:
 
         bm = BYTE_RE.match(line)
         if bm:
+            n = bm.group(1).count(",") + 1
+            if classified_until is not None and addr < classified_until:
+                # Inside a labeled, length-declared classified span - not raw,
+                # whether or not this exact line's bytes reach its end (a
+                # classified item's own body is never itself raw data, and a
+                # length mismatch would be a real bug worth its own check,
+                # not silently absorbed here).
+                addr += n
+                if addr >= classified_until:
+                    classified_until = None
+                continue
             if run_start is None:
                 run_start = addr
-            addr += bm.group(1).count(",") + 1
+            addr += n
             continue
 
         wm = WORD_RE.match(line)

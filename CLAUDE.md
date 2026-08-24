@@ -1,2749 +1,568 @@
 # CLAUDE.md
 
-Guidance for whoever (human or Claude) works on this repo next. If you're an
-agent picking this up in a fresh session: read this whole file before
-touching anything, it front-loads a session's worth of "why is it built this
-way" that isn't visible from the code alone.
+Guidance for whoever (human or Claude) works on this repo next. Read it all
+before touching anything.
+
+**Current plan: [docs/plan-2026-08-23-master.md](docs/plan-2026-08-23-master.md).**
+It supersedes both 2026-08-22 plans and is backed by six review docs
+(`docs/review-2026-08-23-*.md`) with the measurements behind every claim.
 
 ## What this is
 
 A decompilation of *Mario & Luigi: Superstar Saga* (USA), GBA, built with
-`agbcc` (the same vintage GCC fork pret-style GBA decomps use). Goal is
-100%: every byte of the ROM as matching C or labeled data, in service of
-modding tools, asset editors, and understanding the game's engine
+`agbcc`. Goal is 100%: every byte of the ROM as matching C or labeled data,
+in service of modding tools, asset editors, and understanding the engine
 (physics/collision is the maintainer's specific interest).
 
-Status as of the infra pass described below: ~24 functions matched, ~5,950
-still raw disassembly, out of ~5,983 in "the game proper" (see Mario Bros.
-note below). Run `tools/progress.py` for the current, live count - don't
-trust a stale number in a doc.
+**Run `tools/progress.py` for the live count. Never trust a number in a doc.**
+As of 2026-08-23: ~1,578 of 5,996 matched (26.3%). `asm/mariobros.s` is a
+separate embedded Mario Bros. ROM — **out of scope by maintainer decision**,
+tracked apart from "game proper" everywhere.
 
-The original author (jellees, upstream `github.com/jellees/mlss`) stopped
-committing in July 2024. This fork is a from-scratch infrastructure pass on
-top of their decompiled work, which was solid - the problem was never code
-quality, it was that every single step (splitting a function out, adding a
-cross-reference symbol, diffing against retail) was 100% manual, and that
-doesn't scale to ~6,000 functions. Everything below exists to fix that.
+Upstream is jellees (`github.com/jellees/mlss`), inactive since July 2024.
+Their decompiled work was solid; the problem was that every step was manual,
+which doesn't scale to ~6,000 functions. Everything here exists to fix that.
+
+**We are not the only GBA matching decomp, and the method is what's unusual.**
+Sonic Advance 1/2 is ~99.2% (human community, explicit no-LLM policy); Minish
+Cap and Mario Kart: Super Circuit are done (MKSC by jellees, this repo's own
+upstream). What's distinctive here is one maintainer plus corpus-level
+automation. Note macabeus benchmarked the standard stack (m2c + agbcc +
+objdiff + permuter) at **0 of 30** on Sonic Advance 3 — GBA/Thumb/agbcc, the
+same platform. Our results come from the corpus-level layer, not the stack.
 
 ## Where this could lead
 
-Not a commitment, not a roadmap item -- a stated hope worth recording so it
-doesn't get lost between sessions.
+**Corrected 2026-08-23. The port goal is reachable NOW, not after 100%.**
 
-**CORRECTED 2026-08-22 by actually looking.** This file used to claim this
-was "the first serious byte-matching decomp attempt at this specific game,
-and one of very few for GBA titles generally". The first half stands; the
-second half is simply false and was never checked. Sonic Advance 1/2
-(`SAT-R/sa2`) is at roughly **99.2%**, The Minish Cap is decompiled, and so
-is Mario Kart: Super Circuit -- by **jellees, this repo's own upstream
-author**, who moved on to it. GBA matching decomps get finished. What is
-genuinely unusual here is the METHOD, not the target: sa2 reached ~100%
-with a human community on decomp.me under an explicit "Strict No LLM / No
-AI Policy", while this repo is one maintainer plus automated corpus-level
-tooling.
+MinishCapRecomp's own policy: *"Only symbol metadata (function names,
+addresses, sizes) from the zeldaret/tmc decompilation enters this repo —
+never its C source."* `gbarecomp` (MKSC Recomp, EmeraldRecomp,
+FireRedLeafGreenRecomp) statically recompiles the ROM directly. What it wants
+from us is a **symbol map**, which we already produce as a by-product.
 
-The m2c claim needs the same correction. An independent benchmark
-(macabeus, 60 functions) ran m2c + compiler + objdiff + decomp-permuter
-over 30 Sonic Advance 3 functions -- GBA, Thumb, agbcc, the same stack this
-repo uses -- and matched **zero**. The same pipeline matched 4 per run on
-N64/IDO code. So this project's 17%+ did NOT come from m2c and the
-permuter; it came from the corpus-level layer built on top of them. Read
-that before deciding to invest in either tool: it is the branch measured at
-0/30 on this platform. If this repo is a useful reference point for the
-next GBA decomp, it will be for the corpus-level method -- the same role
-sotn-decomp plays for PS1
-matching decomps built on Psy-Q/maspsx.
-
-The maintainer's actual hope is bigger than "prove the tooling works":
-seeding a real Harbour Masters-style GBA runtime port, the way LUS/HM64
-does for N64 (Ocarina of Time, Majora's Mask, and others) and how Torch
-handles O2R-style asset extraction for that ecosystem. Worth being honest
-about the shape of that gap rather than glossing it: HM64's core value is
-translating F3DEX display lists (Fast3D) into a modern renderer, and GBA
-has nothing analogous -- no display lists, no microcode, no real 3D. A
-GBA port framework is closer to "a GBA emulator minus the CPU" (natively
-compile the decompiled game code, still reimplement the PPU/tilemap/OAM
-rasterizer, DMA, IRQs, and the m4a/Sappy sound driver underneath it) than
-it is a Fast3D-style translation layer.
-
-**CORRECTED 2026-08-22: that engineering already exists.** `gbarecomp` is a
-collection of GBA static-recompilation projects -- MKSC Recomp,
-EmeraldRecomp, FireRedLeafGreenRecomp among them. So the framing above
-("real, separate engineering this repo doesn't attempt") is no longer the
-obstacle it describes: someone has built the runtime layer, and the thing
-it needs from a game is precisely what this repo produces. The on-ramp for
-the maintainer's stated hope is therefore much shorter than this file
-assumed -- it is "finish the decomp", not "also write a GBA runtime".
-Worth verifying the current state of those projects before relying on it,
-but the category error was assuming the category was empty.
-
-What this repo hands to that effort is a completed, byte-exact decompiled
-codebase to build against, plus whatever's learned here about
-matching-decomp tooling for agbcc/Thumb specifically.
+So an MLSS Recomp is decoupled from ever reaching 100%. The previous framing
+here ("finish the decomp first") was wrong. Readable C and a complete symbol
+map are the deliverables that matter for that path.
 
 ## Building
 
     ./container.sh make
 
-That's it - the container is the entire toolchain (devkitARM + a pinned
-from-source build of agbcc). See [INSTALL.md](INSTALL.md) for the native
-path if you'd rather not use it. `make` ends by hashing the built ROM
-against `rom.sha1` and must print `mlss.gba: OK`. No retail ROM is needed
-to build - the ROM is reproduced entirely from `asm/` and `src/`.
-
-`./container.sh <anything>` runs that command inside the toolchain
-(`./container.sh bash` for a shell, `./container.sh asm-differ ...`, etc).
+The container is the entire toolchain (devkitARM + pinned from-source agbcc).
+See [INSTALL.md](INSTALL.md) for the native path. `make` ends by hashing the
+ROM against `rom.sha1` and must print `mlss.gba: OK`. No retail ROM needed.
+`./container.sh <anything>` runs that command inside the toolchain.
 
 ## Directory layout
 
-- `asm/*.s` - raw disassembly, one file per originally-Luvdis-emitted chunk.
-  `asm/text08057568.s` alone holds 82% of everything left (5,423
-  functions, 1.6MB). `asm/mariobros.s` is a **separate, complete, embedded
-  Mario Bros. minigame ROM** at the tail of the cartridge (different game,
-  different original authors) - tracked apart from "game proper" progress
-  everywhere in this repo's tooling; see the "scope decision" note below.
-- `asm/nonmatching/<name>.s` - a function that's been extracted
-  (`split_func.py`) but isn't proven to compile byte-identical from C yet.
-- `src/*.c` - decompiled C, one file per subsystem. Can freely mix fully
-  matched functions with `NONMATCHING`-guarded in-progress ones (see below)
-  - order in the file IS the byte order in the ROM for that file's
-  contribution, nothing else determines it.
-- `tools/splits.yaml` - **the** manifest of ROM layout; generates
+- `asm/*.s` — raw disassembly, one file per Luvdis-emitted chunk.
+- `asm/nonmatching/<name>.s` — an extracted function not yet proven matching.
+- `src/*.c` — decompiled C. Order in the file IS byte order in the ROM for
+  that file's contribution.
+- `tools/splits.yaml` — **the** manifest of ROM layout; generates
   `ld_script.ld`. Don't hand-edit `ld_script.ld`.
-- `tools/symbols/{ewram,iwram,rom}.txt` - generates `symbols.txt`.
-- `tools/splitlib.py` - shared library for all the above; `split_func.py`,
-  `gen_ldscript.py`, `gen_symbols.py`, `progress.py` all import it.
+- `tools/symbols/{ewram,iwram,rom}.txt` — generates `symbols.txt`.
+- `tools/splitlib.py` — shared library; `split_func.py`, `gen_ldscript.py`,
+  `gen_symbols.py`, `progress.py` all import it.
+- `tools/factory/` — the automated pipeline (see Monitoring).
+- `.claude/factory/state.db` — sqlite state. **The `sqlite3` CLI is not
+  installed; use python3's `sqlite3` module.** Tables: `functions`, `events`,
+  `edges`.
 
 ## The NONMATCHING convention
 
-Every function still being worked on lives as:
-
 ```c
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/name.s\"");
 #else
-return_type name(args) {
-    // C attempt, not yet proven to match
-}
+return_type name(args) { /* C attempt */ }
 #endif
 ```
 
-Default build (`NONMATCHING` undefined): splices in the verbatim retail
-bytes via the `.include`, so the ROM stays byte-identical no matter how
-broken the in-progress C attempt is. `make NONMATCHING=1`: compiles the
-`#else` branch instead, so you can actually test-compile and diff it. Once
-a function is *confirmed* matching (via asm-differ), delete the whole
-guard and leave just the plain function - that's what `tools/progress.py`
-looks for to count something as "matched" (it can't re-verify byte-
-matching itself; that's what asm-differ is for. "Matched" here means
-"someone already confirmed it and removed the guard").
+Default build splices verbatim retail bytes, so the ROM stays byte-identical
+however broken the C is. `make NONMATCHING=1` compiles the `#else` instead.
+Once confirmed matching, delete the whole guard — that's what `progress.py`
+counts. Before a real attempt exists, `split_func.py` leaves an **empty**
+`#else` (deliberately, not an `#error`: agbcc compiles a whole translation
+unit, so one `#error` fails every function in that file).
 
-Before a real attempt exists, `split_func.py` leaves an EMPTY `#else`:
-```c
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/name.s\"");
-#else
-/* No C attempt yet. Deliberately empty - see below. */
-#endif
-```
-
-**This used to be an `#error`, and that was a mistake worth understanding.**
-The reasoning for `#error` was "better to fail loudly under `NONMATCHING=1`
-than compile a silently-wrong stub", which is sound for the function you are
-working on and wrong for every one of its neighbours: agbcc compiles a whole
-translation unit, and `split_func.py` appends each new extraction to the
-preceding `src/*.c`, so one undrafted `#error` fails EVERY function in that
-file. Measured at its worst: **936 placeholders across 184 files, blocking
-853 other functions** - none of which could be compiled, diffed, or
-permuted. Worse, it was a treadmill: extraction adds a placeholder, and it
-stays until that function is drafted, so the block regenerates as fast as
-`unblock_files.py` clears it.
-
-An empty branch is not the "silently-wrong stub" the original note warned
-about - the function simply does not exist under `NONMATCHING=1`. Nothing
-can mistake it for progress: the guard is still there, so `progress.py`
-still counts the function as unmatched, and the `#ifndef` branch is
-untouched, so the real ROM still gets the verbatim retail bytes. And
-`NONMATCHING=1` never builds a shipped ROM - it exists to compile and diff
-one function.
+**This convention is scheduled for replacement.** It is the root cause of a
+whole family of bugs (see The Law below) because a broken draft can sit in the
+tree silently poisoning its siblings. sa2 and tmc both use a naked-function +
+`if(0){draft}` macro where a broken draft fails the *shipping* build
+immediately. Verified working under our own agbcc. Migration plan and costs:
+`docs/review-2026-08-23-other-decomps.md` §3.
 
 ## Workflow: decompiling a function
 
-**Working in a fresh `git worktree` (parallel agents, or your own isolated
-copy)? Run a plain `./container.sh make` once, immediately after creating
-it, before anything else.** `split_func.py` needs `mlss.map` to resolve
-symbol addresses, and `mlss.map` only exists after a build - a brand new
-worktree has no `build/` output yet (it's gitignored, same as any other
-build artifact). Skipping this gives a clear, correctly-worded error
-(`mlss.map not found. Build first: ./container.sh make`) that's easy to
-misdiagnose as something worse than it is if you're not expecting it -
-found when a bounded test of a local LLM agent hit exactly this on its
-first-ever action in a fresh worktree, got a real tool error back, and
-(correctly, given how the test was scoped) didn't have permission to just
-run the fix and retry. Worth the one-line habit even though most sessions
-in this repo don't hit it, since every past parallel-pilot worktree this
-session either got lucky (front of a small file, no dependency on
-`mlss.map` yet at the exact moment) or silently recovered from this same
-error on their own without it being reported back.
+**In a fresh `git worktree`? Run `./container.sh make` once immediately** —
+`split_func.py` needs `mlss.map`, which only exists after a build.
 
-1. `./container.sh tools/progress.py` - see what's next. The "raw
-   functions remaining, by file" list's front entry in each file is what
-   `split_func.py` will accept next (front-to-back only, see below).
-2. `./container.sh tools/split_func.py <symbol-or-address> [--dest NAME]`
-   - extracts it, wires the stub into the right `src/*.c` (creating it
-   with `--dest` if nothing claims that slot yet), regenerates
-   `ld_script.ld`. Prints exactly what it did.
-3. `./container.sh make` - confirm still `mlss.gba: OK` (the asm include
-   path should never break the ROM; if it does, something's wrong with the
-   extraction, not your C - you haven't written any C yet at this point).
-   If it says `FAILED`, run `./container.sh tools/check_layout.py` before
-   anything else: it tells you in one line whether the extraction shifted
-   the ROM's layout and which object did it, instead of leaving you with a
-   bare checksum mismatch.
-4. Write the C in the `#else` branch, replacing the `#error`.
-5. `./container.sh asm-differ -mwo <name>` - iterate. `-m` rebuilds with
-   `NONMATCHING=1` automatically (see diff_settings.py), `-w` re-diffs on
-   save, `-o` diffs against the frozen `expected/` snapshot (see below).
-6. Stuck on register allocation with an otherwise-right function? Set up
-   `./container.sh tools/permute.py <name>` (needs a real, standalone-
-   compilable `#else` attempt first - see decomp-permuter section) then
-   `./container.sh tools/decomp-permuter/permuter.py -j nonmatchings/<name>`.
-7. Once it matches: delete the `#ifndef NONMATCHING`/`#else`/`#endif`
-   wrapper, delete the now-unused `asm/nonmatching/<name>.s` fragment, and
-   run `rm -rf build/ && ./container.sh make` - **the `rm -rf build/` is
-   not optional.** A plain `make` without it can report `mlss.gba: OK`
-   even when the real result is broken (see the landmine below); only a
-   build starting from nothing is real proof.
-8. `git add`, commit. Small, one-function-ish commits are the norm here
-   (see git log).
+1. `./container.sh tools/progress.py` — see what's next.
+2. `./container.sh tools/split_func.py <symbol> [--dest NAME]` — extracts,
+   wires the stub in, regenerates `ld_script.ld`.
+3. `./container.sh make` — must still say `mlss.gba: OK`. If `FAILED`, run
+   `./container.sh tools/check_layout.py` first: it names in one line whether
+   the extraction shifted ROM layout and which object did it.
+4. **Refresh `expected/` now**, not just after a match — extraction moves a
+   symbol between objects, and a stale snapshot makes asm-differ diff against
+   the wrong thing:
+   `./container.sh make && rm -rf expected && mkdir expected && cp -r build expected/`
+   (plain `make`, **never** `NONMATCHING=1`.)
+5. Write the C in the `#else`.
+6. `./container.sh asm-differ -mwo <name>` — iterate.
+7. Stuck on register allocation? `./container.sh tools/permute.py <name>` then
+   `tools/decomp-permuter/permuter.py -j nonmatchings/<name>`.
+8. Once matching: delete the guard, delete the fragment, and
+   **`rm -rf build/ && ./container.sh make`** — the `rm -rf` is not optional
+   (see landmines).
+9. Commit. Small, one-function-ish commits are the norm.
 
-**Extraction is front-to-back only within a file right now.**
-`split_func.py` refuses to pull a function that isn't the first remaining
-one in its `asm/*.s` blob. This matches how every split in this project
-has been done historically (matched-prefix, unmatched-suffix, per file)
-and keeps `splits.yaml` simple (one boundary point per blob instead of
-needing arbitrary hole-punching). Extracting from the middle of a blob is
-future work, not silently broken - you get a clear error naming what to
+**Extraction is front-to-back only within a file.** `split_func.py` refuses a
+function that isn't the first remaining one in its blob, and says what to
 extract first.
 
 ## Generating C: use m2c, not an LLM
 
-**This is the single highest-leverage thing in this repo - read it before
-writing any decompilation tooling.**
+`tools/m2c/` is [m2c](https://github.com/matt-kempster/m2c), a deterministic
+decompiler. Its ARM/Thumb backend is by Simon Lindholm (author of asm-differ
+and decomp-permuter), and m2c's own test suite carries 80 agbcc-Thumb fixtures.
 
-`tools/m2c/` is [m2c](https://github.com/matt-kempster/m2c) (formerly
-`mips_to_c`), a deterministic decompiler that inverts compiler codegen
-mechanically. Its ARM/Thumb backend is written and maintained by Simon
-Lindholm - the author of `asm-differ` and `decomp-permuter`, the two tools
-this project already runs on - and m2c's own test suite carries 80
-agbcc-Thumb fixtures using the exact `thumb_func_start` / `.code 16`
-conventions this repo emits.
+    python3 tools/factory/m2c_bridge.py <symbol>       # seed one function
+    python3 tools/factory/m2c_sweep.py --generate-only # survey yield
 
-    python3 tools/factory/m2c_bridge.py <symbol>      # seed C for one function
-    python3 tools/factory/m2c_sweep.py --generate-only # survey yield, ~26s/337 fns
-    python3 tools/factory/m2c_sweep.py                # measure + seed the pipeline
+`m2c_bridge.py` adds `--valid-syntax` (unknown fields become
+`M2C_FIELD(arg0, u8 *, 0x2B5)`, carrying the access width) and drops m2c's
+guessed declarations for symbols `include/common.h` already declares.
 
-`tools/factory/m2c_bridge.py` wraps it with the two adaptations this
-project needs: `--valid-syntax` (so unknown fields come out as
-`M2C_FIELD(arg0, u8 *, 0x2B5)` - this project's own explicit-byte-cast
-convention, carrying the access width - instead of an invented
-`arg0->unk2B5` that cannot compile against a `void *`), and dropping m2c's
-guessed declarations for symbols `include/common.h` already declares
-(keeping them is a guaranteed conflicting-declaration error unrelated to
-whether the body is right). The `M2C_*` macros are expanded inline, so a
-generated candidate is self-contained C.
+**A controlled 5-way benchmark settled this: nothing beat m2c.** Few-shot,
+best-of-5, multi-turn diff feedback, a 32B dense model and a reasoning model
+all scored the same or worse at 20-125x the cost. Don't reach for a bigger
+model or a cleverer prompt — that path is measured and dead. (Scope: those
+were *local* 32B models on a CPU-only box. Frontier models are a different
+question, ruled out here on **cost**, not capability — the maintainer is on a
+Pro plan. Klonoa reached 51% using Claude Code.)
 
-**Why this replaced the LLM tier, measured not assumed.** A controlled
-5-way comparison on a fixed benchmark set (`tools/factory/bench.py`,
-`bench_set.json`, results in `bench_results/`) tested every plausible way
-to make the local LLM better: few-shot examples, best-of-5 sampling,
-multi-turn diff feedback, a 32B dense model (Qwen2.5-Coder-32B), and a
-reasoning model (DeepSeek-R1-Distill-32B). **Nothing beat a single plain
-draft.** Everything that spent more compute scored the same or worse:
+m2c output is a **seed**, not a match. It goes through the identical permuter
+search and the identical from-scratch validator gate as anything else.
 
-| variant | compiled | matches | mean score | cost |
-|---|---|---|---|---|
-| LLM baseline | 9/13 | 1 | 548 | 18 calls, ~500s |
-| LLM few-shot | 7/13 | 0 | 759 | 18 calls |
-| LLM best-of-5 | 8/13 | 0 | 664 | 90 calls |
-| LLM multi-turn | 8/13 | 0 | 744 | 54 calls |
-| LLM dense 32B | 4/13 | 0 | 843 | ~5x slower/call |
-| LLM reasoning 32B | - | - | - | 2.9 tok/s, disqualified |
-| **m2c** | **9/13** | **2** | **439** | **0 calls, 4s** |
+**m2c is ~5s/function, CPU-bound, embarrassingly parallel: 476/min with 6
+workers.** Measure the bottleneck, don't reason about it.
 
-The reasoning model was disqualified on throughput alone: 2.9 tok/s
-measured on this CPU-only box (vs ~25 for the MoE), and one fully-resourced
-attempt burned 21 minutes without producing compiling code.
+Known rough edges: literal-pool symbol resolution is imperfect; it doesn't
+infer arrays; register-size aliasing is weak; complex control flow falls back
+to `goto`; it can't translate BIOS `swi` veneers.
 
-m2c wins on every axis at once and is ~125x faster wall-clock. Do not
-"improve" generation by reaching for a bigger model or a cleverer prompt -
-that path has been measured and it is a dead end. m2c output is a **seed**,
-not a finished match: it still goes through the identical decomp-permuter
-search and the identical from-scratch-build validator gate as any other
-candidate. Nothing bypasses a check.
-
-Known m2c rough edges (real, expect them): literal-pool symbol resolution
-is imperfect, it doesn't infer arrays (emits scalar field accesses instead
-of indexed loops), register-size aliasing (u8/u16 vs word) is weak, and
-complex control flow can fall back to `goto`. It also can't translate BIOS
-SWI veneers or tiny interworking stubs at all.
-
-`include/global.h` includes `include/m2c_macros.h` (pure typedefs and
-macros, emits no code - rebuild verified byte-identical after adding).
-
-`tools/factory/asmfacts.py`'s symbolic register tracking predates this and
-still feeds the LLM tier; `tools/factory/mechanical.py` is a small
-from-scratch deterministic Thumb->C translator written to validate the idea
-before adopting m2c. It works (translates straight-line + single-branch
-shapes, declines everything else) but m2c supersedes it - kept as a
-reference, not a thing to extend.
+**The biggest known m2c defect, and the largest lever available (2026-08-23):**
+four error classes — `invalid type argument of unary *`, `called object is not
+a function`, `void value not ignored`, `invalid use of void expression`,
+**85.1% of all compile failures** — are ONE defect: m2c reconstructs an address
+as untyped arithmetic then dereferences/calls it with no cast. **1,126
+functions (77.8%)** have every diagnostic inside this family; 1,060 are
+otherwise clean. Two existing rules patch narrow slices, which is why the
+general pattern went unnoticed. Design sketch in
+`docs/review-2026-08-23-m2c-census.md`.
 
 ## Local m2c patches (never upstream)
 
-`tools/m2c` is a submodule pinned to `matt-kempster/m2c`. This project keeps
-a small number of **local** changes to it, held as patches in
-`tools/m2c_patches/` and applied with `tools/m2c_patches/apply.sh`
-(idempotent). **Maintainer's decision: these are not contributed upstream
-and nothing is to be pushed to that repository.** That may change if the
-work proves out; until then, local only.
+`tools/m2c` is a submodule pinned to `matt-kempster/m2c`. Local changes live
+as patches in `tools/m2c_patches/`, applied by `apply.sh` (idempotent).
+**Maintainer's decision: never contributed upstream, nothing pushed there.**
 
-Why patches rather than editing the submodule in place: a submodule is
-tracked by a commit SHA, not by content, so an edit to its working tree is
-invisible to this repo's history and is destroyed by `git submodule update`
-or a fresh clone. Keeping them as patch files puts them under version
-control *here* without entangling anything with upstream.
+Patches, not submodule edits, because a submodule is tracked by SHA — a
+working-tree edit is invisible to this repo's history and destroyed by
+`git submodule update`. `git status` showing `M tools/m2c` is expected and
+means "the submodule's working tree is dirty", not a staged change.
 
-Worth knowing, since it looks alarming the first time: after editing the
-submodule, `git status` in this repo shows `M tools/m2c`. That is "the
-submodule's working tree is dirty", NOT a staged change to the recorded
-commit - `git add tools/m2c` stages nothing while the submodule's HEAD is
-unchanged, `FACTORY_PATHS` does not include it, and with zero local commits
-in the submodule there is nothing that could be pushed to
-`matt-kempster/m2c` even by accident.
+**Run `tools/m2c_patches/apply.sh` after any `git submodule update`**, or if
+m2c starts emitting `M2C_ERROR(/* unknown instruction: ... */)`.
 
-**Run `tools/m2c_patches/apply.sh` after any `git submodule update`, or if
-m2c starts emitting `M2C_ERROR(/* unknown instruction: ... */)` for
-something it used to handle.**
+The main patch: m2c didn't recognise the pre-UAL Thumb spellings `ldsh`/`ldsb`
+though it implements them under the UAL names `ldrsh`/`ldrsb`. That single
+alias affected **36% of the corpus**. Read m2c's error text before theorising.
 
-The first patch matters more than its size suggests: m2c did not recognise
-the legacy (pre-UAL) Thumb spellings `ldsb` / `ldsh`, though it already
-implements those instructions under the UAL names `ldrsb` / `ldrsh`. Our
-disassembly uses the old mnemonics, so m2c emitted
-`M2C_ERROR(/* unknown instruction: ldsh ... */)`. **1,943 of 5,431 seeds
-(36%)** carried an unknown-instruction error and three mnemonics accounted
-for all 8,208 occurrences: `ldsh` (7,568), `ldsb` (622), `swi` (18); 42.1%
-of the seeds that fail to compile were affected. Measured impact on the 32
-smallest affected seeds: 2 compile, 1 byte-exact. So it removes ONE of
-several errors from a third of the corpus and fully fixes the minority that
-had no other problem - real, and not the 36% unlock the headline number
-suggests.
+**No fork is needed and none exists** — upstream *is* the ARM home. We already
+carry Lindholm's ARM fixes from 2026-08-10.
 
 ## Matching tools
 
-**asm-differ** (`asm-differ` on PATH inside the container,
-`diff_settings.py` at repo root): configured for `-o` (object-file diff
-mode) against a gitignored `expected/` snapshot - **not** whole-ROM `-f`
-mode. `-f` doesn't work here: it needs a "load address" annotation in the
-map file to compute a RAM->ROM offset, and this project's `ld_script.ld` has
-no separate load/run address anywhere (everything's VMA==LMA, one flat
-`.text` output section) - GNU ld simply never emits that annotation for a
-script like this, so `-f` hard-fails immediately. `-o` sidesteps this
-entirely by diffing two `.o` files directly.
+**asm-differ** (`diff_settings.py` at repo root): configured for `-o`
+(object-file diff) against a gitignored `expected/` snapshot. `-f` whole-ROM
+mode **does not work here** — it needs a load-address annotation GNU ld never
+emits for this script (everything is VMA==LMA, one flat `.text`).
 
-`expected/` must be refreshed manually after a real match lands (or after
-pulling upstream changes) - **with a plain `make`, never
-`NONMATCHING=1`**, or you'd freeze in-progress bytes as the "known good"
-baseline:
-```
-./container.sh make && rm -rf expected && mkdir expected && cp -r build expected/
-```
+⚠️ **asm-differ `-o` diffs whole OBJECTS, not functions.** `thumb_func_start`
+emits no `.size`, so a diff runs past the function's end and the score is
+dominated by however many functions follow it in the file. This caused a large
+family of bugs. Prefer `tools/factory/isolation_exact.py` (byte-exact, one
+symbol alone, ~2,000/min, read-only) or a plain-build score
+(`rescore_seeds.plain_score`). **objdiff adoption is planned** and fixes this
+by construction — see the master plan §2.2.
 
-**Also refresh it right after every `split_func.py` extraction, not just
-after a match** - found by a parallel pilot agent on `sub_8018E88`.
-Extracting a function changes which object a symbol lives in (moves it
-from the raw `asm/*.s` blob into a new/growing `src/*.c`), so a stale
-`expected/` predating the extraction has the *wrong* object for that
-symbol - `asm-differ` then silently diffs against nothing/wrong content
-and reports the new attempt as ~100% "extra" rather than a real diff
-against retail. Cheap habit: run the refresh command above right after
-step 2 of the workflow below (the "make must say OK" check), not just at
-the end.
+**decomp-permuter** (`tools/decomp-permuter`, fork
+`WhenGryphonsFly/decomp-permuter-agbcc` — mainline doesn't target ARMv4T+agbcc).
+`tools/permute.py <name>` does the isolate+import dance. Needs a real,
+standalone-compilable `#else` first — it improves an attempt, it doesn't write
+one. Local patches in `tools/permuter_patches/` (same never-upstream policy),
+including an `[agbcc]` weight profile; before that, ~6,300 searches ran
+MIPS-derived weights on ARM/Thumb.
 
-**decomp-permuter** (`tools/decomp-permuter`, a submodule pinned to
-`WhenGryphonsFly/decomp-permuter-agbcc` - the mainline
-`simonlindholm/decomp-permuter` only targets MIPS/PPC/AArch32, not this
-project's ARMv4T+agbcc): `git submodule update --init tools/decomp-permuter`
-once. `tools/permute.py <name>` does the whole "isolate + import" dance
-that project's own README describes as a multi-step manual process -
-it works because `split_func.py`'s `asm/nonmatching/<name>.s` fragments
-already are exactly the one-function-per-file layout decomp-permuter wants,
-so there's no separate manual splitting/`expected_objs/` setup needed.
-Requires the target's `#else` branch to already be a real, standalone-
-compilable attempt (not the `#error` placeholder) - the permuter improves
-an existing attempt, it doesn't write one from scratch.
+`pycparser` is pinned `<3.0` in `tools/requirements.txt` — 3.0 dropped the
+`plyparser` module this fork imports. If a container build fails on
+`ModuleNotFoundError: pycparser.plyparser`, re-pin it.
 
-`pycparser` is pinned `<3.0` in `tools/requirements.txt` - 3.0 dropped the
-`plyparser` module this permuter fork imports directly. If a fresh
-container build ever fails on `ModuleNotFoundError: pycparser.plyparser`,
-this pin lapsed; re-pin it.
+Its parser doesn't fully understand nested/tagged unions — expect a reduced
+search space on union-heavy functions, not a wrong answer.
 
-**decomp-permuter's parser doesn't fully understand nested/tagged unions**
-- found on `sub_8018E88`, which needed a union of a plain byte, a u16, and
-two different bitfield structs layered over the same `GameState` offset to
-model how retail code accesses it three different ways. The permuter
-logged ~1,500 "accessing field X of undefined struct" parse errors across
-an 18k-iteration run and never got past a score of 1195 (from a 1590
-baseline) - not proof the C is wrong, but a real, measurable reduction in
-how much of the search space it can actually explore whenever a function
-needs this kind of union trick. Worth knowing before assuming a permuter
-plateau on a union-heavy function means "this is as good as it gets."
+## Throughput: what actually limits it (measured)
 
-## Scope decision: Mario Bros. minigame
+**Not CPU-bound.** 12 permuter slots on 6 physical cores; adding parallelism
+past ~12 does nothing.
 
-`asm/mariobros.s` (~712KB, 923 functions, address range
-`0x08F502B8`-end of ROM) is a **complete, separate Mario Bros. classic
-minigame ROM** (different game code, different original developers),
-embedded whole for the multiplayer minigame. **Confirmed by the
-maintainer: excluded from "100%".** Every decomp tool in this repo
-(`progress.py`, `splits.yaml`'s `mariobros` group) tracks it separately
-from "game proper" on that basis. If the maintainer ever wants it
-decompiled too, that's a straightforward "start splitting
-`asm/mariobros.s` like any other blob" - nothing here blocks it, it just
-doesn't count toward headline progress numbers unless that changes.
+**Not extraction-bound.** ~0.7s per function end to end.
 
-## Landmines already hit (read before you rediscover these)
+**Search is stochastic**: ~15.6% of launches converge, each up to
+`stall_seconds_for(lines)` seconds on one core. ~85% of that CPU produces
+nothing, by design.
 
-- **`.gitignore` used to blanket-ignore `*.py` / `*.pl`.** Would have
-  silently swallowed every tool in this repo. Fixed; there's a comment in
-  `.gitignore` now warning not to re-add it.
-- **`asm/nonmatching/*.s` fragments used to rely on load order for
-  `.include "asm/macros.inc"`.** Only the *first* nonmatching fragment
-  `.include`d by a given `src/*.c` carried its own `macros.inc` include;
-  every later one in that file silently depended on that one having run
-  first in the same assembler invocation (`.macro` definitions persist for
-  the rest of that assembly). Reordering `#ifndef` blocks, or matching that
-  first function (removing its `.include`), would have broken the build
-  with a cryptic "bad instruction `thumb_func_start ...`" error nowhere
-  near the actual cause. Fixed: every `src/*.c` that uses nonmatching
-  includes now has one explicit, order-independent
-  `asm_unified(".include \"asm/macros.inc\"");` near the top;
-  `split_func.py` does the same for files it creates; individual fragments
-  no longer carry their own copy. (Redefining the same `.macro` twice in
-  one assembly is a hard `as` error - verified - so this really would have
-  bitten someone.)
-- **The Makefile used to `cd build/` before linking.** Purely cosmetic
-  until asm-differ needs the map file's object paths to resolve directly
-  from the repo root (its `-o` mode has no `build/`-prefix concept for GNU-
-  format maps). Fixed: links from repo root now; `ld_script.ld`'s object
-  references carry the `build/` prefix to match (generated by
-  `splitlib.py`, not hand-maintained - if you ever *do* hand-edit
-  `ld_script.ld`, this is exactly the kind of thing that'll silently break).
-- **`-DNONMATCHING` must go in `CPPFLAGS`, not `CFLAGS`.** This project's
-  build splits preprocessing (`$(CPP)`, a modern `cpp`) from compilation
-  (`$(CC1)` = `agbcc`, fed an already-preprocessed `.i` file) into two
-  separate invocations. `agbcc` doesn't understand `-D` at all - it never
-  sees the unpreprocessed source. Get this backwards and you get
-  `agbcc: Invalid option`, which reads like a toolchain problem, not a one-
-  word Makefile fix.
-- **Make doesn't track flag changes.** Switching between plain `make` and
-  `make NONMATCHING=1` on an otherwise-unchanged tree won't recompile
-  anything - Make only looks at file mtimes, and `-DNONMATCHING` isn't a
-  file. If a diff looks suspiciously unchanged after flipping
-  `NONMATCHING`, you're looking at a stale object; `rm` it (or the
-  relevant `build/.../*.o`) and rebuild.
-- **`asm-differ -f` (whole-ROM mode) doesn't work on this project** - see
-  the asm-differ section above. Use `-o`.
-- **You cannot reliably add a struct definition to `include/common.h`, and
-  the error blames an innocent file.** The build dies with
-  `asm/macros.inc:1: Error: junk at end of line, first unrecognized character
-  is '@'` - macros.inc is untouched and correct; line 1 is an ordinary `@`
-  comment. The real cause is agbcc's `-ffix-debug-line` debug-info emission.
-  Bisected: not the self-referential function pointer, not padding arrays, not
-  the line count (80 lines of pure comment are fine). The trigger is the
-  struct's POSITION in the file - the identical struct builds at insertion
-  offset 0 or 5 and fails at 17 or 30 - and the object that fails MOVES as the
-  tree changes, so no position is stable. Adding a new header
-  (`include/entity.h`) fails identically. If you need a struct visible to
-  generated seeds, inline it into the seed rather than into a header. Full
-  writeup in section S.
-- **`pycparser>=3.0` breaks decomp-permuter-agbcc** - see above.
-- **`split_func.py` couldn't extract anything - "already claimed" on
-  every symbol, including brand new ones.** Regression from the `cd
-  build/` fix above: once `mlss.map`'s object paths gained a `build/`
-  prefix, `splitlib.py`'s map parser never stripped it back off, so
-  `MapSymbol.obj` (`"build/asm/text08057568.o"`) silently stopped
-  matching the `asm/`-prefix check `split_func.py` uses to tell "raw
-  blob" from "already in a `src/*.c`". Nobody had run `split_func.py`
-  since that fix landed, so it went unnoticed. Fixed in
-  `_parse_map_full`. If this ever regresses again the symptom is exactly
-  this: every target, even ones that were never touched, reports
-  "already claimed."
-- **`tools/permute.py` can't isolate a function from a file with its own
-  local header** (currently only `title_screen.c`/`title_screen.h`).
-  It copies `#include` lines verbatim into `tools/permute-work/`, and
-  cpp's "search the including file's own directory first" rule for
-  `#include "X.h"` stops finding a same-directory header once the copy
-  lives somewhere else. Fixed: local includes get rewritten to absolute
-  paths before the isolated `.c` is written.
-- **`title_screen.c` didn't compile under `NONMATCHING=1`**, which meant
-  the normal `asm-differ -mwo <name>` workflow (it always rebuilds with
-  `NONMATCHING=1` first) didn't work for *any* function in this file,
-  matched or not - the whole translation unit has to compile, and three
-  pre-existing in-progress attempts (`open_init_8055A00`, `open_8055F74`,
-  `open_8056224`) had real bugs: a conflicting prototype in `common.h`
-  for `open_init_8055A00`, missing prototypes for `mbsv_init` /
-  `open_8055F74` / `sub_8019308` at their call sites, `dword_3000DA0`
-  typed as a bare `int*` when `open_8056224` uses it as a struct pointer,
-  and `dword_83A74E4` referenced but never declared or given a symbol
-  table entry. **Fixed** - all four addressed with real types/prototypes
-  (`dword_83A74E4`'s size confirmed by checking the actual ROM bytes, not
-  guessed), file now compiles clean under `NONMATCHING=1`. Worked around
-  for `sub_8057568` via `tools/permute.py` before this fix landed - that
-  workaround (isolating one function into its own translation unit,
-  sidestepping broken siblings) is still the right move for *any other*
-  file that turns out to have the same problem.
-- **`split_func.py` silently corrupted the ROM by leaving orphaned
-  leading data behind.** Its front-to-back check only looked for an
-  earlier *labeled* function before the extraction target - not raw
-  `.byte` data Luvdis never gave a function to, which the Phase 3 section
-  below already notes is common. That data has to stay immediately
-  before the function it precedes in final byte order; the old code kept
-  it in the shrunk `asm/*.s` file instead, where it silently landed
-  *after* the new destination file - wrong order, wrong ROM. Caught by a
-  pilot agent running the documented workflow cold on `text08019CA4.s`
-  (symbol landed at the wrong address; the "`make` must still say OK
-  before touching any C" step in the workflow caught it immediately, so
-  nothing bad actually shipped - that safety check is exactly why this
-  didn't turn into a real problem). `text080542C4.s` has the identical
-  pattern, so this wasn't a one-off; a full scan found it's *also*
-  present in `text08000000.s` (6,076 leading unlabeled lines - expected,
-  matches this doc's own note below about that file's unidentified
-  crt0/m4a region) and `mariobros.s` (out of scope, noted only so it's
-  not a surprise later). Fixed in `splitlib.extract_function_lines` -
-  detects the fixed 5-line file header exactly and folds any real content
-  between it and the front-most labeled function into that function's
-  extraction. Verified against the real bug case (`sub_8019F24`) landing
-  at the correct address afterward. Caveat worth knowing: when someone
-  eventually extracts `AgbMain` from `text08000000.s`, this fix will pull
-  that entire 6,076-line preamble into one giant fragment alongside it -
-  correct, but organizationally ugly; nobody's hit that yet.
-- **The same bug, mirrored: trailing orphaned data on the *last* function
-  extracted from a file.** When `split_func.py` pulls the last remaining
-  function out of an `asm/*.s` blob, it correctly grabs every remaining
-  byte to end-of-file (needed for correctness - nothing else claims
-  them). But those trailing bytes aren't always padding: twice now, in
-  two different files, they turned out to include a second, real,
-  never-labeled function Luvdis missed. Found independently by two
-  parallel pilot agents in the same session: `text08019CA4.s`'s
-  `sub_801A2A0` carried 24 such trailing bytes, decoded by hand and
-  split out as `sub_801A33C` (commit `d15a2ed`) before the fragment was
-  deleted - no bytes lost. `text080542C4.s`'s `sub_805516C` has the same
-  shape (~100 trailing bytes, starts with what reads as a
-  `push {r4,lr}`-ish prologue) but is *not yet* resolved - `sub_805516C`
-  itself isn't matched yet, so nobody's hit the actual "delete the
-  fragment" moment, but there's an explicit warning comment directly in
-  `asm/nonmatching/sub_805516C.s` so it doesn't get deleted carelessly
-  once it does match. **Not yet fixed at the tool level** - unlike the
-  leading-data case, a general fix here needs real instruction decoding
-  to find function boundaries inside unlabeled trailing bytes (telling
-  "this is a second function" from "this is genuinely just padding/a
-  literal pool" isn't a fixed-pattern check the way the file header
-  was). Until then: treat "delete the nonmatching fragment" as unsafe by
-  default for any function that was the *last* one extracted from its
-  file - check the fragment's own tail for unexplained bytes after the
-  function's real `bx lr`/`pop {..., pc}` first.
-- **Any tool that runs a NONMATCHING build MUST delete the objects it
-  produced.** Otherwise everything downstream that judges tree health with
-  a plain `make` is lying. This is the flag-staleness landmine below,
-  weaponised: Make decides what to rebuild from mtimes and cannot see that
-  `-DNONMATCHING` is not a file, so a NONMATCHING object left in `build/`
-  gets LINKED into the ROM by the next plain `make` - an object where every
-  `#else` branch was compiled instead of the retail `.include`.
-  Three tools had this bug at once; the worst was `asm_differ_score()`,
-  because scoring runs constantly. Observed against a completely clean git
-  tree:
-  ```
-  build/src/sub_81333D8.o: undefined reference to `sub_807BF34'
-  .text is 0xFFA070, expected 0x1000000 - 5,304 symbols at the wrong address
-  ```
-  The undefined reference is the giveaway: `sub_807BF34`'s definition only
-  exists inside a `#ifndef NONMATCHING` branch, so an object compiled the
-  other way physically cannot link against it. If you ever see an
-  undefined reference to a `sub_XXXXXXX` against a clean tree, this is why -
-  `rm -rf build/` fixes it, and the real question is which tool left the
-  object behind.
-  The damage is not just a scary message. Anything checking health with a
-  plain `make` reads it as a broken repo: `score_sweep` scored 50 seeds in
-  a row as "does not compile" (all false, and an earlier run mislabeled
-  **1,291 functions** this way), and `tier3.ensure_extracted()`'s
-  post-extraction check would `revert_to_clean()` a perfectly good
-  extraction. Fixed in `asm_differ_score`, `unblock_files.py` and
-  `compile_errors.py` - all three now delete on every exit path.
-- **`make` can report `mlss.gba: OK` against a genuinely broken tree -
-  Make's dependency tracking has no idea assembler `.include`s exist.**
-  This is the single most dangerous landmine in this project, because it
-  breaks the exact safety check every other landmine here relies on.
-  Deleting or editing an `asm/nonmatching/<name>.s` fragment (step 7 of
-  the workflow above, done on *every single function ever matched*) only
-  actually gets checked if the containing object file gets recompiled -
-  and Make decides that purely from the `.c`/`.s` file's own mtime, which
-  has no idea an `.include`d fragment even exists, let alone that it
-  changed or vanished. Concretely: edit `src/heap.c` (removing a guard)
-  *and* delete `asm/nonmatching/free_heap_8018DA8.s` in the same pass,
-  run `make` - it recompiles `heap.c` because *that* file's mtime
-  changed, succeeds, says `mlss.gba: OK`. Run `make` *again* with no
-  further edits: Make sees `build/src/heap.o` is newer than `heap.c` and
-  skips recompiling it entirely - the missing `.include` target is never
-  even looked at again. A genuinely from-scratch build
-  (`rm -rf build/ && make`) immediately fails with `can't open
-  asm/nonmatching/free_heap_8018DA8.s for reading`. Found when an
-  autopilot-run local LLM agent hit exactly this: wrote correct C, got
-  confused trying two malformed `permute.py` invocations, then while
-  "testing if this is an exact match" edited away its own correct C back
-  down to a bare unconditional `.include` *and* deleted the fragment file
-  the include still pointed to - and every `make` it ran afterward,
-  including its "final build check," reported `OK` against a stale
-  cached object, so it committed the broken result with a
-  `git commit -m "Match ..."` message that was completely wrong. This
-  is *not* the "false success" landmine above (that one was the model
-  correctly reporting a real tool result) - this is the tool itself
-  giving a false-positive result, to a human, Claude, or an agent
-  equally. **Fixed at the process level, not the tool level**: step 7 of
-  the workflow above and `tools/qwen_pilot.sh`'s own verification both
-  now do `rm -rf build/` before the final `make` that decides whether
-  something is a real match - a fresh, from-nothing build is the only
-  check that can't be fooled this way. A from-scratch `make` is slower
-  (rebuilds every object, not just the changed one) but that's the
-  actual cost of a trustworthy check here, not a bug to route around.
-- **A fresh `git worktree` has no `mlss.map`, so `split_func.py` fails on
-  its very first use there.** `mlss.map` is a build artifact (gitignored,
-  regenerated by the linker), and a new worktree starts with no `build/`
-  at all. The error is clear (`mlss.map not found. Build first:
-  ./container.sh make`) and easy to recover from - just build once - but
-  an agent given a narrowly-scoped task (or a human who doesn't recognize
-  the error) can get stuck on it or, worse, silently route around it in a
-  way that produces a misleadingly "successful"-looking result instead of
-  actually doing the task. Found via a bounded test of a local LLM
-  agent's tool-use reliability: it hit this on its first action in a
-  fresh worktree, correctly ran the second half of its two-command
-  instructions instead (a trivial no-op `make` on the untouched tree,
-  which of course also says `mlss.gba: OK`), and truthfully reported that
-  - which read, from the outside, exactly like a fabricated success until
-  the actual repo state was checked. Not a reasoning failure once
-  diagnosed; a missing prerequisite plus a task scoped too rigidly to
-  allow the obvious recovery step. See the workflow section above for the
-  fix (`make` once, right after creating any new worktree).
-- **`git reset --hard` / `git clean -fd` on a worktree do not un-stale its
-  `mlss.map`, and `split_func.py`'s "already claimed" check trusts that
-  map unconditionally.** `mlss.map` (like `build/` and `expected/`) is a
-  gitignored build artifact, so resetting or cleaning a worktree's tracked
-  source back to an earlier commit leaves whatever map was last generated
-  completely untouched - it can keep describing a function as living in
-  `src/whatever.o` long after the source-level change that put it there
-  has been reset away. Next `split_func.py <that function>` then refuses
-  with `already claimed by src/whatever.o - nothing to extract`, even
-  though the current source tree has never seen that function at all. Hit
-  for real in `tools/qwen_pilot.sh`'s autopilot worktree: a prior run's
-  in-progress extraction was reset at the git level, but the stale map
-  survived and blocked the very next attempt on that same function. Fixed
-  in `qwen_pilot.sh`: a plain `./container.sh make` (not a full `rm -rf
-  build/` - this is a real source content change with real new mtimes,
-  not the NONMATCHING-flag staleness case Make can't see, see above) now
-  runs immediately before every `split_func.py` call, not just once at
-  worktree creation. Doing this by hand: after resetting/cleaning a
-  worktree, `./container.sh make` before trusting `split_func.py` again.
-- **A manual `rm -rf build/ && make` (or any ad-hoc repo mutation) run
-  OUTSIDE `gitops.repo_lock()` while the factory is live races against it
-  and produces a scary, misleading `mlss.gba: FAILED`.** The lock exists
-  precisely to serialize every repo-touching operation across the 6
-  factory processes; a manual command that skips it is racing against
-  whatever tier1/tier2/tier3/tier_m2c/validator happen to be mid-build at
-  that exact moment, reading a half-written object or a `ld_script.ld`
-  that changed out from under it. The failure is real (a checksum
-  mismatch, a missing `.o`) but the CAUSE is contention, not corruption -
-  re-running the identical command wrapped in
-  `gitops.repo_lock(what="...")` immediately afterward comes back clean
-  every time this was checked. Hit live, TWICE, in one session, by the
-  same agent that had already diagnosed and called out the first
-  occurrence - writing it down in conversation was not enough to make it
-  stick; this entry is the actual fix. **The habit, not optional:** any
-  manual `make`, `split_func.py`, or `git` command run against this repo
-  while a factory process might be running goes inside
-  `gitops.repo_lock()`, full stop - including "just checking" commands
-  that feel read-only, since `make` itself writes to `build/`. If a
-  from-scratch build fails and a factory supervisor is (or was recently)
-  running, suspect contention before suspecting the code, and confirm by
-  re-running under the lock before treating it as a real regression.
+**But the search is not where the matches come from.** Attribution over 1,156
+matched rows: `rescore` 415, `permuter` 278, `m2c` 186, `twin` 130, `tier2` 101.
+**64% came from something other than the permuter finding an answer** — from
+repairing a measurement or propagating across functions. On 08-23 the factory
+logged 199 launches and 233 matches.
 
-- **`split_func.py` can silently shift the whole ROM by extracting a
-  function whose SUCCESSOR sits at a non-word-aligned address.** Found the
-  hard way: the ROM stopped reproducing, `.text` came out `0x01000008`
-  instead of `0x01000000`, and every validator match started failing as a
-  result - which looks exactly like "the pipeline broke" and inflates
-  `needs_human`/`stalled`, because `finish_match()` can never succeed when
-  the ROM won't build. The bytes themselves were fine: a `.byte`-level
-  audit of the offending commit showed **perfect conservation** (delta 0).
-  The extra bytes were ALIGNMENT PADDING. An extracted function becomes
-  its own linker object, and an object carrying `thumb_func_start` gets
-  4-byte alignment (`.align 2, 0`); if the next function in ROM order is
-  at a 2-mod-4 address - this ROM really does have those, that's what
-  `non_word_aligned_thumb_func_start` exists for - the object's size gets
-  rounded up and everything after it slides. Concretely: `sub_80793F4.o`
-  came out `0x2C0` when the gap to the next function is `0x2BE`, pushing
-  `sub_80796B2` from `0x080796B2` to `0x080796B4`, and 5,391 symbols
-  after it landed at the wrong address.
-  **How to diagnose fast** (much faster than bisecting): symbol names
-  encode their own correct address, so parse `mlss.map` and flag any
-  `sub_XXXXXXX` whose linked address != `0xXXXXXXX`. The FIRST mismatch
-  is where the shift starts; its preceding object is the culprit, and
-  `objdump -h` on that object vs the address gap shows the padding
-  directly. Cross-check with `objdump -h mlss.elf` - `.text` must be
-  exactly `0x01000000`. **`tools/check_layout.py` now does exactly this**
-  in one pass over `mlss.map` - no rebuild, no bisect, safe to run against
-  a live factory (read-only). It names the first wrong symbol and the
-  object contribution that pushed it.
-  **FIXED at the tool level.** Two things had to be understood first, both
-  measured rather than assumed:
-  1. GNU as rounds a section's size UP to the section's alignment.
-     Verified directly: 0x2BE bytes of content under `thumb_func_start`
-     assemble to a `.text` of size **0x2C0**; the identical bytes under
-     `non_word_aligned_thumb_func_start` (no `.align`) assemble to exactly
-     **0x2BE**.
-  2. That is *not* the only source of the padding, which is why the
-     obvious fixes don't work. **The Makefile appends a literal
-     `.text` / `.align 2, 0` to every agbcc-generated `.s`** (the `$(CC1)`
-     rule) - so every `src/*.c` object is 4-aligned at the end no matter
-     what its fragments say. Both "drop the `.align` from the fragment"
-     and "give the function its own object" were implemented and tested
-     against the real `sub_8079688` case; both still shifted the ROM by
-     +2, because of this.
-  The fix that actually works: **make the extraction end where the ROM
-  already has a word boundary.** `split_func.py` now walks forward from
-  the requested function, pulling in following functions until the
-  extraction's end address is word-aligned - emitting one
-  `asm/nonmatching/*.s` fragment and one `#ifndef NONMATCHING` stub per
-  function, so decomp-permuter's one-function-per-file assumption still
-  holds. A function at a 2-mod-4 address is physically un-splittable from
-  its predecessor, so this isn't a workaround, it's the actual shape of
-  the data. If there's no following function to extend through (the blob
-  itself ends non-word-aligned), it refuses instead of guessing.
-  Verified end to end: `sub_8079688` - the exact extraction that corrupted
-  the ROM - now pulls `sub_80796B2` with it and builds `mlss.gba: OK` from
-  scratch with a clean layout check. There are exactly three such sites in
-  the game proper (`sub_80796B2`, `sub_819A5D2`, `sub_81C0F7E`); all three
-  are detected, and an ordinary extraction is unchanged.
-  `tier3.ensure_extracted()` also used to **throw away `make`'s exit
-  code** - that's how the bad extraction got committed in the first place.
-  It now checks the build *and* `layout_ok()`, and calls
-  `revert_to_clean()` if either fails, so a bad extraction costs one
-  function instead of the whole run.
+**So the lever is better seeds and correct measurement, not more compute.**
+Every deterministic rule converts a 15-minute gamble into an instant match.
 
-## Finishing the disassembly (Phase 3)
-
-`tools/map_raw_regions.py` walks every asm/*.s file's actual address space
-(not a whole-file average) and lists every still-raw `.byte` run with exact
-addresses - that's the real starting point for this phase, not the
-642KB-ish estimate quoted early in this project (that number came from a
-coarser per-file heuristic; run the tool for the current true figure).
-
-**Important finding: most raw-`.byte` bytes are not "unreached code".**
-The instinct is to assume a `.byte` run means Luvdis missed a function.
-In practice most of what's left in `asm/text0801A548.s` and
-`asm/text08057568.s` is data sitting between real, already-disassembled
-functions - sprite/tile/palette tables, jump tables Luvdis didn't
-recognize as such, that kind of thing. Don't assume "raw" means "missed
-code" without looking; `map_raw_regions.py --min-size N` combined with
-actually reading a region is the way to check, not the byte count alone.
-
-**A second, bigger finding: some "raw" functions were already
-disassembled - just anonymously.** `tools/find_library_code.py` byte-
-matches our own pinned agbcc's compiled libgcc/libc against the retail
-ROM (self-contained leaf routines only - no relocations to go wrong, see
-its docstring). Every hit so far turned out to already be a properly
-disassembled `thumb_func_start sub_XXXXXXX` function, just never
-identified - Luvdis had already found the code, it just couldn't know
-that `sub_81DCD38` was `memcpy`. Confirmed and renamed with
-`tools/rename_symbol.py` (pure whole-word text rename - zero risk to
-bytes, since the disassembly was already correct): `_lshrdi3`, `_muldi3`,
-`_negdi2`, `memcpy`, `memset`, `strcmp`, `strlen`, and `abort` (which
-turned out to bundle two more 2-4 byte stubs, `isatty` and `alarm`, that
-Luvdis had left as unlabeled trailing `.byte` - those got hand-split
-since they were too small for `find_library_code.py` to match on their
-own). All in `asm/text08057568.s`, clustered right before rodata begins
-(0x081DC710-0x081DD5B0) - exactly where a linker places pulled-in library
-code. **The `_call_via_rX` interworking-veneer matches found by the same
-scan were NOT applied** - they're a real binutils feature (auto-generated
-ARM/Thumb call stubs) but the specific addresses matched didn't correspond
-to any real label or raw-run boundary in our source; likely spurious
-matches of a very low-entropy repeating byte pattern (`bx rN` / `nop`
-pairs). Left alone rather than guessed at.
-
-Also labeled (not "found", just transcribed correctly): the 192-byte GBA
-cartridge header at `_08000000` in `asm/text08000000.s` - its exact layout
-comes straight from `tools/gbafix/gbafix.c`'s own `Header` struct, not
-reverse engineering.
-
-**Still open, and the actual bulk of this phase:**
-
-- `asm/text08000000.s`'s first ~94.5KB (0x08000000-0x08017A00, right after
-  the header). **`0x08000000`-~`0x08002E00`** (~11.7KB) is clean ARM -
-  textbook GBA crt0 (mode switches to IRQ/System via `msr CPSR_fc`,
-  interrupt-vector install, REG_IE (`0x04000200`) bit-testing dispatch),
-  0.0% bad instructions through most of it. That part is solid.
-
-  **`~0x08003000`-`0x08017A00`** (~84KB) - **CORRECTED: this is NOT the
-  m4a sound driver, and there is no good evidence it is code at all.**
-  This file previously recorded it as "confirmed real missed code, not a
-  guess anymore" and "almost certainly the m4a ('Sappy') sound driver" on
-  the strength of `probe_code_region.py`'s bad-instruction rate (2.4-2.5%
-  as Thumb vs 6.6%+ as ARM). **That metric does not support the claim**,
-  measured three ways:
-
-  1. *The Thumb number can't tell code from data.* Known rodata at
-     `0x081E2764` scores **0.0% bad as Thumb** - better than this region.
-     Thumb's 16-bit encoding is dense enough that nearly anything decodes
-     to something valid, so "Thumb beats ARM" is close to meaningless.
-     (ARM's sparser encoding makes *its* number worth something.)
-  2. *Function-prologue density says data.* Counting `push {...,lr}`
-     (0xB5xx) / `pop {...,pc}` (0xBDxx) per KB: real Thumb code in this
-     ROM runs **3.4-6.9/KB**, rodata is **0.0**, and this region is
-     **0.5** - an order of magnitude short of code. ARM prologues
-     (`stmfd`/`ldmfd`) are **0.02/KB** here vs **9.39/KB** in the crt0
-     above it, so it isn't ARM either.
-  3. *It doesn't touch sound hardware.* A sound driver is saturated with
-     `0x04000080`-`0x040000A8` and DMA register literals. This entire
-     84KB contains **zero**; the first such literal in the ROM is at
-     `0x08017D30`, just *past* the region's end. The m4a `SoundInfo`
-     ident `0x68736D53` appears **42 times in the ROM and every single
-     one is inside the embedded Mario Bros. ROM** (`0x08F6xxxx`), never
-     in the main game.
-
-  4. *It is referenced exactly like rodata.* Counting 32-bit words
-     anywhere in the ROM that point into an 84KB window: this region gets
-     **1,606**, a same-size known-rodata window gets **1,674**, and
-     arbitrary control windows elsewhere get **116** and **35**. So it is
-     heavily and deliberately referenced - 14-45x above background - at
-     statistically the same rate as real rodata. Target spacings cluster
-     at 1/2/3/4/8 bytes, i.e. it is addressed as a **byte stream**, not
-     as word-aligned records or code entry points.
-
-  What it actually is: entropy 6.75 bits/byte, all 256 values present,
-  byte-to-byte deltas averaging 71 (random is ~85; real 8-bit PCM audio
-  is under 25, so it is **not** raw sample data either), with visible
-  repeating structure (long `77 C0` runs, recurring `0B FC`).
-  `find_compressed_blocks.py` finds **zero** BIOS LZ77/RLE/Huffman blocks
-  in the range, so if it is compressed it uses a custom scheme, not a
-  BIOS one. Best current description: a large, heavily-referenced,
-  byte-addressed data blob in a custom/packed format.
-
-  **Do not spend time trying to decompile it as m4a.**
-  `find_library_code.py` finding nothing here is consistent with this,
-  not with the old m4a theory. (And for the record: GBA audio is not
-  SNES-derived - there is no SPC700, no S-DSP and no BRR. The ARM7 mixes
-  in software into two DMA-fed PCM FIFOs; the four PSG channels are
-  inherited from the Game Boy for GB/GBC compatibility.)
-- Two enormous, nearly-adjacent runs in `asm/text08057568.s`
-  (0x0818A658-0x081AFAAA and 0x081AFAAC-0x081C91BC, ~257KB combined,
-  current live boundaries per `map_raw_regions.py` have drifted slightly
-  as extraction has continued: `0x0819B83C`-`0x081DA3A0`, still ~257KB
-  combined) - **inspected byte-by-byte with the same tool, and the
-  original "probably a big data table" guess was mostly right, with one
-  real exception.** The second/larger run
-  (`0x081C0C90`-`0x081DA3A0`, ~104KB) is genuinely data: its bad-instruction
-  rate stays flat (~16%) regardless of which 2-byte alignment phase it's
-  disassembled at, the signature of real data rather than misaligned real
-  code (misaligned code shows a sharp clean/garbage contrast between the
-  right and wrong phase; this doesn't) - byte content confirms it, a
-  clean fixed-stride repeating record structure, most likely animation/
-  sprite frame metadata (not dialogue - that's now confirmed to live
-  elsewhere, see the text-string finding in docs/formats/README.md). The
-  first run (`0x0819B83C`-`0x081C0C8E`, ~152KB) is a genuine **mix**: real
-  code at the front (high byte diversity, clean prologue/epilogue,
-  sensible branches, near-0% bad) transitioning into the same kind of
-  repeating-record data table partway through - so there's a real,
-  bounded chunk of recoverable missed code at its start, just not the
-  whole 152KB. Neither block contains a GBA BIOS decompression call
-  (`swi 0x11`-`0x18`) - checked directly, see docs/formats/README.md's
-  Yoshi Magic cross-reference section for why that mattered.
-- `asm/mariobros.s` has its own huge raw runs (led by one 433,882-byte
-  block) - out of scope per the Mario Bros. decision above, noted here
-  only so nobody "discovers" it as a surprise.
-
-## Data/assets (Phase 4)
-
-Neither rodata blob (`asm/rodata081DD790.s`, ~20KB; `asm/rodata081E2764.s`,
-~14MB, both still 100% raw `.byte`) has been *split* (turned into real,
-committed, buildable source) yet - but real bytes have now been pulled out
-and written to files, which is further than pure recon. Full findings and
-how to use the tools are in [docs/formats/README.md](docs/formats/README.md)
-- short version:
-
-- `tools/find_compressed_blocks.py` / `tools/gba_compress.py`: finds GBA
-  BIOS-compressed (LZ77/RLE) data with a real decompressor requiring clean
-  termination at the declared size - not a header-pattern guess. 75
-  confirmed blocks, several 500KB+. RLE dominates over LZ77 in this ROM.
-- `tools/extract_assets.py`: decompresses all 75 to `assets/raw/*.bin`
-  (gitignored - decompressed copyrighted game data, same treatment as
-  `baserom.gba`) and renders a tile-grid PNG preview for anything sized as
-  a clean multiple of 32 bytes. **The tile decoder is verified correct**
-  against `dword_81DD9F4` - known, already-documented, uncompressed GBA
-  tile data (see `src/game_boy_player_logo.c`) - not just "looks plausible."
-  **Which of the 75 blocks are actually graphics is not verified** - the
-  32-byte-size classifier alone is weak; treat PNG output as leads, ranked
-  by a `nibble_dominance` heuristic, not conclusions. `0x08820273` is the
-  current best unconfirmed candidate (60% dominance).
-- `tools/find_pointer_tables.py`: finds runs of consecutive words in raw
-  rodata that all look like valid ROM addresses, cross-referenced against
-  every `.4byte` literal already in disassembled code for independent
-  confirmation. 20 code-confirmed tables found (one over 1,000 entries),
-  337 more unconfirmed.
-
-Concrete unstarted next steps in `docs/formats/README.md`: confirming
-which extracted blocks are really graphics (vs. some other RLE-compressed
-data that happened to size out to a multiple of 32); cross-checking
-pointer table *entries* (not just table start addresses) against the
-compressed-block address list, which came up empty at the table-address
-level but was never tried at the entry level.
-
-## Room properties table & the solidity/collision data pipeline
-
-Found while answering a question about the community `Yoshi Magic`
-editor's "Solidity Map" feature, not from a planned phase step - but it's
-real, address-level-confirmed reverse engineering, not just discussion, so
-it's recorded here like any other finding. Full writeup with the field
-table and pointer-chain detail is in
-[docs/formats/README.md](docs/formats/README.md#room-properties-and-the-soliditycollision-pipeline).
-
-Short version: the per-room properties table (`room_props_table`, was
-`0x083A78D4`, 24 bytes/room, full field layout known) and the two-level
-pointer chain that resolves each room's actual solidity/collision
-tile-grid (`room_solidity_index_table` -> `solidity_grid_offset_table` -> a
-row-major byte-per-tile grid, staged into RAM by
-`stage_room_solidity_grid`) are now both located and structurally
-understood - cross-confirmed against the independently-reverse-engineered
-[Yoshi Magic](https://github.com/CaptainSwag101/YoshiMagic) tool's source,
-found here first via our own disassembly and only checked against theirs
-afterward. This is the natural on-ramp into the physics/collision
-decompilation this project's whole goal keeps citing (see "What this is"
-above).
-
-Follow-up pass: `tools/render_solidity_grids.py` resolves and renders the
-grid for every room (529 rooms, 501 distinct grids) straight from ROM
-data, no emulation. Confirmed grid width is **30 tiles** (one GBA screen,
-407 of 501 resolved grids are an exact multiple of 30 bytes) by actually
-rendering the width-30 family and getting genuinely coherent room shapes
-- solid blocks, floor bands, evenly-spaced pillars - not noise; see
-`docs/formats/README.md` for the specific examples and the recurring
-small value-families (`0x18`/`0x2D` as an edge/interior pair, `0xFF` as a
-likely open-space sentinel, etc.).
-
-**The "what do grid byte values mean" gap is now closed at the structural
-level.** A grid byte is not a self-contained enum - it's an index (0-255)
-into one of 14 possible 256-entry x 4-byte "coldef" arrays, selected per
-room by `room_props_table`'s `solidind` field via a newly found pointer
-table (`col_set_ptr_table`, `0x083AADD0` - the same address the Yoshi
-Magic authors tried and apparently abandoned per their own commented-out
-code, but it's live, heavily-used code here). Full derivation, the coldef
-struct's byte layout, and the one confirmed live caller are in
-`docs/formats/README.md`'s "missing link" subsection. Still open: what a
-coldef's individual bytes *do* (which is height/offset, which is a
-slope/edge type enum) - traced the struct shape, not yet the semantics.
-Same open status for the height/gravity variables from Part 1 of the
-physics illusion - still a different, unlocated struct.
-
-Symbol renames for the room-properties addresses **have been applied**:
-`sub_805A00C` -> `stage_room_solidity_grid`; `room_props_table`,
-`col_set_ptr_table`, `room_solidity_index_table`,
-`solidity_grid_offset_table` added to `tools/symbols/rom.txt`. Rebuild
-verified byte-identical (`mlss.gba: OK`) afterward. Worth knowing this is
-a *new* rename pattern for this project, not quite the same safety
-argument as Phase 3's: these four addresses only ever appear as raw hex
-literals inside still-raw, unextracted `asm/text08057568.s`, so the
-rename relies on the linker's `--just-symbols=symbols.txt` resolving an
-undefined symbol reference from inside a standalone-assembled `.s` file -
-mechanically different from Phase 3's local-label-only renames, though
-confirmed working the same way.
-
-## Throughput: what actually limits it (measured, not guessed)
-
-Read this before trying to make the factory "faster" - the intuitive
-levers are the wrong ones.
-
-**It is not CPU-bound.** With 12 permuter slots running, load sat at ~6 on
-6 physical cores with the browser and editor also running; individual
-permuter processes idle at 30-45% CPU. Adding parallelism past ~12 does
-nothing, because there are only 6 real cores (0-5 and 6-11 are the same
-cores' SMT siblings - see `tier2.FARM_CPUSET`).
-
-**It is not extraction-bound.** Measured end to end: `split_func.py` 0.2s
-+ incremental `make` 0.4s + `refresh_expected` 0.2s ~ **0.7s per
-function**. Even 5,000 extractions is about an hour.
-
-**It is search-bound, and that is inherent.** decomp-permuter is a
-stochastic search. Measured over 24h: **1,780 launches -> 278 converged, a
-15.6% hit rate** (20.6% over a good 6h window). Each search runs up to
-`stall_seconds_for(lines)` = `min(max(60, lines*6), 900)` seconds on one
-core. So the arithmetic is roughly 12 slots x ~4 searches/hour x ~15% ~
-**7 matches/hour**, which is exactly what gets observed. ~85% of all that
-pinned CPU produces nothing, *by design*.
-
-**Therefore the only real lever is better seeds, not more compute.** Every
-deterministic rule converts a 15-minute gamble into an instant score-0
-match. The arg-register rule
-(`m2c_bridge.restore_omitted_leading_params`) alone covered 15% of the
-corpus and took functions that had stalled through *full* permuter
-searches straight to 0. That is why `stall_patterns.py` and
-`compile_errors.py` exist, and why "add cores" or "raise the timeout" are
-not the answer.
+Three scheduling ideas measured and settled: closest-first claiming caused a
+spin loop (fixed by sorting on attempt count first); filling the queue faster
+does nothing (it's saturated); and **anything holding the repo lock in a tight
+loop starves everything else** — `repo_lock` has no fairness, so run
+lock-heavy tools sequentially.
 
 ## Monitoring
 
-- `python3 tools/factory/dashboard.py` - live view (match count, pipeline
-  funnel, throughput, worker liveness, recent matches). Refreshes every
-  5s; `--once` for a snapshot.
-- `python3 tools/factory/health.py` - asserts invariants and reports
-  **violations**, one line each. Use this to check "is it actually
-  working", not the dashboard. **But note its blind spot, found the hard
-  way:** it and the dashboard were fully green through the entire
-  section-F collapse, because queue depth, worker liveness and container
-  count were all genuinely fine - the searches were succeeding and the
-  results were being discarded. The check that would have caught it is
-  `t2_launch` vs `converged` per hour out of the events table; the
-  dashboard's matches/hr only says *that* something is wrong, never
-  whether the search or the plumbing around it is at fault. Notably it distinguishes the real
-  starvation failure (`tier2_ready=0` **and** permuter idle) from the
-  healthy case (`tier2_ready=0` because seeds are consumed as fast as
-  they're produced, `permuting` high).
-
-- `python3 tools/factory/rescue_isolated_zeros.py [--dry-run]` - replays
-  permuter wins that tier2 rejected before the section-F fix, straight off
-  whatever is still in `nonmatchings/<name>/output-*/`. Not read-only (it
-  takes the repo lock per function, with a deliberate pause between so it
-  can't starve anything). Worth a run after any change to how candidates
-  are spliced.
-
-- `./container.sh tools/check_layout.py` - asserts the linked ROM layout
-  hasn't shifted, straight from `mlss.map`. Run this first whenever `make`
-  reports `mlss.gba: FAILED`, or whenever `needs_human`/`stalled` spikes:
-  a shifted layout makes *every* match fail to validate, so it looks like
-  a pipeline problem when it's one bad extraction. Names the first
-  wrong-addressed symbol and the object that pushed it.
-
-All three are strictly read-only - no repo lock, no builds, no writes - so
-they're safe to run against a live factory as often as you like.
-
-## Work status (updated as tracks close)
-
-**A. Split out hidden functions - DONE (partly).** `split_trailing.py`
-works end to end. 10 previously-unlabeled functions recovered from
-fragment tails, 0 failures, ROM byte-identical after each. **18 regions
-were REFUSED** because they don't end in a return - almost certainly
-multiple functions or code+data mixed (e.g. 436 bytes after
-`sub_80F1CF8`), and one address can't be derived at all. Those 18 (~2KB)
-still need a human; the tool declines rather than guessing.
-`gitops.finish_match()` now refuses to delete any fragment carrying real
-trailing data, so the remaining 77 can't silently corrupt the ROM.
-
-**B. Physics thread - DONE, and it paid off.** See
-`docs/formats/README.md`'s "SOLVED: the slope/height semantics" section:
-`get_surface_height_at_x` (was `sub_8160854`) resolves surface height in
-pixels, with byte 0 = signed tile height and byte 1's low nibble = slope
-type, dispatched through a 7-entry table (flat / two 45° / four 22.5°
-half-slopes). Confirms the long-open `b0`/`b1` hypothesis.
-
-**The `ctx+0x80C` pointer trace is now DONE too, and the answer is
-NEGATIVE - worth knowing before re-chasing it.** `ctx+0x80C` is *not* the
-coldef arrays; the two are parallel mechanisms that merely share a 4-byte
-record shape. Only four game-proper functions besides the reader touch
-offset `0x80C`, and together they give the lifecycle: `sub_8160EC4` inits
-both `ctx+0x804`/`0x80C` to 0, `sub_8160C64` fills, `sub_8160E6C` frees via
-`free_heap_8018D9C`. It is a **heap array of one 4-byte record per tile
-column**, `*(u16*)(ctx+0x820)` entries long, filled by `sub_81606C8(ctx,
-column)` - which scans that column of the **BG tilemap** (`ctx+0x808`, u16
-entries, `id = entry & 0x3FF`) downward through 32 rows and returns
-`b0 = the row a marker tile was found at` (height in tiles) and
-`b1 & 0xF = slope type`, defaulting to height 0x20 / flat if nothing
-matches. That re-derives both field meanings from the WRITE side.
-
-Best part, and a genuine cross-check: the slope variant is taken from the
-tile's **horizontal-flip bit** (`0x400`, bit 10 of a GBA text-BG map entry).
-hflip set/clear selects 4/5 and 3/6 - exactly the mirrored pairs in the
-decoded table (the two 22.5° lower halves, and the two upper halves). The
-level author mirrors a tile in the editor and the physics reads the same
-flag the renderer does.
-
-**Still open on this thread:** what consumes the coldef path
-(`col_set_ptr_table` -> `load_col_set_to_dest` / `get_coldef_ptr_by_xz`) -
-it is live code, just not what feeds `get_surface_height_at_x`. Also note
-`src/load_col_set_to_dest.c`'s unproven `#else` draft has its copy
-direction backwards (the asm copies 256 entries OUT of
-`col_set_ptr_table[solidind]` INTO `*(u32*)(dest+0xA0)`) and cannot match
-as written.
-
-**C. m4a sound driver - CLOSED, premise was wrong.** The 84KB region is
-not m4a and almost certainly isn't code; see the corrected Phase 3 entry.
-Replacement work: identify what that byte-addressed data actually is, and
-find the real sound code (first sound/DMA register literals are at
-`0x08017D30`, i.e. in already-extracted code that may just be unlabeled).
-
-**D. The translation-unit deadlock - the structural throughput
-blocker.** agbcc compiles a whole translation unit, so ONE undrafted
-`#error` sibling fails every function in that file, however correct their
-own C is. `split_func.py` appends each newly extracted function to the
-preceding `src/*.c`, so files accumulate placeholders as extraction
-proceeds - after a full extraction pass, **756 files held 5,205
-placeholders**, `src/sub_8171FF8.c` alone holding 500. Not one function in
-a poisoned file can be compiled or diffed.
-
-Both `tier_m2c` and `m2c_sweep` skip any function with a blocking sibling
-(`tier3.blocking_siblings()`), which is right in isolation and fatal in
-aggregate: it is why a `compile_errors.py` sample of 30 stalled functions
-found only 2 compiling, with most diagnostics pointing at OTHER functions'
-placeholders rather than at m2c's own output.
-
-`unblock_files.py` is the fix - drafts every placeholder in a file at once
-so the unit compiles as a unit. It was all-or-nothing per file, which does
-not survive contact with real files (one bad seed reverted every good seed
-beside it: 0 of the first 4 files succeeded). It now attributes each
-compiler diagnostic back to the guard block containing its line number,
-empties only those `#else` branches, and rebuilds. An empty `#else` is
-deliberate and safe: `NONMATCHING=1` never builds the shipped ROM, the
-tool compiles one object rather than linking, and asm-differ `-o` diffs
-per symbol - whereas a stub with a guessed signature could collide with a
-real prototype.
-
-**A dead-end class worth knowing about:** `tier_m2c._claim()` excludes
-every row it previously declined (`notes LIKE 'm2c:%'`) to stop an
-infinite re-claim loop. That was correct while tier3's LLM was the
-fallback - but tier3 is gone, so nothing claims those rows at all and they
-sit in `needs_attempt`/`stalled` forever. Measured after a full drain:
-**1,165 rows** (857 "doesn't compile", 190 "declined", 118 "blocked by a
-sibling"). `unblock_files.py` now moves rows out of `stalled` too, which is
-the only thing that puts them back in play. Any future tier that declines
-work must leave SOMETHING able to reclaim it.
-
-**E. The queue is saturated; seed QUALITY is the only lever left.**
-Worth stating plainly because it is counter-intuitive and it changes what
-is worth working on. There are 12 permuter slots and ~2,900 seeds waiting:
-the permuter is ~240 deep per slot and **cannot be starved**. Adding seeds
-to that queue buys exactly nothing. Neither does "clearing the backlog to
-feed it" -- the ~2,600 functions in `needs_attempt` are not waiting for CPU,
-they have each been tried and their m2c draft does not COMPILE. That is a
-code problem, not a compute problem, and no scheduling change touches it.
-
-Three scheduling ideas were tried and measured against this, and the
-history is worth keeping because two of them looked obviously right:
-
-  * **Closest-first claiming** (order by `best_score`) fixed a real
-    problem -- 9 of 12 slots were searching seeds scoring 1,495-12,160 --
-    but caused a spin loop: a stalled seed got re-seeded, was immediately
-    the lowest-scoring row again, and was re-claimed at once. 738 launches
-    and 736 stalls in one hour, one match, the same dozen names in the
-    slots across three checks. Fixed by sorting on attempt count FIRST
-    (`escalation_count`, repurposed from retired tier3), closest-first
-    within a round.
-  * **Filling the queue faster** does nothing, per the saturation above.
-  * **Anything that holds the repo lock in a tight loop starves everything
-    else.** `repo_lock` has no fairness. A tool taking it every ~0.5s
-    (score_sweep, a churning tier_m2c) will stall `git commit`, the
-    validator, and tier2's isolation indefinitely. If two lock-heavy things
-    must run, run them sequentially.
-
-**A related trap: don't let two tiers re-derive the same verdict.**
-`score_sweep` wrote "score_sweep: seed does not compile", which tier_m2c did
-not recognise as already-judged, so it re-generated the identical seed for
-the identical verdict -- 1,759 re-tries in 30 minutes for 38 useful
-results, all of it holding the lock. Anything that writes a verdict
-tier_m2c would otherwise re-derive must stamp it with
-`m2c_bridge.ruleset_version()`.
-
-**Where the remaining work actually is:** ~2,400 seeds that do not compile.
-m2c now gets a real `--context` (preprocessed from the project headers),
-which recovered 290 of 2,706 previously-dead seeds (10.7%) and moved the
-near-miss pile (score 1-99) from 6 to 113. It is capped, though: the
-context only knows the ~1,295 symbols the headers declare, while ~5,700
-`sub_XXXXXXX` functions are declared nowhere, so m2c still guesses most
-callee signatures. The compounding fix is to feed the context the
-signatures of functions already matched -- marginal at ~280/5,986 matched,
-worth revisiting around 20-30%.
-
-**F. Throughput collapse is usually a BUG, not a tuning problem.**
-Worth leading with because the instinct - and the previous section's own
-framing - points the other way. Convergence had fallen to **0.6% over 12h**
-against a 15.6% baseline, and 0 matches in the hour it was noticed. Nothing
-about the scheduling was wrong. decomp-permuter was solving functions and
-tier2 was throwing the answers away.
-
-The permuter searches an ISOLATED copy of a function
-(`nonmatchings/<name>/base.c`) carrying m2c's guessed callee prototypes
-above the body. On a win, `trim_source()` spliced only the function text
-back into the real `src/*.c` - cutting exactly at the function, so those
-prototypes never came back with it. The callee was then undeclared, and
-agbcc runs `-Wimplicit -Werror`: the result did not merely score
-differently, **it did not compile**. `already_matches()` returned False,
-tier2 logged "permuter reached score 0 in isolation but the candidate does
-not match in its real source file", and the row went back to `tier2_ready`
-to be searched again from nothing.
-
-Measured when found: **178 distinct functions** had reached score 0 this
-way and only 10 were ever matched, while tier2 spent **1,599 of 2,897
-launches (55%)** over 24h re-searching them. Fixed in `tier2.py`
-(`decl_prefix` / `reattach_decls` / `_prefix_variants`), which reattaches a
-prefix and lets a real asm-differ score choose between variants - nothing
-is promoted without scoring 0 in the real file, and the validator's
-from-scratch gate is untouched. `rescue_isolated_zeros.py` replayed the
-backlog straight off disk: **26 matches recovered with no new search.**
-Matches went 281 -> 294 within half an hour of the fix landing.
-
-**How to notice this class of thing:** compare `t2_launch` count against
-`converged` count per hour, straight out of the events table. If launches
-are healthy and convergence is not, the search is fine and something
-downstream of it is discarding results. Queue depth and worker liveness -
-what `health.py` and the dashboard show - were green through all of it.
-
-Three more real bugs surfaced in the same pass, all of them invisible to
-the dashboard:
-
-  * **`already_matches()` never reverted its splice.** It is a predicate,
-    but scoring requires writing the candidate into the real `src/*.c`,
-    and it left it there. `gitops.commit()` stages `FACTORY_PATHS`, which
-    includes `src/` - so every abandoned splice was swept into whatever
-    match committed next. `Match sub_8163A24` (`1f84d124`) carries edits to
-    **six unrelated source files, 271 insertions and 284 deletions**.
-    Harmless to the ROM (a `#else` branch never builds it) but it makes
-    commit messages lie and can commit non-compiling drafts that re-create
-    the section-D deadlock in a file nobody touched on purpose. Any
-    function that splices to measure something must revert in a `finally`.
-  * **tier2 leaked its `permuting` claims on exit.** It marks rows
-    `permuting` with `worker_id=None` (ownership lives in its in-process
-    `procs` dict), so an abandoned row sits in a state nothing claims from
-    until the supervisor's reaper notices - a **45-minute** window. Two
-    restarts ten minutes apart parked 24 functions behind a single live
-    container. `_cleanup_all()` now hands them back; the reaper stays as
-    the backstop for SIGKILL/crash/power-cut.
-  * **The permuter can solve a different problem than the real file
-    poses.** The isolated `base.c` is built from m2c's *guessed* callee
-    signatures, and a project header can contradict them
-    (`void *sub_8021A18(void *, s32);` vs. the real declaration). Then no
-    prefix can reconcile the two - adding the guess is a conflicting
-    declaration, omitting it is an implicit one. This is the residue the
-    rescue could not recover (10 of ~90 "no compiling prefix", plus several
-    that scored in the thousands in place despite a clean zero in
-    isolation). The real fix is for `permute.py`'s isolation to take
-    declarations from the actual translation unit rather than from m2c's
-    guesses; not attempted yet.
-
-**And a fifth, found by not trusting the rescue's own numbers.** Of the 25
-candidates `rescue_isolated_zeros.py` recovered, only 12 became matches -
-13 were rejected by the validator as "asm-differ said match but
-from-scratch build FAILED". Checking *why* rather than filing them under
-the known backlog found the check itself was broken:
-
-`asm_differ_score()` derived its object stem from `find_guard_block()`,
-which returns `None` once `splice_candidate()` has REMOVED the guard -
-which is precisely the state the validator calls it in. The stem fell back
-to the FUNCTION's own name, so for any function living in someone else's
-file (`sub_8028E14` in `start_battle_8027AC4.c` - the normal case, since
-`split_func.py` appends) it deleted a file that does not exist, while
-asm-differ's `-m` rebuilt the real object with `NONMATCHING=1` and nothing
-removed it. `object_size_matches()` then ran `make <obj>`, Make saw an
-object newer than its source and declined to rebuild, and the size check
-measured the NONMATCHING object - where every `#else` branch was compiled
-instead of the retail `.include`, so the object is a fraction of its real
-size. Reported mismatches like **-4652 bytes** on candidates that were
-fine.
-
-Diagnosed by a test worth reusing: with the tree CLEAN, rebuild the object
-and compare it to `expected/`. All four files checked reproduced
-`expected/` exactly - which ruled out the obvious suspect (a stale
-`expected/`) in one step and pointed at `build/` instead. With the stem
-fixed, the same three functions report `0xC8` / `0x1388` / `0x4D8`,
-unchanged. **17 rows requeued, 14 matched** (`sub_801B034`'s -276 is a
-real length mismatch and stays for a human).
-
-Two process lessons from this, both cheap and both nearly missed:
-  * **A tool's own success number is not the result.** "26 recovered" was
-    26 *promotions*, and 13 of them died at the next gate. Count matches at
-    the terminal state, never at the hand-off.
-  * **A long-running worker holds the code it imported at startup.** The
-    first requeue of those 17 rows failed identically, because the
-    validator process had loaded `gitops.py` at 12:07 and the fix landed at
-    14:15. Restart the worker that owns a fix before re-running work
-    through it - the supervisor restarts children on SIGTERM, so it costs
-    one signal.
-
-**A sixth, which was quietly halving the machine.** `tier2.main()` catches
-an exception from `run_pool()` and calls it again - but `procs` is LOCAL to
-`run_pool()`, so the retry starts with an empty pool and refills to
-`max_functions` while the previous pool's containers are still running,
-owned only by module-level `_active`. Every exception there therefore
-*added* up to 12 concurrent searches instead of replacing them. Measured
-live: **20 permuter containers against a 12-slot pool**, stable across three
-samples 20s apart, no duplicate names, none of them orphans - 20
-genuinely-owned searches, **load average 31 on 6 physical cores**, with
-individual permuters starved down to 31-52% CPU. That is not extra
-throughput; it is the same work done slower. `_cleanup_all()` now runs on
-that path too (killing containers and requeuing their rows); after the fix,
-12 containers and load 11.
-
-Worth knowing how nearly-invisible this was. `podman ps`'s `{{.Command}}`
-column truncates, and `nonmatchings/<name>` sits past the cut - so a
-first pass at the orphan check reported "20 orphans, 0 legitimate" and the
-correct reading (`--no-trunc`) reported the exact opposite. `kill_search()`
-already carries a comment about this same truncation biting it. **Use
-`--no-trunc` for anything that identifies a permuter container.**
-
-**And the reason it took an hour: the logs were lying by omission.** The
-supervisor pointed each child's stdout at a file, so Python block-buffered
-it - `tier2.log` had stopped updating at 13:57 while tier2 was very much
-alive, and the one exception that explains the whole incident sat unflushed
-in a buffer for the entire investigation of it. Children now launch with
-`-u`. A log you cannot read *during* the incident is not a log.
-
-**A measured claim ordering rule: high-score seeds are not worth a slot.**
-Over 1,020 seeds with a recorded asm-differ score, against whether they
-ever reached matched/validating:
-
-| seed score | seeds | converted |
-|---|---|---|
-| 1 - 99 | 43 | **25.6%** |
-| 100 - 499 | 147 | 12.9% |
-| 500 - 1499 | 213 | 3.3% |
-| 1500 - 4999 | 255 | 2.4% |
-| 5000 - 19999 | 135 | 0.7% |
-| 20000+ | 227 | **0.0%** |
-
-227 seeds above 20,000 have been searched and *none* has ever matched,
-while 1,975 of 2,923 queued seeds sit above 5,000 - so attempts-first
-fairness was spending most of the pool on the two bands that convert at
-0.7% and 0.0%. `tier2.SEED_SCORE_CEILING` (5000) is a **ceiling, not an
-exclusion**: those rows stay in `tier2_ready` and the pool takes them the
-moment nothing cheaper is claimable, so it can only reorder work, never
-drop it. A new m2c rule that re-seeds a function lower puts it straight
-back in contention - which is the section-E thesis expressed as a queue
-policy.
-
-**G. What the ~1,547 non-compiling seeds ACTUALLY fail on (measured).**
-"2,400 seeds do not compile" was the headline for a long time without
-anyone asking what the compiler says. Clustered over a random sample of 45,
-compiling with warnings ALLOWED so only genuine errors remain:
-
-| fatal error | share | root cause |
-|---|---|---|
-| `called object is not a function` | 24.4% | unknown callee signature |
-| *(compiles once warnings are allowed)* | 22.2% | `-Werror` only |
-| `void value not ignored as it ought to be` | 13.3% | unknown callee signature |
-| `invalid type argument of ...` | 11.1% | mostly signature/type |
-| `X undeclared` (raw `r1`/`r2`) | 8.9% | m2c could not recover a value |
-| `X redeclared as different kind of symbol` | 6.7% | signature conflicts a header |
-| `too few arguments to function` | 4.4% | unknown callee signature |
-| `syntax error before X` | 4.4% | m2c could not recover |
-
-So roughly **half the pile is one root cause - m2c guessing callee
-signatures** - about **22% is nothing but `-Werror`**, and only ~13% is m2c
-genuinely failing to recover the function.
-
-**Two deterministic levers follow directly, and this is the thesis working
-exactly as intended:**
-
-1. **Extend m2c's `--context` with the signatures of already-matched
-   functions.** This is the "compounding fix" section E parks as "marginal
-   at ~280/5,986, worth revisiting around 20-30%". The measurement says
-   otherwise: the binding constraint *right now* is unknown signatures, at
-   ~50% of the pile, and every function matched makes the context better.
-   The plumbing landed with the review fixes - `ruleset_version()` hashes
-   `include/**/*.h`, so improving the context automatically re-opens all
-   2,702 parked rows instead of leaving them stamped shut.
-2. **A cast-insertion rule for the `-Werror` class.** agbcc's warnings do
-   not change codegen, so a cast added purely to silence a pointer/int
-   conversion is a no-op at the instruction level - safe by construction,
-   and verifiable by comparing the object before and after.
-
-**Method note, because getting this wrong is easy and I did.** The first
-clustering pass keyed on the FIRST diagnostic line and produced a confident
-"69% are pointer/int conversion warnings". Testing that directly - compile
-the same seeds without `-Werror` - showed only **1 of 5** then compiled. The
-warning was a symptom sitting *above* the real error. Cluster on the fatal
-error, and confirm a cluster by acting on it, before believing a share.
-
-**H. Four things that did NOT work on the non-compiling pile, measured.**
-Recorded because each looked obviously right, and re-deriving them costs a
-night. Baseline throughout: a fixed 45-seed sample from the pile, 0 of which
-compile.
-
-1. **Matched-function signatures in m2c's `--context`** - no effect, 0/45
-   twice. The 2,255 failing seeds reference **2,793 distinct `sub_*`
-   callees** and only **2.3%** are matched. Section E's "revisit at 20-30%
-   matched" is if anything optimistic: a seed needs EVERY one of its callees
-   right, and at 9% callee coverage **0 of 49 sampled seeds** had all of
-   theirs known. Kept in the tree (it is correct and free) but it is not the
-   lever.
-2. **Inferring signatures from call sites** (`infer_signatures.py`). The ARM
-   EABI puts the first four arguments in r0-r3, and there are 20,123 call
-   sites, so arity and void-vs-value are readable without any match.
-   Validated at **83.6% arity accuracy** against the 349 known signatures
-   (94.7% at >=8 sites and >=0.8 agreement). End to end it made things
-   **worse**: 139 errors -> **164** across 20 seeds, introducing `too many
-   arguments` (11), `conflicting types` (9) and `previous declaration` (9).
-   At 84% per-callee accuracy the wrong signatures cost more than the right
-   ones gain. Not wired in. Two "improvements" also measured and reverted:
-   widening the scan to the ABI boundary (83.6% -> 70.6%) and
-   max-with-support aggregation (-> 64.1%).
-3. **`void value not ignored as it ought to be` is not a signature problem
-   at all** - and section G's clustering said it was, which was wrong. It is
-   30% of all errors and it is m2c **dereferencing an untyped pointer**:
-   `temp = *(temp_r1 + 0x58 + ...)`, where dereferencing `void *` yields
-   void so the assignment is illegal.
-4. **A typed-dereference cast rule** for (3) clears the error, and on one
-   seed took it to a clean compile. Across the sample it removed only ~7% of
-   errors and produced **0 additional compiles**, because seeds carry several
-   errors each. Worse, the obvious implementation is UNSAFE: a regex on
-   `= *(` also rewrites `*(u8 *)(p + 4)` into `*(s32 *)(u8 *)(p + 4)`,
-   silently turning a 1-byte load into a 4-byte one. Any version of this
-   needs a negative lookahead for an existing cast AND the byte-identical
-   object gate `werror_casts.apply()` already uses.
-
-**What this leaves, and it is the important part.** After the mechanically
-fixable errors are removed, what remains is dominated by m2c failing to
-recover the function at all:
-
-| remaining error | count |
-|---|---|
-| `X undeclared` - raw `r1`/`r2` left in the output | 17 |
-| `called object is not a function` | 11 |
-| `syntax error before X` | 6 |
-
-Those are not missing declarations or missing casts. They are m2c's ARM/Thumb
-backend not managing the function, and **no deterministic rule in this repo
-fixes them.** The honest conclusion is that automated throughput is near its
-ceiling with m2c as it stands: `werror_casts` (section G) is the one lever
-that did pay, adding 211 compiling seeds, and the reachable permuter pool has
-roughly 25 matches left in it. Going further means improving m2c's ARM
-backend upstream, or decompiling by hand - not another scheduling or seeding
-tweak.
-
-**I. THE BIG ONE: every "does not compile" verdict was measured in a
-poisoned translation unit.**
-
-agbcc compiles a whole translation unit, and `split_func.py` appends every
-newly extracted function to an existing `src/*.c` - so one file holds dozens
-of unproven `#else` drafts, and any single broken one fails the object.
-Every compile verdict this project ever recorded was taken that way, in the
-shared tree. An unknown share of them were never about the function being
-judged at all.
-
-Measured: **613 seeds compile perfectly well alone.** On a random 30 of the
-pile it is 16.7%; smallest-first it is much higher (18 of the first 25).
-
-They are not merely mislabelled, they are USABLE - decomp-permuter works on
-an isolated copy too (`ensure_isolated` -> `permute.py` builds
-`nonmatchings/<name>/` with its own single-function `.c`), so the search can
-match them however broken their real file is. **We were declining seeds the
-permuter could have matched.**
-
-    tier2_ready         3,038 -> 3,667
-    needs_attempt       2,384 -> 1,787
-    first-attempt seeds   132 -> 533     <- this is the one that matters
-
-That last line is the difference between plateau and not: the pool had run
-out of first attempts, which is what drove throughput toward zero, and
-**176 of the first 201 matches came from attempt 1**.
-
-`gitops.compiles_in_isolation()` is the check, `tier_m2c` consults it before
-declining, and `reclaim_sibling_blocked.py` was the one-time catch-up.
-Found by chasing the largest remaining error class, "`r1' undeclared", and
-discovering it was not in the function under test at all - it was line 34 of
-a *sibling's* draft. The independent review named this as its central
-finding and it had not been followed up.
-
-**J. m2c did not know two Thumb mnemonics, and it cost 36% of the corpus.**
-`M2C_ERROR(/* unknown instruction: ldsh ... */)`. m2c already implements
-that instruction under its UAL name `ldrsh`; our disassembly uses the
-pre-UAL spelling. A two-line alias. Enumerating every `M2C_ERROR` variant
-across all 5,431 seeds showed three mnemonics accounted for all 8,208
-occurrences: `ldsh` (7,568), `ldsb` (622), `swi` (18) - and nothing else of
-consequence. See "Local m2c patches" above; the long tail really is small.
-
-**Read m2c's error text before theorising.** Both of this session's real
-wins came from that, and every theory-first attempt (section H) failed.
-
-**K. Where the time actually goes - two plausible answers, both wrong.**
-The reclaim sweep ran at 7 rows/min with the factory live and **11/min with
-the machine idle at load 3.7**, so contention was not the cost; and
-`container.sh` returns in **0.096s** because it reuses a warm container, so
-process startup was not it either. The cost is **m2c itself**, ~5s per
-function - CPU-bound and embarrassingly parallel. Six workers: 11/min ->
-**328/min**. Measure the bottleneck; do not reason about it.
-
-A corollary worth acting on, and the maintainer's idea: **the two kinds of
-work want the machine at different times.** Seed repair is m2c-bound and
-parallelises ~30x; search is permuter-bound with 12 fixed slots and near-zero
-marginal value once first attempts run out. Run continuously they throttle
-each other, and repair is what *creates* the work search needs. Alternating
-phases beats running both.
-
-**L. The "LLMs lose to m2c" finding is narrower than it reads.** Every
-variant in that 5-way benchmark was a LOCAL 32B model on a CPU-only box
-(Qwen2.5-Coder-32B, DeepSeek-R1-Distill-32B). It says nothing about frontier
-models - and the Klonoa: Empire of Dreams GBA decomp reached **51%** with
-Claude Code as its primary decompiler, using purpose-built tools (asmlift,
-Transmuter, gba-kit; see also `macabeus/mizuchi`, an ARMv4T/agbcc pipeline
-integrating Claude, m2c, decomp-permuter and objdiff). **We are not the only
-serious GBA matching decomp** - worth knowing before building more tooling
-from scratch. The reason not to take that route here is COST (the
-maintainer is on a Pro plan; ~5,600 functions is not viable), not
-capability. Keep those two reasons separate so the record stays honest.
-
-**M. The plateau was partly a MEASUREMENT failure, again -- this time on
-the promotion path, where it destroys finished work rather than mislabelling
-it.**
-
-Section I found that every "does not compile" verdict had been measured in a
-translation unit full of OTHER functions' broken drafts. The same poisoning
-also defeats the step AFTER a search succeeds, and that is strictly worse: a
-mislabelled seed is still on the queue, but a rejected promotion is a
-finished match thrown in the bin.
-
-The shape of it. decomp-permuter searches an isolated copy and reaches score
-0. tier2 splices the winner into the real `src/*.c` and re-scores. That
-rebuild is `NONMATCHING=1`, which compiles EVERY `#else` in the file -- so
-one bad sibling fails the object, no prefix variant can help, and tier2
-logs "no declaration prefix made it match in its real source file" and
-returns the row to `tier2_ready` to be searched again from nothing. Forever.
-
-Measured when found: **191 functions** had a permuter score-0 sitting unused
-on disk -- 146 back in `tier2_ready`, 25 `stalled`, 20 `needs_human`. Wins
-from *four minutes* before the check were already in the pile, so this was
-live, not a backlog. That is section F's disease with a different vector,
-and it is why `search yield` read 2.4% against a ~15% baseline.
-
-**Three distinct causes, and the first two are invisible to every existing
-tool:**
-
-1. **Truncated drafts (12 files, 68 functions trapped).** A draft cut off
-   mid-expression -- `src/sub_8063118.c` ended a line as
-   `r0 = *(u32*)((u8*)r0 +` followed by `#endif`. An unbalanced brace
-   swallows the rest of the unit, so agbcc reports `syntax error at end of
-   input`, or a syntax error against whichever innocent function follows.
-   **That mis-attribution is why nothing caught it:** `unblock_files.py`
-   blames the guard block containing the reported line, which here is the
-   VICTIM. In 11 of the 12 the culprit was the file's FIRST function -- the
-   signature of a truncated write from the retired LLM tier. Detectable
-   statically by counting delimiters per `#else` body; no compiler needed.
-2. **A prototype contradicting its own definition (4 files).** An earlier
-   draft carries m2c's caller-side guess (`void *sprite_heap_alloc(s32, s32,
-   u32, u16);`) and a later block defines it from its own disassembly
-   (`s8 *sprite_heap_alloc(u8, s32, u8, u16);`). `conflicting types for X`,
-   fatal under `-Werror`, whole unit dead. The definition is the
-   better-informed signature, so the declaration is what moves. Also static
-   -- 4 pairs across ~700 files, found with a regex and no builds.
-3. **Ordinary non-compiling drafts**, which is the bulk, and what
-   `tools/factory/quarantine_broken_drafts.py` now handles: compile under
-   `NONMATCHING=1`, attribute each diagnostic to its guard block, empty only
-   those drafts, repeat up to 4 rounds, and revert the file whole if it
-   still fails. `unblock_files.py` does NOT cover this -- it drafts `#error`
-   placeholders, and that convention was replaced by an empty `#else`, which
-   is already harmless. The remaining case is the opposite: a draft that
-   exists and is wrong.
-
-**Sequencing matters and I got it wrong first.** Running
-`rescue_isolated_zeros.py` before the files compiled produced 1 promotion in
-25 minutes, because it cannot score a candidate in a file that will not
-build -- it was being defeated by the exact bug it was there to clean up
-after. Unblock first, rescue second.
-
-**A cheap check worth keeping:** if a permuter win will not reproduce in its
-real file, compile that file with NO splice at all before believing the
-candidate is at fault. Three of three sampled "the candidate does not match"
-verdicts turned out to be files that could not parse or type-check on their
-own.
-
-**N. THE CORPUS IS ONE PROBLEM, NOT ~5,600 PROBLEMS -- and every factory
-component is a `for function in queue:` loop.**
-
-This section is the answer to "what would a frontier LLM do that the factory
-does not", asked directly and answered by doing it. The result was **361 ->
-491 matched (6.03% -> 8.2%) in one session, +130 functions, with the factory
-STOPPED and zero permuter time.** Not one of those matches came from writing
-better C for a single function. Every one came from looking ACROSS functions,
-which nothing in the pipeline does: m2c decompiles one function,
-decomp-permuter searches one function, the validator validates one function.
-`twins.py` is the only cross-function component and it only fires reactively.
-
-**N.1 -- Four measurement bugs, each silently discarding correct work.**
-Sections F, I and M each found one of these; there were four more. The
-pattern is now overwhelming and deserves to be stated as a law: *in this
-project, when throughput disagrees with effort, suspect the instrument before
-the code.* Every one of these presented as "the candidate is wrong".
-
-  * **`ruleset_version()` was blind to local m2c patches, by construction.**
-    It hashed `git rev-parse HEAD:tools/m2c` -- the RECORDED submodule SHA.
-    This project's m2c changes are applied to the submodule's WORKING TREE
-    and deliberately never committed (see "Local m2c patches"), so that SHA
-    never moves. `tier_m2c._claim()` excludes rows stamped with the current
-    ruleset, so **section J's ldsh/ldsb patch -- the biggest deterministic
-    win this project has had, 36% of the corpus -- re-opened ZERO rows.**
-    Proven, not inferred: 766 `needs_attempt` rows still stored bodies
-    containing `M2C_ERROR(/* unknown instruction: ldsh */)`; regenerating
-    three of them produced 0 errors each. Now hashes the decompiler's source
-    CONTENT. **1,832 rows became claimable again the moment it landed.**
-    Any future "hash the pinned revision" check has this same hole.
-  * **asm-differ is the wrong gate for a whole-function candidate.**
-    `thumb_func_start` emits `.type %function` but no `.size`, so asm-differ
-    cannot tell where a function ends and diffs to the end of the section on
-    both sides. Under `NONMATCHING=1` every sibling with an empty `#else`
-    vanishes from the object, so the retail side runs on into functions the
-    candidate side does not have and the score is dominated by phantom
-    trailing content. **`sub_8060DC4` scored 100,700 while being
-    instruction-for-instruction IDENTICAL to retail.** Gate instead on the
-    object's `.text` bytes PLUS relocations, with the guard removed and a
-    PLAIN build, so both objects hold every function
-    (`twin_backfill._text_image`). Relocations are not optional: `bl target`
-    and `.word target` are placeholder zeroes in the object, so bytes alone
-    call two different callees identical.
-  * **A repair measured in one build mode, gated in the other.** Under
-    `NONMATCHING=1` every sibling's `#else` draft compiles, so a declaration
-    inside one of those drafts is in scope for the whole unit; in a plain
-    build those branches become their retail `.include` and the declaration
-    goes with them. `sub_8064E08` compiled clean under `NONMATCHING=1` and
-    died on an implicit `sub_8082E1C` in the plain build that gated it.
-  * **`expected/` was a day stale**, which is the already-documented failure
-    -- it just is not enough to know about it. Refresh it as a reflex before
-    trusting any score.
-
-**N.2 -- `git checkout --` as a revert DESTROYS uncommitted work, and this
-bit twice in one session.** `rescue_isolated_zeros.py` and
-`gitops.revert_to_clean()` both restore files by checking them out of HEAD.
-Any tool holding uncommitted improvements in the working tree loses them --
-and then re-reports the candidate as "does not compile" for exactly the
-reason the wiped repair had just fixed, which reads as a code problem. Two
-rules follow: a predicate that splices must restore from a **byte snapshot it
-took itself**, not from git; and anything a later gate depends on must be
-**committed before that gate runs**.
-
-**N.3 -- Retroactive twin propagation: +130 matches, no search.**
-`validator.propagate_to_twins()` is REACTIVE -- it fires when a match lands,
-against twins unmatched at that instant. Extraction is continuous, so any
-function extracted after template X matched never received X's propagation
-and never would. Nothing re-ran the sweep.
-
-`tools/factory/twin_backfill.py` sweeps every already-matched function
-against the whole current pool. Matched functions' fragments are deleted by
-step 7 of the workflow, so their assembly is recovered from git history (the
-deleting commit's parent still has it). Measured: **236 unmatched functions
-were shape-identical to an already-matched one**, 200 propagated cleanly, and
-130 validated byte-exact. It is idempotent and compounding -- re-run it after
-any batch of matches. It scores candidates immediately rather than seeding
-`tier2_ready`, because a twin substitution with a provably consistent
-constant map is not a guess that needs a 15-minute stochastic search.
-
-Note `twins.py`'s docstring is badly out of date: it claims "86 unmatched in
-31 groups". Among unmatched functions alone it is now **1,639 in 431 groups
-(29.2% of the pool)**, and the DEDUPLICATION exploit its own docstring
-describes as #1 is still not wired into tier2's claim logic -- one 63-member
-shape group currently gets 63 separate permuter searches.
-
-**N.4 -- Most "does not compile" is a MISSING DECLARATION, not bad C, and
-the fix is choosing the right KIND of declaration.**
-`tools/factory/declare_missing.py`. Of the 99 files owning a twin candidate,
-16 failed to compile untouched, on 19 `X undeclared` plus 13 `implicit
-declaration of function X` -- references that are correct, to targets nobody
-ever declared. Usual origin: section F's splice bug cutting m2c's callee
-prototypes off the top of a candidate.
-
-The classification is the whole trick, and both wrong answers are fatal:
-
-    used as `X(...)`  -> `int X();`        ; declaring it data gives
-                                             "called object is not a function"
-                                             -- section G's largest class, 24.4%
-    used as `&X`      -> `extern s32 X;`   ; declaring it a function makes `&X`
-                                             a function pointer and the
-                                             assignment a type error
-
-**This is why section H's conclusion needs qualifying rather than
-overturning.** H measured *signature inference* at 83.6% arity accuracy and
-found it made things strictly worse (139 errors -> 164), and that stands. But
-"is this symbol a function or data" is a DIFFERENT fact: it is 100% knowable
-from the disassembly for all 6,558 thumb symbols, and choosing it from how
-the file actually uses the symbol is unambiguous. A K&R `int X();` declares
-no parameters, so it can never conflict with a call's argument list -- it
-asserts only the part we are certain of. **Propagate the facts you know
-exactly; do not propagate the ones you can only estimate.**
-
-Watch the scoping detail that cost a full cycle: a guard's `#else` branch
-often already carries the extern m2c emitted above the body, but
-`splice_candidate` DELETES the guard and takes that declaration with it. A
-whole-file substring check sees it, skips the file-scope insert, and the
-validator then fails on precisely that symbol. Check the header region only;
-a repeated identical `extern s32 X;` at file scope is legal C.
-
-**N.4a -- THE BIG ONE: `best_score` was measuring OBJECT LAYOUT, not code
-quality, and it drove the entire work queue.**
-
-Bigger than everything else in this section. `gitops.asm_differ_score()`
-splices into the guard's `#else` and lets asm-differ rebuild with
-`NONMATCHING=1` (diff_settings.py's `make_command`). In that build every
-sibling whose `#else` is the empty "no C attempt yet" placeholder DOES NOT
-EXIST, while `expected/` holds all of them -- and asm-differ `-o` diffs the
-OBJECTS, not the function. Measured: **869 diff lines for one 24-line
-function**, almost all of them target-only rows for functions the candidate
-side was never going to contain.
-
-So the score is largely a function of HOW MANY FUNCTIONS FOLLOW THIS ONE IN
-ITS FILE. Across all 3,251 scored `tier2_ready` rows:
-
-| position in object | n | median score | %>=20000 |
-|---|---|---|---|
-| LAST (nothing follows) | 433 | **1,200** | 0.9% |
-| 1-2 functions after | 597 | 5,250 | 13.1% |
-| 3-10 after | 975 | 16,050 | 46.4% |
-| >10 after | 1,246 | **91,130** | 77.3% |
-
-Same code quality, 76x the score, purely from position.
-
-**Everything built on that number is therefore wrong.** `tier2`'s
-`SEED_SCORE_CEILING` (5000) and its closest-first ordering rank the queue by
-an artifact, systematically starving functions that sit early in a big file
-no matter how close their C is. And section F's conversion table -- "227
-seeds above 20,000 have been searched and none has ever matched", the
-measurement that justified the ceiling -- is measuring POSITION, not
-difficulty. The band does not convert because it never gets a slot.
-
-**The fix is one line of build mode.** Remove the guard
-(`splice_candidate`) and build PLAIN, so both objects contain every function
-and the trailing functions are identical retail bytes on both sides.
-`tools/factory/rescore_seeds.py` does this. Results, all validated through
-the ordinary from-scratch ROM sha1 gate:
-
-    first function tried            stored  84,310  ->  plain      10
-    30 highest-stored seeds         30/30 scored lower, 28 scored exactly 0
-    first 40 promoted               38 validated, 0 rejected
-
-Those 38 were finished matches sitting in `tier2_ready` with scores around
-155,000, in the band this file said never converts.
-
-**What to do about it permanently:** `asm_differ_score()` itself should score
-this way, or `diff_settings.py`'s `make_command` should stop forcing
-`NONMATCHING=1` for scoring. Until then any decision keyed on `best_score`
-(claim order, ceilings, "is this seed worth a slot", conversion statistics)
-is keyed on noise. Note `-s/--stop-at-ret` does NOT fix it -- tried, no
-change, because the problem is object-level diffing, not function bounds.
-
-**N.4b -- `compiles_in_isolation()` rejected known-good C.**
-Control: the committed, byte-exact, ROM-reproducing C of `sub_8060464`,
-`sub_8132DE4` and `sub_809D24C` all returned False. It compiles
-`global.h + common.h + body` under `-Wimplicit -Werror`, and their callees
-and address-taken handlers are declared in their real source FILE, not in a
-header. So it was measuring "does this body reference only header-declared
-symbols". Fixed by synthesising the missing ROM-symbol declarations
-(`gitops.rom_symbol_declarations`).
-
-Scope it honestly, because it is narrower than it first looks: A/B over 40
-seeds showed **no change on m2c output** (15/40 both ways), because m2c emits
-its own callee declarations. It only matters for bodies that do NOT carry
-their own -- committed C, twin candidates, and **permuter output after
-`trim_source()`**, which is exactly section F's bug. Section I's "16.7%"
-therefore stands for m2c seeds.
-
-Also worth keeping: that A/B reconciled a confusing result. A random sample
-across all of `needs_attempt` compiled 0/40, while smallest-first compiled
-15/40 (38%) -- matching section I's "18 of the first 25". Random sampling
-over this pile is dominated by large functions; always say which sampling a
-number came from.
-
-**N.5 -- The measured shape of what remains, which reframes the plateau.**
-Of the seeds still queued when this started: **1,543 scored 20,000+**, a band
-whose own measured conversion rate in this repo is **0.0%**, and **1,612 did
-not compile**. That is ~3,155 functions -- 56% of the remainder -- that the
-permuter cannot reach at any iteration count. The dashboard's "N days at this
-rate" projection silently assumes they are reachable; they are not.
-
-And the type model is the biggest untouched lever. Across the 5,613 unmatched
-fragments, offsets accessed off the first argument: **+0x00 in 1,359
-functions (24.2%), +0x4C in 1,254 (22.3%), +0x08 in 1,229 (21.9%)**. That is
-one dominant struct whose `+0x4C` is a handler function pointer, it is
-defined NOWHERE, and every function re-derives
-`(*(s32 **)((s8 *)(arg0) + (0x4C)))` from scratch as `void *`. Co-occurrence
-with +0x4C cleanly separates it from other structs (with: 0x8, 0x10, 0x14,
-0x18, 0x28, 0x2C, 0x30, 0x38, 0x3C, 0x40, 0x50, 0x58, 0x68, 0x6C; without:
-0x0, 0x2, 0x4, 0x12, 0x70, 0x74, 0x78), and access widths majority-vote at
-high confidence (+0x12 -> u8, 95% over 393 samples; +0x4C -> u32, 100% over
-1,165). Section H's "context does not help" was measured on function
-signatures at 2.3% callee coverage; **one struct definition improves 1,254
-functions at once, and has never been tried.**
-
-**N.6 -- Compiler idioms are recognisable, and m2c does not recognise them.**
-`sub_8135084` is filed under section H's "m2c could not recover the function,
-no deterministic rule fixes them". It is not raw register garbage: m2c
-declares `sp44` and then references `sp48, sp4C ... sp7C`, because it failed to
-see that `sp+0x44` is a 0x44-byte STACK STRUCT and that 16 consecutive
-ldr/str pairs copying `sp+0x44...0x80` into `arg0+0x00...0x3C` are one
-agbcc-expanded **struct assignment** -- one C statement, 32 instructions.
-That class is detectable statically (a contiguous run of stack slots whose
-base is passed to a call; a monotonic ldr/str pair run between two bases).
-Same family, same approach: switch jump tables, inline memcpy,
-division-by-constant reciprocal multiply.
-
-**O. Jump tables: data-as-code, and the one class nothing had ever matched.**
-
-Measured repeatedly and it kept getting worse: **0 of 186 jump-table
-functions had EVER matched**, while the corpus went 8.2% -> 8.8% -> 13.5%.
-The gap widened at every re-check, which is the strongest negative signal in
-the dataset.
-
-The cause is not difficulty. Luvdis stops disassembling at `mov pc, rX`, so
-the jump table AND every case body are dumped as raw `.byte`. m2c saw a
-function that ends at the dispatch and failed with `Unable to determine jump
-table`; the case bodies were invisible to every tool in the repo.
-
-m2c's ARM backend **already supports** these
-(`flow_graph.arm_jtbl_for_ldr`), and m2c's own agbcc fixtures
-(`tests/end_to_end/switch/agbcc-o2.s`) use the identical inline layout this
-ROM has. It needs exactly one shape: the literal pool names a SYMBOL, and
-that symbol labels a run of `.4byte` case targets in `.text`.
-
-`tools/decode_jumptable.py` produces that shape. Result on the 95 fragments
-rewritten so far, **all of which m2c previously refused outright**: 79 now
-emit a real `switch()`, 20 of them completely clean. 13,069 instructions and
-999 switch cases recovered from raw bytes. `--all` reports every candidate,
-`--all --in-place` rewrites them, and it is idempotent.
-
-Four things had to be right, none of them guessable:
-
-  * **The label prefix must be `lbl_`.** It is in m2c's `re_local_label`, so
-    the table does not read as the start of a NEW function, and it is also in
-    flow_graph's jump-table prefix list. With `jtbl_` m2c split the function
-    in two and decompiled the table as its own function.
-  * **Disassemble as `armv4t`, not `arm`.** With plain `arm`, objdump happily
-    emits Thumb-2 and NEON (`vaddl.u q8, d15, d0`, `ldrsb.w`, `stc`) that an
-    ARM7TDMI cannot execute -- a reliable sign it is decoding DATA. Fixing
-    this alone took the verified count 53 -> 96.
-  * **Stop at the first non-Thumb-1 instruction** and leave the rest as raw
-    `.byte`. Raw runs frequently mix trailing data in with the code; decoding
-    conservatively took 96 -> 111 (later 95 under the stricter rule below).
-    Losing code costs a seed; mis-decoding data corrupts the fragment.
-  * **Do NOT rewrite objdump's `[pc, #N]` literal loads into symbolic form.**
-    Tried; it caused 23 new failures and fixed ~5. The rewrite preserves every
-    address exactly, so the offset objdump computed is still correct.
-
-**O.1 -- The verification was weaker than the gate it stood in for, which is
-this project's most repeated bug and I wrote a fresh instance of it.**
-
-Per function the tool assembles both versions and compares `.text` bytes with
-relocations resolved BY HAND -- necessary, because the original bakes
-addresses in as `.byte` constants while the rewrite uses real relocations, so
-comparing before resolution is meaningless. (Linking with `ld --defsym` does
-not work: those symbols look like ARM to the linker, which injects
-interworking veneers the real build never emits. Setting the Thumb bit does
-not help.)
-
-The hole: the resolver fell back to reading a `_0XXXXXXX` label's address out
-of its own NAME. So a case target living in ANOTHER fragment resolved fine
-here and passed byte-identity -- then failed to LINK. The from-scratch build
-caught it (`undefined reference to '_0819B7A8'`, x50). **16 functions were
-dropped for exactly this**, and the tool now refuses any table whose targets
-leave the fragment, up front.
-
-Two rules worth generalising: a verifier that can resolve something the real
-linker cannot is not a verifier; and `rm -rf build/ && make` remains the only
-check that sees cross-object problems at all.
-
-**O.2 -- Rewriting `asm/nonmatching/` does NOT re-open the affected rows.**
-`ruleset_version()` hashes `m2c_bridge.py`, the m2c source, and
-`include/**/*.h` -- deliberately, and correctly, for its own purpose. It does
-not hash the disassembly. So all 95 rewritten functions stayed stamped
-`m2c:<ruleset>: declined` and `tier_m2c._claim()` would have excluded them
-forever, exactly the dead-end class section D describes. They had to be
-requeued explicitly (notes/candidate_body/best_score cleared). **Any future
-tool that changes a fragment's CONTENT must requeue its rows, or the work is
-invisible to the pipeline.**
-
-**Still open here:** 94 candidates are refused rather than guessed at, mostly
-raw runs mixing trailing data, plus a handful whose literal pool is not a
-plain `.4byte 0xADDR`. And **this overturns section H's ceiling claim**: H
-concluded the residual `called object is not a function` / `syntax error`
-errors were m2c backend weakness with "no deterministic rule in this repo
-fixes them". For this class the rule existed and was cheap -- the errors were
-a symptom of feeding a decompiler data-as-code.
-
-**P. The VALIDATOR's own pre-check was scored the broken way too, and it was
-throwing away finished matches by the hundred.**
-
-Section N.4a found that `best_score` measured object layout rather than code
-quality, and fixed the QUEUE that was ranked by it. The same broken
-measurement was still sitting on the PROMOTION path, where it does not
-mis-rank work, it destroys it.
-
-`validator.validate_one()` splices the candidate, removes the guard, then asks
-`gitops.asm_differ_matches()` whether the result is byte-identical. That helper
-rebuilds with `NONMATCHING=1` (diff_settings.py's `make_command`), where every
-sibling still on the empty "no C attempt yet" placeholder DOES NOT EXIST while
-`expected/` holds all of them - and asm-differ `-o` diffs OBJECTS. So the
-verdict was dominated by whatever happens to follow the function in its file.
-
-Measured directly, same candidate, same file:
-
-    sub_80291C8    plain build 0    NONMATCHING build 13,467
-
-Rejected, and sent back to `tier2_ready` to be searched again from nothing.
-The events table says that happened **179 times** for `sub_80291C8` and **172**
-for `sub_8029804` - the two functions CLAUDE.md already cites under Phase 4 as
-"solved-and-discarded". They were not hard. The gate was wrong.
-
-End to end on the first ten functions holding a permuter win on disk, counted
-at the TERMINAL state rather than at promotion: **1 of 10 matched before,
-10 of 10 after.**
-
-The fix is `validator._matches_in_plain_build()`, which scores through
-`rescore_seeds.plain_score()`. `finish_match()` - a from-scratch build plus the
-ROM sha1 - is untouched and remains the real gate, so the change is strictly
-more permissive and can never commit anything unearned. An unreadable verdict
-still falls back to the legacy check.
-
-**Two traps to know, both of which caught me:**
-
-  * **`plain_score()` needs `assume_spliced=True` from the validator.** The
-    validator has ALREADY removed the guard, so plain_score's own
-    `splice_candidate()` finds nothing, returns None, and the helper silently
-    degrades to exactly the check it was replacing. My first attempt at this
-    fix therefore changed nothing - all ten functions were rejected a second
-    time - and it looked like the diagnosis was wrong rather than the wiring.
-    N.4a documents this exact `find_guard_block()`-returns-None-after-splice
-    behaviour; reading it did not stop me reproducing it.
-  * **`rescue_isolated_zeros.winning_source()` falls back to `base.c`.** That
-    is right for `affected()`, where an event already said the base scored 0.
-    In a blind sweep it matches every function that merely has an m2c SEED on
-    disk - 2,413 of them - and replays it as though a search had endorsed it.
-    `--all-on-disk` requires a real `output-*/score.txt` of 0, which is 281.
-
-**The general lesson, now four times over (F, I, M, N, and this):** when
-throughput disagrees with effort in this project, suspect the instrument
-before the code. And note where this one lived - not in the search, not in the
-seeds, but in the check that decides whether finished work counts.
-
-**Q. `needs_human` is a dead-end queue, and most of what was in it had
-already fixed itself.**
-
-Nothing in the factory ever reclaims from `needs_human`. `health.py` says so
-("nothing re-claims needs_human, so these are invisible, not hard"), but the
-consequence had not been drawn: a row filed there keeps its verdict FOREVER,
-while this project fixes things in the shared tree continuously -
-`quarantine_broken_drafts`, `unblock_files`, `declare_missing`, and every
-match that lands in a neighbouring guard all change whether some OTHER
-function's file compiles.
-
-106 rows were filed as "plain-build asm-differ score 0 (very likely correct
-C), but the destination file will not compile with it spliced". Re-checked
-with `tools/factory/recheck_needs_human.py`: **99 of the 106 compiled
-perfectly well.** They were finished, byte-correct functions parked in a queue
-nobody looks at. Requeued to `validating`, and they converted straight through
-`finish_match()`'s from-scratch gate - matched went **809 -> 893** over that
-batch and the harvest running alongside it, with no rejections.
-
-Only **7** still carry the real conflict, and it is section N.4's classification
-problem biting from the other side: `X redeclared as different kind of symbol`,
-where `declare_missing` emitted `extern s32 X;` because the file takes `&X`,
-while the same file also DEFINES X as a function. N.4's rule ("used as `&X` ->
-declare it data") is right for a symbol the file only references and wrong for
-one it defines. The fix is a function declaration plus a cast at the
-address-taken site; agbcc's warnings do not change codegen, so such a cast is
-verifiable byte-identical.
-
-**The 7, resolved 5 of 7.** `tools/factory/fix_decl_conflicts.py` replaces
-`extern s32 X;` with a forward declaration derived from the file's OWN
-definition and casts the address-taken site. Deleting the declaration does not
-work - X is often defined LATER in the file, so the use becomes undeclared.
-Byte-neutral by construction: the linker sets bit 0 of a function pointer from
-the SYMBOL's Thumb type, not from how C declared it (retail for `sub_806021C`
-is `.4byte sub_80603D8` loading `0x080603D9` either way). All 5 matched.
-
-**The remaining 2 were a SECOND shape, now also fixed - and it turned out to
-be the more important one.** There the stale `extern s32 <target>;` is not in
-the candidate at all: it sits at FILE scope, emitted earlier for a sibling that
-takes `&<target>` back when target was still a guard. Repairing it edits the
-file, and that file holds already-MATCHED code (`sub_807991C`). Safe for two
-reasons, both of which must hold: the change is byte-neutral, and
-`finish_match()` re-checks the whole ROM sha1, so a break anywhere in the file
-fails the gate rather than slipping through. Both matched.
-`repair_file_scope()` handles it, and `rescue_isolated_zeros.py` restores the
-file unless the candidate actually wins.
-
-**That second shape was the entire "no compiling prefix" residue of the
-harvest.** Clustered over the sweep's first 37 functions, **10 of 10** such
-failures were this one cause - not section F's "the permuter solved a different
-problem", which is what that verdict had always been read as. With the repair
-wired in, that failure count went to **zero** and `sub_8060694`, which had
-failed twice, matched. All 106 rows of this class are now resolved.
-
-**The general point, and it applies to any terminal state:** a queue nothing
-revisits accumulates stale verdicts at exactly the rate the rest of the system
-improves. Re-check it periodically, or give it an owner. The same argument
-applies to `stalled` and to rows parked behind a ruleset stamp.
-
-**R. N.4a's positional artifact is real, but it is NOT what keeps the
-high-score band out of the queue - those seeds simply do not compile.**
-
-N.4a showed `best_score` tracks position-in-file and concluded that section
-F's "227 seeds above 20,000 have been searched and none has ever matched" was
-measuring position rather than difficulty. Half right, and the other half
-matters more.
-
-Tested directly by re-scoring the above-ceiling band against a plain build,
-worst-first: **148 of 158 returned no score at all** - the candidate does not
-compile - against 10 that scored. And the three highest came back
-`149,300 -> 149,300`, `127,590 -> 127,590`, `104,085 -> 104,085`: IDENTICAL
-under both build modes, i.e. genuinely that far from retail, with no artifact
-involved.
-
-`werror_casts` does not rescue them either; it reports "fails even with
-warnings allowed (a real error, not -Werror)" on the ones sampled. So the
-above-20,000 band is the section G/H non-compiling pile wearing a score, not
-good work that was mis-ranked.
-
-**What this does NOT overturn:** the scoring fix itself. For seeds that DO
-compile the artifact is large and the correction is decisive - the jump-table
-seeds went `78,000 -> 1,365` and `25,800 -> 4,780`, and two that could not be
-scored at all (a broken sibling failed the whole unit under `NONMATCHING=1`)
-scored 2,475 and 5,577 once measured in a plain build. That second effect is
-worth naming separately: **a plain build compiles every sibling as its retail
-`.include`, so translation-unit poisoning cannot affect a measurement taken
-that way.** Section I's whole "compiles in isolation" workaround is
-unnecessary for scoring once this lands.
-
-**The practical rule:** fix scoring at SEED time (`tier_m2c`, done), where it
-decides claim order for compiling candidates. Do not spend the repo lock bulk
-re-scoring the high band - measured at roughly 6% useful, while the factory
-alongside it was converting at 126 matches/hour. Re-scoring is worth it for a
-band you have reason to believe compiles, which is how the jump-table seeds
-were found.
-
-**S. The `+0x4C` struct: measured, tested, and it does NOT do what N.5
-predicted. Also, you cannot add a struct to `include/common.h`.**
-
-N.5 named this the biggest untouched lever: one struct accessed by ~1,254
-unmatched functions, its `+0x4C` a handler function pointer, defined nowhere,
-and "one struct definition improves 1,254 functions at once". It was never
-tried. It has now been tried, and the headline claim is **wrong**.
-
-**What was measured** (`tools/scan_entity.py`, re-derivable): across 4,528
-fragments, 1,177 functions access `arg0+0x4C` and 98% of those accesses are
-word-width. Co-occurrence cleanly separates the struct - `0x60` at 11.9x
-lift over baseline, `0x58` 8.1x, `0x5C` 6.6x, `0x6C` 5.6x - while `0x04` and
-`0x0C` ANTI-correlate at 0.1x, i.e. they belong to something else (they are
-`Process`'s `frames` and `previousProcess`; `struct Process` is only 0x1C
-bytes, so this is a different, larger object). A first pass missed everything
-above 0x7C entirely because Thumb's ldr immediate caps there and larger fields
-arrive via `adds rN, #0xAC` - the struct really runs to at least 0xB4.
-
-**Result 1, the negative one: it does not improve matching.** A/B over the
-seeds that compile both ways: **4 identical scores, 1 worse, 0 better**. That
-is not surprising in hindsight and should have been predicted - m2c already
-emits explicit-width `M2C_FIELD` casts, so `arg0->field_AC = 2` and
-`M2C_FIELD(arg0, s16 *, 0xAC) = 2` compile to the same instructions. A struct
-buys readability, not codegen. **N.5's premise confused "m2c does not know the
-type" with "m2c gets the width wrong". It mostly does not.**
-
-**Result 2, the real one: it fixes the DECLARATION class.** Over 60 functions,
-`extern <type> X;` data-declarations of handlers fell **71 -> 10**, and 58 of
-60 seeds emitted `arg0->handler = sub_X;`. That is the exact root cause of
-"X redeclared as different kind of symbol" - the class behind all 106
-`needs_human` rows in section Q and 10 of 10 sampled "no compiling prefix"
-harvest failures. So the struct attacks a real and expensive problem, just not
-through the score.
-
-**Result 3, the blocker: adding it to `include/common.h` breaks the build.**
-`asm/macros.inc:1: Error: junk at end of line, first unrecognized character is
-'@'` - an error pointing at an innocent file, which is what makes it so
-confusing. Bisected carefully, and none of the obvious suspects is it: not the
-self-referential function pointer, not padding arrays, not the line count (80
-lines of pure comment are fine). What reproduces deterministically is the
-struct's POSITION: identical struct at insertion offset 0 or 5 builds, at 17 or
-30 fails. And the failing OBJECT moves as the tree changes, so a working
-position is not stable - placing it at the top passed the file that failed
-before and then failed a different one. This is agbcc's `-ffix-debug-line`
-debug-info emission, and adding a NEW header (`include/entity.h`) fails the same
-way for the same reason.
-
-**UNBLOCKED 2026-08-23, and the struct is now IN `include/common.h`.** The
-blocker was never the struct -- section T.9 established that `-g` feeds agbcc's
-buggy debug-line emitter, that `-ffix-debug-line` only suppresses most of the
-damage, and that `-g` is byte-neutral for the shipped ROM. The Makefile now
-recompiles any object the assembler rejects without `-g`.
-
-Retested by inserting `struct Entity` at line 30 of `common.h` -- the exact
-position class this section recorded as failing:
-
-    ROM                       mlss.gba: OK
-    macros.inc errors         0
-    objects using -g fallback 5
-    layout                    ok
-
-**The bug still fires -- five times -- and the fallback catches every one.** So
-this is structurally fixed rather than a lucky position, which is what the
-original note said could not be relied on.
-
-The layout is verified rather than asserted: 15 compile-time offset checks
-(negative-size-array trick, since agbcc is C89) covering `sizeof == 0xB4`,
-`handler == 0x4C`, `unk12 == 0x12`, `unk7E == 0x7E`, `unkAC == 0xAC` and the
-rest. Fields are named only where `tools/scan_entity.py` is confident; every
-gap is an explicit `pad` array rather than an invented name.
-
-**What this does and does not buy.** Still no score improvement -- the A/B
-above stands, because m2c emits explicit-width casts that compile identically
-to struct access. What it buys is READABILITY, which is the actual reason to
-want it: `entity->handler` instead of `(*(s32 **)((s8 *)(arg0) + (0x4C)))`,
-across the 980 functions that touch that field. That is the gate on any
-"make the decompiled C human-readable" work, and it is now open.
-
-**If someone wants to revisit it**, the tractable route is not the header. It is
-to make `m2c_bridge` inline the struct definition into each generated seed the
-way it already expands the `M2C_*` macros, so nothing in `include/` changes at
-all. That was not attempted.
-
-**T. Four more instrument failures, and two clean negatives. 2026-08-22.**
-
-Found by auditing the toolchain rather than the code. Full plan and evidence:
-`docs/plan-2026-08-22-toolchain-overhaul.md`.
-
-**First, the attribution that should frame everything below.** Matched rows by
-`candidate_source`, straight from the live DB (n=1,156): `rescore` 415,
-`permuter` 278, `m2c` 186, `twin` 130, `tier2` 101, unattributed 46. **47% of
-every match this project has ever made came from `rescore` + `twin`** -- from
-repairing a measurement and propagating across functions, with zero new search.
-64% came from something other than the permuter finding an answer. On 08-23 the
-factory logged 199 `t2_launch` events and 233 matches: more matches than
-searches. The producing machinery is not the search.
-
-**T.1 -- a row PROMOTED to tier2_ready could never be re-seeded, forever.**
-`tier_m2c._claim()` read `needs_attempt`, then `stalled`, and nothing else. So
-the instant a row was seeded and promoted, its `candidate_body` froze for life,
-however much the seeder improved afterwards. That is section D's law ("any tier
-that declines work must leave SOMETHING able to reclaim it") stated for the
-PROMOTE path, and it cost more than the decline case did:
-
-  * **1,639 rows** still stored a body containing `M2C_ERROR` -- 6,905 `ldsh`
-    and 592 `ldsb`, i.e. exactly what section J's patch fixed.
-  * **863 of them sat in `tier2_ready`**, being fed to the permuter as though
-    they were candidates.
-  * **596 permuter launches (9.4% of all 6,335)** had already been spent
-    searching code that cannot compile.
-
-Section J's patch is applied and working (`arch_arm.py:137`); section N.1's
-`ruleset_version()` fix is in place. Neither could reach a row that had already
-moved on. The smallest case was a three-instruction function parked at score
-210 whose current m2c output is a one-liner.
-
-Fixed: seeds carry the ruleset that produced them (new `seed_ruleset` column),
-and `tier_m2c` reclaims a promoted row whose stamp is stale -- LAST in its claim
-order, so it can never starve a first attempt.
-`tools/factory/requeue_stale_seeds.py` was the one-time catch-up: 1,624 rows
-requeued, `M2C_ERROR` bodies **1,639 -> 5** (the residual `swi` BIOS veneers m2c
-genuinely cannot translate).
-
-**T.2 -- 407 functions are declared as DATA at file scope in the very file that
-would define them, and it only breaks AT SPLICE TIME.** `declare_missing` emits
-`extern s32 X;` when a SIBLING takes `&X` (N.4's rule, correct for a symbol the
-file only references). Then X's own candidate arrives and defines X as a
-function.
-
-The conflict does not exist in the tree at rest -- while the guard is in place
-there is no definition -- which is why a static scan finds nothing and
-`fix_decl_conflicts.py` reported `0/0 repaired`. It materialises exactly when
-the validator splices to measure. agbcc says ``sub_806C8C0' redeclared as
-different kind of symbol``, the WHOLE object fails to build, asm-differ has
-nothing to score, and a byte-exact candidate is filed as "wasn't
-byte-identical" and sent back to be searched again from nothing.
-
-Proven, not inferred: `sub_806C8C0`'s stored candidate compiles
-**instruction-for-instruction identical to retail**, and it had been rejected on
-every attempt. `splice_candidate()` now applies
-`fix_decl_conflicts.repair_file_scope`, so every consumer (validator,
-`plain_score`, rescue) gets it. `sub_806C8C0` matched through the real
-from-scratch gate immediately afterwards.
-
-**T.3 -- `supervisor.py` ran `git checkout -- .` REPO-WIDE on every start.**
-Its comment argued that anything uncommitted is in-flight factory work that was
-going to be redone anyway. That is true of `asm/` and `src/` and false of
-`tools/`, `docs/`, and CLAUDE.md itself. **Caught live: the T.1 and T.2 fixes
-above were destroyed by restarting the factory to load them.** N.2 records this
-exact failure mode and the fix was applied to `gitops.revert_to_clean()` -- but
-the supervisor kept its own unscoped copy, so the landmine was only half
-removed. Now scoped to `FACTORY_PATHS`.
-
-Two habits follow, both already in N.2 and both worth repeating because they
-were not enough on their own: commit a fix BEFORE restarting the thing that
-loads it, and grep for every copy of a pattern you fix, not just the one that
-bit you.
-
-**T.4 -- the promotion path applies `declare_missing` but never
-`werror_casts`, and the order matters.** Chasing why six more byte-exact
-candidates still failed: after the T.2 repair they hit a DIFFERENT blocker, a
-sibling defined later in the same file with no forward declaration
-(``sub_805DEB4' undeclared`` / `used prior to declaration`). `declare_missing`
-fixes that correctly on its own -- and what remains is then only a WARNING,
-`assignment from incompatible pointer type`, fatal solely under `-Werror`.
-That is section G's "-Werror only" class, ~22% of the non-compiling pile, and
-`werror_casts.py` exists for it.
-
-But `werror_casts.apply()` bailed with "fails even with warnings allowed (a
-real error, not -Werror)" -- because it spliced and compiled BEFORE
-`declare_missing` had run, so the hard error was still there. Same shape as
-section M's sequencing lesson ("unblock first, rescue second"): a repair that
-runs before its prerequisite measures the PREREQUISITE's failure and blames the
-thing it was asked to fix.
-
-**FIXED, and it took three passes because there are four distinct shapes of
-this conflict, not one.** Worth listing, because each one was hiding behind the
-last and each was individually invisible:
-
-  1. `extern s32 <target>;` at FILE scope, target defined by the candidate.
-     `repair_file_scope` -- wired into `splice_candidate` (T.2).
-  2. `extern s32 X;` at FILE scope for a THIRD-PARTY symbol the candidate
-     calls. `repair_file_third_party` -- already existed.
-  3. **`extern s32 X;` inside the CANDIDATE**, for a symbol the destination
-     file DEFINES as a function (m2c declares a symbol data whenever the body
-     takes its address). `fix_decl_conflicts.repair()` already implemented this
-     exactly -- and was only ever called from `rescue_isolated_zeros.py`, so
-     nothing on the seed or validator path benefited. Now applied in BOTH
-     splice primitives.
-  4. Shape 1 again, but on the `splice_into_else` path. Under `NONMATCHING=1`
-     the `#else` branch IS the definition, so the same file-scope collision
-     happens with the guard still in place. Fixing only `splice_candidate` left
-     every `#else`-path consumer -- `werror_casts` among them -- still broken.
-
-Result on the six byte-exact candidates parked in `needs_human`: 0 -> 2 -> 5
-reporting "clean under -Werror, object byte-identical" as each shape was
-covered. **All five routed and matched.**
-
-**The generalisable rule:** any tool that PREDICTS what a splice will do must
-apply the same transformations the splice does, or it under-reports.
-`recheck_needs_human.py` was doing a raw guard-block substitution and clustering
-four rows under "X redeclared" that the real path now fixes; simulating the
-repairs turned those into requeues.
-
-**T.16 -- the project DOES compound, but not through the mechanism section E
-predicted, and E's threshold was keyed on the wrong variable.**
-
-Section E parks "feed m2c's `--context` the signatures of functions already
-matched" as marginal at ~280/5,986 and "worth revisiting around 20-30%
-matched". Section H.1 then measured it at that time and found nothing: 0/45
-twice, because only 2.3% of the callees referenced by failing seeds were
-matched.
-
-Re-measured at **1,555 matched (25.6%)**, i.e. inside E's own window:
-
-| | section H | now |
-|---|---:|---:|
-| matched functions | ~280 | 1,555 |
-| callee coverage in failing seeds | 2.3% | **7.6%** |
-| seeds where EVERY callee is matched | 0 of 49 | **0 of 708** |
-
-Coverage more than tripled -- the compounding is real -- and the lever is still
-dead, because **a seed needs ALL of its callees known, not some**. At 7.6%, a
-seed with two callees has about a 0.6% chance of full coverage and one with
-three about 0.04%. The threshold is roughly **50% CALLEE coverage**, which is
-not the same thing as 50% of the corpus matched.
-
-And callee coverage LAGS the headline number badly -- 7.6% against 25.6% --
-because callees are a biased sample: a heavily-called function tends to be one
-of the big hard ones still outstanding. So the gap will close more slowly than
-the match count suggests. **Do not re-try the context lever on the strength of
-the headline percentage; measure callee coverage directly** (the query is in
-this section's commit).
-
-**What DOES compound, and is delivering right now: twin propagation.** Every
-match is a solved TEMPLATE, and structural twins take its C for free. Measured
-over one 2h window at this point in the project: twin 26, m2c 26, tier2 15 --
-so roughly a quarter of live production is matches producing further matches.
-That, not the context lever, is the compounding effect this project actually
-has.
-
-**Working against both: pool depletion.** The easy functions go first, so the
-residue is harder by construction and yield falls even when nothing regresses.
-Any "days to completion" figure derived from a current rate is a best case.
-
-**T.15 -- a broken measurement in this project ALWAYS fails toward "this work
-is bad". That is why they survive.**
-
-Four instrument bugs were written and caught in a single day, all in new tools,
-all by the author of the tools:
-
-  * a verdict stated from ZERO observations (`compiler_variants` printed "the
-    hypothesis does NOT hold" after measuring nothing)
-  * a diagnostic filter that dropped the evidence (`grep 'rror'` misses agbcc's
-    real messages, which read ``X' undeclared`` with no "error" in the line)
-  * clustering on the TAIL of a multi-line diagnostic, making "for each
-    function it appears in.)" the largest error class, 102 of 335
-  * a placeholder collision -- substituting flags for the bare word `STRICT`
-    also rewrote the success marker in `echo "$n STRICT_OK"`, so every clean
-    compile became an unparseable line and **151 of 399 candidates were counted
-    as failures while the tool reported "100% a genuine error"**
-
-Plus one in the harness they all share: the context was PRE-PREPROCESSED, so
-its macros were gone, and a body referencing `NULL` failed as an undeclared
-identifier. That was another 104 of 335.
-
-**The pattern is not that measurement is hard. It is directional.** Every one
-of these -- and every one of sections F, I, M, N.4a, P, Q, T.2, T.4, T.14 --
-failed the same way: work that was fine got reported as broken. None of them
-ever produced a false MATCH, because the from-scratch ROM sha1 gate makes that
+All three are read-only and safe against a live factory:
+
+- `python3 tools/factory/dashboard.py` — live view. `--once` for a snapshot.
+- `python3 tools/factory/health.py` — asserts invariants, reports violations.
+  **Known blind spot:** it was fully green through a total collapse, because
+  queue depth and worker liveness were fine while results were being discarded.
+  The check that catches that class is `t2_launch` vs `converged` per hour out
+  of the events table.
+- `./container.sh tools/check_layout.py` — asserts ROM layout hasn't shifted,
+  straight from `mlss.map`. **Run this first whenever `make` says `FAILED`**,
+  or whenever `needs_human`/`stalled` spikes: one bad extraction makes every
+  match fail to validate and looks like a pipeline problem.
+
+## THE LAW
+
+> **When throughput disagrees with effort in this project, suspect the
+> instrument before the code.**
+
+This is the single most important thing in this file. **Eighteen separate
+instances** have been found and fixed. Every one failed in the same direction:
+**correct, finished work reported as broken.** None ever produced a false
+*match*, because `finish_match()`'s from-scratch build + ROM sha1 makes that
 impossible.
 
-So the errors are invisible by construction. A false negative looks exactly
-like a hard function, and this corpus has thousands of genuinely hard
-functions to hide among. That asymmetry, not carelessness, is why fourteen
-sections of this file are the same bug.
-
-**The fifth instance, and the one worth copying.** `compiler_variants.stage()`
-required every row to have its own `asm/nonmatching/<name>.s` and silently
-skipped any that did not. Correct for tools measuring real functions, wrong for
-every tool measuring VARIANTS of one -- `extern_lever` staging `sub_X__EXT`,
-`fix_bare_deref` staging `sub_X__u8`...`__s32`. Those names have no fragment, so
-their `body.c` was never written, and the tools reported a verdict on data they
-never had: "29 of 30 does not compile", then "nothing measured" twice.
-
-Fixed structurally rather than per-caller. `stage()` takes `frag_owner`, mapping
-a row to the function whose retail fragment it is measured against, so every
-staged row gets its own `<row>.frag.s` and callers compare
-`<row>.agbcc.bin` to `<row>.retail.bin` uniformly. And it now RAISES
-`StagingError` naming what it could not stage instead of returning a short list.
-**A tool that cannot stage its input should stop, not answer.**
-
-**Two habits follow, and they are cheap:**
-
-1. **Every measurement tool must refuse to answer when it cannot.** Not "return
-   a default" -- refuse, loudly, naming what was missing. `isolation_exact`,
-   `compiler_variants`, `agbcc_ab` and `search_yield` all now do this, and
-   `search_yield` additionally refuses to quote a rate below 100 launches
-   because 1-in-32 is noise wearing a decimal point.
-2. **When a tool reports that most of the corpus is bad, suspect the tool
-   first.** "100% a genuine error" and "0/30 does not compile" were both the
-   instrument. The prior should be that this codebase is mostly fine and
-   mostly mismeasured, because that is what fourteen sections of evidence say.
-
-**T.14 -- section P's bug was in TWO promotion paths; P fixed one. The
-re-ranking is what made the other visible.**
-
-`tier2.already_matches()` spliced the candidate into the `#else` branch and
-called `gitops.asm_differ_matches()`, which rebuilds with `NONMATCHING=1` and
-diffs OBJECTS -- precisely the verdict section P proved worthless (same
-candidate: 0 in a plain build, 13,467 under `NONMATCHING`). P fixed
-`validator.validate_one()` and stopped.
-
-But a permuter win reaches `tier2` FIRST. If this check says no, the row is
-filed *"permuter reached score 0 in isolation but no declaration prefix made it
-match in its real source file"* and sent back to be searched again from
-nothing. Section Q reported that failure count driven to zero -- it was only
-ever driven to zero for the validator.
-
-Measured, scoring the permuter's ACTUAL winning output (from
-`nonmatchings/<name>/output-*/source.c`, not the stored seed) in a plain build:
-
-    sub_806EADC   plain_score  0   -- MATCHES, filed as a failure
-    sub_80DC638   plain_score  0   -- MATCHES, filed as a failure
-    sub_809CA24   plain_score 60   -- genuinely does not
-    sub_80DDA78   plain_score 60   -- genuinely does not
-
-**Two of four sampled were finished work thrown away.** Fixed to score in a
-plain build, falling back to the legacy check only when `plain_score` returns
-no verdict -- never silently answering "no".
-
-**The part worth generalising: fixing the ranking is what exposed this.**
-Before T.13 the pool spent its slots on functions far from retail, which rarely
-reach score 0, so the broken promotion check almost never fired. Feeding it
-near-misses made a latent downstream bug produce 12 losses in two hours. *When
-you remove a bottleneck, re-audit everything downstream of it immediately* --
-the new load exercises paths the old one never reached.
-
-Independent confirmation from `audit_instruments.py` the same morning:
-**12/12 sampled stored scores differ by more than 50% from a plain-build
-re-score.** Not a sample with some noise in it -- every single one.
-
-**T.13 -- the permuter queue is now ranked by isolation distance, and the old
-ranking was starving near-certain matches.**
-
-N.4a established that `best_score` measures position-in-file more than code
-quality. What had not been drawn from that: with ~2,600 rows queued against 12
-slots, **claim order is one of the highest-leverage things in the factory**,
-and it was keyed on that artifact.
-
-`isolation_exact.py` already produces the artifact-free number at ~1,900/min --
-byte distance with the function compiled ALONE, so no translation unit to
-poison and no trailing content to diff. Recorded as a separate `iso_score`
-column (different scale from `best_score`; keeping them apart matters).
-
-Measured over 2,316 rows, the two agree only broadly -- **Spearman 0.717** --
-and they disagree exactly in the tail that decides scheduling:
-
-    247 candidates sit within 16 bytes of retail
-     72 of those the old ordering could not see or actively buried
-
-    sub_8065310    6 bytes from retail    best_score  94,430
-    sub_806CB3C    7 bytes from retail    best_score 100,225
-
-Both are above `SEED_SCORE_CEILING`, so they were claimed only when nothing
-cheaper existed. `tier2` now ranks AND admits on `iso_score` when a row has
-one, ignoring `best_score` entirely, falling back to the old behaviour when it
-does not. Still a ceiling, not an exclusion.
-
-Immediately visible: the pool went from searching whatever happened to sit last
-in its file to searching iso 2, 2, 6, 7, 20, 20, 20, 20, 21, 24, 24, 24.
-`tier_m2c` clears `iso_score` at all three seed-write sites, so a re-seeded row
-can never be ranked on a measurement of a body it no longer has.
-
-**This is most of what Phase 1 of the toolchain plan wanted, at a fraction of
-the cost.** The plan called for regenerating `expected/` from the ROM and
-scoring per-symbol with objdiff; measuring one symbol alone gets the same
-artifact-free number without touching the build. The remaining Phase 1 benefit
--- a trustworthy score on the PROMOTION path -- is already handled by
-`_matches_in_plain_build` plus the from-scratch gate.
-
-**Re-run `isolation_exact.py --apply` after any batch of seed repairs.** It now
-does double duty: harvests finished work AND refreshes the ranking.
-
-**T.12 -- the jump-table class was blocked by ONE line of label emission, and
-the error message pointed at the wrong problem.** Section O left it at 181
-candidates and **zero** rewritable. It is now **49**, recovering **6,637
-instructions and 654 switch cases** from raw bytes.
-
-These are the highest-value functions available, because m2c refuses them
-OUTRIGHT ("Unable to determine jump table") -- they have no seed at all, so
-nothing downstream can touch them. 13 of 20 sampled now emit a real `switch()`.
-
-The cause: `code_prefix()` stops decoding at the first non-Thumb-1 instruction
-and leaves the rest as raw `.byte`, but the switch still branches in there.
-Those addresses were in the label set (every table entry is) while nothing ever
-DEFINED them, so the rewrite emitted a `.4byte _0805396E` reference against a
-label that did not exist. The assembler then said
-
-    unresolved symbol '_0805396E' (not defined in this fragment)
-
-which reads exactly like a cross-fragment target -- precisely what section
-O.1's guardrail refuses on sight. **It is not cross-fragment.** For
-`bclr_update_8053778` the "missing" `_0805396E` sits 502 bytes into its own
-1,338-byte fragment. **74 of the 84 refusals were this.**
-
-Fix: split each leftover raw run at every referenced address and emit a label
-there. Labels emit no bytes, so it is neutral by construction; the tool's own
-byte-identity check and a from-scratch build both confirm it (`mlss.gba: OK`,
-layout clean). All 49 rows were requeued explicitly, per O.2 -- changing a
-fragment's CONTENT leaves its rows stamped shut otherwise.
-
-**The recurring shape, now six times in one session:** a diagnostic that is
-accurate about what it measured and wrong about what it blames. "Unresolved
-symbol" was true; "therefore the target is outside the fragment" was not.
-Before trusting an error message's implied cause, check the cause directly --
-here that was one arithmetic comparison between an address and a range.
-
-Remaining in this class: 29 assemble failures and 10 byte-differs. **A second
-attempt at those gained nothing, and the attempt is worth recording so it is
-not repeated.** After the leftover-splitting fix the dominant assemble failure
-became `symbol '_080F36E4' is already defined` (2 -> 14), because a generated
-leftover-cut can name an address the fragment already labels. Two corrections
-were tried:
-
-  * define each label once (guarded emitter, pre-seeded with the labels on
-    verbatim-copied lines)
-  * emit pre-table leftovers BEFORE the table, in address order, rather than
-    after the tail
-
-Both are correct in themselves. Neither made a single additional function
-rewritable: refusals went from 29 assemble + 10 byte-differ to 15 assemble +
-24 byte-differ -- the same total, with hard failures converted into silent
-byte differences. **Reverted**, on the grounds that shipping extra complexity
-for a measured gain of zero is a bad trade even when each piece is defensible.
-
-What that tells you about the residue: for these functions the duplicate label
-is a SYMPTOM, not the cause. The same address genuinely appears at two output
-positions, so suppressing one definition leaves the layout wrong and the byte
-check refuses it either way. Fixing them needs the region/`code_prefix`
-boundary logic to be right, not the label emission.
-
-**T.10 -- CLEAN NEGATIVE: Klonoa's highest-value lever needs ROM symbols we do
-not have.** Their `agbcc-source-shape-levers.md` puts "a named `extern` is not
-the same as a cast address constant" first -- numerically identical, compiled
-differently, 20-29 points across four of their functions. 561 of our candidate
-bodies carry a raw `0x08xxxxxx` constant, so a `perm_symbol_vs_constant` pass
-looked like the obvious next thing to write.
-
-Counted before writing it. `tools/symbols/rom.txt` holds **56 symbols total**.
-Unmatched seeds contain **1,863 raw ROM-address constants, 684 distinct**, of
-which **60 (3.2%), covering 16 distinct addresses**, have a name. A pass that
-swaps a constant for a symbol has almost nothing to swap to.
-
-**The prerequisite is naming ROM data, not writing the pass** -- which is
-Klonoa's own corollary ("if a table only exists as a `#define ADDR 0x...`,
-promoting it to a real `extern` object plus a linker-script line is often the
-whole match"). Route: the Phase 4 data work already described above
-(`find_pointer_tables.py`, `map_raw_regions.py`), plus minting symbols for
-those 684 addresses -- `--just-symbols=symbols.txt` resolves them, and the
-`room_props_table` renames already proved that mechanism works.
-
-That is now the third time in one session a corpus census killed a plausible
-permuter pass before it was built (bitfields 0/3,124, arrays 1/3,124, this
-3.2%). **Measure the corpus before writing a mutation for it.**
-
-**T.11 -- the extern lever is REAL here but not decisive: 5% closer, 0 matches.
-Measured, not assumed.** `tools/factory/extern_lever.py`.
-
-T.10 said the lever could not be applied because only 3.2% of the referenced
-addresses have names. The obvious next move is to mint the other 684 -- so
-before doing that, this measures whether the lever would pay if we did.
-
-**Minting is safe by construction**, which is the part worth keeping: we do NOT
-need to know where the underlying data object starts or how big it is, only
-that the symbol resolves to exactly the address the code already loads -- true
-by definition, because the address is taken FROM the load. 81% of these point
-into the 14MB `rodata081E2764` blob that has never been split, and that does
-not matter. The element type comes free too: m2c already emits the access width
-at each site, so `extern u8 X[];` vs `extern s32 X[];` is read off the seed.
-
-Over 250 candidates, 201 measurable, comparing the stored body against a
-minted-extern rewrite of the same body:
-
-| outcome | n |
-|---|---:|
-| identical | 187 |
-| **extern CLOSER** | **11** |
-| extern worse | 3 |
-| neither compiles | 49 |
-
-**Nothing reached 0.** The best was `sub_8021EA8` at 36 -> 4, then
-`init_heap` 243 -> 216 and `sub_819A9DC` 125 -> 100; most of the rest moved by
-1-5 bytes. So on this corpus the lever is worth roughly 5% "closer" and zero
-direct matches -- materially weaker than Klonoa, where it was "often the whole
-match."
-
-The reason is the same corpus-shape difference that killed the bitfield and
-array passes: Klonoa's wins are on data tables INDEXED IN LOOPS, where a
-symbol_ref survives in a callee-saved register and a CONST_INT gets
-strength-reduced. Our m2c seeds mostly STORE an address or do a single deref,
-which gives agbcc nothing to strength-reduce either way.
-
-**What it is actually good for.** 36 -> 4 is a near-match, and a permuter
-search starting from 4 converges far more readily than one starting from 36. So
-the lever belongs as a **seed improvement feeding the search**, applied per
-function ONLY where it measurably helps -- which is cheap, because
-`isolation_exact`-style measurement costs milliseconds. Minting all 684 symbols
-up front, on the other hand, is not justified by this measurement.
-
-**The measurement trap it had to avoid, and did not at first.** Retail bakes
-the address into the literal pool as a plain word with no relocation, while an
-`extern` emits `.word symbol` plus `R_ARM_ABS32` -- so the object's bytes there
-are ZERO and the address lives in the relocation. Comparing without resolving
-relocations reports the lever as harmful in every single case. And the first
-run DID report 29/30 "does not compile", which was the staging code silently
-dropping every rewritten twin, not a result. Both were caught only because the
-numbers were too clean. See T.7.
-
-**T.9 -- `declare_missing` can turn a fixable `-Werror` warning into an
-UNFIXABLE assembler error, and it is section S wearing different clothes.**
-
-Section S records that adding a struct to `include/common.h` breaks the build
-with `asm/macros.inc:1: Error: junk at end of line, first unrecognized
-character is '@'` -- an error naming a file that is untouched and correct --
-and that the trigger is the struct's POSITION, with no stable position.
-
-**It is not limited to structs, and not limited to headers.** Adding ordinary
-declaration LINES to a `src/*.c` does it too. Measured on `sub_8106928`, A/B
-under the repo lock:
-
-    A) splice only                       -> 3x `implicit declaration of ...`
-                                            (a -Werror warning; fixable)
-    B) splice + declare_missing's 3 lines -> the C compiles CLEANLY, and the
-                                            ASSEMBLER dies with
-                                            asm/macros.inc:1: junk at end of line
-
-So `declare_missing` did its job correctly -- and converted a tractable
-problem into an intractable one. That is why 27 of the 61 candidates left
-after the batch drain report "clean under -Werror, object byte-identical" from
-`werror_casts` (which measures in a `NONMATCHING=1` build) while the plain
-build rejects them: N.1's "a repair measured in one build mode, gated in the
-other", stacked on top of an agbcc codegen bug.
-
-Tried and did NOT work: appending the declarations to an existing line so the
-file's line COUNT is unchanged. Picking that line automatically is the hard
-part -- the obvious heuristics land on a preprocessor directive (`extra tokens
-at end of '#include'`) or inside a function body (declarations end up in the
-wrong scope). Not pursued further; recorded so the next attempt starts past
-these two.
-
-**What this means practically:** for some files there is currently no way to
-declare what a spliced candidate references. Those candidates are correct C
-that this toolchain cannot build. They are NOT permuter work and NOT seed
-quality problems, and any sweep that files them as "does not compile" is
-mislabelling them.
-
-**CORRECTION, tested rather than assumed: `-ffix-debug-line` is NOT the
-villain, and dropping it makes things WORSE.** The obvious fix -- and what an
-earlier version of this entry proposed -- is to stop emitting the flag for the
-affected object. Measured with three from-scratch ROM builds under the repo
-lock:
-
-    A) normal flags                    -> mlss.gba: OK
-    B) CFLAGS without -ffix-debug-line  -> asm/macros.inc:1: junk at end of
-                                           line, on build/src/sub_801B748.o
-    C) normal flags again              -> restored
-
-So the flag is doing exactly what the Makefile comment says it does ("fixes
-debug lines so they are emitted properly"): it SUPPRESSES this failure in the
-general case, and removing it re-introduces the identical error on a different
-object. Section S's framing -- and T.9's own first draft -- treated the flag as
-the trigger. It is a partial fix for a deeper agbcc debug-line bug, and the
-`declare_missing` case is one the fix does not cover.
-
-**RESOLVED. `-g` is the trigger, and it is byte-neutral, so the fix is a
-per-object fallback.** Measured, in this order:
-
-    the blocked object, without -g          -> compiles clean
-    .text + relocs, 8 files, with vs no -g  -> 8/8 IDENTICAL
-    whole ROM, CFLAGS lacking -g            -> mlss.gba: OK, layout clean
-
-So the chain is: agbcc's debug-line emission is buggy; `-ffix-debug-line`
-suppresses it for most inputs (which is why removing that flag makes MORE
-objects fail); the `declare_missing` case is one it does not cover; and `-g`
-itself is what feeds the emitter.
-
-The Makefile now compiles normally and, **only if the assembler rejects the
-generated `.s`**, recompiles that one object with `CFLAGS_NODEBUG`
-(`$(filter-out -g,$(CFLAGS))`) and re-assembles, printing a note naming the
-object. It cannot change output -- byte-neutrality was proven at ROM level,
-not merely per object -- and it triggers on nothing that already works.
-Verified end to end: the previously-unbuildable `sub_8106840` builds with the
-note, and a full from-scratch build still reports `mlss.gba: OK` with a clean
-layout.
-
-**Why this matters beyond the rows it unblocks:** the class was
-`declare_missing` CORRECTLY fixing a `-Werror` warning and thereby converting
-a tractable problem into an unbuildable one. Every future candidate needing a
-declaration in an affected file was hitting the same wall silently, and being
-filed as "candidate doesn't compile".
-
-**T.8 -- measuring ONE SYMBOL ALONE finds finished work by the hundred, in
-seconds.** `tools/factory/isolation_exact.py`.
-
-The whole recurring bug family (D, I, M, N.4a, P, T.2, T.4) shares one cause:
-verdicts are taken by building the candidate inside its real translation unit
-and diffing whole OBJECTS. Measuring the function alone removes both halves --
-there is no unit to poison and no trailing content to diff against:
-
-    retail    = assemble asm/nonmatching/<name>.s              -> .text + relocs
-    candidate = preprocessed context + candidate_body -> agbcc -> .text + relocs
-
-Equal is not a score, it is an answer. Relocations are compared alongside the
-bytes for the reason `twin_backfill._text_image` documents.
-
-Swept the entire claimable pool: **2,097 candidates measured in 63 seconds
-(~2,000/min), of which 205 (9.8%) are byte-exact** -- finished functions
-sitting in `tier2_ready`, `stalled` and `needs_human`. The first 58 tried by
-hand had included `sub_806C8C0`, instruction-for-instruction identical to
-retail and rejected on every previous attempt.
-
-**It routes, it never promotes.** Byte-exact in isolation does not prove a
-match in the real file: agbcc couples codegen across a translation unit, and
-the Klonoa decomp measured a byte-identical edit changing a DIFFERENT function
-1,833 lines further down the same `.c`. `finish_match()`'s from-scratch build
-plus ROM sha1 remains the only verdict. Re-run it after any batch of seed
-repairs -- it is the cheapest yield in the repo, and it is read-only against
-the working tree (repo mounted read-only, all work in a scratch dir, no repo
-lock).
-
-**T.5 -- CLEAN NEGATIVE: this ROM has ONE compiler configuration.**
-`tools/agbcc/bin/` ships `agbcc`, `old_agbcc` AND `agbcc_arm`, and the Makefile
-invokes only the first. `old_agbcc` really does differ -- register allocation,
-operand order, and **literal-pool ordering**, which is a whole-function property
-no C-level permutation can fix -- and `-fprologue-bugfix` really does change
-leaf-function output. Klonoa needs `old_agbcc -ftst` for its m4a module and
-per-function `-fprologue-bugfix` units, so the question was live.
-
-Tested with `tools/factory/compiler_variants.py` (compiles each stored candidate
-under all four variants in a scratch container, compares `.text` + relocations
-against the retail fragment; repo mounted read-only, no repo lock, safe against
-a live factory). Over 58 high-score functions: **agbcc is closest for 54**, the
-4 where `old_agbcc` wins do so by 2-4 bytes out of ~100-200, and `old_agbcc`
-never produces a byte-exact result agbcc does not. **Hypothesis retired.** Do
-not re-chase it; the residue in section R is not a compiler-variant problem.
-
-**T.6 -- CLEAN NEGATIVE: two of the three obvious permuter passes have nothing
-to act on here.** decomp-permuter ships no ARM/agbcc weight profile at all --
-`[base]`, `[ido]`, `[mwcc]`, `[gcc]` -- and `permuter_settings.toml` selected
-`"gcc"`, whose own comment says its passes "were originally written with IDO in
-mind". So ~6,300 searches ran MIPS-derived weights on ARM/Thumb. Fixed: an
-`[agbcc]` profile with 11 evidence-backed deltas, held as a patch under
-`tools/permuter_patches/` for the same submodule reason as `tools/m2c_patches/`.
-
-The interesting part is what was NOT built. Klonoa's ablations name bitfield
-container type and multi-dimensional array shape as real agbcc levers, and
-neither has ANY corresponding mutation (`bitsize` appears zero times in
-`randomizer.py`; `perm_randomize_internal_type` requires `ca.TypeDecl` so it
-skips arrays). Both look like obvious wins. A census of our own 3,124 stored
-candidate bodies killed both: **0 declare a bitfield, 1 declares an array, 0
-mention float/double, and 2,983 (95%) are built from flat `*(TYPE *)(base +
-off)` casts.** m2c emits pointer arithmetic, not structs, so there is nothing
-for either pass to mutate. Measure the corpus before writing a mutation for it.
-
-The lever that IS both measured and applicable is Klonoa's highest-value one --
-a named `extern` versus a cast address constant, numerically identical and
-compiled differently, 20-29 points across four of their functions. **561 of our
-bodies carry a raw `0x08xxxxxx` constant.** No pass exists; one needs project
-knowledge (`tools/symbols/rom.txt`), which is exactly why it belongs in our
-fork. Not yet written.
-
-**T.7 -- read this before adding a check.** Two of the tools written during this
-session shipped the project's own recurring bug on the first try: a verdict
-asserted from zero observations (`compiler_variants.py` printed "the hypothesis
-does NOT hold" after measuring nothing), and a diagnostic filter that silently
-dropped the evidence (`grep 'rror'` misses agbcc's real diagnostics, which say
-``X' redeclared`` and `X undeclared` with no "error" in the line). Both were
-caught only because the numbers looked too clean. **A check that cannot
-distinguish "nothing is wrong" from "nothing was measured" is not a check.**
-
-**Next levers, in rough order of value:**
-0a. **Re-run `tools/factory/isolation_exact.py --apply`** after any batch of
-   seed repairs (sections T.8, T.13). It measures one symbol alone at
-   ~2,000/min, harvests byte-exact candidates (205 on its first full sweep),
-   AND refreshes `iso_score`, which is what the permuter queue is now ranked
-   by. Cheapest yield in the repo, and read-only against the working tree.
-0b. **The other 94 jump-table candidates** (section O) - the tool refuses
-   them rather than guessing. The dominant cause is a raw run that mixes
-   trailing data into the code region; a smarter code/data boundary than
-   "stop at the first non-Thumb-1 instruction" would recover more. Also
-   worth checking whether the 79 newly-seeded switch functions actually
-   convert, before assuming they do.
-1. **More deterministic rules.** This is the whole thesis and it keeps
-   paying: the arg-register rule alone covered 15% of the corpus and
-   turned 15-minute permuter gambles into instant score-0 matches. Use
-   `stall_patterns.py` (clusters stalls by normalized diff signature) and
-   `compile_errors.py` (clusters seed compile failures by cause) - but
-   note that `compile_errors.py` does NOT apply `blocking_siblings()`, so
-   on a poisoned tree it measures the deadlock above rather than real m2c
-   defects. Run `unblock_files.py` first or its output will mislead you.
-1b. **Re-run `rescue_isolated_zeros.py --all-on-disk`** after any batch of
-   permuter wins. With section P's fix it is the cheapest matches available:
-   no search, one build per function, and the backlog GREW from 164 to 303
-   while the old gate was discarding them. Also worth re-checking whether
-   `needs_human` rows filed as "wasn't byte-identical" were victims of the
-   same broken gate rather than real anomalies.
-2. **The "asm-differ said match but from-scratch build FAILED" rows**
-   (16 currently in `needs_human`; ~30 more isolated by `batch_validate`
-   as "the ROM does not reproduce with this candidate").
-   Reproduced one (`sub_801ADC0`): it compiles fine, but the linked ROM's
-   sha1 differs - so asm-differ and the real ROM genuinely disagree about
-   the same bytes. Not corruption fallout (they date from 12h-19h on
-   08-20; the ROM-shifting extractions landed at 20:25-20:45). Untriaged;
-   the obvious first check is whether `check_layout.py` flags a size
-   change, i.e. whether the compiled function is a different LENGTH than
-   the retail one rather than different content.
-3. The 18 refused trailing regions (real unlabeled code, needs a human).
-4. The `ctx+0x80C` pointer trace to finish the collision-data chain.
-
-## Housekeeping still outstanding
-
-- No CI job runs `tools/progress.py` or posts a progress badge yet.
-- `tools/apply_library_matches.py` (byte-level raw-region splicing, driven
-  by `tools/disasm_object.py`) was built and round-trip-verified for this
-  phase but ended up unused - every match this pass found was the "rename
-  an existing label" case instead. It's real, tested infrastructure for
-  whenever a `find_library_code.py` match *does* land in a genuine raw
-  `.byte` run rather than an already-labeled function; don't delete it as
-  dead code.
+That asymmetry is why they survive. A false negative is indistinguishable from
+a hard function, and this corpus has thousands of genuinely hard functions to
+hide among. The prior should be that this codebase is **mostly fine and mostly
+mismeasured**.
+
+### The recurring shapes
+
+| shape | what it looks like |
+|---|---|
+| **Wrong build mode** | A verdict measured under `NONMATCHING=1` but gated in a plain build, or vice versa. Under NONMATCHING every sibling `#else` compiles; in a plain build they become their retail `.include`. Declarations, object contents and scores all differ. |
+| **Object-level diffing** | asm-differ `-o` runs past the function's end (no `.size`), so the score tracks *position in file*. A function identical to retail scored 100,700. |
+| **TU poisoning** | agbcc compiles a whole unit, so one broken sibling fails every function in the file. A verdict may be about a different function entirely. |
+| **Stale terminal state** | A queue nothing reclaims from accumulates dead verdicts at exactly the rate the rest of the system improves. 99 of 106 `needs_human` rows had already self-healed. |
+| **Predicting a splice without simulating it** | A tool that predicts what a splice will do must apply the same transformations the splice does, or it under-reports. |
+| **`git checkout --` as revert** | Destroys uncommitted work, then re-reports the candidate as broken for the reason the wiped repair had just fixed. |
+| **Answering from zero observations** | A check that cannot distinguish "nothing is wrong" from "nothing was measured" is not a check. Also: filters that drop the evidence (`grep 'rror'` misses agbcc's `X' undeclared`), clustering on the wrong line of a multi-line diagnostic, placeholder collisions. |
+| **Bytes without relocations** | `bl target` and `.word target` are placeholder zeroes in an object. Comparing bytes alone calls two different callees identical. |
+| **Stored vs. live** | A count of what's in the DB is not a count of what the tool does today. T.1's "`M2C_ERROR` driven to 5" is stored; live regeneration gives 114. |
+| **Scanning the wrong tree** | `map_raw_regions.py` scans `asm/*.s` but not `asm/nonmatching/*.s`, so its number *falls as extraction proceeds* without anything being classified. Under-reports 1000x. |
+
+### The rules that follow
+
+1. **Every measurement tool must refuse to answer when it cannot** — loudly,
+   naming what was missing. Never return a default.
+2. **A tool's own success number is not the result.** Count at the terminal
+   state, never at the hand-off. ("26 recovered" was 26 promotions; 13 died at
+   the next gate.)
+3. **Cluster on the fatal error**, and confirm a cluster by acting on it,
+   before believing a share.
+4. **A verifier that can resolve something the real linker cannot is not a
+   verifier.**
+5. **When you remove a bottleneck, re-audit everything downstream immediately** —
+   new load exercises paths the old one never reached.
+6. **A long-running worker holds the code it imported at startup.** Restart the
+   worker that owns a fix before running work through it.
+7. **Commit a fix BEFORE restarting the thing that loads it**, and grep for
+   every copy of a pattern you fix, not just the one that bit you.
+8. **Measure the corpus before writing a mutation for it.** Three plausible
+   permuter passes were killed this way (bitfields 0/3,124; arrays 1/3,124;
+   symbol constants 3.2%).
+9. **Sequencing matters**: a repair that runs before its prerequisite measures
+   the *prerequisite's* failure and blames the thing it was asked to fix.
+   Unblock first, rescue second.
+10. **Any tool that changes a fragment's CONTENT must requeue its rows**, or
+    the work is invisible to the pipeline. Any tier that declines or promotes
+    work must leave something able to reclaim it.
+
+## Clean negatives — do NOT re-chase
+
+Each looked obviously right. Re-deriving them costs a session.
+
+| hypothesis | verdict |
+|---|---|
+| **Compiler variants** (`old_agbcc`, `agbcc_arm`, `-fprologue-bugfix`) | agbcc closest for 54 of 58; `old_agbcc` never produces a byte-exact result agbcc doesn't. **One configuration.** |
+| **Bitfield / array permuter passes** | 0 of 3,124 bodies declare a bitfield, 1 declares an array. m2c emits pointer arithmetic; nothing to mutate. |
+| **Extern vs. cast address constant** (Klonoa's top lever) | 11/201 "closer", **0 matches**. Useful only as a per-function seed improvement where it measurably helps. |
+| **Signature inference from call sites** | 83.6% arity accuracy, but end to end made things **worse** (139 → 164 errors). At 84% the wrong signatures cost more than the right ones gain. |
+| **Matched-function signatures in m2c `--context`** | 0/45, twice. A seed needs ALL its callees known; callee coverage is 7.6% at 25.6% matched, and lags badly because callees are biased toward the big hard ones. Threshold is ~50% **callee** coverage, not corpus. |
+| **`struct Entity` improving scores** | 4 identical, 1 worse, 0 better. m2c already emits explicit-width casts that compile identically. It fixes the **declaration** class, not codegen. |
+| **Draining the re-opened backlog** (ruleset bump) | 2.5% newly compile — **~43 functions, not ~1,700**. |
+| **Shape-group dedup as "exploit #1"** | 761 twins in 249 groups, largest 21 (not 63). `twin_backfill.py` already harvested it. Worth ~512 searches; 92% of the corpus is structurally unique. |
+| **Cheap/local LLMs** | Best 2026 data point is MIPS-only, needed an H200, ~0.9% end-to-end. Nothing targets ARM/Thumb or byte-exactness. |
+| **dtk / splat** | dtk is PowerPC-only. splat is superseded by our `splitlib`. |
+| **The 84KB blob as m4a** | Not m4a, not code. **Solved 2026-08-23** — see Phase 3. |
+
+## Landmines already hit
+
+**The two most dangerous first.**
+
+- **`make` can report `mlss.gba: OK` against a genuinely broken tree.** Make's
+  dependency tracking has no idea assembler `.include`s exist, so deleting or
+  editing an `asm/nonmatching/*.s` fragment is only checked if the containing
+  object happens to get recompiled. A genuinely from-scratch build fails
+  immediately. **This breaks the safety check every other landmine relies on.**
+  An agent once committed a broken result whose every `make` said `OK`.
+  **`rm -rf build/ && make` is the only trustworthy check.**
+
+- **Trailing orphaned data on the last function extracted from a file — NOT
+  FIXED at the tool level.** When `split_func.py` pulls the last function from
+  a blob it grabs every remaining byte (necessary), but those bytes aren't
+  always padding — twice they were a real, never-labeled function.
+  A general fix needs real instruction decoding. **Until then, "delete the
+  fragment" is unsafe by default for any function that was the last extracted
+  from its file** — check the fragment's tail for bytes after the real
+  `bx lr`/`pop {..., pc}`. `gitops.finish_match()` refuses to delete a fragment
+  carrying real trailing data; that guard is load-bearing.
+  ⚠️ **`sub_81C0F7E` is a 2-byte interworking veneer with 104,208 bytes of data
+  glued to its fragment.** If it matches and the fragment is deleted, that
+  deletes 104KB of ROM.
+
+**Build system**
+
+- **`-DNONMATCHING` goes in `CPPFLAGS`, not `CFLAGS`.** The build splits
+  preprocessing (modern `cpp`) from compilation (`agbcc`, fed a `.i`). agbcc
+  doesn't understand `-D` at all. Getting it backwards gives
+  `agbcc: Invalid option`, which reads like a toolchain problem.
+- **Make doesn't track flag changes.** Switching between `make` and
+  `make NONMATCHING=1` won't recompile anything — `-DNONMATCHING` isn't a file.
+  A suspiciously unchanged diff after flipping it means a stale object.
+- **Any tool that runs a NONMATCHING build MUST delete the objects it
+  produced**, or the next plain `make` links them. Symptom: an undefined
+  reference to a `sub_XXXXXXX` against a clean tree.
+- **agbcc's `-g` debug-line emission is buggy** and can make the *assembler*
+  fail with `asm/macros.inc:1: junk at end of line` — an error naming an
+  innocent file. `-ffix-debug-line` suppresses most of it (removing that flag
+  makes things *worse*). **Resolved:** the Makefile now recompiles any object
+  the assembler rejects without `-g`, which is byte-neutral (verified at ROM
+  level). This is what unblocked putting structs in headers.
+
+**Repo operations**
+
+- **Any manual `make`, `split_func.py` or `git` command run while the factory
+  might be live goes inside `gitops.repo_lock()`** — including "just checking"
+  commands, since `make` writes to `build/`. Contention produces a real but
+  misleading `mlss.gba: FAILED`. Suspect contention before corruption.
+- **A fresh `git worktree` has no `mlss.map`**, so `split_func.py` fails on its
+  first use. Build once immediately after creating one.
+- **`git reset --hard`/`git clean` do not un-stale `mlss.map`**, and
+  `split_func.py`'s "already claimed" check trusts it unconditionally. Rebuild
+  after resetting a worktree before trusting that tool again.
+- **`git checkout --` as a revert destroys uncommitted work.** A predicate that
+  splices must restore from a **byte snapshot it took itself**, not from git.
+
+**Fixed at the tool level — symptoms worth recognising**
+
+- **Alignment padding shifting the whole ROM.** An extracted function becomes
+  its own object; if the next function sits at a 2-mod-4 address, the object's
+  size rounds up and everything after slides. Symptom: `.text` is `0x01000008`
+  instead of `0x01000000` and every validator match starts failing.
+  `split_func.py` now extends the extraction to a word boundary;
+  `check_layout.py` diagnoses it in one pass with no rebuild.
+- **Leading orphaned data** before the front-most labeled function (fixed).
+- **`asm/macros.inc` include order** — every `src/*.c` now carries one explicit
+  order-independent include (fixed).
+- **`.gitignore` used to blanket-ignore `*.py`** — would have swallowed every
+  tool here. There's a warning comment in `.gitignore` now.
+
+## Finishing the disassembly (Phase 3)
+
+⚠️ **`map_raw_regions.py` still only scans `asm/*.s`, not `asm/nonmatching/*.s`**
+— its number falls as extraction proceeds without anything being classified.
+Not fixed yet; treat its total as a floor, not the true still-raw figure,
+until that's addressed.
+
+**Most raw `.byte` bytes are not unreached code** — much is data between real
+functions (sprite/tile/palette tables, unrecognised jump tables).
+
+**SOLVED 2026-08-23, SPLIT INTO REAL SOURCE 2026-08-24: the 84KB blob at
+`0x08003000`-`0x08017A00`.** `0x08000534`-`0x0800063C` is a **264-byte
+relocatable ARM decompressor** for a game-specific LZ codec, copied to heap at
+boot and called through IWRAM slot `0x03000C84`. Found by following real call
+sites. Extent independently confirmed: `0x08000534 + 0x108 == 0x0800063C`,
+exactly the existing `sub_800063C` symbol. Sweep (re-verified 2026-08-24 with
+the corrected `gba_compress.decompress_custom_lz`): **15 streams, 0 false
+positives**, each decoding to exactly its declared size, each a multiple of 32
+(4bpp tile) or 2048 (screen block). It is the boot/title/menu graphics bank.
+Details: `docs/review-2026-08-23-data-symbols.md`.
+
+`asm/text08000000.s`'s single 96,768-byte anonymous `.byte` run
+(`0x08000000`-`0x08017A00`, previously counted as one giant raw block) is now
+split into real labeled source: 15 `custom_lz_ADDR:` compressed-stream labels
++ 2 `unk_ADDR:` uncompressed-region labels, byte-identical (verified by
+re-extracting every `.byte` in the file and diffing against `baserom.gba`
+before AND after, plus a from-scratch `mlss.gba: OK`). `map_raw_regions.py`
+now recognizes this project's classified-data label prefixes
+(`byte_`/`word_`/`dword_`/`off_`/`unk_`/`custom_lz_`, each REQUIRING an
+explicit `len=N` in its comment — a label alone still proves nothing, see the
+tool's own docstring) as closing a run instead of treating every label as
+inert the way a bare Luvdis jump-target label is. Verified effect, not
+assumed: this file's raw-byte count for `map_raw_regions.py`'s existing
+`asm/*.s`-only scan went from 96,768 to 12,963 (the still-genuinely-raw crt0
+prologue plus small inter-stream alignment gaps); game-proper total (that
+same scan, still excluding `asm/nonmatching/*.s` per the caveat above) is now
+13,303 bytes across 31 regions.
+
+**Some "raw" functions were already disassembled, just anonymously.**
+`tools/find_library_code.py` byte-matches our own agbcc's libgcc/libc against
+the ROM. Confirmed and renamed: `_lshrdi3`, `_muldi3`, `_negdi2`, `memcpy`,
+`memset`, `strcmp`, `strlen`, `abort` (which bundled `isatty` and `alarm`).
+The `_call_via_rX` veneer matches were **not** applied — likely spurious
+matches of a low-entropy repeating pattern.
+
+**Still open:**
+- `asm/nonmatching/sub_819BABC.s` (152KB) — a genuine **mix**: real code at the
+  front transitioning into repeating-record data. The last big chunk of missed
+  code in the game proper.
+- `asm/nonmatching/sub_81C0F7E.s` (104KB) — data, flat ~16% bad-instruction
+  rate at every alignment phase (the signature of real data). See the landmine.
+- `0x08000000`-`~0x08002E00` is clean ARM crt0 and is solid.
+- 18 refused trailing regions (~2KB) that don't end in a return — real
+  unlabeled code, needs a human. `split_trailing.py` declines rather than
+  guessing.
+- **Jump tables.** Luvdis stops at `mov pc, rX`, dumping the table and every
+  case body as raw `.byte`. `tools/decode_jumptable.py` rewrites fragments into
+  the shape m2c's ARM backend already supports. Requirements that are not
+  guessable: label prefix must be `lbl_`; disassemble as **`armv4t`**, not
+  `arm`; stop at the first non-Thumb-1 instruction; do **not** rewrite
+  `[pc, #N]` literal loads into symbolic form. ~94 candidates still refused
+  (mostly raw runs mixing trailing data). A second attempt at the residue
+  gained exactly zero and was reverted — for those, the duplicate label is a
+  symptom, not the cause.
+
+## Data/assets (Phase 4)
+
+Neither rodata blob (`asm/rodata081DD790.s` ~20KB; `asm/rodata081E2764.s`
+~14MB) has been split into buildable source yet. Full findings:
+[docs/formats/README.md](docs/formats/README.md).
+
+- `tools/find_compressed_blocks.py` / `gba_compress.py` — finds all three real
+  formats in this ROM: the two GBA BIOS codecs (LZ77, RLE) and this game's own
+  custom, non-BIOS LZ scheme (`decompress_custom_lz`, promoted from the old
+  `try_custom_decomp.py` experiment 2026-08-24 — see below). 70 BIOS blocks (69
+  RLE + 1 LZ77) plus **1,309 individual custom-LZ streams**.
+- `tools/extract_assets.py` — decompresses to `assets/raw/*.bin` (gitignored)
+  and renders tile previews, writes `assets/manifest.json` (1,379 entries).
+  **The tile decoder is verified correct** against known uncompressed data.
+  **Which blocks are actually graphics is not verified** — treat PNGs as leads.
+- `tools/find_pointer_tables.py` — 20 code-confirmed tables, 337 unconfirmed.
+- `tools/mint_data_symbols.py` — names 946 addresses, 100% of
+  currently-referenced ROM addresses, up from 3.5%. **Symbol names are
+  committed** (`tools/symbols/rom.txt`/`symbols.txt`); the literal-pool
+  rewrite half is **reverted, not applied** — it broke `compiler_variants.py`'s
+  isolation staging (assembles a fragment alone, no `--just-symbols` link
+  step, so a symbol reference becomes an unresolved relocation/zero bytes
+  where a raw hex literal used to be the real address, corrupting the
+  isolated byte-diff *and* the relocation-set comparison for ~1,050
+  fragments). Re-applying it safely needs the isolation harness taught to
+  resolve `symbols.txt` first — real, scoped follow-up work, not done.
+
+**SOLVED 2026-08-24: the custom-LZ codec is a first-class format now, not an
+experimental dead end.** `tools/try_custom_decomp.py`'s original port had
+three real bugs (off-by-one header skip, a too-small iteration cap, no
+declared-size validation) that made a genuine, common format look like it
+explained nothing. The corrected decoder (`gba_compress.decompress_custom_lz`)
+is verified against all 4 addresses `src/title_screen.c` calls the real
+in-ROM decompressor on directly, and `gba_compress.scan()` now disqualifies
+an LZ77/RLE hit whose span is mostly covered by genuine custom-LZ streams
+instead (fixed 11 of 12 previously-hand-corrected `assets/manifest.json`
+false positives automatically, by threshold; the 12th needed a named,
+decisive-evidence exclusion since its coverage was too low to trust — see
+`gba_compress.KNOWN_FALSE_POSITIVE_ADDRS`). **Two addresses remain a
+genuinely open question** (`0x084EAAD4`, `0x081ED420` — real custom-LZ
+coverage ~11%, above every genuine RLE block but below the reliable
+threshold, no decisive code reference either way): left classified RLE,
+the conservative default, not guessed at. Full numbers and the false-positive
+table: [docs/formats/README.md](docs/formats/README.md).
+
+## Room properties & the solidity/collision pipeline
+
+Real, address-level-confirmed reverse engineering; full writeup in
+[docs/formats/README.md](docs/formats/README.md).
+
+`room_props_table` (24 bytes/room, layout known) and the two-level chain
+resolving each room's collision grid (`room_solidity_index_table` →
+`solidity_grid_offset_table` → a row-major byte-per-tile grid, staged by
+`stage_room_solidity_grid`) are located and understood. Grid width is **30
+tiles**, confirmed by rendering all 529 rooms and getting coherent shapes.
+Cross-confirmed against the independently-built
+[Yoshi Magic](https://github.com/CaptainSwag101/YoshiMagic) tool — found here
+first.
+
+**SOLVED: slope/height semantics.** `get_surface_height_at_x` resolves surface
+height in pixels; byte 0 = signed tile height, byte 1's low nibble = slope
+type, dispatched through a 7-entry table (flat / two 45° / four 22.5°).
+Re-derived from the *write* side too: `sub_81606C8` scans a BG tilemap column
+and takes the slope variant from the tile's **horizontal-flip bit** — the level
+author mirrors a tile in the editor and the physics reads the same flag the
+renderer does.
+
+**`ctx+0x80C` is NOT the coldef arrays** — negative result, don't re-chase. It
+is a heap array of one 4-byte record per tile column.
+
+**Still open:** what consumes the coldef path (`col_set_ptr_table` →
+`load_col_set_to_dest` / `get_coldef_ptr_by_xz`). Note
+`src/load_col_set_to_dest.c`'s draft has its **copy direction backwards** (the
+asm copies 256 entries OUT of `col_set_ptr_table[solidind]` INTO
+`*(u32*)(dest+0xA0)`) and cannot match as written; a corrected redraft exists in
+`docs/review-2026-08-23-data-symbols.md`.
+
+## Scope decision: Mario Bros. minigame
+
+`asm/mariobros.s` (~712KB, 923 functions, `0x08F502B8`-end) is a complete,
+separate Mario Bros. ROM embedded for the multiplayer minigame. **Confirmed by
+the maintainer: excluded from "100%".** Tracked separately everywhere. If that
+ever changes, nothing blocks it.
+
+## Housekeeping outstanding
+
+- No CI job runs `tools/progress.py` or posts a progress badge. `frogress`
+  would close this cheaply.
+- `tools/apply_library_matches.py` is real, tested, round-trip-verified
+  infrastructure that ended up unused (every match this pass was the "rename an
+  existing label" case). **Don't delete it as dead code.**
+- `tools/factory/asmlift_bridge.py` is blocked only by "no system Node" — but
+  node exists at `~/.bun/bin/node`. One `npm install @asmlift/cli` away.
+- `twins.py`'s docstring still advertises deduplication as "exploit #1". It
+  isn't any more; update it.
+- Six `docs/review-2026-08-23-*.md` docs and `tools/mint_data_symbols.py` are
+  uncommitted, plus 13 verified matches in a detached worktree.
