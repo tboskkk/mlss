@@ -45,7 +45,7 @@ asm_unified(".include \"asm/nonmatching/sub_806BB48.s\"");
 #else
 void *sub_807BF34(s32, s32, s32, s32, s32, u32, s32); /* extern */
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
-void sub_806BFD4(void *arg0);
+void sub_806BFD4(struct Entity *arg0);
 extern s32 sub_8087540;
 
 void sub_806BB48(void *arg0) {
@@ -99,7 +99,7 @@ asm_unified(".include \"asm/nonmatching/sub_806BC40.s\"");
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 s32 sub_8086858(void *, s32);                       /* extern */
 extern s32 sub_806BEA8;
-void sub_806BF70(void *arg0);
+void sub_806BF70(struct Entity *arg0);
 void sub_806BC40(void *arg0) {
     s32 var_r1_58;
     u16 temp_r0_17;
@@ -236,7 +236,7 @@ asm_unified(".include \"asm/nonmatching/sub_806BEA8.s\"");
 s32 sub_80DF024(s32, s32, s32, s32, void *);    /* extern */
 s32 sub_810DD7C(void *, void *, s32);           /* extern */
 extern s32 sub_806BDA4;
-void sub_806BF70(void *arg0);
+void sub_806BF70(struct Entity *arg0);
 s32 sub_806BEA8(void *arg0, void *arg1) {
     s32 *var_r0_40;
     s32 var_r1_10;
