@@ -581,14 +581,23 @@ ever changes, nothing blocks it.
 
 ## Housekeeping outstanding
 
-- No CI job runs `tools/progress.py` or posts a progress badge. `frogress`
-  would close this cheaply.
 - `tools/apply_library_matches.py` is real, tested, round-trip-verified
   infrastructure that ended up unused (every match this pass was the "rename an
   existing label" case). **Don't delete it as dead code.**
-- `tools/factory/asmlift_bridge.py` is blocked only by "no system Node" — but
-  node exists at `~/.bun/bin/node`. One `npm install @asmlift/cli` away.
-- `twins.py`'s docstring still advertises deduplication as "exploit #1". It
-  isn't any more; update it.
-- Six `docs/review-2026-08-23-*.md` docs and `tools/mint_data_symbols.py` are
-  uncommitted, plus 13 verified matches in a detached worktree.
+- **`tools/factory/asmlift_bridge.py` is unblocked from Node (npm install
+  done, `node_modules/@asmlift/cli` present) but hits its OWN separate
+  disassembler gap.** Tested directly against a random sample of
+  still-undraftable functions, not assumed: **80% (12/15) decline with
+  the exact same reason**, `raw data directive '.byte' in the code
+  stream`. The one checked closely (`sub_8103B6C`) is full of `ldsh` —
+  the pre-UAL Thumb spelling — strongly suggesting this is the SAME root
+  cause as m2c's own already-fixed `ldsh`/`ldsb` gap (see "Local m2c
+  patches" above, 36% of the corpus), just unpatched in asmlift's
+  separate Node/TS lifter instead of m2c's Python one. Not fixed here —
+  patching a third-party Node package's own disassembler is out of scope
+  for a quick check, flagged as a real, well-scoped lever for later.
+
+CI already runs `tools/gen_readme_progress.py --check` (closes the old
+"no CI posts a progress badge" item) and `twins.py`'s docstring already
+carries the corrected PROPAGATE/DEDUPLICATE numbers — both done, this
+section no longer needs to track them.
