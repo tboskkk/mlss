@@ -35,31 +35,34 @@ void sub_808863C(struct Entity *arg0) {
     (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_80886E0;
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_808864C.s\"");
-#else
-s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 extern s32 sub_8087C6C;
-
-void sub_808864C(void *arg0) {
-    s32 temp_r1_18;
-    void *temp_r2_46;
-
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
-        temp_r1_18 = 6 & (*(u8 *)((s8 *)(arg0) + (0x76)));
-        if ((temp_r1_18 == 2) || (temp_r1_18 == 4)) {
-            if (M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */) == -1) {
-                sub_8082E1C(arg0, 6, 0x2000, 0);
-            } else {
-                sub_8082E1C(arg0, 6, 0x204D, 0);
-            }
-            temp_r2_46 = (*(void **)((s8 *)(arg0) + (8)));
-            (*(u8 *)((s8 *)(temp_r2_46) + (0x12))) = (u8) ((-7 & (*(u8 *)((s8 *)(temp_r2_46) + (0x12)))) | 2);
-        }
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8087C6C;
+void sub_808864C(void *arg0)
+{
+  s8 *new_var2;
+  s32 temp_r1_18;
+  void *temp_r2_46;
+  u8 new_var;
+  if (8 & (*((u8 *) ((new_var2 = (s8 *) (*((void **) (((s8 *) arg0) + 8)))) + 0x12))))
+  {
+    temp_r1_18 = 6 & (*((u8 *) (((s8 *) arg0) + 0x76)));
+    if ((temp_r1_18 == 2) || (temp_r1_18 == 4))
+    {
+      if ((*((s16 *) (((s8 *) (*((void **) (0x28 + ((s8 *) arg0))))) + 0xEC))) == (-1))
+      {
+        sub_8082E1C(arg0, 6, 0x2000, 0);
+      }
+      else
+      {
+        sub_8082E1C(arg0, 6, 0x204D, 0);
+      }
+      temp_r2_46 = *((void **) (((s8 *) arg0) + 8));
+      new_var2 = (u8 *) (((s8 *) temp_r2_46) + 0x12);
+      new_var = (u8) (2 | ((*new_var2) & (-7)));
+      *new_var2 = new_var;
     }
+    *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_8087C6C;
+  }
 }
-#endif
 
 s32 sub_8087CE4();                              /* extern */
 
