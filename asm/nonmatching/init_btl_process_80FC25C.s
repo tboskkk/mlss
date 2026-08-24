@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start init_btl_process_80FC25C
-init_btl_process_80FC25C: @ 080FC25C
 	push {r4, r5, r6, lr}
 	adds r6, r0, #0x0
 	adds r5, r3, #0x0

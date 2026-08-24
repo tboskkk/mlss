@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start get_coldef_ptr_by_xz
-get_coldef_ptr_by_xz: @ 0805A118
 	push {lr}
 	mov r12, r0
 	lsls r2, r2, #0x10

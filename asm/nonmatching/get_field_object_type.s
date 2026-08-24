@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start get_field_object_type
-get_field_object_type: @ 080FB738
 	push {lr}
 	lsls r0, r0, #0x10
 	lsrs r0, r0, #0x10

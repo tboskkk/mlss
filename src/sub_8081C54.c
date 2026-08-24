@@ -21,11 +21,11 @@ asm_unified(".include \"asm/nonmatching/sub_8081C7C.s\"");
 s32 sub_807FF48(s32 *, s32);                /* extern */
 s32 sub_80E3D1C();                              /* extern */
 extern s32 sub_8081A68;
-extern s32 sub_80FC91C;
+void sub_80FC91C(void *arg0);                   /* extern */
 
 void sub_8081C7C(void *arg0) {
     sub_80E3D1C();
-    sub_807FF48(&sub_80FC91C, 0);
+    sub_807FF48((s32 *) &sub_80FC91C, 0);
     (*(s8 *)((s8 *)(*(void **)0x03000FD8) + (0x10))) = 4;
     *(u8 *)0x03000BD4 |= 0x10;
     (*(s32 **)((s8 *)(arg0) + (4))) = &sub_8081A68;
@@ -38,11 +38,11 @@ asm_unified(".include \"asm/nonmatching/sub_8081CC0.s\"");
 s32 sub_807FF48(s32 *, s32);                /* extern */
 s32 sub_80E3D1C();                              /* extern */
 extern s32 sub_80821C4;
-extern s32 sub_80FC91C;
+void sub_80FC91C(void *arg0);                   /* extern */
 
 void sub_8081CC0(void *arg0) {
     sub_80E3D1C();
-    sub_807FF48(&sub_80FC91C, 0);
+    sub_807FF48((s32 *) &sub_80FC91C, 0);
     (*(s8 *)((s8 *)(*(void **)0x03000FD8) + (0x10))) = 4;
     *(u8 *)0x03000BD4 |= 0x10;
     (*(s32 **)((s8 *)(arg0) + (4))) = &sub_80821C4;

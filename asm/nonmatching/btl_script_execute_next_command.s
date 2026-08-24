@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start btl_script_execute_next_command
-btl_script_execute_next_command: @ 080F2CB8
 	push {r4, r5, r6, lr}
 	add sp, #-0x008
 	adds r4, r0, #0x0

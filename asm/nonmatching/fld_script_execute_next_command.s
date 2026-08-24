@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start fld_script_execute_next_command
-fld_script_execute_next_command: @ 080EBAC8
 	push {r4, r5, r6, lr}
 	add sp, #-0x01C
 	adds r4, r0, #0x0

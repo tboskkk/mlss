@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start btl_update_80FC8F4
-btl_update_80FC8F4: @ 080FC8F4
 	push {r4, r5, lr}
 	adds r5, r0, #0x0
 	ldr r4, _080FC918 @ =0x03000FE0

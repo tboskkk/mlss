@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start btl_80FC5C0
-btl_80FC5C0: @ 080FC5C0
 	push {r4, r5, r6, r7, lr}
 	add sp, #-0x004
 	mov r0, sp

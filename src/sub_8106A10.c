@@ -208,7 +208,7 @@ void sub_8106D54(void *arg0)
 
 s32 sub_810591C();                                  /* extern */
 s32 sub_810CB04(s32, s32);                      /* extern */
-extern s32 sub_80FCC78;
+void sub_80FCC78(void *arg0);                       /* extern */
 
 void sub_8106D9C(void *arg0) {
     void *temp_r2_13;
@@ -220,7 +220,7 @@ void sub_8106D9C(void *arg0) {
                 sub_810CB04(0, 0);
                 sub_810CB04(1, 0);
             }
-            (*(s32 **)((s8 *)(arg0) + (4))) = &sub_80FCC78;
+            (*(s32 **)((s8 *)(arg0) + (4))) = (s32 *) &sub_80FCC78;
         }
     }
 }

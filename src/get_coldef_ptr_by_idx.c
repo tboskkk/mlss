@@ -14,12 +14,4 @@ s32 get_coldef_ptr_by_idx(void *arg0, s32 arg1)
   return (*((s32 *) (((s8 *) arg0) + 0xA0))) + (((u32) new_var) >> 0x16);
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/get_coldef_ptr_by_xz.s\"");
-#else
-/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
-   compiles a whole translation unit at a time, so an #error here fails
-   every OTHER function in this file under NONMATCHING=1. Guard intact, so
-   the real ROM still gets the verbatim retail bytes and progress.py still
-   counts this as unmatched. Write the C here, replacing this comment. */
-#endif
+ASM_FUNC("asm/nonmatching/get_coldef_ptr_by_xz.s", s32 get_coldef_ptr_by_xz(void *arg0, s16 arg1, u16 arg2));
