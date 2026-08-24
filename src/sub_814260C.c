@@ -11,7 +11,7 @@ asm_unified(".include \"asm/macros.inc\"");
 
 extern s32 sub_813B1E8;
 extern s32 sub_813B360;
-extern s32 sub_8141D54;
+void sub_8141D54(void *arg0, void *arg1, s32 **arg2);                       /* extern */
 
 int sub_813B650();
 
@@ -26,7 +26,7 @@ void sub_814260C(s32 arg0, void *arg1, void *arg2)
     *((s16 *) (((s8 *) arg1) + 0x1D2)) = (s16) new_var;
     *((s32 **) (((s8 *) arg2) + 0)) = &sub_813B1E8;
     *((s32 **) (((s8 *) arg2) + 0xC)) = &sub_813B360;
-    *((s32 **) (((s8 *) arg2) + 4)) = &sub_8141D54;
+    *((s32 **) (((s8 *) arg2) + 4)) = (s32 *) &sub_8141D54;
   }
 }
 

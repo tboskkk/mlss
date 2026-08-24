@@ -26,7 +26,7 @@ void sub_8142E6C(s32 arg0, void *arg1) {
 s32 sub_8046A90(void *, s32, s32, s32, s32);    /* extern */
 s32 sub_8046D18(void *);                        /* extern */
 s32 sub_8047A3C(void *);                            /* extern */
-extern s32 sub_8141D54;
+void sub_8141D54(void *arg0, void *arg1, s32 **arg2);                       /* extern */
 void sub_8142EFC(s32 arg0, void *arg1, s32 **arg2)
 {
   int new_var;
@@ -46,7 +46,7 @@ void sub_8142EFC(s32 arg0, void *arg1, s32 **arg2)
   {
     new_var = *((u16 *) (((s8 *) temp_r6_13) + 0x38));
     *((u16 *) (((s8 *) arg1) + 0x1D2)) = (u16) new_var;
-    *arg2 = &sub_8141D54;
+    *arg2 = (s32 *) &sub_8141D54;
   }
 }
 

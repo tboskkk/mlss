@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start sub_8137FA4
-sub_8137FA4:
 	push {r4, r5, lr}
 	mov r12, r0
 	movs r0, #0xE8

@@ -10,7 +10,7 @@ asm_unified(".include \"asm/macros.inc\"");
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81427AC.s\"");
 #else
-extern s32 sub_81417F8;
+void sub_81417F8(void *arg0, void *arg1, s32 **arg2);                       /* extern */
 
 void sub_81427AC(void *arg1, s32 **arg2) {
     u16 temp_r0_21;
@@ -19,7 +19,7 @@ void sub_81427AC(void *arg1, s32 **arg2) {
         temp_r0_21 = (*(u16 *)((s8 *)(arg1) + (0x1D2))) - 1;
         (*(u16 *)((s8 *)(arg1) + (0x1D2))) = temp_r0_21;
         if ((temp_r0_21 << 0x10) == 0) {
-            *arg2 = &sub_81417F8;
+            *arg2 = (s32 *) &sub_81417F8;
         }
     }
 }
@@ -27,13 +27,13 @@ void sub_81427AC(void *arg1, s32 **arg2) {
 
 s32 sub_8139AA0(void *);                        /* extern */
 extern s32 sub_813B380;
-extern s32 sub_8141508;
+void sub_8141508(void *arg0, void *arg1, s32 **arg2);                       /* extern */
 
 void sub_81427E0(s32 arg0, void *arg1) {
     (*(u8 *)((s8 *)(arg1) + (0x33E))) = (u8) ((*(u8 *)((s8 *)(arg1) + (0x33E))) | 0x10);
     sub_8139AA0(arg1);
     (*(s32 **)((s8 *)(arg1) + (0x198))) = &sub_813B380;
-    (*(s32 **)((s8 *)(arg1) + (0x1A0))) = &sub_8141508;
+    (*(s32 **)((s8 *)(arg1) + (0x1A0))) = (s32 *) &sub_8141508;
 }
 
 u8 sub_813B5B4(void *);                             /* extern */
@@ -77,7 +77,7 @@ asm_unified(".include \"asm/nonmatching/sub_81428FC.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-extern s32 sub_81410D0;
+void sub_81410D0(s32 arg0, void *arg1);                       /* extern */
 void sub_814294C(s32 arg0, void *arg1)
 {
   u8 new_var;
@@ -90,7 +90,7 @@ void sub_814294C(s32 arg0, void *arg1)
   new_var = *((u8 *) (((s8 *) temp_r4_11) + 0x23));
   *((s16 *) (((s8 *) arg1) + 0x2F8)) = (s16) new_var;
   *((s16 *) (((s8 *) arg1) + 0x1D4)) = 0;
-  *((s32 **) (((s8 *) arg1) + 0x198)) = &sub_81410D0;
+  *((s32 **) (((s8 *) arg1) + 0x198)) = (s32 *) &sub_81410D0;
   *((s32 **) (((s8 *) arg1) + 0x1A0)) = &sub_81428FC;
 }
 
@@ -99,7 +99,7 @@ asm_unified(".include \"asm/nonmatching/sub_81429BC.s\"");
 #else
 s32 sub_8199F30();                                  /* extern */
 u16 sub_81DD77C(s32, s32);                          /* extern */
-extern s32 sub_81407A0;
+void sub_81407A0(s32 arg0, void *arg1, s32 **arg2);                       /* extern */
 
 void sub_81429BC(void *arg0) {
     s32 temp_r5_11;
@@ -108,7 +108,7 @@ void sub_81429BC(void *arg0) {
     (*(u16 *)((s8 *)(arg0) + (0x1D0))) = sub_81DD77C(4, sub_8199F30());
     (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x294)))) + (0x20))) = (u8) (*(u8 *)((s8 *)(((*(u16 *)((s8 *)(arg0) + (0x1D0))) + temp_r5_11)) + (0x1A)));
     (*(s16 *)((s8 *)(arg0) + (0x1D2))) = (s16) (*(u8 *)((s8 *)(((*(u16 *)((s8 *)(arg0) + (0x1D0))) + (*(s32 *)((s8 *)(arg0) + (0x1B0))))) + (0x16)));
-    (*(s32 **)((s8 *)(arg0) + (0x1A0))) = &sub_81407A0;
+    (*(s32 **)((s8 *)(arg0) + (0x1A0))) = (s32 *) &sub_81407A0;
 }
 #endif
 

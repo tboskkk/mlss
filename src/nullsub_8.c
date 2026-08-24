@@ -17,7 +17,7 @@ s32 sub_801E68C(struct Sprite *);               /* extern */
 s32 sub_804761C(void *, s32);                   /* extern */
 s32 sub_8139AA0(void *);                        /* extern */
 extern s32 sub_813B380;
-extern s32 sub_813FBE8;
+void sub_813FBE8(s32 arg0, void *arg1, s32 arg2);                       /* extern */
 
 void sub_8142A70(s32 arg0, void *arg1) {
     sub_8139AA0(arg1);
@@ -29,18 +29,18 @@ void sub_8142A70(s32 arg0, void *arg1) {
     sub_801E150((*(struct Sprite **)((s8 *)(arg1) + (0x294))), 3, -1, 0, 0);
     sub_801E68C((*(struct Sprite **)((s8 *)(arg1) + (0x294))));
     (*(s32 **)((s8 *)(arg1) + (0x198))) = &sub_813B380;
-    (*(s32 **)((s8 *)(arg1) + (0x1A0))) = &sub_813FBE8;
+    (*(s32 **)((s8 *)(arg1) + (0x1A0))) = (s32 *) &sub_813FBE8;
 }
 #endif
 
 s32 sub_8139AA0(void *);                        /* extern */
 extern s32 sub_813B380;
-extern s32 sub_813FDF4;
+void sub_813FDF4(void *arg0, void *arg1, s32 **arg2);                       /* extern */
 
 void sub_8142B04(s32 arg0, void *arg1) {
     (*(u8 *)((s8 *)(arg1) + (0x33E))) = (u8) ((*(u8 *)((s8 *)(arg1) + (0x33E))) | 0x10);
     sub_8139AA0(arg1);
     (*(s16 *)((s8 *)(arg1) + (0x1D4))) = 0;
     (*(s32 **)((s8 *)(arg1) + (0x198))) = &sub_813B380;
-    (*(s32 **)((s8 *)(arg1) + (0x1A0))) = &sub_813FDF4;
+    (*(s32 **)((s8 *)(arg1) + (0x1A0))) = (s32 *) &sub_813FDF4;
 }

@@ -24,7 +24,7 @@ void sub_813C368(void *arg1) {
 }
 #endif
 
-extern s32 sub_813BF94;
+void sub_813BF94(s32 arg0, void *arg1, s32 **arg2);                       /* extern */
 extern s32 sub_813C484;
 void sub_813C3C8(s32 arg0, void *arg1)
 {
@@ -32,7 +32,7 @@ void sub_813C3C8(s32 arg0, void *arg1)
   sub_8139030(arg1, 0);
   *((s32 **) (((s8 *) arg1) + 0x198)) = &sub_813C484;
   *((s32 **) (((s8 *) arg1) + 0x1A0)) = &sub_8139420;
-  *((s32 **) (((s8 *) arg1) + 0x1A4)) = &sub_813BF94;
+  *((s32 **) (((s8 *) arg1) + 0x1A4)) = (s32 *) &sub_813BF94;
   *((u8 *) (((s8 *) arg1) + 0x214)) = (u8) (((-8) & (*(((s8 *) arg1) + 0x214))) | 3);
 }
 

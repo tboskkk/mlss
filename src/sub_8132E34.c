@@ -35,7 +35,7 @@ void sub_8132E68(void *arg0)
 }
 
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
-extern s32 sub_8132818;
+void sub_8132818(void *arg0);                       /* extern */
 void sub_8132EA8(void *arg0)
 {
   u16 temp_r0_11;
@@ -44,6 +44,6 @@ void sub_8132EA8(void *arg0)
   {
     sub_8082E1C(arg0, 0xA, 0, 0);
     play_sfx_80195B4(0x9F, -1);
-    *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_8132818;
+    *((s32 **) (((s8 *) arg0) + 0x4C)) = (s32 *) &sub_8132818;
   }
 }

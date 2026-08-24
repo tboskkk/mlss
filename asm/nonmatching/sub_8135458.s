@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start sub_8135458
-sub_8135458:
 	push {r4, r5, r6, lr}
 	add sp, #-0x088
 	adds r4, r0, #0x0

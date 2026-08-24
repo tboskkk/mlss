@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start sub_81232E0
-sub_81232E0:
 	lsls r0, r0, #0x10
 	ldr r1, _08123300 @ =0x083C03E8
 	lsrs r0, r0, #0x0E

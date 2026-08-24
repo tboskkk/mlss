@@ -9,7 +9,7 @@ asm_unified(".include \"asm/macros.inc\"");
 
 
 extern s32 sub_813B360;
-extern s32 sub_813E618;
+void sub_813E618(void *arg0, void *arg1, s32 **arg2);                       /* extern */
 
 extern s32 sub_813E504;
 
@@ -20,7 +20,7 @@ void sub_8142B4C(s32 arg0, void *arg1, s32 **arg2) {
     (*(s32 *)((s8 *)(arg1) + (0x18))) = temp_r0_11;
     if ((s32) ((*(s32 *)((s8 *)(arg1) + (0x14))) + temp_r0_11) >= (s32) (*(s32 *)((s8 *)(arg1) + (0x2D4)))) {
         (*(s32 **)((s8 *)(arg1) + (0x198))) = &sub_813E504;
-        *arg2 = &sub_813E618;
+        *arg2 = (s32 *) &sub_813E618;
     }
 }
 
@@ -50,7 +50,7 @@ void sub_8142BCC(s32 arg0, void *arg1, void *arg2)
     *((s16 *) (((s8 *) arg1) + 0x1D2)) = new_var;
     *((s32 **) (((s8 *) arg2) + 0)) = &sub_813B1E8;
     *((s32 **) (((s8 *) arg2) + 0xC)) = &sub_813B360;
-    *((s32 **) (((s8 *) arg2) + 4)) = &sub_813E618;
+    *((s32 **) (((s8 *) arg2) + 4)) = (s32 *) &sub_813E618;
   }
 }
 
@@ -61,8 +61,8 @@ s32 sub_80FBDE0(s32 *, void *, s32, s32);       /* extern */
 s32 sub_8139BB0(s32 *, void *, s32, s32);   /* extern */
 u8 sub_813B5B4(void *);                             /* extern */
 extern s32 sub_813B360;
-extern s32 sub_813E618;
-extern s32 sub_813F85C;
+void sub_813E618(void *arg0, void *arg1, s32 **arg2);                       /* extern */
+void sub_813F85C(s32 arg0, void *arg1, s32 **arg2);                       /* extern */
 
 void sub_8142C18(s32 arg0, void *arg1, void *arg2) {
     s32 sp0;
@@ -75,10 +75,10 @@ void sub_8142C18(s32 arg0, void *arg1, void *arg2) {
         sub_8139BB0(&sp0, arg1, 0x22, 0);
         if ((sub_80FBDE0(&sp0, arg1, 0x7FFF, 0) << 0x18) != 0) {
             (*(s32 **)((s8 *)(arg2) + (0))) = &sub_813B360;
-            (*(s32 **)((s8 *)(arg2) + (4))) = &sub_813E618;
+            (*(s32 **)((s8 *)(arg2) + (4))) = (s32 *) &sub_813E618;
             return;
         }
-        (*(s32 **)((s8 *)(arg2) + (0))) = &sub_813F85C;
+        (*(s32 **)((s8 *)(arg2) + (0))) = (s32 *) &sub_813F85C;
     }
 }
 #endif

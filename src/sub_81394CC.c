@@ -59,13 +59,13 @@ s32 sub_8137550(void *, s32);                   /* extern */
 s32 sub_81378CC(void *, s32, s32, s32);         /* extern */
 s32 sub_81381D4(void *);                        /* extern */
 s32 sub_8138F64(s32, u16);                      /* extern */
-extern s32 sub_813980C;
+void sub_813980C(s32 arg0, void *arg1, void *arg2);                       /* extern */
 
 void sub_813955C(s32 arg0, void *arg1, s32 **arg2) {
     sub_8137550(arg1, sub_8138F64(arg0, (*(u16 *)((s8 *)(arg1) + (0x134)))));
     sub_81378CC(arg1, 1, M2C_ERROR(/* unknown instruction: ldsh $r2, ($mem_loc_fictive_) */) << 8, M2C_ERROR(/* unknown instruction: ldsh $r3, ($mem_loc_fictive_) */) << 8);
     sub_81381D4(arg1);
-    *arg2 = &sub_813980C;
+    *arg2 = (s32 *) &sub_813980C;
 }
 #endif
 

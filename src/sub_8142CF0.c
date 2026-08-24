@@ -8,11 +8,11 @@
 asm_unified(".include \"asm/macros.inc\"");
 
 s32 sub_813B5B4(s32);                               /* extern */
-extern s32 sub_813E974;
+void sub_813E974(void *arg0, void *arg1, s32 **arg2);                       /* extern */
 
 void sub_8142CF0(s32 arg0, s32 arg1, s32 **arg2) {
     if ((sub_813B5B4(arg1) << 0x18) == 0) {
-        *arg2 = &sub_813E974;
+        *arg2 = (s32 *) &sub_813E974;
     }
 }
 
