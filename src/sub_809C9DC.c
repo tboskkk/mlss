@@ -36,14 +36,14 @@ void sub_809CA24(void *arg0)
   *((s32 **) (((s8 *) arg0) + 0x4C)) = (s32 *) (&sub_809CAC8);
 }
 
-extern s32 sub_809C660;
+void sub_809C660(void *arg0, s32 arg3);                       /* extern */
 void sub_809CA6C(void *arg0)
 {
   void *temp_r2_13;
   sub_8082E1C(arg0, 2, -1, 0);
   temp_r2_13 = *((void **) (((s8 *) arg0) + 8));
   *((u8 *) (((s8 *) temp_r2_13) + 0x12)) = (u8) (((-7) & (*(((s8 *) temp_r2_13) + 0x12))) | 2);
-  *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_809C660;
+  *((s32 **) (((s8 *) arg0) + 0x4C)) = (s32 *) &sub_809C660;
 }
 
 #ifndef NONMATCHING

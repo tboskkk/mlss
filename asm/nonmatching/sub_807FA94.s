@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start sub_807FA94
-sub_807FA94:
 	push {lr}
 	adds r3, r0, #0x0
 	cmp r3, #0x00

@@ -1,8 +1,3 @@
-	.syntax unified
-	.text
-
-	thumb_func_start sub_8083E84
-sub_8083E84:
 	push {r4, r5, r6, r7, lr}
 	cmp r0, #0x00
 	beq _08083EDA

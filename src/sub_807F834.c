@@ -29,7 +29,7 @@ void sub_807F834(void *arg0)
 asm_unified(".include \"asm/nonmatching/sub_807F868.s\"");
 #else
 s32 sub_807F7BC(s32, s32, s32, s32, s32);   /* extern */
-extern s32 sub_807CEC4;
+void sub_807CEC4(void *arg0);                       /* extern */
 
 void sub_807F868(void *arg0) {
     s32 var_r1_11;
@@ -54,7 +54,7 @@ void sub_807F868(void *arg0) {
     (*(u16 *)((s8 *)(temp_r4_9) + (0x16))) = temp_r0_36;
     if ((temp_r0_36 << 0x10) == 0) {
         (*(u16 *)((s8 *)(temp_r4_9) + (0x16))) = 0xEU;
-        (*(s32 **)((s8 *)(arg0) + (4))) = &sub_807CEC4;
+        (*(s32 **)((s8 *)(arg0) + (4))) = (s32 *) &sub_807CEC4;
     }
 }
 #endif
@@ -63,7 +63,7 @@ void sub_807F868(void *arg0) {
 asm_unified(".include \"asm/nonmatching/sub_807F8C4.s\"");
 #else
 s32 sub_807F7BC(s32, s32, s32, s32, s32);   /* extern */
-extern s32 sub_807CD18;
+void sub_807CD18(void *arg0);                       /* extern */
 
 void sub_807F8C4(void *arg0) {
     s32 var_r1_11;
@@ -88,7 +88,7 @@ void sub_807F8C4(void *arg0) {
     (*(u16 *)((s8 *)(temp_r4_9) + (0x16))) = temp_r0_36;
     if ((temp_r0_36 << 0x10) == 0) {
         (*(u16 *)((s8 *)(temp_r4_9) + (0x16))) = 0xEU;
-        (*(s32 **)((s8 *)(arg0) + (4))) = &sub_807CD18;
+        (*(s32 **)((s8 *)(arg0) + (4))) = (s32 *) &sub_807CD18;
     }
 }
 #endif

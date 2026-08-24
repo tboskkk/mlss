@@ -7,11 +7,11 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-extern s32 sub_809EA4C;
+void sub_809EA4C(void *arg0);                       /* extern */
 
 void sub_809EB58(struct Entity *arg0) {
     (*(s32 *)((s8 *)(arg0) + (0x80))) = 0;
-    arg0->handler = &sub_809EA4C;
+    arg0->handler = (s32 *) &sub_809EA4C;
     (*(s16 *)((s8 *)(arg0) + (0xAC))) = 0;
 }
 
@@ -33,7 +33,7 @@ asm_unified(".include \"asm/nonmatching/sub_809EB8C.s\"");
 #endif
 
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
-extern s32 sub_809E5E4;
+void sub_809E5E4(void *arg0, s32 arg3);                       /* extern */
 
 void sub_809EBDC(struct Entity *arg0) {
     void *temp_r5_8;
@@ -45,7 +45,7 @@ void sub_809EBDC(struct Entity *arg0) {
     if ((*(s16 *)((s8 *)((*(void **)((s8 *)(temp_r5_8) + (0x28)))) + (0xEC))) == -2) {
         sub_8082E1C(arg0, 0x15, 0, 0);
     }
-    arg0->handler = &sub_809E5E4;
+    arg0->handler = (s32 *) &sub_809E5E4;
 }
 
 #ifndef NONMATCHING
