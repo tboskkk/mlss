@@ -54,7 +54,16 @@ def spliced_text(name, body):
             return None, None
     # 1. declarations inside the candidate that contradict the file
     body = gitops._repair_body_decls(c_path, body)
-    text = c_path.read_text().replace(block, body.rstrip() + "\n")
+    # 1b. drop declarations the destination file ALREADY makes. The real
+    # gitops.splice_candidate() applies _dedupe_decls() here and this tool did
+    # not, which is precisely the under-reporting this function's own
+    # docstring warns about: m2c guesses each callee's prototype per candidate,
+    # so a candidate and its destination file routinely declare the same symbol
+    # with different signatures. The real splice drops the candidate's copy;
+    # predicting without that step reports "conflicting types for X" for a
+    # conflict that never actually happens.
+    raw = c_path.read_text()
+    text = raw.replace(block, gitops._dedupe_decls(raw, block, body).strip() + "\n", 1)
     # 2. a stale file-scope `extern s32 <name>;` for the symbol being defined
     try:
         import fix_decl_conflicts
