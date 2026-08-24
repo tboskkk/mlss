@@ -56,6 +56,39 @@ SEED_SCORE_CEILING = 5000
 # while a near-miss waits. Like SEED_SCORE_CEILING it is a ceiling, not an
 # exclusion.
 ISO_SCORE_CEILING = 200
+
+# Admission floor on objdiff_score (objdiff_score.py) -- a per-SYMBOL
+# instruction-match percentage, resolving real ELF boundaries so it is not
+# the N.4a position-in-file artifact best_score is, and normalized (0-100)
+# rather than a raw byte count like iso_score. Deliberately a SEPARATE
+# admission path, not a replacement for ISO_SCORE_CEILING: the two agree
+# broadly (Spearman -0.792 measured over 2,444 rows with both scores) and
+# disagree exactly where it matters -- a pure register-allocation miss can
+# look "far" as a raw byte distance while being genuinely close as an
+# instruction match. Measured live: 24 rows sat buried behind
+# ISO_SCORE_CEILING (iso_score >= 200) despite being 90%+ instruction-
+# identical by objdiff, some as high as 96%. Nothing rescues a row with NO
+# iso_score at all -- objdiff_score correlates too closely with iso_score
+# for that; checked directly, 0 such rows exist in the current pool. A
+# ceiling here too, not an exclusion: it only widens which rows this claim
+# treats as near-certain, it can never make anything less claimable.
+OBJDIFF_ADMIT_FLOOR = 90.0
+
+# Cap on wall-clock time run_pool() spends refilling slots before it must
+# reach the monitoring loop below. Each refill can do a blocking build
+# (already_matches() splices+builds+asm-diffs; ensure_isolated() runs
+# permute.py) under the repo lock, and the old code refilled EVERY free
+# slot in a tight loop before the monitor -- or the give-up-deadline check
+# inside it -- ever ran again. Measured: 148 searches overran their own
+# stall_s budget by >1.5x (551 slot-hours), with overrun rate inversely
+# proportional to budget (7.1% at 60-90s vs 0.4% at 421-900s) -- exactly
+# the signature of a roughly-fixed refill delay eating a larger fraction of
+# a short budget. The watchdog's cure was worse than the disease: it
+# SIGTERMs a wedged tier2, the supervisor restarts it, and _cleanup_all()
+# requeues EVERY in-flight search, not just the wedged ones -- 424
+# interrupted searches across 35 restart bursts, mean 12.1 lost per
+# firing (== the pool size). Docs: docs/review-2026-08-23-findings.md.
+REFILL_BUDGET_S = 20
 NONMATCHINGS_DIR = REPO / "nonmatchings"
 WORKER_ID = "tier2"
 
@@ -168,7 +201,33 @@ def ensure_isolated(name: str, candidate_body: str | None) -> bool:
     # the SETUP is locked; the long permuter search itself runs outside the
     # lock, entirely inside nonmatchings/<name>/, so searches stay fully
     # parallel with everything else. See gitops.repo_lock().
-    with gitops.repo_lock(what=f"tier2 isolate {name}"):
+    #
+    # timeout=30 on the ACQUISITION wait (not the hold -- once acquired, the
+    # lock is legitimately held for the whole permute.py run below, which
+    # is real necessary work, not contention). This call runs on every
+    # refill-loop claim that gets past already_matches(), so under real
+    # repo_lock contention it could otherwise block the refill+monitor
+    # cycle for up to 30 minutes waiting just to START -- the same class of
+    # wedge already_matches() was fixed for, see its docstring.
+    #
+    # NOT 8, which is what this first shipped with. Measured live within
+    # minutes: the lock is under SUSTAINED contention with 12 permuter
+    # slots running (not an occasional spike), so 8s failed on nearly every
+    # claim -- 171 "repo_lock timed out" lines in one short tier2.log
+    # window. 30s is still a small fraction of the original 30-minute
+    # default and far below the 12-22 minute overruns that caused the
+    # original wedge, but gives a realistic queue depth room to clear.
+    #
+    # And critically: a timeout here must NEVER resolve to needs_human --
+    # see the caller in run_pool(), which now catches TimeoutError
+    # separately and requeues to tier2_ready instead. A lock being busy
+    # says nothing about the candidate; needs_human is a dead end nothing
+    # reclaims from (CLAUDE.md sections D/Q), and filing 85 real rows there
+    # from pure lock contention was a worse bug than the wedge this exists
+    # to fix. Whatever this function raises, the CALLER'S handling of that
+    # exception is what actually matters -- get that right regardless of
+    # the exact timeout value chosen here.
+    with gitops.repo_lock(timeout=30, what=f"tier2 isolate {name}"):
         c_path = None
         if candidate_body:
             c_path = gitops.splice_into_else(name, candidate_body)
@@ -411,7 +470,7 @@ def stall_seconds_for(lines_count: int, stall_min: float) -> float:
     return min(max(60.0, lines_count * 6.0), stall_min * 60.0)
 
 
-def already_matches(name: str, candidate_body: str | None) -> bool:
+def already_matches(name: str, candidate_body: str | None, lock_timeout: float = 1800) -> bool:
     """Cheap pre-check: is this candidate ALREADY byte-perfect?
 
     Most correct tier3 drafts are already exact -- confirmed repeatedly
@@ -466,10 +525,26 @@ def already_matches(name: str, candidate_body: str | None) -> bool:
     matched, and 12 filed under exactly that note. Section Q had reported that
     failure count driven to zero; it was only ever driven to zero for the
     validator.
+
+    `lock_timeout` defaults to repo_lock()'s own 1800s, appropriate for the
+    monitor-loop callers (checking one just-finished search's result, a rare
+    event worth waiting patiently for). The refill-loop caller in run_pool()
+    passes a short override instead: that call runs on EVERY claim attempt,
+    and under real repo_lock contention (12 permuter containers + validator +
+    tier_m2c all contending for it) it can block for the FULL 30 minutes on
+    a single claim -- which starves the monitoring loop far worse than the
+    cumulative-refill-time cap (REFILL_BUDGET_S) alone can prevent, since
+    that cap only checks the deadline BETWEEN claims, never interrupts one
+    already in progress. Measured live: two watchdog WEDGED firings inside
+    the 49-minute window immediately after REFILL_BUDGET_S landed -- proof
+    that fix was necessary but not sufficient. A short-timeout miss here is
+    exactly the "false negative" case the docstring above already calls
+    harmless: falls through to the permuter, which is what would have
+    happened anyway.
     """
     if not candidate_body:
         return False
-    with gitops.repo_lock(what=f"tier2 precheck {name}"):
+    with gitops.repo_lock(timeout=lock_timeout, what=f"tier2 precheck {name}"):
         try:
             score = rescore_seeds.plain_score(name, candidate_body)
         except Exception:
@@ -595,32 +670,54 @@ def run_pool(jobs: int, stall_min: float, max_functions: int):
             # best_score entirely; fall back to the old behaviour when it has
             # none. Still a ceiling and not an exclusion: the unfiltered claim
             # below takes anything the moment nothing under a ceiling is left.
+            # objdiff_score jumps the queue within its own escalation_count
+            # band (see OBJDIFF_ADMIT_FLOOR above) -- a row that clears the
+            # floor is treated as a near-certain match and searched before
+            # anything ranked only by iso_score/best_score, even if this
+            # process has never scored it with iso_score at all.
             order = ("escalation_count ASC, "
+                     "CASE WHEN objdiff_score >= " + repr(OBJDIFF_ADMIT_FLOOR) + " THEN 0 ELSE 1 END ASC, "
                      "iso_score IS NULL ASC, iso_score ASC, "
                      "best_score IS NULL ASC, best_score ASC")
             # DEDUPLICATE. Do not start a search on a function whose
             # structural twin is already being searched. twins.fingerprint()
             # normalises immediates, labels and symbol names away, so two
-            # functions sharing a shape_hash differ only in constants -- and
-            # 254 such groups hold 787 unmatched functions here, which is 533
-            # redundant searches on what are really 254 problems. With 12 slots
-            # against a queue thousands deep, a wasted slot is the scarcest
-            # thing in the factory, and twins.py has listed this as its exploit
-            # #1 since it was written with nothing ever consuming it.
+            # functions sharing a shape_hash differ only in constants. This
+            # IS wired in (the shape_hash NOT IN (...) clause below) -- an
+            # earlier version of this comment claimed twins.py's dedup
+            # exploit had "nothing ever consuming it," which stopped being
+            # true here and was stale; see twins.py's own corrected
+            # docstring (2026-08-24) for the current, re-measured numbers:
+            # 249 multi-member groups hold 746 unmatched functions, largest
+            # 21, which this guard keeps from being searched redundantly.
             #
             # No risk attached, which is why it is safe to do at claim time: if
             # the twin converges, validator.propagate_to_twins() hands this
             # function the same C for free; if it does not, this one is
             # claimable again the moment the slot frees. Nothing is dropped,
             # only deferred.
+            # NOT a CASE/WHEN keyed on NULL-ness -- an earlier draft of this
+            # used `CASE WHEN iso_score IS NOT NULL THEN iso_score < ?
+            # WHEN objdiff_score IS NOT NULL THEN ...`, which is wrong: SQL
+            # CASE stops at the first TRUE condition, and `iso_score IS NOT
+            # NULL` is true for every buried row this exists to rescue (they
+            # have an iso_score, it's just >= the ceiling) -- so the
+            # objdiff_score branch was dead code for exactly the rows it
+            # needed to catch. Caught by re-running the same dry-run SELECT
+            # already used to measure the 24 buried rows, against the actual
+            # query about to ship, instead of trusting the edit on sight.
+            # Plain OR across all three signals is what that measurement
+            # used and is what actually admits them.
             row = db.claim_for_worker(
                 conn, "tier2_ready", WORKER_ID, order_by=order,
-                extra_where="(CASE WHEN iso_score IS NOT NULL THEN iso_score < ? "
-                            "ELSE (best_score IS NULL OR best_score < ?) END) "
+                extra_where="((iso_score IS NOT NULL AND iso_score < ?) "
+                            "OR (objdiff_score IS NOT NULL AND objdiff_score >= ?) "
+                            "OR (iso_score IS NULL AND objdiff_score IS NULL "
+                            "    AND (best_score IS NULL OR best_score < ?))) "
                             "AND (shape_hash IS NULL OR shape_hash NOT IN "
                             "(SELECT shape_hash FROM functions "
                             " WHERE state = 'permuting' AND shape_hash IS NOT NULL))",
-                params=(ISO_SCORE_CEILING, SEED_SCORE_CEILING))
+                params=(ISO_SCORE_CEILING, OBJDIFF_ADMIT_FLOOR, SEED_SCORE_CEILING))
             if row is not None:
                 return row
             # The fallback keeps the dedup guard -- without it a busy pool
@@ -634,7 +731,8 @@ def run_pool(jobs: int, stall_min: float, max_functions: int):
         finally:
             conn.close()
 
-    def resolve(name, state, notes=None, event=None, detail="", body=None, source="tier2"):
+    def resolve(name, state, notes=None, event=None, detail="", body=None, source="tier2",
+                bump_escalation=False):
         conn = db.connect()
         try:
             fields = {"worker_id": None}
@@ -643,6 +741,19 @@ def run_pool(jobs: int, stall_min: float, max_functions: int):
             if body is not None:
                 fields["candidate_body"] = body
                 fields["candidate_source"] = source
+            if bump_escalation:
+                # Used by the ensure_isolated() TimeoutError path: without
+                # this, a row bounced back to tier2_ready with its priority
+                # totally unchanged can be reclaimed immediately by this
+                # same process under SUSTAINED lock contention (not a rare
+                # spike -- measured, see that call site), spinning on one
+                # row instead of trying others while the lock clears.
+                # claim_one() sorts fewest-attempts-first, so bumping this
+                # is enough to send it to the back of its own priority band
+                # without conflating it with a real failed search attempt.
+                cur = conn.execute(
+                    "SELECT escalation_count FROM functions WHERE name = ?", (name,)).fetchone()
+                fields["escalation_count"] = (cur["escalation_count"] or 0) + 1 if cur else 1
             with db.tx(conn):
                 db.set_state(conn, name, state, **fields)
             if event:
@@ -668,8 +779,15 @@ def run_pool(jobs: int, stall_min: float, max_functions: int):
       # pool alive if any other transient DB fault appears. `procs` stays
       # intact across the retry, so the running searches are undisturbed.
       try:
-        # --- refill every free slot -------------------------------------
-        while len(procs) < max_functions:
+        # --- refill free slots, but not for longer than REFILL_BUDGET_S --
+        # A slot's own claim/isolate/launch work can be slow (see the
+        # constant's docstring above); this stops that work from chaining
+        # across several slots and starving the monitoring loop and its
+        # give-up-deadline check below. Any slots left unfilled this pass
+        # get their turn on the next one -- refilling is not starved,
+        # only spread out enough that wedged searches get noticed on time.
+        refill_deadline = time.time() + REFILL_BUDGET_S
+        while len(procs) < max_functions and time.time() < refill_deadline:
             row = claim_one()
             if row is None:
                 break
@@ -678,8 +796,22 @@ def run_pool(jobs: int, stall_min: float, max_functions: int):
 
             # Cheap win first: if it already matches, skip the permuter
             # entirely and hand it straight to the validator.
+            #
+            # lock_timeout=30, short relative to the 1800s default: this
+            # call runs on EVERY claim in this loop, so under real lock
+            # contention it can otherwise block the WHOLE refill+monitor
+            # cycle for up to 30 minutes on one claim -- see
+            # already_matches()'s own docstring for the measurement that
+            # found this. A miss here is a harmless false negative (falls
+            # through to the permuter below), not a correctness loss --
+            # unlike ensure_isolated() below, this path was never the one
+            # filing rows to needs_human on a timeout, so it didn't need
+            # the same TimeoutError-specific handling, only the value
+            # itself needed correcting: 8s failed almost every claim once
+            # measured against the real, sustained contention 12 permuter
+            # slots produce, not just the rare spike this was designed for.
             try:
-                if already_matches(name, body):
+                if already_matches(name, body, lock_timeout=30):
                     resolve(name, "validating", event="converged",
                             detail="score=0 (pre-check: candidate already matched)",
                             body=body)
@@ -709,7 +841,40 @@ def run_pool(jobs: int, stall_min: float, max_functions: int):
                 processed += 1
                 continue
 
-            if not ensure_isolated(name, body):
+            # Catch broadly, matching the already_matches() pre-check right
+            # above: the repo_lock timeout just added to ensure_isolated()
+            # raises TimeoutError under contention, and nothing in this
+            # while loop's own `except sqlite3.OperationalError` would have
+            # caught that -- it would have propagated to main()'s handler
+            # and triggered _cleanup_all(), killing every running search.
+            # That is precisely the expensive cascade the short timeout was
+            # meant to AVOID; without this except it would have made things
+            # worse, not better, under contention.
+            #
+            # TimeoutError gets its OWN branch, not lumped in with a real
+            # isolate failure. Measured live, minutes after this timeout
+            # first shipped at 8s: the repo_lock is under SUSTAINED, not
+            # occasional, contention -- 171 "repo_lock timed out" lines in
+            # one short tier2.log window, 85 rows filed to needs_human from
+            # it. needs_human is a known dead end nothing ever reclaims
+            # from (CLAUDE.md sections D/Q) -- a lock being busy says
+            # NOTHING about whether the candidate is good, so filing it
+            # there was a worse bug than the wedge this was fixing. A
+            # timeout instead goes back to tier2_ready to retry once the
+            # lock frees up, exactly like already_matches()'s own timeout
+            # handling right above already does correctly.
+            try:
+                isolated = ensure_isolated(name, body)
+            except TimeoutError as e:
+                print(f"  {name}: isolate lock-timed-out ({e}), retrying later")
+                resolve(name, "tier2_ready", bump_escalation=True,
+                        notes="tier2: repo_lock busy during isolate, requeued to retry")
+                processed += 1
+                continue
+            except Exception as e:
+                print(f"  {name}: isolate failed ({e}), needs_human")
+                isolated = False
+            if not isolated:
                 resolve(name, "needs_human",
                         notes="tier2: couldn't isolate for permuter (permute.py failed)")
                 processed += 1
