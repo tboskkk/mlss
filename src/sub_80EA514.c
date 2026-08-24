@@ -7,14 +7,12 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80EA514.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+void sub_80EA514(s32 arg0, void *arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
+    (*(s32 *)((s8 *)(arg1) + (8))) = arg2;
+    (*(s32 *)((s8 *)(arg1) + (0xC))) = arg3;
+    (*(s16 *)((s8 *)(arg1) + (0xA2))) = (s16) arg4;
+    (*(s8 *)((s8 *)(arg1) + (0xA5))) = (s8) arg5;
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80EA530.s\"");
@@ -34,7 +32,6 @@ asm_unified(".include \"asm/nonmatching/sub_80EA550.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-s32 sub_80EA514(s32, s32, s32, s32, s32, s32); /* extern */
 s32 sub_80EA550();                              /* extern */
 void sub_80EA584(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
 {
@@ -45,7 +42,7 @@ void sub_80EA584(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
   new_var2 = (s32) ((u16) arg4);
   new_var3 = (u8) arg5;
   sub_80EA550();
-  sub_80EA514(arg0, arg1, new_var, arg3, new_var2, (s32) new_var3);
+  sub_80EA514(arg0, (void *) arg1, new_var, arg3, new_var2, (s32) new_var3);
 }
 
 s32 sub_80EA530(s32, s32, s32, s32, s32, s32); /* extern */
