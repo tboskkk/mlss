@@ -102,11 +102,31 @@ asm_unified(".include \"asm/nonmatching/sub_8108F14.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8108FE4.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+s32 sub_810907C(void *);                        /* extern */
+void sub_8108FE4(void *arg0)
+{
+  s16 temp_r5_29;
+  int new_var2;
+  u8 temp_r0_18;
+  void *temp_r2_10;
+  void *temp_r2_15;
+  void *temp_r2_65;
+  void **new_var;
+  void *temp_r5_8;
+  temp_r5_8 = *((void **) (((s8 *) arg0) + 8));
+  temp_r2_10 = *((void **) 0x03000FD8);
+  *((u8 *) (((s8 *) temp_r2_10) + 0xB)) = (u8) ((*((u8 *) (((s8 *) temp_r2_10) + 0xB))) | 4);
+  temp_r2_15 = *((void **) (((s8 *) temp_r5_8) + 8));
+  new_var = (void **) 0x03000FD8;
+  new_var2 = -5;
+  temp_r0_18 = *((u8 *) (((s8 *) temp_r2_15) + 0x21));
+  if (((((temp_r0_18 != 0) && (temp_r0_18 != 0xE)) && (temp_r0_18 != 1)) || (((temp_r5_29 = *((s16 *) (((s8 *) (*((void **) (((s8 *) temp_r5_8) + 0x28)))) + 0xEC)), temp_r5_29 == (-1))) && (((*((u16 *) (((s8 *) temp_r2_15) + 0x16))) | (((u16) ((*((u8 *) (((s8 *) temp_r2_15) + 0x1E))) << 0xC)) + 0x1000)) != 0x2000))) || ((temp_r5_29 == (-2)) && (((*((u16 *) (((s8 *) temp_r2_15) + 0x16))) | (((u16) ((*((u8 *) (((s8 *) temp_r2_15) + 0x1E))) << 0xC)) + 0x1000)) != 0x204D)))
+  {
+    *((s32 (**)(void *)) (((s8 *) arg0) + 4)) = (void *) 0;
+    temp_r2_65 = *new_var;
+    *((u8 *) (((s8 *) temp_r2_65) + 0xB)) = (u8) (new_var2 & (*((u8 *) (((s8 *) temp_r2_65) + 0xB))));
+    return;
+  }
+  *((s32 (**)(void *)) (((s8 *) arg0) + 4)) = sub_810907C;
+  sub_810907C(arg0);
+}
