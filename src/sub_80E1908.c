@@ -7,23 +7,23 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80E1908.s\"");
-#else
-extern void sub_80DF5EC();
-
-void sub_80E1908(void* p0) {
-    u32* ptr = *(u32**)((u8*)p0 + 0x0C);
-    u16 val = *(u16*)(ptr);
-    *(u16*)((u8*)p0 + 0x10) = val;
-    ptr += 1;
-    *(u32*)((u8*)p0 + 0x0C) = ptr;
-    *(u32*)((u8*)p0 + 0x04) = (u32)sub_80DF5EC;
-    ((void(*)())*(u32*)((u8*)p0 + 0x04))();
-    p0 = *(void**)((u8*)p0 + 0x00);
-    ((void(*)())p0)();
+s32 sub_80DF5EC();                              /* extern */
+void sub_80E1908(void *arg0)
+{
+  s8 *new_var2;
+  s8 *new_var3;
+  void *new_var;
+  u16 *temp_r1_7;
+  new_var = arg0;
+  temp_r1_7 = *((u16 **) (((s8 *) arg0) + 0xC));
+  new_var2 = (s8 *) arg0;
+  new_var3 = ((s8 *) new_var) + 0xC;
+  *((u16 *) (arg0 + 0x10)) = (u16) (*temp_r1_7);
+  new_var = temp_r1_7;
+  *((u16 **) new_var3) = (u16 *) (new_var + 2);
+  *((s32 (**)()) (new_var2 + 4)) = sub_80DF5EC;
+  sub_80DF5EC();
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80E1924.s\"");
