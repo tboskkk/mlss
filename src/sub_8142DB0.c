@@ -26,16 +26,17 @@ void sub_8142DB0(void *arg0, void *arg1, s32 **arg2) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8142E28.s\"");
-#else
 extern s32 sub_813E2A4;
-
-void sub_8142E28(s32 arg0, void *arg1, s32 **arg2) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg1) + (0x294)))) + (0x12)))) {
-        (*(s16 *)((s8 *)(arg1) + (0x274))) = 0x600;
-        (*(u8 *)((s8 *)(arg1) + (0x214))) = (u8) (-8 & (*(u8 *)((s8 *)(arg1) + (0x214))));
-        *arg2 = &sub_813E2A4;
-    }
+void sub_8142E28(s32 arg0, void *arg1, s32 **arg2)
+{
+  int new_var2;
+  unsigned long new_var;
+  new_var = -8;
+  new_var2 = 0x600;
+  if (8 & (*((u8 *) (((s8 *) (*((void **) (((s8 *) arg1) + 0x294)))) + 0x12))))
+  {
+    *((s16 *) (((s8 *) arg1) + 0x274)) = new_var2;
+    *((u8 *) (((s8 *) arg1) + 0x214)) = (u8) (new_var & (*((u8 *) (((s8 *) arg1) + 0x214))));
+    *arg2 = &sub_813E2A4;
+  }
 }
-#endif
