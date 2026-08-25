@@ -18,27 +18,32 @@ s32 sub_80EAA5C(s32 arg0, s32 arg1, s16 *arg2, s32 arg3)
   return 1;
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80EAA84.s\"");
-#else
-s32 sub_80E9C4C(s32, s32, s32, s32, s32, s32);  /* extern */
-
-s32 sub_80EAA84(s32 arg0, s32 arg1, void *arg2, s32 arg3) {
-    u16 temp_r2_9;
-    u16 var_r2_13;
-
-    temp_r2_9 = (*(u16 *)((s8 *)(arg2) + (4)));
-    if (temp_r2_9 == 0) {
-        var_r2_13 = (*(u16 *)((s8 *)((void *)0x0300034C) + (0x2A)));
-    } else if (temp_r2_9 == 1) {
-        var_r2_13 = (*(u16 *)((s8 *)((void *)0x0300034C) + (0x28)));
-    } else {
-        var_r2_13 = 0;
-    }
-    sub_80E9C4C(arg3, arg1 + 0x18, 0, 0, M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */), (s32) var_r2_13);
-    return 1;
+s32 sub_80EAA84(s32 arg0, s32 arg1, void *arg2, s32 arg3)
+{
+  int new_var;
+  u16 temp_r2_9;
+  u16 var_r2_13;
+  s8 *new_var2;
+  var_r2_13 = *((u16 *) (((s8 *) arg2) + 4));
+  temp_r2_9 = var_r2_13;
+  if (temp_r2_9 == 0)
+  {
+    new_var = 0x0300034C;
+    var_r2_13 = *((u16 *) (((s8 *) ((void *) new_var)) + 0x2A));
+  }
+  else
+    if (temp_r2_9 == 1)
+  {
+    new_var2 = (s8 *) ((void *) 0x0300034C);
+    var_r2_13 = *((u16 *) (new_var2 + 0x28));
+  }
+  else
+  {
+    var_r2_13 = 0;
+  }
+  sub_80E9C4C(arg3, arg1 + 0x18, 0, 0, (s32) (*((s16 *) (((s8 *) arg2) + 0))), (s32) var_r2_13);
+  return 1;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80EAACC.s\"");
