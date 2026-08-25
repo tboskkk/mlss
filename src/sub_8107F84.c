@@ -283,39 +283,40 @@ s32 sub_81083EC(void *arg0, s32 arg1)
   return 1;
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_81084B4.s\"");
-#else
-s32 sub_8086E8C(void *);                            /* extern */
-s32 sub_8199F30();                                  /* extern */
-s32 sub_81DD77C(s32, s32);                          /* extern */
+s32 sub_81084B4(void *arg0, s32 arg1)
+{
+  unsigned int new_var;
+  unsigned int new_var2;
+  u16 temp_r0_29;
+  if ((0x800 & (*((u16 *) (((s8 *) arg0) + 0x11E)))) || (arg1 < sub_81DD77C(0x64, sub_8199F30())))
+  {
+    return 0;
+  }
+  temp_r0_29 = *((u16 *) (((s8 *) arg0) + 0x11E));
+  *((u16 *) (((s8 *) arg0) + 0x11E)) = (u16) (0xF3FF & temp_r0_29);
+  new_var = 1U;
+  if (!(temp_r0_29 & 0x400))
+  {
+    new_var2 = 0xFF;
+    if (!(0x40 & (*((u8 *) (((s8 *) arg0) + 0x122)))))
+    {
+      *((s32 *) (((s8 *) arg0) + 0x118)) = sub_8086E8C(arg0 + 8);
+      *((u8 *) (((s8 *) ((0, arg0))) + 0x122)) = (u8) ((*((u8 *) (((s8 *) arg0) + 0x122))) | 0x40);
+    }
+    *((s8 *) (((s8 *) arg0) + 0x128)) = new_var2;
+    *((s16 *) (((s8 *) arg0) + 0x126)) = 1;
+    *((s8 *) (((s8 *) arg0) + 0x12A)) = 1;
+    *((u16 *) (((s8 *) arg0) + 0x11E)) = (u16) (0x800 | (*((u16 *) (((s8 *) arg0) + 0x11E))));
+    goto block_8;
+  }
+  if (((u32) ((u8) ((*((u8 *) (((s8 *) arg0) + 0x12C))) - 0x13))) <= new_var)
+  {
+    block_8:
+    *((s32 *) (((s8 *) arg0) + 0x120)) = (s32) (((*((s32 *) (((s8 *) arg0) + 0x120))) & 0xFFFC7FFF) | 0x20000);
 
-s32 sub_81084B4(void *arg0, s32 arg1) {
-    u16 temp_r0_29;
-
-    if ((0x800 & (*(u16 *)((s8 *)(arg0) + (0x11E)))) || (arg1 < sub_81DD77C(0x64, sub_8199F30()))) {
-        return 0;
-    }
-    temp_r0_29 = (*(u16 *)((s8 *)(arg0) + (0x11E)));
-    (*(u16 *)((s8 *)(arg0) + (0x11E))) = (u16) (0xF3FF & temp_r0_29);
-    if (!(temp_r0_29 & 0x400)) {
-        if (!(0x40 & (*(u8 *)((s8 *)(arg0) + (0x122))))) {
-            (*(s32 *)((s8 *)(arg0) + (0x118))) = sub_8086E8C(arg0 + 8);
-            (*(u8 *)((s8 *)(arg0) + (0x122))) = (u8) ((*(u8 *)((s8 *)(arg0) + (0x122))) | 0x40);
-        }
-        (*(s8 *)((s8 *)(arg0) + (0x128))) = 0xFF;
-        (*(s16 *)((s8 *)(arg0) + (0x126))) = 1;
-        (*(s8 *)((s8 *)(arg0) + (0x12A))) = 1;
-        (*(u16 *)((s8 *)(arg0) + (0x11E))) = (u16) (0x800 | (*(u16 *)((s8 *)(arg0) + (0x11E))));
-        goto block_8;
-    }
-    if ((u32) (u8) ((*(u8 *)((s8 *)(arg0) + (0x12C))) - 0x13) <= 1U) {
-block_8:
-        (*(s32 *)((s8 *)(arg0) + (0x120))) = (s32) (((*(s32 *)((s8 *)(arg0) + (0x120))) & 0xFFFC7FFF) | 0x20000);
-    }
-    return 1;
+  }
+  return 1;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_810857C.s\"");
