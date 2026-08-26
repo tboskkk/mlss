@@ -310,6 +310,51 @@ def checks(conn) -> list[tuple[str, str, str]]:
     else:
         out.append(("stale objects", OK, "no NONMATCHING leftovers in build/src/"))
 
+    # --- DB says matched, source disagrees --------------------------------
+    # A row marked `matched` whose fragment still exists is one of two things,
+    # and both were found live on 2026-08-25 (11 rows, 8 of the bad kind):
+    #
+    #   * MISLABELLED -- src/*.c still holds a live guard for it. Nothing in
+    #     the factory ever claims a `matched` row, so this work is invisible:
+    #     it will never be searched, validated or reported again, and
+    #     progress.py (which counts SOURCE, not the DB) correctly refuses to
+    #     count it. The likely cause is gitops.revert_to_clean()'s
+    #     `git checkout -- asm/ src/` restoring the guard after finish_match()
+    #     had already set the state, leaving the two out of sync.
+    #   * ORPHAN FRAGMENT -- genuinely matched, guard gone, but the .s file
+    #     was left behind (finish_match refuses to delete a fragment carrying
+    #     real trailing data; see CLAUDE.md's landmine).
+    #
+    # Only the first kind loses work, so they are counted separately. This is
+    # the same "silently parked" class the inert-rows and parked checks above
+    # exist for -- a state nothing reclaims from is invisible, not finished.
+    try:
+        matched = [r[0] for r in conn.execute(
+            "SELECT name FROM functions WHERE state = 'matched'")]
+        frag_dir = REPO / "asm" / "nonmatching"
+        srcs = {p: p.read_text(errors="ignore") for p in (REPO / "src").glob("*.c")}
+        mislabelled, orphan = [], []
+        for n in matched:
+            if not (frag_dir / f"{n}.s").exists():
+                continue
+            needle = f'asm/nonmatching/{n}.s'
+            guarded = any(needle in t for t in srcs.values())
+            (mislabelled if guarded else orphan).append(n)
+        if mislabelled:
+            out.append(("db vs source", FAIL,
+                        f"{len(mislabelled)} row(s) marked matched while src/ still holds a "
+                        f"live guard -- invisible, nothing reclaims a matched row: "
+                        + ", ".join(sorted(mislabelled)[:3])))
+        elif orphan:
+            out.append(("db vs source", WARN,
+                        f"{len(orphan)} matched row(s) left an orphan fragment in "
+                        f"asm/nonmatching/ (harmless, but see finish_match's trailing-data "
+                        f"guard): " + ", ".join(sorted(orphan)[:3])))
+        else:
+            out.append(("db vs source", OK, "every matched row agrees with src/"))
+    except Exception as e:
+        out.append(("db vs source", WARN, f"could not compare DB to source: {e}"))
+
     # A draft that cannot even PARSE poisons its whole translation unit, and
     # the two shapes below are the ones no other tool can attribute: agbcc
     # reports them at `end of input` or against an innocent later function,
