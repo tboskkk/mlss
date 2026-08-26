@@ -30,7 +30,7 @@ void sub_809E5E4(void *arg0, s32 arg3);                       /* extern */
 void sub_809EBDC(struct Entity *arg0) {
     void *temp_r5_8;
 
-    temp_r5_8 = (*(void **)((s8 *)(arg0) + (0x2C)));
+    temp_r5_8 = arg0->unk2C;
     if ((*(s16 *)((s8 *)((*(void **)((s8 *)(temp_r5_8) + (0x28)))) + (0xEC))) == -1) {
         sub_8082E1C(arg0, 0x14, 0, 0);
     }

@@ -424,7 +424,7 @@ void sub_809AD30(struct Entity *arg0) {
     temp_r1_12 = *(void **)0x03000FD8;
     temp_r4_15 = (void *)((*(s32 *)((s8 *)(temp_r1_12) + (0x70))) + 8);
     temp_r7_18 = (void *)((*(s32 *)((s8 *)(temp_r1_12) + (0x74))) + 8);
-    temp_r6_19 = (*(void **)((s8 *)(arg0) + (0x2C)));
+    temp_r6_19 = arg0->unk2C;
     arg0->unk18 = (s32) (arg0->unk18 + (*(s16 *)((s8 *)(arg0) + (0xB2))));
     (*(s16 *)((s8 *)(arg0) + (0xB2))) = (s16) ((u16) (*(s16 *)((s8 *)(arg0) + (0xB2))) - 0x33);
     temp_r2_30 = (*(void **)((s8 *)(arg0) + (8)));
@@ -439,7 +439,7 @@ void sub_809AD30(struct Entity *arg0) {
         }
         sub_807FB34((*(s32 *)((s8 *)(temp_r6_19) + (0xA8))));
         (*(s32 *)((s8 *)(temp_r6_19) + (0xA8))) = 0;
-        (*(void **)((s8 *)(arg0) + (0x2C))) = (void *) ((*(s32 *)((s8 *)(temp_r6_19) + (0x28))) + 8);
+        arg0->unk2C = (void *) ((*(s32 *)((s8 *)(temp_r6_19) + (0x28))) + 8);
         (*(s32 *)((s8 *)(temp_r6_19) + (0x2C))) = 0;
         (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_809ADC0;
     }

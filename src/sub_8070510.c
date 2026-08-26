@@ -61,7 +61,7 @@ extern s32 sub_80706B0;
 s32 sub_8070670(struct Entity *arg0, s32 arg1) {
     sub_810DD7C(arg0, arg1, 0xFF);
     sub_807F47C(arg0);
-    (*(s32 *)((s8 *)(arg0) + (0x10))) = (s32) (*(s32 *)((s8 *)((*(void **)((s8 *)((*(void **)((s8 *)(arg0) + (0x2C)))) + (0x28)))) + (0xD8)));
+    (*(s32 *)((s8 *)(arg0) + (0x10))) = (s32) (*(s32 *)((s8 *)((*(void **)((s8 *)(arg0->unk2C) + (0x28)))) + (0xD8)));
     sub_8082E1C(arg0, 8, 0, 0);
     (*(s16 *)((s8 *)(arg0) + (0xAC))) = 2;
     arg0->handler = &sub_80706B0;

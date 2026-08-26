@@ -51,7 +51,7 @@ struct Entity {
 /* 0x24 */ u8  unk24;
 /* 0x25 */ u8  pad25[0x03];
 /* 0x28 */ s32 unk28;
-/* 0x2C */ s32 unk2C;
+/* 0x2C */ void *unk2C;
 /* 0x30 */ s32 unk30;
 /* 0x34 */ s32 unk34;
 /* 0x38 */ s32 unk38;

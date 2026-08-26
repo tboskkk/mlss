@@ -80,7 +80,7 @@ void sub_805DD74(struct Entity *arg0) {
     s32 var_r0_32;
 
     (*(u16 *)((s8 *)(arg0) + (0xAE))) = (u16) ((*(u16 *)((s8 *)(arg0) + (0xAE))) + 0x14);
-    var_r0_17 = (*(s32 *)((s8 *)(arg0) + (0x38))) - (s16) (*(u16 *)((s8 *)(arg0) + (0xAE)));
+    var_r0_17 = arg0->unk38 - (s16) (*(u16 *)((s8 *)(arg0) + (0xAE)));
     (*(s32 *)((s8 *)(arg0) + (0x10))) = var_r0_17;
     if (var_r0_17 < 0) {
         var_r0_17 += 0xFF;

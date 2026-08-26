@@ -81,7 +81,7 @@ extern s32 sub_8088F9C;
 void sub_8089D88(struct Entity *arg0) {
     void *temp_r5_8;
 
-    temp_r5_8 = (*(void **)((s8 *)(arg0) + (0x2C)));
+    temp_r5_8 = arg0->unk2C;
     if ((*(s16 *)((s8 *)((*(void **)((s8 *)(temp_r5_8) + (0x28)))) + (0xEC))) == -1) {
         sub_8082E1C(arg0, 7, 0, 0);
     }
@@ -161,7 +161,7 @@ void sub_8089F44(struct Entity *arg0) {
     s32 var_r0_32;
 
     (*(u16 *)((s8 *)(arg0) + (0xAE))) = (u16) ((*(u16 *)((s8 *)(arg0) + (0xAE))) - 8);
-    var_r0_17 = (*(s32 *)((s8 *)(arg0) + (0x38))) + (s16) (*(u16 *)((s8 *)(arg0) + (0xAE)));
+    var_r0_17 = arg0->unk38 + (s16) (*(u16 *)((s8 *)(arg0) + (0xAE)));
     (*(s32 *)((s8 *)(arg0) + (0x10))) = var_r0_17;
     if (var_r0_17 < 0) {
         var_r0_17 += 0xFF;
@@ -742,13 +742,13 @@ asm_unified(".include \"asm/nonmatching/sub_808BFBC.s\"");
 s32 stop_sfx_80195A8(s32);                      /* extern */
 s32 sub_810DD7C(void *, void *, s32);           /* extern */
 
-void sub_808BFF8(void *arg0) {
+void sub_808BFF8(struct Entity *arg0) {
     s32 temp_r1_33;
     u16 temp_r1_26;
     void *temp_r0_32;
     void *temp_r2_8;
 
-    temp_r2_8 = (*(void **)((s8 *)(arg0) + (0x2C)));
+    temp_r2_8 = arg0->unk2C;
     if (!(0x80 & (*(u8 *)((s8 *)(temp_r2_8) + (0x76)))) && ((*(s32 *)((s8 *)(temp_r2_8) + (0x18))) == 0)) {
         sub_810DD7C(arg0, temp_r2_8, 0xFF);
     }

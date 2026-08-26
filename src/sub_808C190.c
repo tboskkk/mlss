@@ -153,12 +153,12 @@ void sub_808C324(void *arg0) {
 
 extern s32 sub_808AEE4;
 
-void sub_808C348(void *arg0) {
+void sub_808C348(struct Entity *arg0) {
     (*(s16 *)((s8 *)(arg0) + (0xAC))) = 0x18;
-    if ((*(s16 *)((s8 *)((*(void **)((s8 *)((*(void **)((s8 *)(arg0) + (0x2C)))) + (0x28)))) + (0xEC))) == -1) {
+    if ((*(s16 *)((s8 *)((*(void **)((s8 *)(arg0->unk2C) + (0x28)))) + (0xEC))) == -1) {
         sub_80873B8(arg0, 4, 0);
     }
-    if ((*(s16 *)((s8 *)((*(void **)((s8 *)((*(void **)((s8 *)(arg0) + (0x2C)))) + (0x28)))) + (0xEC))) == -2) {
+    if ((*(s16 *)((s8 *)((*(void **)((s8 *)(arg0->unk2C) + (0x28)))) + (0xEC))) == -2) {
         sub_80873B8(arg0, 6, 0);
     }
     (*(s32 **)((s8 *)(arg0) + (0x50))) = &sub_808AEE4;

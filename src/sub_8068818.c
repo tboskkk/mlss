@@ -62,7 +62,7 @@ void sub_80688B8(void *arg0)
 
 ASM_FUNC("asm/nonmatching/sub_806890C.s", void sub_806890C(void *arg0));
 void sub_8068A28(void *arg0);
-void sub_80689AC(void *arg0) {
+void sub_80689AC(struct Entity *arg0) {
     s32 temp_r5_9;
     void *temp_r1_17;
 
@@ -70,7 +70,7 @@ void sub_80689AC(void *arg0) {
     if (temp_r5_9 == 0) {
         sub_8082E1C(arg0, 0, 0, 0);
         temp_r1_17 = (*(void **)((s8 *)(arg0) + (0x30)));
-        (*(s32 *)((s8 *)(temp_r1_17) + (0x10))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x38))) + 0x2200);
+        (*(s32 *)((s8 *)(temp_r1_17) + (0x10))) = (s32) (arg0->unk38 + 0x2200);
         (*(s32 *)((s8 *)(temp_r1_17) + (0x14))) = (s32) (*(s32 *)((s8 *)(arg0) + (0x3C)));
         (*(s32 **)((s8 *)(temp_r1_17) + (0x4C))) = (s32 *) &sub_8068A28;
         (*(s32 *)((s8 *)(arg0) + (0x4C))) = temp_r5_9;
@@ -210,7 +210,7 @@ void sub_8068E98(struct Entity *arg0) {
 
     temp_r1_11 = (*(s32 *)((s8 *)(arg0) + (0x10))) - (*(s32 *)((s8 *)(arg0) + (0xA0)));
     (*(s32 *)((s8 *)(arg0) + (0x10))) = temp_r1_11;
-    temp_r0_19 = (*(s32 *)((s8 *)((*(void **)((s8 *)((*(void **)((s8 *)(arg0) + (0x2C)))) + (0x28)))) + (0xD8))) + 0x1600;
+    temp_r0_19 = (*(s32 *)((s8 *)((*(void **)((s8 *)(arg0->unk2C) + (0x28)))) + (0xD8))) + 0x1600;
     if (temp_r0_19 >= temp_r1_11) {
         (*(s32 *)((s8 *)(arg0) + (0x10))) = temp_r0_19;
         sub_8082E1C(arg0, 0xA, 0, 0);

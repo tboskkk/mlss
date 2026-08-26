@@ -46,10 +46,10 @@ void sub_8110A30(struct Entity *arg0) {
 
     if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_80883A0(arg0, 0x20);
-        temp_r1_18 = (*(void **)((s8 *)((*(void **)((s8 *)(arg0) + (0x2C)))) + (0x28)));
+        temp_r1_18 = (*(void **)((s8 *)(arg0->unk2C) + (0x28)));
         temp_r0_24 = (*(s32 *)((s8 *)(temp_r1_18) + (0xD8))) + 0x2000;
         (*(s32 *)((s8 *)(arg0) + (0x10))) = temp_r0_24;
-        (*(s32 *)((s8 *)(arg0) + (0x38))) = temp_r0_24;
+        arg0->unk38 = temp_r0_24;
         temp_r0_29 = (*(s32 *)((s8 *)(temp_r1_18) + (0xDC)));
         (*(s32 *)((s8 *)(arg0) + (0x14))) = temp_r0_29;
         (*(s32 *)((s8 *)(arg0) + (0x3C))) = temp_r0_29;

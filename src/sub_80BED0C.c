@@ -214,10 +214,10 @@ void sub_80C0930(void *arg0)
 s32 sub_8087CE4();                              /* extern */
 extern s32 sub_80C0CC0;
 
-void sub_80C0980(void *arg0) {
+void sub_80C0980(struct Entity *arg0) {
     void *temp_r5_8;
 
-    temp_r5_8 = (*(void **)((s8 *)(arg0) + (0x2C)));
+    temp_r5_8 = arg0->unk2C;
     sub_8087CE4();
     if (0x20 & (*(u8 *)((s8 *)(arg0) + (0x79)))) {
         (*(s32 *)((s8 *)(arg0) + (0x4C))) = 0;

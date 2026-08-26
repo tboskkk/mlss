@@ -162,7 +162,7 @@ void sub_80612D4(struct Entity *arg0) {
 void sub_80610D4(void *arg0);                       /* extern */
 
 void sub_80612FC(struct Entity *arg0) {
-    if (((u32) (*(u16 *)((s8 *)(arg0) + (0xAC))) <= 0x3FFFU) && ((s32) (*(s32 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x2C)))) + (0x40))) > 0)) {
+    if (((u32) (*(u16 *)((s8 *)(arg0) + (0xAC))) <= 0x3FFFU) && ((s32) (*(s32 *)((s8 *)(arg0->unk2C) + (0x40))) > 0)) {
         arg0->unkA8 = 1;
     }
     (*(u16 *)((s8 *)(arg0) + (0xAC))) = (u16) ((*(u16 *)((s8 *)(arg0) + (0xAC))) + 1);

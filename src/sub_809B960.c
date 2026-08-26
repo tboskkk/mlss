@@ -68,7 +68,7 @@ void sub_809BD98(struct Entity *arg0) {
 
     temp_r0_20 = ((s32) (sub_8082D50((*(s32 *)((s8 *)(*(void **)0x03000FD8) + (0x24C)))) << 0x10) >> 8) + 0x10000;
     (*(s32 *)((s8 *)(arg0) + (0x10))) = temp_r0_20;
-    (*(s32 *)((s8 *)(arg0) + (0x38))) = temp_r0_20;
+    arg0->unk38 = temp_r0_20;
     arg0->unk18 = 0x7800;
     arg0->unk40 = 0x7800;
     (*(u8 *)((s8 *)(arg0) + (0x78))) = (u8) ((0x1F & (*(u8 *)((s8 *)(arg0) + (0x78)))) | 0x20);
@@ -91,7 +91,7 @@ void sub_809BEE0(struct Entity *arg0) {
 
     temp_r0_20 = ((s32) (sub_8082D50((*(s32 *)((s8 *)(*(void **)0x03000FD8) + (0x24C)))) << 0x10) >> 8) + 0x10000;
     (*(s32 *)((s8 *)(arg0) + (0x10))) = temp_r0_20;
-    (*(s32 *)((s8 *)(arg0) + (0x38))) = temp_r0_20;
+    arg0->unk38 = temp_r0_20;
     arg0->unk18 = 0x7800;
     arg0->unk40 = 0x7800;
     if ((*(s16 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x28)))) + (0xF6))) != 0) {
@@ -113,7 +113,7 @@ void sub_809C018(struct Entity *arg0) {
 
     temp_r0_20 = ((s32) (sub_8082D50((*(s32 *)((s8 *)(*(void **)0x03000FD8) + (0x24C)))) << 0x10) >> 8) + 0x10000;
     (*(s32 *)((s8 *)(arg0) + (0x10))) = temp_r0_20;
-    (*(s32 *)((s8 *)(arg0) + (0x38))) = temp_r0_20;
+    arg0->unk38 = temp_r0_20;
     arg0->unk18 = 0x7800;
     arg0->unk40 = 0x7800;
     if ((*(s16 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x28)))) + (0xF6))) != 0) {
