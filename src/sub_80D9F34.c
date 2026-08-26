@@ -24,8 +24,8 @@ s32 sub_80D9E34(void *arg0);                       /* extern */
 void sub_80D9F50(struct Entity *arg0) {
     s32 temp_r5_16;
 
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
-        temp_r5_16 = (*(s32 *)((s8 *)(arg0) + (0xA8)));
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
+        temp_r5_16 = arg0->unkA8;
         if (temp_r5_16 != 0) {
             sub_8082E1C(arg0, 0xA, 0, 0);
         } else {

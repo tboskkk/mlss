@@ -133,7 +133,7 @@ s32 sub_80880C4(void *, s32);                   /* extern */
 s32 sub_808843C(void *, s32, s32, s32, s32);    /* extern */
 extern s32 sub_809D91C;
 
-void sub_809D4E4(void *arg0) {
+void sub_809D4E4(struct Entity *arg0) {
     s32 var_r1_57;
     s32 var_r1_66;
     s32 var_r2_32;
@@ -175,7 +175,7 @@ block_4:
     sub_808843C(arg0, (var_r1_66 >> 8) + 0x38, var_r2_51, 0, 0x100);
     sub_80880C4(arg0, 0x180);
     play_sfx_80195B4(0x99, -1);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_809D91C;
+    arg0->handler = &sub_809D91C;
 }
 
 #ifndef NONMATCHING

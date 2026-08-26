@@ -25,10 +25,10 @@ s32 sub_8082E1C();
 void sub_806A77C(struct Entity *arg0) {
     s32 temp_r0_10;
 
-    temp_r0_10 = (*(s32 *)((s8 *)(arg0) + (0x18))) + 0xFFFFFE00;
-    (*(s32 *)((s8 *)(arg0) + (0x18))) = temp_r0_10;
+    temp_r0_10 = arg0->unk18 + 0xFFFFFE00;
+    arg0->unk18 = temp_r0_10;
     if (temp_r0_10 <= 0) {
-        (*(s32 *)((s8 *)(arg0) + (0x18))) = 0;
+        arg0->unk18 = 0;
         arg0->handler = &sub_808750C;
     }
 }

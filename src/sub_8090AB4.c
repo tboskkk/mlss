@@ -30,8 +30,8 @@ s32 sub_8090BC8(void *);                        /* extern */
 void sub_8090B80(struct Entity *arg0) {
     s32 temp_r0_11;
 
-    temp_r0_11 = (*(s32 *)((s8 *)(arg0) + (0x9C))) - 1;
-    (*(s32 *)((s8 *)(arg0) + (0x9C))) = temp_r0_11;
+    temp_r0_11 = arg0->unk9C - 1;
+    arg0->unk9C = temp_r0_11;
     if (temp_r0_11 <= 0) {
         (*(s8 *)((s8 *)(arg0->unk08) + (0x20))) = 0x10;
         sub_8090BC8(arg0);
@@ -43,8 +43,8 @@ s32 sub_8090C2C(void *);                        /* extern */
 void sub_8090BA4(struct Entity *arg0) {
     s32 temp_r0_11;
 
-    temp_r0_11 = (*(s32 *)((s8 *)(arg0) + (0x9C))) - 1;
-    (*(s32 *)((s8 *)(arg0) + (0x9C))) = temp_r0_11;
+    temp_r0_11 = arg0->unk9C - 1;
+    arg0->unk9C = temp_r0_11;
     if (temp_r0_11 <= 0) {
         (*(s8 *)((s8 *)(arg0->unk08) + (0x20))) = 0x10;
         sub_8090C2C(arg0);

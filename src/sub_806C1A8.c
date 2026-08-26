@@ -209,8 +209,8 @@ asm_unified(".include \"asm/nonmatching/sub_806C848.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-s32 sub_806C8C0(void *arg0, s32 arg1) {
-    (*(s32 *)((s8 *)(arg0) + (0x9C))) = 1;
+s32 sub_806C8C0(struct Entity *arg0, s32 arg1) {
+    arg0->unk9C = 1;
     sub_810DD7C(arg0, arg1, 0xFF);
     return 0;
 }
@@ -218,17 +218,17 @@ s32 sub_806C8C0(void *arg0, s32 arg1) {
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 s32 sub_8086858(void *, s32);                       /* extern */
 extern s32 sub_806C848;
-s32 sub_806C8C0(void *arg0, s32 arg1);
+s32 sub_806C8C0(struct Entity *arg0, s32 arg1);
 extern s32 sub_806CB3C;
 
 void sub_806C8D8(struct Entity *arg0) {
     s32 var_r1_29;
     void *temp_r2_8;
 
-    temp_r2_8 = (*(void **)((s8 *)(arg0) + (8)));
+    temp_r2_8 = arg0->unk08;
     if (8 & (*(u8 *)((s8 *)(temp_r2_8) + (0x12)))) {
         (*(s8 *)((s8 *)(temp_r2_8) + (0x20))) = 0x10;
-        if ((*(s32 *)((s8 *)(arg0) + (0xA8))) == 0) {
+        if (arg0->unkA8 == 0) {
             sub_8082E1C(arg0, 0xC, 0, 0);
             var_r1_29 = 0x1660;
         } else {
@@ -301,7 +301,7 @@ s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 extern s32 sub_806C9A4;
 
 void sub_806CB6C(struct Entity *arg0) {
-    if ((*(s32 *)((s8 *)(arg0) + (0xA8))) == 0) {
+    if (arg0->unkA8 == 0) {
         sub_8082E1C(arg0, 7, 0, 0);
     } else {
         sub_8082E1C(arg0, 0xD, 0, 0);
@@ -315,7 +315,7 @@ extern s32 sub_806C454;
 void sub_806CBA0(struct Entity *arg0) {
     if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 0x15, 0, 0);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_806C454;
+        arg0->handler = &sub_806C454;
     }
 }
 
@@ -403,12 +403,12 @@ asm_unified(".include \"asm/nonmatching/sub_806D290.s\"");
 s32 stop_sfx_80195A8(s32);                      /* extern */
 extern s32 sub_806D480;
 
-void sub_806D30C(void *arg0) {
+void sub_806D30C(struct Entity *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
         stop_sfx_80195A8(0x81);
         sub_8082E1C(arg0, 4, 0, 0);
         (*(s16 *)((s8 *)(arg0) + (0xAC))) = 4;
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_806D480;
+        arg0->handler = &sub_806D480;
     }
 }
 
@@ -493,7 +493,7 @@ s32 sub_806D548(struct Entity *arg0, s32 arg1) {
     s32 temp_r0_12;
 
     sub_810DD7C(arg0, arg1, 0xFF);
-    temp_r0_12 = (*(s32 *)((s8 *)(arg0) + (0xA8)));
+    temp_r0_12 = arg0->unkA8;
     switch (temp_r0_12) {                           /* irregular */
     case 0:
         var_r0_25 = &sub_806D048;

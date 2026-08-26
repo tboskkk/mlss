@@ -17,7 +17,7 @@ void sub_808750C(struct Entity *arg0) {
 }
 
 void sub_8087524(struct Entity *arg0) {
-    if ((*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x21))) == 0) {
+    if ((*(u8 *)((s8 *)(arg0->unk08) + (0x21))) == 0) {
         arg0->handler = &sub_80874B4;
     }
 }

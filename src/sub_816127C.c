@@ -39,11 +39,11 @@ void sub_81612E4(void *arg0) {
     (*(s32 *)((s8 *)(arg0) + (0xC))) = 0;
 }
 
-void sub_81612F8(void *arg0, s32 arg1) {
+void sub_81612F8(struct Entity *arg0, s32 arg1) {
     struct Sprite *temp_r0_18;
 
     temp_r0_18 = sub_8020DD0(0, (s32) (*(s16 *)((s8 *)(arg0) + (6))), arg1, -1, -1, -1, -1);
     (*(struct Sprite **)((s8 *)(arg0) + (0xC))) = temp_r0_18;
     temp_r0_18->xPosition = (s16) ((s32) (*(s32 *)((s8 *)(arg0) + (0x14))) >> 8);
-    (*(struct Sprite **)((s8 *)(arg0) + (0xC)))->yPosition = (s16) ((s32) (*(s32 *)((s8 *)(arg0) + (0x18))) >> 8);
+    (*(struct Sprite **)((s8 *)(arg0) + (0xC)))->yPosition = (s16) ((s32) arg0->unk18 >> 8);
 }

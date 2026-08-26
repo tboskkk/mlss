@@ -16,7 +16,7 @@ s32 sub_810DD7C();
 
 
 
-void sub_8089F44(void *arg0);
+void sub_8089F44(struct Entity *arg0);
 
 s32 sub_8082E1C();
 
@@ -152,7 +152,7 @@ void sub_8089EC4(void *arg0) {
 }
 #endif
 
-void sub_8089F44(void *arg0) {
+void sub_8089F44(struct Entity *arg0) {
     s32 sp0;
     s32 sp4;
     s32 sp8;
@@ -172,7 +172,7 @@ void sub_8089F44(void *arg0) {
         var_r0_25 += 0xFF;
     }
     sp4 = var_r0_25 >> 8;
-    var_r0_32 = (*(s32 *)((s8 *)(arg0) + (0x18)));
+    var_r0_32 = arg0->unk18;
     if (var_r0_32 < 0) {
         var_r0_32 += 0xFF;
     }

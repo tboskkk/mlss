@@ -17,8 +17,8 @@ void sub_81639F8(void *arg0, s32 arg1) {
 }
 #endif
 
-s32 sub_8163A08(void *arg0) {
-    if (((*(s32 *)((s8 *)(arg0) + (0x44))) != 0) && ((*(s32 *)((s8 *)(arg0) + (0x40))) != 1)) {
+s32 sub_8163A08(struct Entity *arg0) {
+    if (((*(s32 *)((s8 *)(arg0) + (0x44))) != 0) && (arg0->unk40 != 1)) {
         return 0;
     }
     return 1;

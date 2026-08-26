@@ -15,7 +15,7 @@ extern s32 sub_806B56C;
 
 s32 sub_807C298();
 
-void sub_806B3D0(void *arg0);
+void sub_806B3D0(struct Entity *arg0);
 int sub_810DD7C();
 
 s32 sub_8082E1C();
@@ -176,22 +176,22 @@ s32 sub_806B390(struct Entity *arg0) {
     return 0;
 }
 
-void sub_806B3AC(void *arg0) {
+void sub_806B3AC(struct Entity *arg0) {
     s32 temp_r1_11;
 
-    temp_r1_11 = (*(s32 *)((s8 *)(arg0) + (0x10))) - (*(s32 *)((s8 *)(arg0) + (0x9C)));
+    temp_r1_11 = (*(s32 *)((s8 *)(arg0) + (0x10))) - arg0->unk9C;
     (*(s32 *)((s8 *)(arg0) + (0x10))) = temp_r1_11;
-    if (temp_r1_11 <= (s32) (*(s32 *)((s8 *)(arg0) + (0x84)))) {
+    if (temp_r1_11 <= (s32) arg0->unk84) {
         sub_807C298(arg0);
     }
 }
 
 s32 stop_sfx_80195A8(s32);                      /* extern */
 
-void sub_806B3D0(void *arg0) {
+void sub_806B3D0(struct Entity *arg0) {
     s32 var_r1_11;
 
-    var_r1_11 = (*(s32 *)((s8 *)(arg0) + (0x10))) - (*(s32 *)((s8 *)(arg0) + (0x9C)));
+    var_r1_11 = (*(s32 *)((s8 *)(arg0) + (0x10))) - arg0->unk9C;
     (*(s32 *)((s8 *)(arg0) + (0x10))) = var_r1_11;
     if (var_r1_11 < 0) {
         var_r1_11 += 0xFF;

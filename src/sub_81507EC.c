@@ -14,8 +14,8 @@ void sub_81507EC(s32 arg0, void *arg1) {
 
 extern s32 sub_81507A8;
 
-void sub_8150810(s32 arg0, void *arg1, s32 **arg2) {
-    if ((s32) (*(s32 *)((s8 *)(arg1) + (0x18))) > 0xFF) {
+void sub_8150810(s32 arg0, struct Entity *arg1, s32 **arg2) {
+    if ((s32) arg1->unk18 > 0xFF) {
         (*(s32 *)((s8 *)(arg1) + (0x248))) = (s32) (*(s32 *)((s8 *)(arg1) + (0x2C8)));
         *arg2 = &sub_81507A8;
         return;

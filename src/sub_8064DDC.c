@@ -30,7 +30,7 @@ int sub_8086D80();
 
 s32 sub_807C298();
 void sub_8064DDC(struct Entity *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 0, 0, 0);
         arg0->handler = &sub_808750C;
     }
@@ -58,7 +58,7 @@ s32 sub_8086858(void *, s32);                       /* extern */
 s32 sub_8065310(void *arg0);
 void sub_806533C(struct Entity *arg0);
 void sub_80651CC(struct Entity *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 2, 0, 0);
         *(s32 *)0x03000E3C = sub_8086858(arg0, 0x1509);
         (*(s32 **)((s8 *)(arg0) + (0x5C))) = (s32 *) &sub_8065310;
@@ -106,7 +106,7 @@ s32 sub_8065310(void *arg0)
 void sub_806541C(void);                       /* extern */
 
 void sub_806533C(struct Entity *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 3, 0, 0);
         *(s32 *)0x03000E3C = sub_8086858(arg0, 0x151D);
         (*(s32 **)((s8 *)(arg0) + (0x5C))) = (s32 *) &sub_806541C;
@@ -122,10 +122,10 @@ void sub_80653CC(struct Entity *arg0) {
     }
 }
 
-void sub_80653F4(void *arg0) {
+void sub_80653F4(struct Entity *arg0) {
     if (sub_8082B00() == 0) {
         sub_8082E1C(arg0, 0x02, 0, 0);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_8064E30;
+        arg0->handler = (s32 *) &sub_8064E30;
     }
 }
 
@@ -181,11 +181,11 @@ s32 sub_8065AE4(void *arg0)
 s32 sub_807C298(s32);                           /* extern */
 extern s32 sub_8065C5C;
 
-void sub_8065B20(void *arg0) {
+void sub_8065B20(struct Entity *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
         sub_807C298((*(s32 *)((s8 *)(arg0) + (0x30))));
         (*(s16 *)((s8 *)(arg0) + (0xAC))) = 3;
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8065C5C;
+        arg0->handler = &sub_8065C5C;
     }
 }
 

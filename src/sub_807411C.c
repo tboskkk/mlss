@@ -207,11 +207,11 @@ s32 sub_8074324(void *arg0) {
 }
 #endif
 
-void sub_807438C(void *arg0) {
+void sub_807438C(struct Entity *arg0) {
     s32 temp_r0_11;
 
-    temp_r0_11 = (*(s32 *)((s8 *)(arg0) + (0x84))) - 1;
-    (*(s32 *)((s8 *)(arg0) + (0x84))) = temp_r0_11;
+    temp_r0_11 = arg0->unk84 - 1;
+    arg0->unk84 = temp_r0_11;
     if (temp_r0_11 <= 0) {
         (*(s32 *)((s8 *)(arg0) + (0x4C))) = 0;
         sub_807C298(arg0);

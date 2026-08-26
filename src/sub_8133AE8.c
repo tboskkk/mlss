@@ -15,9 +15,9 @@ extern s32 sub_8133BC0;
 void sub_8133B54(struct Entity *arg0) {
     s32 *var_r0_37;
 
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
-        if ((s32) (*(s16 *)((s8 *)(arg0) + (0xAC))) < (s32) (*(s32 *)((s8 *)(arg0) + (0x9C)))) {
-            (*(s32 *)((s8 *)(arg0) + (0x18))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x18))) + 0x1000);
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
+        if ((s32) (*(s16 *)((s8 *)(arg0) + (0xAC))) < (s32) arg0->unk9C) {
+            arg0->unk18 = (s32) (arg0->unk18 + 0x1000);
             sub_8082E1C(arg0, 0xC, 0, 0);
             play_sfx_80195B4(0xD5, -1);
             var_r0_37 = &sub_8133BC0;

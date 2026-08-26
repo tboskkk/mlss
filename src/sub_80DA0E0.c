@@ -15,7 +15,7 @@ extern s32 sub_80DA098;
 void sub_80DA0E0(struct Entity *arg0) {
     u8 temp_r2_10;
 
-    temp_r2_10 = (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x21)));
+    temp_r2_10 = (*(u8 *)((s8 *)(arg0->unk08) + (0x21)));
     if (temp_r2_10 == 0) {
         (*(s16 *)((s8 *)(arg0) + (0xAC))) = (s16) temp_r2_10;
         arg0->handler = &sub_80DA098;

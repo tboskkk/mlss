@@ -146,7 +146,7 @@ asm_unified(".include \"asm/nonmatching/sub_80DC71C.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-void sub_80DC7C4(void *arg0) {
+void sub_80DC7C4(struct Entity *arg0) {
     s32 temp_r0_60;
     s32 temp_r1_64;
     s32 var_r0_16;
@@ -165,11 +165,11 @@ void sub_80DC7C4(void *arg0) {
     (*(u16 *)((s8 *)(arg0) + (0xB2))) = (u16) ((*(u16 *)((s8 *)(arg0) + (0xB2))) + (*(s32 *)((s8 *)(arg0) + (0x94))));
     (*(s32 *)((s8 *)(arg0) + (0x10))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x38))) + (*(s16 *)((s8 *)(arg0) + (0xAE))));
     (*(s32 *)((s8 *)(arg0) + (0x14))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x3C))) + (*(s16 *)((s8 *)(arg0) + (0xB0))));
-    temp_r0_60 = (*(s32 *)((s8 *)(arg0) + (0x40))) + (s16) (*(u16 *)((s8 *)(arg0) + (0xB2)));
-    (*(s32 *)((s8 *)(arg0) + (0x18))) = temp_r0_60;
+    temp_r0_60 = arg0->unk40 + (s16) (*(u16 *)((s8 *)(arg0) + (0xB2)));
+    arg0->unk18 = temp_r0_60;
     temp_r1_64 = (*(s32 *)((s8 *)(arg0) + (0x98)));
     if (temp_r0_60 <= temp_r1_64) {
-        (*(s32 *)((s8 *)(arg0) + (0x18))) = temp_r1_64;
+        arg0->unk18 = temp_r1_64;
         sub_8082E1C(arg0, 0, 0, 0);
         sub_8087540(arg0);
     }
@@ -332,16 +332,16 @@ void sub_80DD6EC(struct Entity *arg0) {
 }
 
 void sub_80DD798(void *arg0);
-void sub_80DD708(void *arg0) {
+void sub_80DD708(struct Entity *arg0) {
     if (sub_8082B00() == 0) {
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_80DD798;
+        arg0->handler = (s32 *) &sub_80DD798;
     }
 }
 
 void sub_80DD7C4(void *arg0);
-void sub_80DD724(void *arg0) {
+void sub_80DD724(struct Entity *arg0) {
     if (sub_8082B00() == 0) {
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_80DD7C4;
+        arg0->handler = (s32 *) &sub_80DD7C4;
     }
 }
 

@@ -45,8 +45,8 @@ s32 sub_8091CC8(void *);                        /* extern */
 void sub_8091D10(struct Entity *arg0) {
     s32 temp_r0_11;
 
-    temp_r0_11 = (*(s32 *)((s8 *)(arg0) + (0x9C))) - 1;
-    (*(s32 *)((s8 *)(arg0) + (0x9C))) = temp_r0_11;
+    temp_r0_11 = arg0->unk9C - 1;
+    arg0->unk9C = temp_r0_11;
     if (temp_r0_11 <= 0) {
         (*(s8 *)((s8 *)(arg0->unk08) + (0x20))) = 0x10;
         sub_8091CC8(arg0);
@@ -67,8 +67,8 @@ s32 sub_8091D34(void *);                        /* extern */
 void sub_8091D78(struct Entity *arg0) {
     s32 temp_r0_11;
 
-    temp_r0_11 = (*(s32 *)((s8 *)(arg0) + (0x9C))) - 1;
-    (*(s32 *)((s8 *)(arg0) + (0x9C))) = temp_r0_11;
+    temp_r0_11 = arg0->unk9C - 1;
+    arg0->unk9C = temp_r0_11;
     if (temp_r0_11 <= 0) {
         (*(s8 *)((s8 *)(arg0->unk08) + (0x20))) = 0x10;
         sub_8091D34(arg0);
@@ -326,16 +326,16 @@ void sub_8092CC0(struct Entity *arg0) {
         sub_808DD2C(arg0);
         return;
     }
-    temp_r0_20 = (*(s32 *)((s8 *)(arg0) + (0x9C)));
+    temp_r0_20 = arg0->unk9C;
     if (temp_r0_20 > 0) {
-        (*(s32 *)((s8 *)(arg0) + (0x9C))) = (s32) (temp_r0_20 - 1);
+        arg0->unk9C = (s32) (temp_r0_20 - 1);
         return;
     }
     temp_r1_27 = (*(void **)((s8 *)(arg0) + (0x30)));
     (*(s32 *)((s8 *)(temp_r1_27) + (0xA0))) = 0xB400;
     (*(s32 *)((s8 *)(temp_r1_27) + (0xA4))) = 0xA00;
     sub_8082E1C(arg0, 2, 0, 0);
-    temp_r2_42 = (*(void **)((s8 *)(arg0) + (8)));
+    temp_r2_42 = arg0->unk08;
     (*(u8 *)((s8 *)(temp_r2_42) + (0x12))) = (u8) ((*(u8 *)((s8 *)(temp_r2_42) + (0x12))) | 0x10);
     arg0->handler = &sub_8092AC8;
 }
@@ -375,16 +375,16 @@ void sub_8092D70(struct Entity *arg0) {
         sub_808DD2C(arg0);
         return;
     }
-    temp_r0_20 = (*(s32 *)((s8 *)(arg0) + (0x9C)));
+    temp_r0_20 = arg0->unk9C;
     if (temp_r0_20 > 0) {
-        (*(s32 *)((s8 *)(arg0) + (0x9C))) = (s32) (temp_r0_20 - 1);
+        arg0->unk9C = (s32) (temp_r0_20 - 1);
         return;
     }
     temp_r1_27 = (*(void **)((s8 *)(arg0) + (0x30)));
     (*(s32 *)((s8 *)(temp_r1_27) + (0xA0))) = 0xB400;
     (*(s32 *)((s8 *)(temp_r1_27) + (0xA4))) = 0xFFFFFE34;
     sub_8082E1C(arg0, 2, 0, 0);
-    temp_r2_41 = (*(void **)((s8 *)(arg0) + (8)));
+    temp_r2_41 = arg0->unk08;
     (*(u8 *)((s8 *)(temp_r2_41) + (0x12))) = (u8) ((*(u8 *)((s8 *)(temp_r2_41) + (0x12))) | 0x10);
     arg0->handler = &sub_8092534;
 }

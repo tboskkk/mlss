@@ -7,14 +7,14 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-void sub_8163264(void *arg0, s32 arg1, s32 arg2) {
+void sub_8163264(struct Entity *arg0, s32 arg1, s32 arg2) {
     (*(s32 *)((s8 *)(arg0) + (0x10))) = arg1;
     (*(s32 *)((s8 *)(arg0) + (8))) = arg1;
     (*(s32 *)((s8 *)(arg0) + (0))) = arg1;
     (*(s32 *)((s8 *)(arg0) + (0x14))) = arg2;
     (*(s32 *)((s8 *)(arg0) + (0xC))) = arg2;
     (*(s32 *)((s8 *)(arg0) + (4))) = arg2;
-    (*(s32 *)((s8 *)(arg0) + (0x18))) = (s32) (arg1 >> 8);
+    arg0->unk18 = (s32) (arg1 >> 8);
     (*(s32 *)((s8 *)(arg0) + (0x1C))) = (s32) (arg2 >> 8);
     (*(s32 *)((s8 *)(arg0) + (0x24))) = 0;
 }

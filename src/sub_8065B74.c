@@ -75,7 +75,7 @@ void sub_8065494(void *arg0);                       /* extern */
 
 void sub_8065CA0(struct Entity *arg0) {
     sub_8082E1C(arg0, 2, 0, 0);
-    (*(s8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x20))) = 0x10;
+    (*(s8 *)((s8 *)(arg0->unk08) + (0x20))) = 0x10;
     arg0->handler = (s32 *) &sub_8065494;
 }
 

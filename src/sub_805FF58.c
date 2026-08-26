@@ -38,7 +38,7 @@ ASM_FUNC("asm/nonmatching/sub_806018C.s", s32 sub_806018C(void *arg0));
 ASM_FUNC("asm/nonmatching/sub_80601D4.s", s32 sub_80601D4(void *arg0, s32 arg1));
 void sub_806021C(struct Entity *arg0) {
     (*(s32 *)((s8 *)(arg0) + (0x10))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x10))) + 0xFFFFFE9A);
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 1, 0, 0);
         (*(s16 *)((s8 *)(arg0) + (0xAC))) = 8;
         arg0->handler = (s32 *) &sub_80603D8;
@@ -101,7 +101,7 @@ void sub_8060404(struct Entity *arg0) {
     if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 0xC, 0, 0);
         (*(s16 *)((s8 *)(arg0) + (0xAC))) = 8;
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8060500;
+        arg0->handler = &sub_8060500;
     }
 }
 
@@ -119,10 +119,10 @@ void sub_8060438(void *arg0)
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 extern s32 sub_80605A4;
 
-void sub_8060464(void *arg0) {
+void sub_8060464(struct Entity *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
         sub_8082E1C(arg0, 4, 0, 0);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80605A4;
+        arg0->handler = &sub_80605A4;
     }
 }
 

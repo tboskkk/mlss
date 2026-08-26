@@ -71,11 +71,11 @@ void sub_815F3CC(s32 arg0) {
     (*(s16 *)((s8 *)(sub_815FA3C((void *) arg0)) + (6))) = 0xC0;
 }
 
-void sub_815F3F0(void *arg0, s32 arg1) {
+void sub_815F3F0(struct Entity *arg0, s32 arg1) {
     (*(s32 *)((s8 *)(arg0) + (0x30))) = 0x08CDCDD0;
-    if ((*(s32 *)((s8 *)(arg0) + (0x40))) != 0) {
+    if (arg0->unk40 != 0) {
         sub_8021308();
-        (*(s32 *)((s8 *)(arg0) + (0x40))) = 0;
+        arg0->unk40 = 0;
     }
     if ((*(s32 *)((s8 *)(arg0) + (0x3C))) != 0) {
         sub_8021308();

@@ -11,9 +11,9 @@ asm_unified(".include \"asm/macros.inc\"");
 s32 sub_81151E4();
 s32 process_add(void *, u8);                    /* extern */
 
-void *tld_init_8127A94(void *arg0, u8 arg1) {
+void *tld_init_8127A94(struct Entity *arg0, u8 arg1) {
     process_add(arg0, arg1);
-    (*(s32 *)((s8 *)(arg0) + (0x18))) = 0x08CDC3C8;
+    arg0->unk18 = 0x08CDC3C8;
     return arg0;
 }
 

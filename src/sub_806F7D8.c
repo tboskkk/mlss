@@ -199,7 +199,7 @@ extern s32 sub_8070B70;
 
 void sub_80703B0(struct Entity *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
-        if ((*(s32 *)((s8 *)(arg0) + (0xA8))) != 0) {
+        if (arg0->unkA8 != 0) {
             sub_8082E1C(arg0, 0x29, 0, 0);
         } else {
             sub_8082E1C(arg0, 0x2A, 0, 0);
@@ -211,7 +211,7 @@ void sub_80703B0(struct Entity *arg0) {
 extern s32 sub_80700C8;
 
 void sub_80703F0(struct Entity *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 0x27, 0, 0);
         (*(s16 *)((s8 *)(arg0) + (0xAC))) = 1;
         arg0->handler = &sub_80700C8;

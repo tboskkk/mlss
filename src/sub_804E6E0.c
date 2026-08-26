@@ -334,7 +334,7 @@ block_18:
 
 void *get_coldef_ptr_by_xz(s32, s16, s16);          /* extern */
 
-void *sub_804FA30(void *arg0, s16 arg1, s16 arg2, s32 *arg3, s32 *arg4, s32 *arg5) {
+void *sub_804FA30(struct Entity *arg0, s16 arg1, s16 arg2, s32 *arg3, s32 *arg4, s32 *arg5) {
     s32 temp_r1_35;
     s32 temp_r2_22;
     u32 temp_r0_29;
@@ -342,7 +342,7 @@ void *sub_804FA30(void *arg0, s16 arg1, s16 arg2, s32 *arg3, s32 *arg4, s32 *arg
     u32 temp_r2_37;
     void *temp_r0_15;
 
-    temp_r0_15 = get_coldef_ptr_by_xz((*(s32 *)((s8 *)(arg0) + (0x40))), arg1, arg2);
+    temp_r0_15 = get_coldef_ptr_by_xz(arg0->unk40, arg1, arg2);
     temp_r1_17 = (*(u32 *)((s8 *)(temp_r0_15) + (0)));
     temp_r2_22 = (((u32) (temp_r1_17 << 0x14) >> 0x1C) << 0xB) << (temp_r1_17 >> 0x1F);
     *arg3 = temp_r2_22;

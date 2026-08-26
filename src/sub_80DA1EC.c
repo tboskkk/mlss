@@ -20,13 +20,13 @@ void sub_80DA264(void *arg0);
 void sub_80D9D5C(void *arg0);                       /* extern */
 
 void sub_80DA1EC(struct Entity *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         arg0->handler = (s32 *) &sub_80D9D5C;
     }
 }
 
 void sub_80DA208(struct Entity *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         arg0->handler = (s32 *) &sub_80DA264;
     }
 }

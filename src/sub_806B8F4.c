@@ -307,8 +307,8 @@ void sub_806BF0C(void *arg0) {
 #endif
 
 void sub_806BF70(struct Entity *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
-        if ((*(s32 *)((s8 *)(arg0) + (0xA8))) == 0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
+        if (arg0->unkA8 == 0) {
             sub_8082E1C(arg0, 0xA, 0, 0);
             sub_8082E1C((*(void **)((s8 *)(arg0) + (0x30))), 0xA, 0, 0);
         } else {
@@ -321,8 +321,8 @@ void sub_806BF70(struct Entity *arg0) {
 }
 
 void sub_806BFD4(struct Entity *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
-        if ((*(s32 *)((s8 *)(arg0) + (0xA8))) == 0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
+        if (arg0->unkA8 == 0) {
             sub_8082E1C(arg0, 8, 0, 0);
         } else {
             sub_8082E1C(arg0, 0x10, 0, 0);

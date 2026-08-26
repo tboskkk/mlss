@@ -19,11 +19,11 @@ asm_unified(".include \"asm/macros.inc\"");
 
 
 
-void sub_808C968(void *arg0);
+void sub_808C968(struct Entity *arg0);
 
-void sub_808C90C(void *arg0);
+void sub_808C90C(struct Entity *arg0);
 
-void sub_808C8E0(void *arg0);
+void sub_808C8E0(struct Entity *arg0);
 
 void sub_808C83C(struct Entity *arg0);
 
@@ -445,28 +445,28 @@ asm_unified(".include \"asm/nonmatching/sub_808C868.s\"");
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 extern s32 sub_808A4D0;
 
-void sub_808C8E0(void *arg0) {
+void sub_808C8E0(struct Entity *arg0) {
     u16 temp_r1_9;
 
     temp_r1_9 = (*(u16 *)((s8 *)(arg0) + (0xAC)));
     (*(u16 *)((s8 *)(arg0) + (0xAC))) = (u16) (temp_r1_9 - 1);
     if ((s32) (temp_r1_9 << 0x10) <= 0) {
         sub_8082E1C(arg0, 9, 0, 0);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_808A4D0;
+        arg0->handler = &sub_808A4D0;
     }
 }
 
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 extern s32 sub_808A3C4;
 
-void sub_808C90C(void *arg0) {
+void sub_808C90C(struct Entity *arg0) {
     u16 temp_r1_9;
 
     temp_r1_9 = (*(u16 *)((s8 *)(arg0) + (0xAC)));
     (*(u16 *)((s8 *)(arg0) + (0xAC))) = (u16) (temp_r1_9 - 1);
     if ((s32) (temp_r1_9 << 0x10) <= 0) {
         sub_8082E1C(arg0, 5, 0, 0);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_808A3C4;
+        arg0->handler = &sub_808A3C4;
     }
 }
 
@@ -483,14 +483,14 @@ void sub_808C938(void *arg0)
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 extern s32 sub_808A27C;
 
-void sub_808C968(void *arg0) {
+void sub_808C968(struct Entity *arg0) {
     u16 temp_r1_9;
 
     temp_r1_9 = (*(u16 *)((s8 *)(arg0) + (0xAC)));
     (*(u16 *)((s8 *)(arg0) + (0xAC))) = (u16) (temp_r1_9 - 1);
     if ((s32) (temp_r1_9 << 0x10) <= 0) {
         sub_8082E1C(arg0, 5, 0, 0);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_808A27C;
+        arg0->handler = &sub_808A27C;
     }
 }
 

@@ -28,22 +28,22 @@ ASM_FUNC("asm/nonmatching/sub_8158B90.s", void sub_8158B90(s32 arg0));
 s32 sub_8021308();                              /* extern */
 s32 sub_815FB14(void *, s32);                   /* extern */
 
-void sub_8158BB4(void *arg0, s32 arg1) {
+void sub_8158BB4(struct Entity *arg0, s32 arg1) {
     (*(s32 *)((s8 *)(arg0) + (0x30))) = 0x08CDC8B0;
-    if ((*(s32 *)((s8 *)(arg0) + (0x40))) != 0) {
+    if (arg0->unk40 != 0) {
         sub_8021308();
-        (*(s32 *)((s8 *)(arg0) + (0x40))) = 0;
+        arg0->unk40 = 0;
     }
     sub_815FB14(arg0, arg1);
 }
 
 ASM_FUNC("asm/nonmatching/sub_8158BE0.s", void * sub_8158BE0(void *arg0, u16 arg2));
 ASM_FUNC("asm/nonmatching/sub_8158C6C.s", void sub_8158C6C(void *arg0));
-void sub_8158C98(void *arg0, s32 arg1) {
+void sub_8158C98(struct Entity *arg0, s32 arg1) {
     (*(s32 *)((s8 *)(arg0) + (0x30))) = 0x08CDC8F0;
-    if ((*(s32 *)((s8 *)(arg0) + (0x40))) != 0) {
+    if (arg0->unk40 != 0) {
         sub_8021308();
-        (*(s32 *)((s8 *)(arg0) + (0x40))) = 0;
+        arg0->unk40 = 0;
     }
     sub_815FB14(arg0, arg1);
 }

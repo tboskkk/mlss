@@ -13,11 +13,11 @@ void sub_813E618(void *arg0, void *arg1, s32 **arg2);                       /* e
 
 extern s32 sub_813E504;
 
-void sub_8142B4C(s32 arg0, void *arg1, s32 **arg2) {
+void sub_8142B4C(s32 arg0, struct Entity *arg1, s32 **arg2) {
     s32 temp_r0_11;
 
-    temp_r0_11 = (*(s32 *)((s8 *)(arg1) + (0x18))) + 0x100;
-    (*(s32 *)((s8 *)(arg1) + (0x18))) = temp_r0_11;
+    temp_r0_11 = arg1->unk18 + 0x100;
+    arg1->unk18 = temp_r0_11;
     if ((s32) ((*(s32 *)((s8 *)(arg1) + (0x14))) + temp_r0_11) >= (s32) (*(s32 *)((s8 *)(arg1) + (0x2D4)))) {
         (*(s32 **)((s8 *)(arg1) + (0x198))) = &sub_813E504;
         *arg2 = (s32 *) &sub_813E618;

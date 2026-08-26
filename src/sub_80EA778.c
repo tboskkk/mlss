@@ -7,11 +7,11 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-void sub_80EA778(s32 arg0, void *arg1) {
+void sub_80EA778(s32 arg0, struct Entity *arg1) {
     s32 temp_r0_10;
 
-    temp_r0_10 = (*(s32 *)((s8 *)(arg1) + (0x9C))) - 1;
-    (*(s32 *)((s8 *)(arg1) + (0x9C))) = temp_r0_10;
+    temp_r0_10 = arg1->unk9C - 1;
+    arg1->unk9C = temp_r0_10;
     if (temp_r0_10 == 0) {
         (*(u16 *)((s8 *)(arg1) + (0xA0))) = (u16) (0xFFEF & (*(u16 *)((s8 *)(arg1) + (0xA0))));
     }

@@ -71,7 +71,7 @@ ASM_FUNC("asm/nonmatching/sub_805DCE0.s", void sub_805DCE0(void *arg0));
 s32 sub_807C298(void *);                        /* extern */
 s32 sub_807FC08(s32 *, s32 *, s32 *, s32);      /* extern */
 
-void sub_805DD74(void *arg0) {
+void sub_805DD74(struct Entity *arg0) {
     s32 sp0;
     s32 sp4;
     s32 sp8;
@@ -91,7 +91,7 @@ void sub_805DD74(void *arg0) {
         var_r0_25 += 0xFF;
     }
     sp4 = var_r0_25 >> 8;
-    var_r0_32 = (*(s32 *)((s8 *)(arg0) + (0x18)));
+    var_r0_32 = arg0->unk18;
     if (var_r0_32 < 0) {
         var_r0_32 += 0xFF;
     }

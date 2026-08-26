@@ -221,7 +221,7 @@ void sub_809A0F4(void *arg0)
 }
 
 void sub_809A120(struct Entity *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 9, 0, 0);
         arg0->handler = (s32 *) &sub_809A14C;
     }
@@ -232,7 +232,7 @@ extern s32 sub_8099BE4;
 void sub_809A14C(struct Entity *arg0) {
     if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 0xA, 0, 0);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8099BE4;
+        arg0->handler = &sub_8099BE4;
     }
 }
 
@@ -264,13 +264,13 @@ void sub_809A560(struct Entity *arg0) {
     (*(u16 *)((s8 *)(arg0) + (0xB2))) = (u16) ((*(u16 *)((s8 *)(arg0) + (0xB2))) + (*(s32 *)((s8 *)(arg0) + (0x94))));
     (*(s32 *)((s8 *)(arg0) + (0x10))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x10))) + (*(s16 *)((s8 *)(arg0) + (0xAE))));
     (*(s32 *)((s8 *)(arg0) + (0x14))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x14))) + (*(s16 *)((s8 *)(arg0) + (0xB0))));
-    (*(s32 *)((s8 *)(arg0) + (0x18))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x18))) + (s16) (*(u16 *)((s8 *)(arg0) + (0xB2))));
-    if ((s32) (*(s32 *)((s8 *)(arg0) + (0x9C))) < 0) {
-        temp_r1_39 = (*(void **)((s8 *)(arg0) + (8)));
+    arg0->unk18 = (s32) (arg0->unk18 + (s16) (*(u16 *)((s8 *)(arg0) + (0xB2))));
+    if ((s32) arg0->unk9C < 0) {
+        temp_r1_39 = arg0->unk08;
         (*(u16 *)((s8 *)(temp_r1_39) + (0xC))) = (u16) ((*(u16 *)((s8 *)(temp_r1_39) + (0xC))) + 0xA00);
     }
-    if ((s32) (*(s32 *)((s8 *)(arg0) + (0x8C))) >= (s32) (*(s32 *)((s8 *)(arg0) + (0x18)))) {
-        temp_r0_54 = (*(void **)((s8 *)(arg0) + (8)));
+    if ((s32) arg0->unk8C >= (s32) arg0->unk18) {
+        temp_r0_54 = arg0->unk08;
         if (((*(u16 *)((s8 *)(temp_r0_54) + (0x16))) | ((u16) ((*(u8 *)((s8 *)(temp_r0_54) + (0x1E))) << 0xC) + 0x1000)) == 0x40D7) {
             play_sfx_80195B4(0x6A, -1);
         } else {
@@ -279,9 +279,9 @@ void sub_809A560(struct Entity *arg0) {
         temp_r1_81 = (*(s32 *)((s8 *)(arg0) + (0x98)));
         if (!(temp_r1_81 & 4)) {
             (*(s32 *)((s8 *)(arg0) + (0x98))) = (s32) (temp_r1_81 | 4);
-            (*(s32 *)((s8 *)(arg0) + (0x10))) = (s32) (*(s32 *)((s8 *)(arg0) + (0x84)));
+            (*(s32 *)((s8 *)(arg0) + (0x10))) = (s32) arg0->unk84;
             (*(s32 *)((s8 *)(arg0) + (0x14))) = (s32) (*(s32 *)((s8 *)(arg0) + (0x88)));
-            (*(s32 *)((s8 *)(arg0) + (0x18))) = (s32) (*(s32 *)((s8 *)(arg0) + (0x8C)));
+            arg0->unk18 = (s32) arg0->unk8C;
             arg0->handler = &sub_809A364;
             return;
         }
@@ -333,9 +333,9 @@ asm_unified(".include \"asm/nonmatching/sub_809A76C.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-void sub_809A7EC(void *arg0) {
+void sub_809A7EC(struct Entity *arg0) {
     sub_8082E1C(arg0, 2, 0, 0);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_809A808;
+    arg0->handler = (s32 *) &sub_809A808;
 }
 
 void sub_809A808(struct Entity *arg0) {
@@ -413,7 +413,7 @@ s32 sub_807FB34(s32);                           /* extern */
 s32 sub_807FB64(void *);                        /* extern */
 extern s32 sub_809ADC0;
 
-void sub_809AD30(void *arg0) {
+void sub_809AD30(struct Entity *arg0) {
     void *temp_r1_12;
     void *temp_r2_30;
     void *temp_r4_15;
@@ -425,7 +425,7 @@ void sub_809AD30(void *arg0) {
     temp_r4_15 = (void *)((*(s32 *)((s8 *)(temp_r1_12) + (0x70))) + 8);
     temp_r7_18 = (void *)((*(s32 *)((s8 *)(temp_r1_12) + (0x74))) + 8);
     temp_r6_19 = (*(void **)((s8 *)(arg0) + (0x2C)));
-    (*(s32 *)((s8 *)(arg0) + (0x18))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x18))) + (*(s16 *)((s8 *)(arg0) + (0xB2))));
+    arg0->unk18 = (s32) (arg0->unk18 + (*(s16 *)((s8 *)(arg0) + (0xB2))));
     (*(s16 *)((s8 *)(arg0) + (0xB2))) = (s16) ((u16) (*(s16 *)((s8 *)(arg0) + (0xB2))) - 0x33);
     temp_r2_30 = (*(void **)((s8 *)(arg0) + (8)));
     if ((s32) (*(s16 *)((s8 *)(temp_r2_30) + (2))) >= (s32) ((*(s16 *)((s8 *)((*(void **)((s8 *)(temp_r6_19) + (8)))) + (2))) + 0x20)) {

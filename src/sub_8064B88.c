@@ -115,7 +115,7 @@ block_7:
 #endif
 
 void sub_8064D20(struct Entity *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         if ((*(s32 *)((s8 *)(arg0) + (0xA0))) == 0) {
             sub_8082E1C(arg0, 0x05, 0, 0);
         } else {

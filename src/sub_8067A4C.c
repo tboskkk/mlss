@@ -21,10 +21,10 @@ extern s32 sub_808750C;
 
 void sub_8067A4C(struct Entity *arg0) {
     (*(s32 *)((s8 *)(arg0) + (0x10))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x10))) + 0x200);
-    (*(s32 *)((s8 *)(arg0) + (0x18))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x18))) - (*(s32 *)((s8 *)(arg0) + (0x8C))));
-    (*(s32 *)((s8 *)(arg0) + (0x8C))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x8C))) + 0x66);
-    if ((s32) (*(s32 *)((s8 *)(arg0) + (0x18))) <= 0) {
-        (*(s32 *)((s8 *)(arg0) + (0x18))) = 0;
+    arg0->unk18 = (s32) (arg0->unk18 - arg0->unk8C);
+    arg0->unk8C = (s32) (arg0->unk8C + 0x66);
+    if ((s32) arg0->unk18 <= 0) {
+        arg0->unk18 = 0;
         arg0->handler = &sub_808750C;
     }
 }
@@ -115,10 +115,10 @@ void sub_80680A0(void *arg0)
 ASM_FUNC("asm/nonmatching/sub_80680D4.s", s32 sub_80680D4(void *arg0, void *arg1));
 s32 sub_807C298(void *);                        /* extern */
 
-void sub_8068124(void *arg0) {
+void sub_8068124(struct Entity *arg0) {
     s32 var_r1_11;
 
-    var_r1_11 = (*(s32 *)((s8 *)(arg0) + (0x10))) - (*(s32 *)((s8 *)(arg0) + (0x84)));
+    var_r1_11 = (*(s32 *)((s8 *)(arg0) + (0x10))) - arg0->unk84;
     (*(s32 *)((s8 *)(arg0) + (0x10))) = var_r1_11;
     if (var_r1_11 < 0) {
         var_r1_11 += 0xFF;

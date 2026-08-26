@@ -34,7 +34,7 @@ void sub_80665AC(struct Entity *arg0) {
     }
     if (var_r0_13 == NULL) {
         play_sfx_80195B4(0x114, -1);
-        if ((*(s32 *)((s8 *)(arg0) + (0x9C))) == 0) {
+        if (arg0->unk9C == 0) {
             sub_8082E1C(arg0, 8, 0, 0);
         } else {
             sub_8082E1C(arg0, 0xC, 0, 0);
@@ -64,8 +64,8 @@ asm_unified(".include \"asm/nonmatching/sub_806670C.s\"");
 extern s32 sub_8065FBC;
 
 void sub_8066780(struct Entity *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
-        if ((*(s32 *)((s8 *)(arg0) + (0x9C))) == 0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
+        if (arg0->unk9C == 0) {
             sub_8082E1C(arg0, 6, 0, 0);
         } else {
             sub_8082E1C(arg0, 0xA, 0, 0);
@@ -192,7 +192,7 @@ extern s32 sub_808750C;
 void sub_8066D78(struct Entity *arg0) {
     if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 0xB, 0, 0);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_808750C;
+        arg0->handler = &sub_808750C;
     }
 }
 
@@ -208,7 +208,7 @@ asm_unified(".include \"asm/nonmatching/sub_8066DA4.s\"");
 void sub_8066E5C(void *arg0);
 void sub_8066E0C(struct Entity *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
-        if ((*(s32 *)((s8 *)(arg0) + (0x9C))) == 0) {
+        if (arg0->unk9C == 0) {
             sub_8082E1C(arg0, 4, 0, 0);
         } else {
             sub_8082E1C(arg0, 5, 0, 0);
@@ -242,7 +242,7 @@ extern s32 sub_806688C;
 void sub_8066EB4(struct Entity *arg0) {
     if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 7, 0, 0);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_806688C;
+        arg0->handler = &sub_806688C;
     }
 }
 

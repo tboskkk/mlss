@@ -9,9 +9,9 @@ asm_unified(".include \"asm/macros.inc\"");
 
 s32 process_add(void *, u8);                    /* extern */
 
-void *sub_81367C0(void *arg0, u8 arg1) {
+void *sub_81367C0(struct Entity *arg0, u8 arg1) {
     process_add(arg0, arg1);
-    (*(s32 *)((s8 *)(arg0) + (0x18))) = 0x08CDC4A0;
+    arg0->unk18 = 0x08CDC4A0;
     return arg0;
 }
 

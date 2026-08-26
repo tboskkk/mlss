@@ -73,10 +73,13 @@ def offset_forms(offset: int) -> list[str]:
 
 
 def access_regex(ctype: str, offset: int) -> re.Pattern[str]:
-    """`(*(CTYPE *)((s8 *)(NAME) + (OFFSET)))` -- CTYPE is the field's own
-    type (e.g. `s32 *`), so the cast is one level higher, matching the
-    existing corpus convention (handler is `s32 *`, accessed as `s32 **`)."""
-    cast = re.escape(ctype + "*")
+    """`(*(CAST)((s8 *)(NAME) + (OFFSET)))` reads/writes a value of type
+    CTYPE. If CTYPE is itself a pointer (e.g. `s32 *`, as for `handler`),
+    the cast needs one more `*` (`s32 **`); a plain value type (e.g. `s32`)
+    just gets one (`s32 *`)."""
+    base = ctype.rstrip()
+    cast = base + "*" if base.endswith("*") else base + " *"
+    cast = re.escape(cast)
     alt = "|".join(re.escape(f) for f in offset_forms(offset))
     return re.compile(rf"\(\*\({cast}\)\(\(s8 \*\)\((\w+)\) \+ \((?:{alt})\)\)\)")
 
@@ -107,8 +110,13 @@ def rewrite(text: str, matched: set[str], field: str, access: re.Pattern[str]) -
         if len(names) != 1:
             continue
         var = names.pop()
-        # only a parameter declared exactly `void *var`
-        if not re.search(rf"\bvoid\s*\*\s*{re.escape(var)}\b", params):
+        # only a parameter declared exactly `void *var`, or already
+        # `struct Entity *var` from a prior field's pass over this function --
+        # once one field retypes arg0, every later field must still recognize
+        # it or the pass only ever reaches each function once.
+        is_void = re.search(rf"\bvoid\s*\*\s*{re.escape(var)}\b", params)
+        is_entity = re.search(rf"\bstruct\s+Entity\s*\*\s*{re.escape(var)}\b", params)
+        if not (is_void or is_entity):
             continue
         # ...and NOT one the function does pointer arithmetic on.
         #

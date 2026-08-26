@@ -17,7 +17,7 @@ void sub_8110078(void *arg0);
 extern s32 sub_8110034;
 
 void sub_810FEF4(struct Entity *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         (*(s16 *)((s8 *)(arg0) + (0xAC))) = 0xC;
         arg0->handler = &sub_8110034;
     }

@@ -24,7 +24,7 @@ asm_unified(".include \"asm/nonmatching/sub_806E884.s\"");
 #endif
 
 void sub_806E8E8(struct Entity *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 0x05, 0, 0);
         (*(s16 *)((s8 *)(arg0) + (0xAC))) = 0x0A;
         arg0->handler = (s32 *) &sub_806E414;
@@ -70,7 +70,7 @@ void sub_806E91C(void *arg0) {
 extern s32 sub_806D6A8;
 
 void sub_806E98C(struct Entity *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 6, 0, 0);
         sub_8082E1C((*(void **)((s8 *)(arg0) + (0x30))), 6, 0, 0);
         (*(s16 *)((s8 *)(arg0) + (0xAC))) = 4;
@@ -122,7 +122,7 @@ asm_unified(".include \"asm/nonmatching/sub_806EA54.s\"");
 #endif
 
 void sub_806EAA8(struct Entity *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 0x0A, 0, 0);
         (*(s16 *)((s8 *)(arg0) + (0xAC))) = 0x3C;
         arg0->handler = (s32 *) &sub_806EADC;

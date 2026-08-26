@@ -163,7 +163,7 @@ void sub_80798A8(struct Entity *arg0) {
 }
 
 void sub_80798C4(struct Entity *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         if (*(s32 *)0x03000F6C == 0) {
             sub_8082E1C(arg0, 3, 0x4029, 0);
         } else {
@@ -176,7 +176,7 @@ void sub_80798C4(struct Entity *arg0) {
 
 extern s32 sub_807940C;
 void sub_8079BA8(struct Entity *arg0);
-void sub_807991C(void *arg0) {
+void sub_807991C(struct Entity *arg0) {
     s32 *temp_r0_8;
     s32 *temp_r2_21;
 
@@ -188,7 +188,7 @@ void sub_807991C(void *arg0) {
     sub_8082E1C(arg0, 0x11, 0, 0);
     (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_8079BA8;
     temp_r2_21 = (*(s32 **)((s8 *)(arg0) + (0x30)));
-    (*(s32 *)((s8 *)(temp_r2_21) + (0xA0))) = (s32) (*(s32 *)((s8 *)(arg0) + (0x9C)));
+    (*(s32 *)((s8 *)(temp_r2_21) + (0xA0))) = (s32) arg0->unk9C;
     (*(s32 **)((s8 *)(temp_r2_21) + (0x4C))) = &sub_807940C;
 }
 
@@ -226,8 +226,8 @@ void sub_807995C(void *arg0) {
 extern s32 sub_8078A5C;
 
 void sub_80799B4(struct Entity *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
-        sub_8082E1C(arg0, (*(s32 *)((s8 *)(arg0) + (0xA8))) + 5, 0, 0);
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
+        sub_8082E1C(arg0, arg0->unkA8 + 5, 0, 0);
         (*(s16 *)((s8 *)(arg0) + (0xAC))) = 0x14;
         arg0->handler = &sub_8078A5C;
     }
@@ -376,7 +376,7 @@ void sub_8079BD0(void *arg0)
 
 void sub_8079C70(struct Entity *arg0);
 void sub_8079C0C(struct Entity *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 0xD, 0x4029, 0);
         arg0->handler = (s32 *) &sub_8079C70;
     }
@@ -410,15 +410,15 @@ void sub_8079C9C(struct Entity *arg0) {
         sub_80790CC(arg0);
         play_sfx_80195B4(0x86, -1);
         (*(s32 *)((s8 *)(arg0) + (0xA4))) = 6;
-        temp_r0_26 = (*(s32 *)((s8 *)(arg0) + (0xA8))) + 1;
-        (*(s32 *)((s8 *)(arg0) + (0xA8))) = temp_r0_26;
+        temp_r0_26 = arg0->unkA8 + 1;
+        arg0->unkA8 = temp_r0_26;
         if ((temp_r0_26 > 5) && (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12))))) {
             if (*(s32 *)0x03000F6C == 0) {
                 sub_8082E1C(arg0, 6, 0x4029, 0);
             } else {
                 sub_8082E1C(arg0, 0xA, 0x4029, 0);
             }
-            (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8079018;
+            arg0->handler = &sub_8079018;
         }
     }
 }
@@ -445,10 +445,10 @@ s32 free_heap_memory_8018C68();                 /* extern */
 s32 process_remove(void *, s32);                /* extern */
 s32 sub_80E4FC8();                              /* extern */
 
-void sub_807A658(void *arg0, s32 arg1) {
+void sub_807A658(struct Entity *arg0, s32 arg1) {
     s32 (*temp_r1_22)(s32);
 
-    (*(s32 *)((s8 *)(arg0) + (0x18))) = 0x08CDC2D8;
+    arg0->unk18 = 0x08CDC2D8;
     if ((*(s32 *)((s8 *)(arg0) + (0x1C))) != -1) {
         sub_80E4FC8();
         if ((*(s32 *)((s8 *)(arg0) + (0x1C))) != 0) {

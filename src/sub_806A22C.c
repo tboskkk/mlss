@@ -26,7 +26,7 @@ void sub_806A24C(struct Entity *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
         stop_sfx_80195A8(0x81);
         temp_r4_20 = (*(s32 *)((s8 *)(arg0) + (0xA4))) - (*(s32 *)((s8 *)(arg0) + (0xA0)));
-        (*(s32 *)((s8 *)(arg0) + (0xA8))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0xA0))) + (sub_8199F30() % temp_r4_20));
+        arg0->unkA8 = (s32) ((*(s32 *)((s8 *)(arg0) + (0xA0))) + (sub_8199F30() % temp_r4_20));
         arg0->handler = (s32 *) &sub_806A348;
     }
 }

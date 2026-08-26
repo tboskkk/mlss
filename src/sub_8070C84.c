@@ -27,14 +27,14 @@ extern s32 sub_806F47C;
 void sub_8070D88(struct Entity *arg0) {
     s32 temp_r0_25;
 
-    (*(s32 *)((s8 *)(arg0) + (0x18))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x18))) + (*(s32 *)((s8 *)(arg0) + (0x8C))));
-    (*(s32 *)((s8 *)(arg0) + (0x8C))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x8C))) - 0x80);
-    if ((s32) (*(s32 *)((s8 *)(arg0) + (0x18))) <= 0) {
-        (*(s32 *)((s8 *)(arg0) + (0x18))) = 0;
-        temp_r0_25 = (*(s32 *)((s8 *)(arg0) + (0x9C))) - 1;
-        (*(s32 *)((s8 *)(arg0) + (0x9C))) = temp_r0_25;
+    arg0->unk18 = (s32) (arg0->unk18 + arg0->unk8C);
+    arg0->unk8C = (s32) (arg0->unk8C - 0x80);
+    if ((s32) arg0->unk18 <= 0) {
+        arg0->unk18 = 0;
+        temp_r0_25 = arg0->unk9C - 1;
+        arg0->unk9C = temp_r0_25;
         if (temp_r0_25 == 0) {
-            (*(s32 *)((s8 *)(arg0) + (0x8C))) = 0x300;
+            arg0->unk8C = 0x300;
             return;
         }
         arg0->handler = &sub_806F47C;

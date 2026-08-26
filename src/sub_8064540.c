@@ -93,13 +93,13 @@ void sub_8064908(struct Entity *arg0) {
     s32 var_r0_44;
     void *temp_r1_9;
 
-    temp_r1_9 = (*(void **)((s8 *)(arg0) + (8)));
+    temp_r1_9 = arg0->unk08;
     (*(u16 *)((s8 *)(temp_r1_9) + (0xC))) = (u16) ((*(u16 *)((s8 *)(temp_r1_9) + (0xC))) + 0x1000);
     if (sub_801B1C8(*(void **)0x03000E18, 0x03000E60, 0x03000E64) == 1) {
         var_r0_27 = *(s32 *)0x03000E60;
         (*(s32 *)((s8 *)(arg0) + (0x10))) = var_r0_27;
         temp_r2_29 = *(s32 *)0x03000E64;
-        (*(s32 *)((s8 *)(arg0) + (0x18))) = temp_r2_29;
+        arg0->unk18 = temp_r2_29;
         if (var_r0_27 < 0) {
             var_r0_27 += 0xFF;
         }

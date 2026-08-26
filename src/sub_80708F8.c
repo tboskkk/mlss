@@ -63,7 +63,7 @@ asm_unified(".include \"asm/nonmatching/sub_80709E4.s\"");
 extern s32 sub_8070DCC;
 
 void sub_8070A50(struct Entity *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 5, 0, 0);
         arg0->handler = &sub_8070DCC;
     }

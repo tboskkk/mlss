@@ -35,7 +35,7 @@ ASM_FUNC("asm/nonmatching/sub_805F638.s", void sub_805F638(void *arg0));
 void sub_805DF88(void *arg0, s32 arg3);                       /* extern */
 
 void sub_805F690(struct Entity *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 4, 0, 0);
         arg0->handler = (s32 *) &sub_805DF88;
     }
