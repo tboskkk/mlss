@@ -26,8 +26,8 @@ void sub_80746A8(struct Entity *arg0) {
 
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 
-void sub_80746C4(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+void sub_80746C4(struct Entity *arg0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 0, 0, 0);
         (*(s32 *)((s8 *)(arg0) + (0x4C))) = 0;
     }

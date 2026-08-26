@@ -7,8 +7,8 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-void sub_8064540(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+void sub_8064540(struct Entity *arg0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         (*(s32 *)((s8 *)(arg0) + (0x4C))) = 0;
     }
 }

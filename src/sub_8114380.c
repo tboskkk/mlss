@@ -86,7 +86,7 @@ asm_unified(".include \"asm/nonmatching/sub_8114404.s\"");
 
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 
-void sub_811448C(void *arg0) {
+void sub_811448C(struct Entity *arg0) {
     u8 temp_r5_10;
     void *temp_r2_14;
 
@@ -95,7 +95,7 @@ void sub_811448C(void *arg0) {
         temp_r2_14 = *(void **)0x03000FD8;
         (*(u8 *)((s8 *)(temp_r2_14) + (0xC))) = (u8) ((*(u8 *)((s8 *)(temp_r2_14) + (0xC))) | 0x80);
         sub_8082E1C(arg0, -1, -1, 0);
-        (*(s8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x20))) = 0x10;
+        (*(s8 *)((s8 *)(arg0->unk08) + (0x20))) = 0x10;
         (*(s32 *)((s8 *)(arg0) + (0x4C))) = (s32) temp_r5_10;
     }
 }

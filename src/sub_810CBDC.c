@@ -7,10 +7,10 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-void sub_810CBDC(void *arg0) {
+void sub_810CBDC(struct Entity *arg0) {
     s32 temp_r0_9;
 
-    temp_r0_9 = (*(s32 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (4)));
+    temp_r0_9 = (*(s32 *)((s8 *)(arg0->unk08) + (4)));
     if (temp_r0_9 == 0) {
         (*(s32 *)((s8 *)(arg0) + (4))) = temp_r0_9;
         return;

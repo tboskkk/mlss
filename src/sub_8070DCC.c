@@ -43,8 +43,8 @@ void sub_8070EC0(struct Entity *arg0) {
     arg0->handler = &sub_806EB18;
 }
 
-void sub_8070EDC(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+void sub_8070EDC(struct Entity *arg0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 0, 0, 0);
         (*(s32 *)((s8 *)(arg0) + (0x4C))) = 0;
     }

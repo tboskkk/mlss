@@ -10,11 +10,11 @@ asm_unified(".include \"asm/macros.inc\"");
 s32 sub_807FB34(void *);                        /* extern */
 s32 sub_807FC54(void *, s16, s16, s16, s32);    /* extern */
 
-void sub_80E1AB0(void *arg0) {
+void sub_80E1AB0(struct Entity *arg0) {
     u8 temp_r0_14;
     void *temp_r5_9;
 
-    temp_r5_9 = (*(void **)((s8 *)(arg0) + (8)));
+    temp_r5_9 = arg0->unk08;
     temp_r0_14 = 8 & (*(u8 *)((s8 *)(temp_r5_9) + (0x12)));
     if (temp_r0_14 == 0) {
         sub_807FC54(temp_r5_9, (*(s16 *)((s8 *)(arg0) + (0x12))), (*(s16 *)((s8 *)(arg0) + (0x14))), (*(s16 *)((s8 *)(arg0) + (0x16))), (s32) temp_r0_14);

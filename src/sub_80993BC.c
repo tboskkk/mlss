@@ -19,13 +19,13 @@ int sub_807F47C();
 int sub_8086D80();
 extern s32 sub_809A76C;
 
-void sub_809A858(void *arg0);
+void sub_809A858(struct Entity *arg0);
 
-void sub_809A14C(void *arg0);
+void sub_809A14C(struct Entity *arg0);
 
 int sub_807C298();
 
-void sub_809A808(void *arg0);
+void sub_809A808(struct Entity *arg0);
 void sub_809A120(struct Entity *arg0);
 s32 sub_8082E1C();
 extern s32 sub_809A09C;
@@ -153,8 +153,8 @@ asm_unified(".include \"asm/nonmatching/sub_8099F7C.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-void sub_8099FC4(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+void sub_8099FC4(struct Entity *arg0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8087540(arg0);
     }
 }
@@ -229,8 +229,8 @@ void sub_809A120(struct Entity *arg0) {
 
 extern s32 sub_8099BE4;
 
-void sub_809A14C(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+void sub_809A14C(struct Entity *arg0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 0xA, 0, 0);
         (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8099BE4;
     }
@@ -338,8 +338,8 @@ void sub_809A7EC(void *arg0) {
     (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_809A808;
 }
 
-void sub_809A808(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+void sub_809A808(struct Entity *arg0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         if (!((*(s32 *)((s8 *)(arg0) + (0x98))) & 1)) {
             sub_8082E1C(arg0, 3, 0, 0);
         } else {
@@ -352,8 +352,8 @@ void sub_809A808(void *arg0) {
 
 extern s32 sub_809A178;
 
-void sub_809A858(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+void sub_809A858(struct Entity *arg0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         if (!((*(s32 *)((s8 *)(arg0) + (0x98))) & 2)) {
             sub_8082E1C(arg0, 5, 0, 0);
         } else {
@@ -468,8 +468,8 @@ void sub_809AE80(void *arg0) {
     }
 }
 
-void sub_809AEB0(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+void sub_809AEB0(struct Entity *arg0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_807C298(arg0);
     }
 }

@@ -111,8 +111,8 @@ s32 sub_8064224(void *arg0)
   return var_r0_8;
 }
 
-void sub_806424C(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+void sub_806424C(struct Entity *arg0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 0, 0, 0);
         (*(s32 *)((s8 *)(arg0) + (0x4C))) = 0;
     }
@@ -208,7 +208,7 @@ void sub_806446C(struct Entity *arg0) {
 }
 
 s32 sub_8082B00();                                  /* extern */
-void sub_8064514(void *arg0);
+void sub_8064514(struct Entity *arg0);
 extern s32 sub_8064540;
 void sub_8064488(void *arg0)
 {
@@ -233,8 +233,8 @@ void sub_8064488(void *arg0)
 }
 
 ASM_FUNC("asm/nonmatching/sub_80644DC.s", void sub_80644DC(void *arg0));
-void sub_8064514(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+void sub_8064514(struct Entity *arg0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 3, 0, 0);
         (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_8063CC8;
     }

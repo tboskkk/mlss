@@ -59,12 +59,12 @@ void sub_808EC08(void *arg0)
 
 s32 sub_808DD2C(void *);                        /* extern */
 
-void sub_808EC58(void *arg0) {
+void sub_808EC58(struct Entity *arg0) {
     if (0x38 & (*(u8 *)((s8 *)(arg0) + (0x76)))) {
         sub_808DD2C(arg0);
         return;
     }
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_808DD2C(arg0);
     }
 }

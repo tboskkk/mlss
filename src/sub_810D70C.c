@@ -15,7 +15,7 @@ s32 stop_sfx_80195A8();
 void sub_810FE44(void *arg0);
 
 u8 sub_8087CE4();
-void sub_810FE1C(void *arg0);
+void sub_810FE1C(struct Entity *arg0);
 
 s32 sub_80883A0();
 s32 sub_8082E1C();
@@ -250,8 +250,8 @@ asm_unified(".include \"asm/nonmatching/sub_810FD94.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-void sub_810FE1C(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+void sub_810FE1C(struct Entity *arg0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, -1, -1, 0);
         (*(s32 *)((s8 *)(arg0) + (0x4C))) = 0;
     }

@@ -122,8 +122,8 @@ void sub_8068A50(void *arg0)
 ASM_FUNC("asm/nonmatching/sub_8068AA8.s", void sub_8068AA8(void *arg0));
 ASM_FUNC("asm/nonmatching/sub_8068B68.s", void sub_8068B68(void *arg0));
 ASM_FUNC("asm/nonmatching/sub_8068BF0.s", void sub_8068BF0(void *arg0));
-void sub_8068C70(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+void sub_8068C70(struct Entity *arg0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 0, 0, 0);
         (*(s32 *)((s8 *)(arg0) + (0x4C))) = 0;
     }
@@ -262,8 +262,8 @@ s32 sub_8069354(struct Entity *arg0) {
 
 ASM_FUNC("asm/nonmatching/sub_8069394.s", void sub_8069394(void *arg0));
 ASM_FUNC("asm/nonmatching/sub_80693BC.s", void sub_80693BC(void *arg0));
-void sub_8069450(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+void sub_8069450(struct Entity *arg0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 9, 0, 0);
         (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_808750C;
     }

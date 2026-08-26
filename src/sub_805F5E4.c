@@ -61,10 +61,10 @@ ASM_FUNC("asm/nonmatching/sub_805FD5C.s", void sub_805FD5C(void *arg0));
 ASM_FUNC("asm/nonmatching/sub_805FDB8.s", void sub_805FDB8(void *arg0));
 ASM_FUNC("asm/nonmatching/sub_805FE74.s", void sub_805FE74(void *arg0));
 ASM_FUNC("asm/nonmatching/sub_805FEF4.s", void sub_805FEF4(void *arg0));
-void sub_805FF30(void *arg0) {
+void sub_805FF30(struct Entity *arg0) {
     s32 (*temp_r1_14)(void *);
 
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         temp_r1_14 = (*(s32 (**)(void *))((s8 *)(arg0) + (0x68)));
         if (temp_r1_14 != NULL) {
             temp_r1_14(arg0);

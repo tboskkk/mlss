@@ -10,7 +10,7 @@ asm_unified(".include \"asm/macros.inc\"");
 
 
 
-void sub_8062F40(void *arg0);
+void sub_8062F40(struct Entity *arg0);
 
 extern s32 sub_8062E98;
 
@@ -258,8 +258,8 @@ asm_unified(".include \"asm/nonmatching/sub_8062D84.s\"");
 
 extern s32 sub_806259C;
 
-void sub_8062DE0(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+void sub_8062DE0(struct Entity *arg0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 0xB, 0, 0);
         (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_806259C;
     }
@@ -302,8 +302,8 @@ void sub_8062F00(struct Entity *arg0) {
 }
 
 void sub_8062F8C(void *arg0);
-void sub_8062F40(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+void sub_8062F40(struct Entity *arg0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         if ((*(s32 *)((s8 *)(arg0) + (0x9C))) == 0) {
             sub_8082E1C(arg0, 5, 0, 0);
         } else {

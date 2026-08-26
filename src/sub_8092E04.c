@@ -10,10 +10,10 @@ asm_unified(".include \"asm/macros.inc\"");
 
 
 
-void sub_809316C(void *arg0);
+void sub_809316C(struct Entity *arg0);
 
 s32 sub_8082E1C();
-void sub_8093140(void *arg0);
+void sub_8093140(struct Entity *arg0);
 
 s32 sub_808DD2C();
 
@@ -42,13 +42,13 @@ asm_unified(".include \"asm/nonmatching/sub_8092E58.s\"");
 
 s32 sub_8092E58(void *);                        /* extern */
 
-void sub_8092EA0(void *arg0) {
+void sub_8092EA0(struct Entity *arg0) {
     s32 temp_r0_11;
 
     temp_r0_11 = (*(s32 *)((s8 *)(arg0) + (0x9C))) - 1;
     (*(s32 *)((s8 *)(arg0) + (0x9C))) = temp_r0_11;
     if (temp_r0_11 <= 0) {
-        (*(s8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x20))) = 0x10;
+        (*(s8 *)((s8 *)(arg0->unk08) + (0x20))) = 0x10;
         sub_8092E58(arg0);
     }
 }
@@ -64,13 +64,13 @@ asm_unified(".include \"asm/nonmatching/sub_8092EC4.s\"");
 
 s32 sub_8092EC4(void *);                        /* extern */
 
-void sub_8092F08(void *arg0) {
+void sub_8092F08(struct Entity *arg0) {
     s32 temp_r0_11;
 
     temp_r0_11 = (*(s32 *)((s8 *)(arg0) + (0x9C))) - 1;
     (*(s32 *)((s8 *)(arg0) + (0x9C))) = temp_r0_11;
     if (temp_r0_11 <= 0) {
-        (*(s8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x20))) = 0x10;
+        (*(s8 *)((s8 *)(arg0->unk08) + (0x20))) = 0x10;
         sub_8092EC4(arg0);
     }
 }
@@ -167,8 +167,8 @@ void sub_80930D8(void *arg0)
 
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 
-void sub_8093140(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+void sub_8093140(struct Entity *arg0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 0, 0x204D, 0);
         (*(s32 *)((s8 *)(arg0) + (0x4C))) = 0;
     }
@@ -176,8 +176,8 @@ void sub_8093140(void *arg0) {
 
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 
-void sub_809316C(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+void sub_809316C(struct Entity *arg0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 0, 0x2000, 0);
         (*(s32 *)((s8 *)(arg0) + (0x4C))) = 0;
     }
@@ -358,12 +358,12 @@ void sub_8093DBC(struct Entity *arg0) {
     arg0->handler = &sub_8093580;
 }
 
-void sub_8093E20(void *arg0) {
+void sub_8093E20(struct Entity *arg0) {
     if (0x38 & (*(u8 *)((s8 *)(arg0) + (0x76)))) {
         sub_808DD2C(arg0);
         return;
     }
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_808DD2C(arg0);
     }
 }

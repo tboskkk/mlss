@@ -62,7 +62,7 @@ asm_unified(".include \"asm/nonmatching/sub_810BD88.s\"");
 
 s32 sub_810B99C(void *);                        /* extern */
 
-void sub_810BFFC(void *arg0) {
+void sub_810BFFC(struct Entity *arg0) {
     u16 temp_r3_17;
     void *temp_r2_24;
 
@@ -71,7 +71,7 @@ void sub_810BFFC(void *arg0) {
         temp_r3_17 = (*(u16 *)((s8 *)(arg0) + (0x14)));
         if ((s32) (s16) (*(u16 *)((s8 *)(arg0) + (0x14))) > 0x88) {
             (*(u16 *)((s8 *)(arg0) + (0x14))) = (u16) (temp_r3_17 - 4);
-            temp_r2_24 = (*(void **)((s8 *)(arg0) + (8)));
+            temp_r2_24 = arg0->unk08;
             if ((temp_r2_24 != NULL) && ((6 & (*(u8 *)((s8 *)(temp_r2_24) + (0x7E)))) != 2)) {
                 (*(s16 *)((s8 *)((*(void **)((s8 *)(temp_r2_24) + (0x10)))) + (2))) = (s16) (temp_r3_17 + 0x14);
             }

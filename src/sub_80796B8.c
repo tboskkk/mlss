@@ -17,9 +17,9 @@ void sub_8079B48(void *arg0);
 
 void sub_8079C0C(struct Entity *arg0);
 
-void sub_8079C3C(void *arg0);
+void sub_8079C3C(struct Entity *arg0);
 
-void sub_8079C9C(void *arg0);
+void sub_8079C9C(struct Entity *arg0);
 
 s32 sub_8082E1C();
 s32 sub_807C298();
@@ -45,8 +45,8 @@ void sub_80796C4(void *arg0)
   }
 }
 
-void sub_8079704(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+void sub_8079704(struct Entity *arg0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 0, 0, 0);
         (*(s32 *)((s8 *)(arg0) + (0x4C))) = 0;
     }
@@ -156,8 +156,8 @@ void sub_8079850(void *arg0) {
 }
 #endif
 
-void sub_80798A8(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+void sub_80798A8(struct Entity *arg0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_807C298(arg0);
     }
 }
@@ -382,8 +382,8 @@ void sub_8079C0C(struct Entity *arg0) {
     }
 }
 
-void sub_8079C3C(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+void sub_8079C3C(struct Entity *arg0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 0, 0, 0);
         (*(s32 *)((s8 *)(arg0) + (0x4C))) = 0;
         *(u8 *)0x03000ED0 += 1;
@@ -400,7 +400,7 @@ void sub_8079C70(struct Entity *arg0) {
 s32 sub_80790CC(void *);                        /* extern */
 extern s32 sub_8079018;
 
-void sub_8079C9C(void *arg0) {
+void sub_8079C9C(struct Entity *arg0) {
     s32 temp_r0_11;
     s32 temp_r0_26;
 
@@ -412,7 +412,7 @@ void sub_8079C9C(void *arg0) {
         (*(s32 *)((s8 *)(arg0) + (0xA4))) = 6;
         temp_r0_26 = (*(s32 *)((s8 *)(arg0) + (0xA8))) + 1;
         (*(s32 *)((s8 *)(arg0) + (0xA8))) = temp_r0_26;
-        if ((temp_r0_26 > 5) && (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12))))) {
+        if ((temp_r0_26 > 5) && (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12))))) {
             if (*(s32 *)0x03000F6C == 0) {
                 sub_8082E1C(arg0, 6, 0x4029, 0);
             } else {

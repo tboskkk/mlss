@@ -69,7 +69,7 @@ void sub_81634DC(void *arg0) {
     sub_8161C9C((*(s32 *)((s8 *)(arg0) + (0xC))), 0, 0);
 }
 
-void sub_8163528(void *arg0, s32 arg1) {
+void sub_8163528(struct Entity *arg0, s32 arg1) {
     void *temp_r1_12;
     void *temp_r1_23;
     void *temp_r1_34;
@@ -89,7 +89,7 @@ void sub_8163528(void *arg0, s32 arg1) {
         temp_r1_23 = (*(void **)((s8 *)(temp_r2_20) + (0xC)));
         (*(s32 (**)(void *, s32))((s8 *)(temp_r1_23) + (0xC)))(temp_r2_20 + (*(s16 *)((s8 *)(temp_r1_23) + (8))), 3);
     }
-    temp_r2_31 = (*(void **)((s8 *)(arg0) + (8)));
+    temp_r2_31 = arg0->unk08;
     if (temp_r2_31 != NULL) {
         temp_r1_34 = (*(void **)((s8 *)(temp_r2_31) + (0xC)));
         (*(s32 (**)(void *, s32))((s8 *)(temp_r1_34) + (0xC)))(temp_r2_31 + (*(s16 *)((s8 *)(temp_r1_34) + (8))), 3);

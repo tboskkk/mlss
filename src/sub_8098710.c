@@ -185,8 +185,8 @@ asm_unified(".include \"asm/nonmatching/sub_8098E48.s\"");
    counts this as unmatched. Write the C here, replacing this comment. */
 #endif
 
-void sub_809900C(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+void sub_809900C(struct Entity *arg0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8087540(arg0);
     }
 }

@@ -15,10 +15,10 @@ asm_unified(".include \"asm/macros.inc\"");
 
 void sub_8060CB8(void *arg0);
 
-void sub_8061480(void *arg0);
+void sub_8061480(struct Entity *arg0);
 int sub_8082B00();
 
-void sub_80613FC(void *arg0);
+void sub_80613FC(struct Entity *arg0);
 void sub_8060A58(void *arg0);                       /* extern */
 
 void sub_8060694(void *arg0);
@@ -53,8 +53,8 @@ void sub_8060500(void *arg0)
 }
 
 ASM_FUNC("asm/nonmatching/sub_8060544.s", void sub_8060544(void *arg0));
-void sub_80605A4(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+void sub_80605A4(struct Entity *arg0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 0, 0, 0);
         (*(s32 *)((s8 *)(arg0) + (0x4C))) = 0;
     }
@@ -161,21 +161,21 @@ void sub_80612D4(void *arg0) {
 
 void sub_80610D4(void *arg0);                       /* extern */
 
-void sub_80612FC(void *arg0) {
+void sub_80612FC(struct Entity *arg0) {
     if (((u32) (*(u16 *)((s8 *)(arg0) + (0xAC))) <= 0x3FFFU) && ((s32) (*(s32 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x2C)))) + (0x40))) > 0)) {
         (*(s32 *)((s8 *)(arg0) + (0xA8))) = 1;
     }
     (*(u16 *)((s8 *)(arg0) + (0xAC))) = (u16) ((*(u16 *)((s8 *)(arg0) + (0xAC))) + 1);
     if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
         sub_8082E1C(arg0, 3, 0, 0);
-        (*(s8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x20))) = 0x10;
+        (*(s8 *)((s8 *)(arg0->unk08) + (0x20))) = 0x10;
         (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_80610D4;
     }
 }
 
 ASM_FUNC("asm/nonmatching/sub_8061354.s", void sub_8061354(void *arg0));
-void sub_80613FC(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+void sub_80613FC(struct Entity *arg0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 0, 0, 0);
         (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_808750C;
     }
@@ -183,10 +183,10 @@ void sub_80613FC(void *arg0) {
 
 void sub_8060F70(void *arg0);                       /* extern */
 
-void sub_8061428(void *arg0) {
+void sub_8061428(struct Entity *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
         sub_8082E1C(arg0, 3, 0, 0);
-        (*(s8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x20))) = 0x10;
+        (*(s8 *)((s8 *)(arg0->unk08) + (0x20))) = 0x10;
         (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_8060F70;
     }
 }
@@ -200,10 +200,10 @@ void sub_8061458(void *arg0) {
 
 void sub_8060E90(void *arg0);                       /* extern */
 
-void sub_8061480(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+void sub_8061480(struct Entity *arg0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 3, 0, 0);
-        (*(s8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x20))) = 0x10;
+        (*(s8 *)((s8 *)(arg0->unk08) + (0x20))) = 0x10;
         (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_8060E90;
     }
 }
@@ -249,8 +249,8 @@ ASM_FUNC("asm/nonmatching/sub_8061DA8.s", void sub_8061DA8(void *arg0));
 ASM_FUNC("asm/nonmatching/sub_8061E80.s", void sub_8061E80(void *arg0));
 void sub_8061DA8(void *arg0);                       /* extern */
 
-void sub_8061F3C(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+void sub_8061F3C(struct Entity *arg0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 0, 0, 0);
         (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_8061DA8;
     }
@@ -258,11 +258,11 @@ void sub_8061F3C(void *arg0) {
 
 s32 sub_807C298(void *);                        /* extern */
 
-void sub_8061F68(void *arg0) {
+void sub_8061F68(struct Entity *arg0) {
     s32 temp_r4_17;
     void *temp_r1_8;
 
-    temp_r1_8 = (*(void **)((s8 *)(arg0) + (8)));
+    temp_r1_8 = arg0->unk08;
     (*(u16 *)((s8 *)(temp_r1_8) + (0xC))) = (u16) ((*(u16 *)((s8 *)(temp_r1_8) + (0xC))) + 0x1600);
     temp_r4_17 = (*(s32 *)((s8 *)(arg0) + (0x10))) + 0xFFFFFD80;
     (*(s32 *)((s8 *)(arg0) + (0x10))) = temp_r4_17;
@@ -272,8 +272,8 @@ void sub_8061F68(void *arg0) {
     }
 }
 
-void sub_8061FC8(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+void sub_8061FC8(struct Entity *arg0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 0, 0, 0);
         (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_808750C;
     }

@@ -16,7 +16,7 @@ asm_unified(".include \"asm/macros.inc\"");
 
 void sub_80DEDB0(void *arg0);
 
-void sub_80DEE80(void *arg0);
+void sub_80DEE80(struct Entity *arg0);
 
 s32 stop_sfx_80195A8();
 
@@ -216,8 +216,8 @@ void sub_80DEE34(void *arg0)
   }
 }
 
-void sub_80DEE80(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+void sub_80DEE80(struct Entity *arg0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 0, 0, 0);
         sub_8087540(arg0);
     }

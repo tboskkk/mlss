@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Turn `+0x4C` handler accesses into `entity->handler`, byte-identically.
+"""Turn `+OFFSET` struct Entity field accesses into `entity->field`, byte-identically.
 
 WHAT THIS IS FOR. Matching decompilation produces C that is correct and almost
 unreadable: the entity handler assignment appears 419 times across 137 files as
@@ -11,8 +11,9 @@ CLAUDE.md section S, unblocked 2026-08-23) the same statement is
 
     arg0->handler = &sub_8111234;
 
-Identical bytes, and now it says what it means. This is the first pass of the
-readability work that section S gated for the whole life of the project.
+Identical bytes, and now it says what it means. This is one field of a general
+pass: --offset/--field/--ctype parameterize which struct Entity field gets the
+same treatment (default is the pilot field, handler at 0x4C).
 
 WHY IT IS SAFE, and why the safety is unusually good here. Two properties have
 to hold and both are checkable:
@@ -55,10 +56,29 @@ REPO = Path(__file__).resolve().parent.parent
 SRC = REPO / "src"
 DB = REPO / ".claude" / "factory" / "state.db"
 
-# `(*(s32 **)((s8 *)(NAME) + (0x4C)))`
-ACCESS = re.compile(r"\(\*\(s32 \*\*\)\(\(s8 \*\)\((\w+)\) \+ \(0x4C\)\)\)")
 # A function definition line: `type name(params) {`
 FUNCDEF = re.compile(r"^([A-Za-z_][\w \*]*?)\b(\w+)\s*\(([^;{]*)\)\s*\{", re.M)
+
+
+def offset_forms(offset: int) -> list[str]:
+    """split_func.py/m2c write offsets 0/4/8 in decimal and everything from
+    0xC up in hex (no leading zero) -- measured, not assumed (see
+    docs/... none written up; checked directly against src/*.c). Return every
+    spelling actually seen so the access regex matches either."""
+    forms = [str(offset)]
+    hexf = f"0x{offset:X}"
+    if hexf not in forms:
+        forms.append(hexf)
+    return forms
+
+
+def access_regex(ctype: str, offset: int) -> re.Pattern[str]:
+    """`(*(CTYPE *)((s8 *)(NAME) + (OFFSET)))` -- CTYPE is the field's own
+    type (e.g. `s32 *`), so the cast is one level higher, matching the
+    existing corpus convention (handler is `s32 *`, accessed as `s32 **`)."""
+    cast = re.escape(ctype + "*")
+    alt = "|".join(re.escape(f) for f in offset_forms(offset))
+    return re.compile(rf"\(\*\({cast}\)\(\(s8 \*\)\((\w+)\) \+ \((?:{alt})\)\)\)")
 
 
 def matched_names() -> set[str]:
@@ -69,7 +89,7 @@ def matched_names() -> set[str]:
         return set()
 
 
-def rewrite(text: str, matched: set[str]) -> tuple[str, list[str]]:
+def rewrite(text: str, matched: set[str], field: str, access: re.Pattern[str]) -> tuple[str, list[str]]:
     """-> (new text, [function names rewritten])."""
     done: list[str] = []
     out = text
@@ -83,7 +103,7 @@ def rewrite(text: str, matched: set[str]) -> tuple[str, list[str]]:
         if end == -1:
             continue
         body = text[start:end]
-        names = {n for n in ACCESS.findall(body)}
+        names = {n for n in access.findall(body)}
         if len(names) != 1:
             continue
         var = names.pop()
@@ -106,7 +126,7 @@ def rewrite(text: str, matched: set[str]) -> tuple[str, list[str]]:
             continue
         new_params = re.sub(rf"\bvoid(\s*\*\s*{re.escape(var)}\b)",
                             rf"struct Entity\1", params, count=1)
-        new_body = ACCESS.sub(lambda mm: f"{mm.group(1)}->handler", body)
+        new_body = access.sub(lambda mm: f"{mm.group(1)}->{field}", body)
         old_chunk = text[m.start():end]
         new_chunk = (old_chunk[:m.start(3) - m.start()] + new_params
                      + old_chunk[m.end(3) - m.start():(start - m.start())] + new_body)
@@ -138,7 +158,18 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--apply", action="store_true")
+    ap.add_argument("--offset", default="0x4C",
+                     help="struct Entity offset, decimal or 0x-hex (default: 0x4C)")
+    ap.add_argument("--field", default="handler",
+                     help="field name in struct Entity (default: handler)")
+    ap.add_argument("--ctype", default="s32 *",
+                     help="field's C type, e.g. 's32 *' or 'void *' (default: s32 *)")
     args = ap.parse_args()
+
+    offset = int(args.offset, 0)
+    field, ctype = args.field, args.ctype
+    access = access_regex(ctype, offset)
+    anchors = [f"+ ({f}))" for f in offset_forms(offset)]
 
     matched = matched_names()
     if not matched:
@@ -148,14 +179,14 @@ def main() -> int:
     plan: dict[Path, tuple[str, list[str]]] = {}
     for p in sorted(SRC.glob("*.c")):
         text = p.read_text(errors="ignore")
-        if "0x4C" not in text:
+        if not any(a in text for a in anchors):
             continue
-        new, done = rewrite(text, matched)
+        new, done = rewrite(text, matched, field, access)
         if done and new != text:
             plan[p] = (new, done)
 
     total = sum(len(v[1]) for v in plan.values())
-    print(f"{total} function(s) in {len(plan)} file(s) can become entity->handler")
+    print(f"{total} function(s) in {len(plan)} file(s) can become entity->{field}")
     for p, (_n, done) in list(plan.items())[:8]:
         print(f"   {p.name:<26} {', '.join(done[:4])}"
               + (f" +{len(done)-4}" if len(done) > 4 else ""))

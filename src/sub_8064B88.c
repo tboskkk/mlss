@@ -68,10 +68,10 @@ void sub_8064C00(void *arg0)
   }
 }
 
-void sub_8064C80(void *arg0) {
+void sub_8064C80(struct Entity *arg0) {
     void *temp_r1_8;
 
-    temp_r1_8 = (*(void **)((s8 *)(arg0) + (8)));
+    temp_r1_8 = arg0->unk08;
     (*(u16 *)((s8 *)(temp_r1_8) + (0xC))) = (u16) ((*(u16 *)((s8 *)(temp_r1_8) + (0xC))) + 0x1000);
     if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
         (*(s16 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x28)))) + (0xB4))) = 1;

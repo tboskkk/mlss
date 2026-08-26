@@ -9,11 +9,11 @@ asm_unified(".include \"asm/macros.inc\"");
 
 
 s32 sub_8082E1C();
-void sub_809B3DC(void *arg0) {
+void sub_809B3DC(struct Entity *arg0) {
     s32 temp_r0_25;
     void *temp_r1_8;
 
-    temp_r1_8 = (*(void **)((s8 *)(arg0) + (8)));
+    temp_r1_8 = arg0->unk08;
     if ((*(u8 *)((s8 *)(temp_r1_8) + (0x21))) != 0) {
         if (8 & (*(u8 *)((s8 *)(temp_r1_8) + (0x12)))) {
             sub_8082E1C(arg0, 0, 0, 0);

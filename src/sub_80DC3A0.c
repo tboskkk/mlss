@@ -12,7 +12,7 @@ asm_unified(".include \"asm/macros.inc\"");
 
 
 
-void sub_80DDABC(void *arg0);
+void sub_80DDABC(struct Entity *arg0);
 
 void sub_80DDA78(void *arg0);
 s32 sub_8082E1C();
@@ -292,8 +292,8 @@ asm_unified(".include \"asm/nonmatching/sub_80DD4EC.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-void sub_80DD560(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+void sub_80DD560(struct Entity *arg0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 0, 0, 0);
         sub_8087540(arg0);
     }
@@ -496,8 +496,8 @@ void sub_80DDA78(void *arg0)
   }
 }
 
-void sub_80DDABC(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+void sub_80DDABC(struct Entity *arg0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 0, 0, 0);
         sub_8087540(arg0);
     }

@@ -28,7 +28,7 @@ void sub_808C8E0(void *arg0);
 void sub_808C83C(struct Entity *arg0);
 
 s32 sub_8082E1C();
-void sub_808C510(void *arg0);
+void sub_808C510(struct Entity *arg0);
 
 void sub_808C810(struct Entity *arg0);
 
@@ -67,12 +67,12 @@ void sub_808C1C4(struct Entity *arg0) {
     }
 }
 
-void sub_808C1FC(void *arg0) {
+void sub_808C1FC(struct Entity *arg0) {
     void *temp_r0_14;
 
     if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
         stop_sfx_80195A8(0x6C);
-        temp_r0_14 = (*(void **)((s8 *)(arg0) + (8)));
+        temp_r0_14 = arg0->unk08;
         (*(u8 *)((s8 *)(temp_r0_14) + (0x11))) = (u8) ((*(u8 *)((s8 *)(temp_r0_14) + (0x11))) | 0x40);
         sub_8087540(arg0);
     }
@@ -137,8 +137,8 @@ void sub_808C2E0(void *arg0) {
     }
 }
 
-void sub_808C308(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+void sub_808C308(struct Entity *arg0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8087540(arg0);
     }
 }
@@ -231,8 +231,8 @@ void sub_808C4EC(void *arg0) {
     (*(s32 **)((s8 *)(arg0) + (0x50))) = (s32 *) &sub_808C754;
 }
 
-void sub_808C510(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+void sub_808C510(struct Entity *arg0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_807C298(arg0);
     }
 }
@@ -674,15 +674,15 @@ asm_unified(".include \"asm/nonmatching/sub_808DC10.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-void sub_808DCB0(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+void sub_808DCB0(struct Entity *arg0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 0, 0x204D, 0);
         (*(s32 *)((s8 *)(arg0) + (0x4C))) = 0;
     }
 }
 
-void sub_808DCDC(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+void sub_808DCDC(struct Entity *arg0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 0, 0x2000, 0);
         (*(s32 *)((s8 *)(arg0) + (0x4C))) = 0;
     }

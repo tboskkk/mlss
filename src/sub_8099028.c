@@ -27,8 +27,8 @@ ASM_FUNC("asm/nonmatching/sub_80990B4.s", void sub_80990B4(void *arg0));
 ASM_FUNC("asm/nonmatching/sub_80991DC.s", void sub_80991DC(void *arg0));
 s32 sub_8087540(void *);                        /* extern */
 
-void sub_80993A0(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+void sub_80993A0(struct Entity *arg0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8087540(arg0);
     }
 }

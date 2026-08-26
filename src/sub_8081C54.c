@@ -9,8 +9,8 @@ asm_unified(".include \"asm/macros.inc\"");
 
 extern s32 sub_8081F84;
 
-void sub_8081C54(void *arg0) {
-    if (!(1 & (*(u8 *)((s8 *)((*(void **)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x28)))) + (0x111))))) {
+void sub_8081C54(struct Entity *arg0) {
+    if (!(1 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0->unk08) + (0x28)))) + (0x111))))) {
         (*(s32 **)((s8 *)(arg0) + (4))) = &sub_8081F84;
     }
 }

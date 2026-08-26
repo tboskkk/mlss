@@ -48,8 +48,8 @@ ASM_FUNC("asm/nonmatching/sub_8064EDC.s", void sub_8064EDC(void *arg0));
 ASM_FUNC("asm/nonmatching/sub_8064FEC.s", void sub_8064FEC(void *arg0));
 ASM_FUNC("asm/nonmatching/sub_80650D8.s", void sub_80650D8(void *arg0));
 ASM_FUNC("asm/nonmatching/sub_806515C.s", s32 sub_806515C(void *arg0));
-void sub_80651B0(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+void sub_80651B0(struct Entity *arg0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_807C298(arg0);
     }
 }

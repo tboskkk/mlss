@@ -38,7 +38,7 @@ struct GameState {
 struct Entity {
 /* 0x00 */ s32 unk00;
 /* 0x04 */ s32 unk04;
-/* 0x08 */ s32 unk08;
+/* 0x08 */ void *unk08;
 /* 0x0C */ s32 unk0C;
 /* 0x10 */ u8  unk10;
 /* 0x11 */ u8  unk11;

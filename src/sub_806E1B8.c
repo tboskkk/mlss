@@ -13,8 +13,8 @@ int sub_807C298();
 ASM_FUNC("asm/nonmatching/sub_806E1B8.s", void sub_806E1B8(void *arg0));
 ASM_FUNC("asm/nonmatching/sub_806E388.s", void sub_806E388(void *arg0));
 ASM_FUNC("asm/nonmatching/sub_806E414.s", void sub_806E414(void *arg0));
-void sub_806E5D8(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+void sub_806E5D8(struct Entity *arg0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_807C298(arg0);
     }
 }

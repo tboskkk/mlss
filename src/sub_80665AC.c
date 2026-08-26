@@ -11,10 +11,10 @@ asm_unified(".include \"asm/macros.inc\"");
 
 
 
-void sub_8066EB4(void *arg0);
+void sub_8066EB4(struct Entity *arg0);
 
 extern s32 sub_806688C;
-void sub_8066D78(void *arg0);
+void sub_8066D78(struct Entity *arg0);
 
 extern s32 sub_8066DA4;
 int sub_8082B00();
@@ -189,8 +189,8 @@ void sub_8066D50(struct Entity *arg0) {
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 extern s32 sub_808750C;
 
-void sub_8066D78(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+void sub_8066D78(struct Entity *arg0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 0xB, 0, 0);
         (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_808750C;
     }
@@ -239,8 +239,8 @@ void sub_8066E5C(void *arg0)
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 extern s32 sub_806688C;
 
-void sub_8066EB4(void *arg0) {
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+void sub_8066EB4(struct Entity *arg0) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         sub_8082E1C(arg0, 7, 0, 0);
         (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_806688C;
     }

@@ -27,10 +27,10 @@ void sub_81147B4(void *arg0) {
 ASM_FUNC("asm/nonmatching/sub_81147D0.s", void sub_81147D0(void *arg0));
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 
-void sub_8114854(void *arg0) {
+void sub_8114854(struct Entity *arg0) {
     void *temp_r1_15;
 
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+    if (8 & (*(u8 *)((s8 *)(arg0->unk08) + (0x12)))) {
         temp_r1_15 = *(void **)0x03000FD8;
         (*(s32 *)((s8 *)((*(void **)((s8 *)(temp_r1_15) + (0x60)))) + (0x54))) = 0;
         (*(s32 *)((s8 *)((*(void **)((s8 *)(temp_r1_15) + (0x64)))) + (0x54))) = 0;

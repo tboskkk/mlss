@@ -59,11 +59,11 @@ void sub_8087BD0(void *arg0) {
 
 s32 sub_8086700(void *);                        /* extern */
 
-void sub_8087C20(void *arg0) {
+void sub_8087C20(struct Entity *arg0) {
     u8 temp_r4_15;
     void *temp_r2_8;
 
-    temp_r2_8 = (*(void **)((s8 *)(arg0) + (8)));
+    temp_r2_8 = arg0->unk08;
     temp_r4_15 = 2 & (*(u8 *)((s8 *)(temp_r2_8) + (0x111)));
     if (temp_r4_15 == 0) {
         sub_8086700(temp_r2_8 + 8);

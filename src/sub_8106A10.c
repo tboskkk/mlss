@@ -32,7 +32,7 @@ s32 sub_810D260(s16, s32);                          /* extern */
 s32 sub_810D34C(s16, s32, s32, s32);            /* extern */
 void sub_8107248(void *arg0);                       /* extern */
 
-void sub_8106A30(void *arg0) {
+void sub_8106A30(struct Entity *arg0) {
     s16 temp_r5_16;
     s32 temp_r4_14;
     void *temp_r2_25;
@@ -40,7 +40,7 @@ void sub_8106A30(void *arg0) {
     temp_r4_14 = ((*(u8 *)((s8 *)(*(void **)0x03000FD8) + (0x342))) * 0x10) + 0x28;
     temp_r5_16 = (*(s16 *)((s8 *)(arg0) + (0x16)));
     sub_810D34C(temp_r5_16, sub_810D260(temp_r5_16, 0xB8), temp_r4_14, 0);
-    temp_r2_25 = (*(void **)((s8 *)(arg0) + (8)));
+    temp_r2_25 = arg0->unk08;
     if (8 & (*(u8 *)((s8 *)(temp_r2_25) + (0x12)))) {
         sub_807FB34(temp_r2_25);
         (*(s16 *)((s8 *)(arg0) + (0x10))) = 0;
