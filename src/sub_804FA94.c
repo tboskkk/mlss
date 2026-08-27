@@ -33,13 +33,9 @@ void sub_804FA94(void *arg0, u16 arg1, u16 arg2) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_804FAF8.s\"");
-#else
 s32 sub_8020D40(s32);                           /* extern */
-
-void sub_804FAF8(void *arg0) {
-    sub_8020D40((*(s32 *)((s8 *)(arg0) + (0x44))));
-    (*(u8 *)((s8 *)(arg0) + (0))) = (u8) (-0x41 & (*(u8 *)((s8 *)(arg0) + (0))));
+void sub_804FAF8(void *arg0)
+{
+  sub_8020D40(*((s32 *) (((s8 *) arg0) + 0x44)));
+  *((u8 *) (((s8 *) arg0) + 0)) = (u8) ((-0x41) & (*(((s8 *) arg0) + 0)));
 }
-#endif
