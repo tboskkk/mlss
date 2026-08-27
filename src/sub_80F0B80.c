@@ -15,16 +15,13 @@ s32 sub_80F0B80(void)
   return 1;
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80F0BA4.s\"");
-#else
 s32 sub_805C78C(s32, u8, u8);                   /* extern */
-
-s32 sub_80F0BA4(void *arg0, void *arg2) {
-    sub_805C78C((*(s32 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x14)))) + (0x304))), (*(u8 *)((s8 *)(arg2) + (0))), (*(u8 *)((s8 *)(arg2) + (4))));
-    return 1;
+s32 sub_80F0BA4(void *arg0, void *arg2)
+{
+  s8 *new_var;
+ do { if (1) { sub_805C78C(*((s32 *) (((s8 *) (*((void **) (((s8 *) arg0) + 0x14)))) + 0x304)), *((u8 *) (new_var + 0)), *((u8 *) (new_var + 4))); } } while (0); new_var = (s8 *) arg2;
+  return 1;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80F0BC0.s\"");
