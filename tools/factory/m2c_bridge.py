@@ -532,6 +532,7 @@ def generate(name: str) -> str | None:
     c = fix_indirect_call_precedence(c)
     c = fix_untyped_address_access(c, name)
     c = fix_pointer_assign_without_cast(c)
+    c = fix_integer_assign_from_pointer(c)
     return restore_omitted_leading_params(c, name)
 
 
@@ -668,13 +669,31 @@ def fix_void_dereference(c: str) -> str:
 
 
 LOCAL_DECL_RE = re.compile(
-    r"^\s*(void\s*\*|u8|s8|u16|s16|u32|s32|u64|s64)\s*\*?\s*(\w+)\s*;", re.MULTILINE)
+    r"^\s*((?:void|u8|s8|u16|s16|u32|s32|u64|s64)\s*\*?)\s*(\w+)\s*;", re.MULTILINE)
 
 
 def _local_types(c: str) -> dict:
-    """name -> declared C type (bare, e.g. 's32' or 'void *') for every
+    """name -> declared C type (bare, e.g. 's32' or 'void*') for every
     m2c-declared local in this candidate. m2c always declares its locals
-    up front, one per line, before the first executable statement."""
+    up front, one per line, before the first executable statement.
+
+    THE TRAILING '*' MUST BE PART OF GROUP 1 FOR EVERY TYPE, NOT JUST
+    `void`. An earlier version of this regex had the optional star
+    OUTSIDE the alternation, so it matched but was never captured for any
+    keyword but `void` -- `s32 *var_r3_45;` reported as bare `"s32"`,
+    silently losing that it was a pointer at all.
+
+    That is not cosmetic: _classify_untyped_head() below decides "already
+    a real pointer, nothing to fix" by checking `t.endswith("*")`, so it
+    was silently FALSE for every `s16 *`/`s32 *`/`u16 *`/`u32 *`/... local
+    -- fix_untyped_address_access (already shipped) could wrap an
+    already-correctly-typed pointer in a spurious cast. Confirmed live
+    while adding a second rule on this same helper: `s32 *var_r3_45;`
+    assigned pointer arithmetic was treated as a plain integer, and a
+    naive fix would have cast a pointer value into a mismatched
+    assignment -- caught by regression-testing before commit, not by
+    review.
+    """
     types = {}
     for m in LOCAL_DECL_RE.finditer(c):
         types[m.group(2)] = m.group(1).replace(" ", "")
@@ -846,6 +865,53 @@ def fix_pointer_assign_without_cast(c: str) -> str:
         return f"{indent}{lhs}{eq}({ctype.replace('*', ' *')}) ({r});"
 
     return _PTR_ASSIGN_RE.sub(repl, c)
+
+
+_INT_ASSIGN_FROM_PTR_RE = re.compile(r"^(\s*)(\w+)(\s*=\s*)(\w+)(\s*[+\-]\s*.+?);\s*$", re.MULTILINE)
+
+# Pointer types where `ptr +/- N` is guaranteed to be pure byte arithmetic --
+# the pointee is one byte wide, so there is no sizeof-scaling to get wrong.
+# u16*/u32*/s16*/s32*/... are deliberately EXCLUDED even though
+# _local_types() can return them: `s32 *p; p + 1` advances 4 bytes, not 1,
+# so casting away the warning there would compile fine and be WRONG. Struct
+# pointers can't appear here at all -- LOCAL_DECL_RE only recognizes the
+# fixed-width keyword types, never `struct X *`.
+BYTE_PTR_TYPES = {"void*", "u8*", "s8*"}
+
+
+def fix_integer_assign_from_pointer(c: str) -> str:
+    """Cast the RHS when a NON-pointer local is assigned byte-pointer
+    arithmetic: `s32 sp4; sp4 = temp_r7_16 - (...);` where temp_r7_16 is
+    `void *`.
+
+    The mirror image of fix_pointer_assign_without_cast above -- same root
+    defect (m2c reconstructs an address as untyped arithmetic), opposite
+    direction (a pointer value flowing into an integer-typed local instead
+    of an untyped value flowing into a pointer-typed one). agbcc warns
+    "assignment makes integer from pointer without a cast", -Werror makes
+    it fatal, same as the other direction.
+
+    SAFE FOR THE SAME REASON AS THE OTHER RULE: a pointer-to-integer CAST
+    never changes bits (both are 4 bytes here), so restricting this to
+    byte-pointee types (see BYTE_PTR_TYPES above) means the arithmetic's
+    VALUE is provably unchanged -- this only silences the warning, it
+    cannot make already-correct arithmetic wrong.
+    """
+    types = _local_types(c)
+    if not types:
+        return c
+
+    def repl(m: re.Match) -> str:
+        indent, lhs, eq, base, rest = m.group(1), m.group(2), m.group(3), m.group(4), m.group(5)
+        lhs_type = types.get(lhs)
+        base_type = types.get(base)
+        if not lhs_type or "*" in lhs_type:
+            return m.group(0)  # only targets a non-pointer LHS
+        if base_type not in BYTE_PTR_TYPES:
+            return m.group(0)
+        return f"{indent}{lhs}{eq}({lhs_type}) ({base}{rest});"
+
+    return _INT_ASSIGN_FROM_PTR_RE.sub(repl, c)
 
 
 def fix_untyped_address_access(c: str, name: str) -> str:
