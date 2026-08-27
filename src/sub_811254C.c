@@ -8,6 +8,10 @@
 asm_unified(".include \"asm/macros.inc\"");
 
 
+
+s32 sub_80880C4();
+s32 sub_808843C();
+
 s32 sub_8082E1C();
 
 extern s32 sub_8111848;
@@ -36,39 +40,40 @@ void sub_8112578(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_81125CC.s\"");
-#else
-s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
-s32 sub_80880C4(void *, s32);                   /* extern */
-s32 sub_808843C(void *, s32, s32, s32, s32);    /* extern */
 extern s32 sub_8112870;
-
-void sub_81125CC(void *arg0) {
-    s32 var_r0_12;
-    s32 var_r0_20;
-    s32 var_r0_28;
-    void *temp_r3_9;
-
-    temp_r3_9 = (*(void **)((s8 *)(arg0) + (0x28)));
-    var_r0_12 = (*(s32 *)((s8 *)(temp_r3_9) + (0xD8)));
-    if (var_r0_12 < 0) {
-        var_r0_12 += 0xFF;
-    }
-    var_r0_20 = (*(s32 *)((s8 *)(temp_r3_9) + (0xDC)));
-    if (var_r0_20 < 0) {
-        var_r0_20 += 0xFF;
-    }
-    var_r0_28 = (*(s32 *)((s8 *)(temp_r3_9) + (0xE0)));
-    if (var_r0_28 < 0) {
-        var_r0_28 += 0xFF;
-    }
-    sub_808843C(arg0, var_r0_12 >> 8, var_r0_20 >> 8, var_r0_28 >> 8, 0x100);
-    sub_80880C4(arg0, 0x300);
-    sub_8082E1C(arg0, 0xC, 0, 0);
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8112870;
+void sub_81125CC(void *arg0)
+{
+  s32 var_r0_12;
+  s32 var_r0_20;
+  s32 new_var3;
+  s32 var_r0_28;
+  void *temp_r3_9;
+  s8 *new_var2;
+  s32 new_var;
+  temp_r3_9 = (void *) (*((void **) (((s8 *) arg0) + 0x28)));
+  var_r0_12 = *((s32 *) (((s8 *) temp_r3_9) + 0xD8));
+  if (var_r0_12 < 0)
+  {
+    var_r0_12 += 0xFF;
+  }
+  new_var3 = var_r0_12 >> 8;
+  var_r0_20 = *((s32 *) (((s8 *) temp_r3_9) + 0xDC));
+  if (var_r0_20 < 0)
+  {
+    var_r0_20 = var_r0_20 + 0xFF;
+  }
+  new_var = var_r0_20 >> 8;
+  var_r0_28 = *((s32 *) (((s8 *) temp_r3_9) + 0xE0));
+  new_var2 = (s8 *) arg0;
+  if (var_r0_28 <= (0 - 1))
+  {
+    var_r0_28 += 0xFF;
+  }
+  sub_808843C(arg0, new_var3, new_var, var_r0_28 >> 8, 0x100);
+  sub_80880C4(arg0, 0x300);
+  sub_8082E1C(arg0, 0xC, 0, 0);
+  *((s32 **) (new_var2 + 0x4C)) = &sub_8112870;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8112630.s\"");
