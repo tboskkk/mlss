@@ -7,6 +7,9 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
+
+s32 sub_8158258();
+
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8154AAC.s\"");
 #else
@@ -50,50 +53,46 @@ block_15:
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8154B24.s\"");
-#else
-s32 sub_8158258(void *);                        /* extern */
-
-void *sub_8154B24(void *arg0) {
-    void *temp_r0_37;
-    void *temp_r0_61;
-    void *temp_r0_83;
-
-    (*(s32 *)((s8 *)(arg0) + (0x1C))) = 0;
-    (*(void **)((s8 *)(arg0) + (8))) = NULL;
-    (*(void **)((s8 *)(arg0) + (4))) = NULL;
-    (*(void **)((s8 *)(arg0) + (0))) = NULL;
-    (*(s32 *)((s8 *)(arg0) + (0x20))) = 0;
-    (*(s32 *)((s8 *)(arg0) + (0x24))) = 0;
-    (*(s32 *)((s8 *)(arg0) + (0x28))) = 0;
-    (*(s32 *)((s8 *)(arg0) + (0x2C))) = 0;
-    (*(s32 *)((s8 *)(arg0) + (0x14))) = 0xE800;
-    (*(s32 *)((s8 *)(arg0) + (0x18))) = 0x1400;
-    (*(s32 *)((s8 *)(arg0) + (0x30))) = 0;
-    (*(s32 *)((s8 *)(arg0) + (0x34))) = 0;
-    temp_r0_37 = sub_8020DD0(4, 0x500C, 0, -1, -1, -1, -1);
-    (*(void **)((s8 *)(arg0) + (0))) = temp_r0_37;
-    sub_801E150(temp_r0_37, 0xA, -1, 0, 0);
-    sprite_show_8020CBC((*(void **)((s8 *)(arg0) + (0))));
-    (*(s16 *)((s8 *)((*(void **)((s8 *)(arg0) + (0)))) + (0))) = 0xD8;
-    (*(s16 *)((s8 *)((*(void **)((s8 *)(arg0) + (0)))) + (2))) = 0x10;
-    temp_r0_61 = sub_8020DD0(4, 0x500C, 0, -1, -1, -1, -1);
-    (*(void **)((s8 *)(arg0) + (4))) = temp_r0_61;
-    sub_801E150(temp_r0_61, 0xA, -1, 0, 0);
-    sprite_show_8020CBC((*(void **)((s8 *)(arg0) + (4))));
-    (*(s16 *)((s8 *)((*(void **)((s8 *)(arg0) + (4)))) + (0))) = 0xE0;
-    (*(s16 *)((s8 *)((*(void **)((s8 *)(arg0) + (4)))) + (2))) = 0x10;
-    temp_r0_83 = sub_8020DD0(4, 0x500C, 0, -1, -1, -1, -1);
-    (*(void **)((s8 *)(arg0) + (8))) = temp_r0_83;
-    sub_801E150(temp_r0_83, 0xA, -1, 0, 0);
-    sprite_show_8020CBC((*(void **)((s8 *)(arg0) + (8))));
-    (*(s16 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0))) = 0xE8;
-    (*(s16 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (2))) = 0x10;
-    sub_8158258(arg0);
-    return arg0;
+void *sub_8154B24(void *arg0)
+{
+  struct Sprite *temp_r0_37;
+  struct Sprite *temp_r0_61;
+  struct Sprite *temp_r0_83;
+  long long new_var;
+  *((s32 *) (((s8 *) arg0) + 0x1C)) = 0;
+  *((struct Sprite **) (((s8 *) arg0) + 8)) = (void *) 0;
+  *((struct Sprite **) (((s8 *) arg0) + 4)) = (void *) 0;
+  *((struct Sprite **) (((s8 *) arg0) + 0)) = (void *) 0;
+  new_var = 0x500C;
+  *((s32 *) (((s8 *) arg0) + 0x20)) = 0;
+  *((s32 *) (((s8 *) arg0) + 0x24)) = 0;
+  *((s32 *) (((s8 *) arg0) + 0x28)) = 0;
+  *((s32 *) (((s8 *) arg0) + 0x2C)) = 0;
+  *((s32 *) (((s8 *) arg0) + 0x14)) = 0xE800;
+  *((s32 *) (((s8 *) arg0) + 0x18)) = 0x1400;
+  *((s32 *) (((s8 *) arg0) + 0x30)) = 0;
+  *((s32 *) (((s8 *) arg0) + 0x34)) = 0;
+  temp_r0_37 = sub_8020DD0(4, new_var, 0, -1, -1, -1, -1);
+  *((struct Sprite **) (((s8 *) arg0) + 0)) = temp_r0_37;
+  sub_801E150(temp_r0_37, 0xA, -1, 0, 0);
+  sprite_show_8020CBC(*((struct Sprite **) (((s8 *) arg0) + 0)));
+  (*((struct Sprite **) (((s8 *) arg0) + 0)))->xPosition = 0xD8;
+  (*((struct Sprite **) (((s8 *) arg0) + 0)))->yPosition = 0x10;
+  temp_r0_61 = sub_8020DD0(4, new_var, 0, -1, -1, -1, -1);
+  *((struct Sprite **) (((s8 *) arg0) + 4)) = temp_r0_61;
+  sub_801E150(temp_r0_61, 0xA, -1, 0, 0);
+  sprite_show_8020CBC(*((struct Sprite **) (((s8 *) arg0) + 4)));
+  (*((struct Sprite **) (((s8 *) arg0) + 4)))->xPosition = 0xE0;
+  (*((struct Sprite **) (((s8 *) arg0) + 4)))->yPosition = 0x10;
+  temp_r0_83 = sub_8020DD0(4, new_var, 0, -1, -1, -1, -1);
+  *((struct Sprite **) (((s8 *) arg0) + 8)) = temp_r0_83;
+  sub_801E150(temp_r0_83, 0xA, -1, 0, 0);
+  sprite_show_8020CBC(*((struct Sprite **) (((s8 *) arg0) + 8)));
+  (*((struct Sprite **) (((s8 *) arg0) + 8)))->xPosition = 0xE8;
+  (*((struct Sprite **) (((s8 *) arg0) + 8)))->yPosition = 0x10;
+  sub_8158258(arg0);
+  return arg0;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8154C08.s\"");
