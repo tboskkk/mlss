@@ -7,6 +7,9 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
+
+void sub_804FCD4(void *arg0);
+
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_804FC90.s\"");
 #else
@@ -74,14 +77,31 @@ void sub_804FD3C(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_804FD80.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+s32 sub_8047804(void *, u8);                    /* extern */
+s32 sub_80494D4(void *);                        /* extern */
+void sub_804FD80(void *arg0, u8 arg1)
+{
+  u16 temp_r1_21;
+  u32 temp_r5_15;
+  u32 temp_r6_20;
+  long long new_var;
+  temp_r5_15 = ((u32) ((*((u8 *) (((s8 *) arg0) + 0x214))) << 0x1D)) >> 0x1D;
+  temp_r6_20 = ((u32) ((*((u8 *) (((s8 *) arg0) + 0x24))) << 0x1D)) >> 0x1D;
+  temp_r1_21 = *((u16 *) (((s8 *) arg0) + 4));
+  if (((u32) ((u16) (temp_r1_21 - 5))) <= 4U)
+  {
+    sub_804FCD4(arg0);
+  }
+  else
+    if (((u32) ((u16) ((*((u16 *) (((s8 *) arg0) + 4))) - 0xA))) <= 2U)
+  {
+    sub_80494D4(arg0);
+  }
+  new_var = -8;
+  *((u8 *) (((s8 *) arg0) + 0x214)) = (u8) (temp_r5_15 | (new_var & (*((u8 *) (((s8 *) arg0) + 0x214)))));
+  *((u8 *) (((s8 *) arg0) + 0x24)) = (u8) ((new_var & (*((u8 *) (((s8 *) arg0) + 0x24)))) | temp_r6_20);
+  sub_8047804(arg0, arg1);
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_804FDF4.s\"");
