@@ -134,6 +134,42 @@ def best_score_seen(name: str) -> int | None:
     return best
 
 
+def best_output_source(name: str) -> Path | None:
+    """The source.c of the lowest-scoring output-N-*/ this run produced, or
+    None if it never improved on its seed at all.
+
+    WHY THIS EXISTS. A stalled search's improving candidates were being
+    thrown away: `ensure_isolated()` rmtree's `nonmatchings/<name>/` on the
+    row's NEXT claim, before anything ever reads them, and the `stalled`
+    resolve() call two screens down never passed `body=`. So every
+    re-launch restarted from the ORIGINAL candidate_body, not from
+    whatever the previous 10+ minutes of search actually found. Confirmed
+    live: sub_8053FC4 stalled at best_score=10 across four separate
+    696-second searches in a row, identical score every time -- rediscovering
+    the same near-miss instead of building on it. 1,687 rows in the corpus
+    have already been relaunched 2+ times this way.
+
+    Safe to promote unconditionally: decomp-permuter only ever writes an
+    output-{score}-N/ directory for a candidate that scored <= the base it
+    was given (permuter.py's should_output()), so whatever this returns is
+    never a regression versus the candidate_body the row was launched with.
+    """
+    out_dir = NONMATCHINGS_DIR / name
+    if not out_dir.is_dir():
+        return None
+    best_score, best_dir = None, None
+    for d in out_dir.iterdir():
+        m = OUTPUT_DIR_RE.match(d.name)
+        if m:
+            score = int(m.group(1))
+            if best_score is None or score < best_score:
+                best_score, best_dir = score, d
+    if best_dir is None:
+        return None
+    src = best_dir / "source.c"
+    return src if src.is_file() else None
+
+
 def has_zero(name: str) -> Path | None:
     hits = sorted((NONMATCHINGS_DIR / name).glob("output-0-*/source.c"))
     return hits[0] if hits else None
@@ -1078,11 +1114,26 @@ def run_pool(jobs: int, stall_min: float, max_functions: int):
             elif stalled:
                 kill_search(name, info["proc"])
                 info["log"].close()
+                # Checkpoint the closest candidate this run found, so the
+                # NEXT attempt (this row goes back to tier2_ready and can be
+                # relaunched) starts from here instead of from the original
+                # seed -- see best_output_source()'s docstring for why this
+                # was previously silently discarded every time.
+                checkpoint = best_output_source(name)
+                body = None
+                if checkpoint is not None:
+                    variants = reattach_decls(checkpoint.read_text(), name)
+                    body = variants[0] if variants else None
+                checkpoint_note = (
+                    f", checkpointed for the next attempt" if body else
+                    ", no improving output to checkpoint")
                 resolve(name, "stalled", event="stalled",
                         detail=f"best_score={info['last_score']}",
+                        body=body,
                         notes=f"no improvement for {info['stall_s']:.0f}s "
-                              f"(best={info['last_score']}) -- likely wrong C, needs tier3")
-                print(f"  {name}: stalled at {info['last_score']} after {info['stall_s']:.0f}s -> tier3")
+                              f"(best={info['last_score']}){checkpoint_note}")
+                print(f"  {name}: stalled at {info['last_score']} after {info['stall_s']:.0f}s"
+                      + (" -> checkpointed" if body else " -> tier3, nothing to checkpoint"))
                 del procs[name]
                 _active.pop(name, None)
                 processed += 1
