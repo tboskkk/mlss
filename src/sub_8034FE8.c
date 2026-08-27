@@ -478,10 +478,380 @@ void sub_8039078(void *arg0) {
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8039250.s\"");
 #else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
+s32 sub_802DC0C(void *, void *);                    /* extern */
+s32 sub_802DF80(void *, s32);                   /* extern */
+s32 sub_80401F0(void *, s32, s32, s32);         /* extern */
+s32 sub_80402C4(void *);                        /* extern */
+s32 sub_8045A94(void *, s32, s32, s32, s32, s32); /* extern */
+s32 sub_80465D8(void *);                        /* extern */
+s32 sub_8046980(void *);                        /* extern */
+u8 sub_8047B78(void *);                             /* extern */
+s32 sub_8049000(void *, s32);                   /* extern */
+s32 sub_804FB64(void *, void *, s32, s32);      /* extern */
+
+void sub_8039250(void *arg0) {
+    s16 temp_r0_105;
+    s32 temp_r0_160;
+    s32 temp_r0_345;
+    s32 temp_r2_840;
+    s32 temp_r3_899;
+    s32 temp_r4_151;
+    s32 temp_r5_336;
+    s32 temp_r5_613;
+    s32 temp_r6_886;
+    s32 var_r0_760;
+    s32 var_r1_378;
+    s32 var_r1_634;
+    s32 var_r1_648;
+    s32 var_r2_36;
+    s32 var_r3_41;
+    s32 var_r3_747;
+    s8 var_r2_80;
+    u16 *temp_r1_538;
+    u16 *temp_r1_664;
+    u16 temp_r0_226;
+    u16 temp_r0_271;
+    u16 temp_r0_540;
+    u16 temp_r0_666;
+    u16 temp_r0_946;
+    u16 temp_r1_15;
+    u8 *temp_r1_387;
+    u8 *temp_r1_445;
+    u8 *temp_r1_729;
+    u8 *temp_r1_900;
+    u8 *temp_r1_907;
+    u8 *temp_r1_914;
+    u8 *temp_r1_927;
+    u8 *temp_r2_887;
+    u8 *temp_r2_921;
+    u8 *temp_r3_894;
+    u8 temp_r0_35;
+    u8 temp_r2_321;
+    u8 temp_r3_563;
+    void *temp_r0_157;
+    void *temp_r0_342;
+    void *temp_r0_486;
+    void *temp_r1_184;
+    void *temp_r1_188;
+    void *temp_r1_197;
+    void *temp_r1_236;
+    void *temp_r1_243;
+    void *temp_r1_247;
+    void *temp_r1_261;
+    void *temp_r1_282;
+    void *temp_r1_286;
+    void *temp_r1_317;
+    void *temp_r1_32;
+    void *temp_r1_434;
+    void *temp_r1_439;
+    void *temp_r1_550;
+    void *temp_r1_557;
+    void *temp_r1_581;
+    void *temp_r1_609;
+    void *temp_r1_626;
+    void *temp_r1_742;
+    void *temp_r1_75;
+    void *temp_r1_779;
+    void *temp_r1_786;
+    void *temp_r1_811;
+    void *temp_r1_838;
+    void *temp_r1_843;
+    void *temp_r1_869;
+    void *temp_r2_209;
+    void *temp_r2_290;
+    void *temp_r2_374;
+    void *temp_r2_474;
+    void *temp_r2_492;
+    void *temp_r2_561;
+    void *temp_r2_630;
+    void *temp_r2_680;
+    void *temp_r2_746;
+    void *temp_r2_868;
+    void *temp_r3_150;
+    void *temp_r3_335;
+    void *temp_r4_676;
+    void *temp_r6_697;
+
+    temp_r1_15 = (*(u16 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x204)))) + (4)));
+    if (((u32) (u16) (temp_r1_15 - 0x80) <= 3U) || ((u32) (u16) (temp_r1_15 - 0x88) <= 3U)) {
+        temp_r1_32 = (void *) ((*(void **)((s8 *)(arg0) + (0x200))));
+        temp_r0_35 = (*(u8 *)((s8 *)(temp_r1_32) + (0x54)));
+        var_r2_36 = 0x0839F6CE;
+        if (temp_r0_35 == 0) {
+            var_r2_36 = 0x0839F730;
+        }
+        var_r3_41 = 0x24;
+        if (temp_r0_35 == 0) {
+            var_r3_41 = 0x20;
+        }
+        (*(s16 *)((s8 *)((*(void **)((s8 *)(temp_r1_32) + (0x294)))) + (4))) = (s16) ((s8) *(((*(s16 *)((s8 *)(arg0) + (0x26E))) * 2) + var_r2_36) * 0x10);
+        (*(s16 *)((s8 *)((*(void **)((s8 *)((*(void **)((s8 *)(arg0) + (0x200)))) + (0x294)))) + (6))) = (s16) ((s32) ((s8) (*(u8 *)((s8 *)((((*(s16 *)((s8 *)(arg0) + (0x26E))) * 2) + var_r2_36)) + (1))) << 8) / var_r3_41);
+        temp_r1_75 = (void *) ((*(void **)((s8 *)(arg0) + (0x200))));
+        var_r2_80 = 0;
+        if ((s32) (*(s16 *)((s8 *)((*(void **)((s8 *)(temp_r1_75) + (0x294)))) + (6))) <= 0xFF) {
+            var_r2_80 = -1;
+        }
+        (*(s8 *)((s8 *)(temp_r1_75) + (0x23B))) = var_r2_80;
+        if ((s32) (*(s16 *)((s8 *)(arg0) + (0x26E))) < 0x30) {
+            (*(s16 *)((s8 *)(arg0) + (0x26E))) = (s16) ((u16) (*(s16 *)((s8 *)(arg0) + (0x26E))) + 1);
+        }
+    }
+    temp_r0_105 = (*(u16 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x204)))) + (4))) - 0x80;
+    switch ((u32) temp_r0_105) {                    /* irregular */
+    case 0:
+    case 8:
+        sub_80402C4((*(void **)((s8 *)(arg0) + (0x204))));
+        if (!(0x40 & *((*(s32 *)((s8 *)(M2C_ERROR(/* Read from unset register $pc */)) + (0x90))) + arg0))) {
+            temp_r3_150 = (void *) ((*(void **)((s8 *)(arg0) + (0x204))));
+            temp_r4_151 = (*(s32 *)((s8 *)(temp_r3_150) + (0x14)));
+            temp_r0_157 = (void *) ((*(void **)((s8 *)(arg0) + (0x200))));
+            temp_r0_160 = (*(s32 *)((s8 *)(temp_r0_157) + (0x14))) + (*(s32 *)((s8 *)(temp_r0_157) + (0x18)));
+            if ((s32) (temp_r4_151 + (*(s32 *)((s8 *)(temp_r3_150) + (0x18)))) < temp_r0_160) {
+                (*(s32 *)((s8 *)(temp_r3_150) + (0x18))) = (s32) (temp_r0_160 - temp_r4_151);
+            }
+        }
+        if (!(8 & (*(u8 *)((s8 *)((*(void **)((s8 *)((*(void **)((s8 *)(arg0) + (0x204)))) + (0x294)))) + (0x12))))) {
+
+        } else {
+            temp_r1_184 = (void *) ((*(void **)((s8 *)(arg0) + (0x200))));
+            (*(u16 *)((s8 *)(temp_r1_184) + (4))) = (u16) ((*(u16 *)((s8 *)(temp_r1_184) + (4))) + 1);
+            temp_r1_188 = (void *) ((*(void **)((s8 *)(arg0) + (0x204))));
+            (*(u16 *)((s8 *)(temp_r1_188) + (4))) = (u16) ((*(u16 *)((s8 *)(temp_r1_188) + (4))) + 1);
+            (*(u16 *)((s8 *)(arg0) + (0x270))) = 0x10U;
+            temp_r1_197 = (void *) ((*(void **)((s8 *)(arg0) + (0x204))));
+            (*(u8 *)((s8 *)(temp_r1_197) + (0x214))) = (u8) (-8 & (*(u8 *)((s8 *)(temp_r1_197) + (0x214))));
+            temp_r2_209 = (void *) ((*(void **)((s8 *)((*(void **)((s8 *)(arg0) + (0x204)))) + (0x294))));
+            (*(u8 *)((s8 *)(temp_r2_209) + (0x12))) = (u8) ((-7 & (*(u8 *)((s8 *)(temp_r2_209) + (0x12)))) | 2);
+        }
+        break;
+    case 1:
+    case 9:
+        temp_r0_226 = (*(u16 *)((s8 *)(arg0) + (0x270))) - 1;
+        (*(u16 *)((s8 *)(arg0) + (0x270))) = temp_r0_226;
+        if ((temp_r0_226 << 0x10) != 0) {
+
+        } else {
+            temp_r1_236 = (void *) ((*(void **)((s8 *)(arg0) + (0x200))));
+            (*(u16 *)((s8 *)(temp_r1_236) + (4))) = (u16) ((*(u16 *)((s8 *)(temp_r1_236) + (4))) + 1);
+            temp_r1_243 = (void *) ((*(void **)((s8 *)(arg0) + (0x204))));
+            (*(u16 *)((s8 *)(temp_r1_243) + (4))) = (u16) ((*(u16 *)((s8 *)(temp_r1_243) + (4))) + 1);
+            temp_r1_247 = (void *) ((*(void **)((s8 *)(arg0) + (0x204))));
+            (*(u8 *)((s8 *)(temp_r1_247) + (0x214))) = (u8) (-8 & (*(u8 *)((s8 *)(temp_r1_247) + (0x214))));
+        }
+        break;
+    case 2:
+    case 10:
+        temp_r1_261 = (void *) ((*(void **)((s8 *)(arg0) + (0x204))));
+        (*(s32 *)((s8 *)(temp_r1_261) + (0x18))) = (s32) ((*(s32 *)((s8 *)(temp_r1_261) + (0x18))) + 0x400);
+        temp_r0_271 = (*(u16 *)((s8 *)(arg0) + (0x270))) + 0x400;
+        (*(u16 *)((s8 *)(arg0) + (0x270))) = temp_r0_271;
+        if ((s32) (temp_r0_271 << 0x10) <= (s32) (*(s32 *)((s8 *)(M2C_ERROR(/* Read from unset register $pc */)) + (0x44)))) {
+
+        } else {
+            temp_r1_282 = (void *) ((*(void **)((s8 *)(arg0) + (0x200))));
+            (*(u16 *)((s8 *)(temp_r1_282) + (4))) = (u16) ((*(u16 *)((s8 *)(temp_r1_282) + (4))) + 1);
+            temp_r1_286 = (void *) ((*(void **)((s8 *)(arg0) + (0x204))));
+            (*(u16 *)((s8 *)(temp_r1_286) + (4))) = (u16) ((*(u16 *)((s8 *)(temp_r1_286) + (4))) + 1);
+            temp_r2_290 = (void *) ((*(void **)((s8 *)(arg0) + (0x204))));
+            (*(u8 *)((s8 *)(temp_r2_290) + (0x214))) = (u8) ((-8 & (*(u8 *)((s8 *)(temp_r2_290) + (0x214)))) | 1);
+            (*(s8 *)((s8 *)((*(void **)((s8 *)((*(void **)((s8 *)(arg0) + (0x204)))) + (0x294)))) + (0x20))) = 0xF0;
+        }
+        break;
+    case 3:
+    case 11:
+        temp_r1_317 = (void *) ((*(void **)((s8 *)(arg0) + (0x204))));
+        temp_r2_321 = (*(u8 *)((s8 *)(temp_r1_317) + (0x214)));
+        if (!(7 & temp_r2_321)) {
+            sub_80402C4(temp_r1_317);
+            if (!(0x40 & *((*(s32 *)((s8 *)(M2C_ERROR(/* Read from unset register $pc */)) + (0x3C))) + arg0))) {
+                temp_r3_335 = (void *) ((*(void **)((s8 *)(arg0) + (0x204))));
+                temp_r5_336 = (*(s32 *)((s8 *)(temp_r3_335) + (0x14)));
+                temp_r0_342 = (void *) ((*(void **)((s8 *)(arg0) + (0x200))));
+                temp_r0_345 = (*(s32 *)((s8 *)(temp_r0_342) + (0x14))) + (*(s32 *)((s8 *)(temp_r0_342) + (0x18)));
+                if ((s32) (temp_r5_336 + (*(s32 *)((s8 *)(temp_r3_335) + (0x18)))) < temp_r0_345) {
+                    (*(s32 *)((s8 *)(temp_r3_335) + (0x18))) = (s32) (temp_r0_345 - temp_r5_336);
+                    (*(s32 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x204)))) + (0x25C))) = -1;
+                }
+            }
+        } else if ((*(u8 *)((s8 *)((*(void **)((s8 *)(temp_r1_317) + (0x294)))) + (0x23))) == 0) {
+            (*(u8 *)((s8 *)(temp_r1_317) + (0x214))) = (u8) (-8 & temp_r2_321);
+            temp_r2_374 = (void *) ((*(void **)((s8 *)(arg0) + (0x204))));
+            var_r1_378 = (*(s32 *)((s8 *)(M2C_ERROR(/* Read from unset register $pc */)) + (0xFC)));
+            if ((*(u8 *)((s8 *)(temp_r2_374) + (0x54))) == 0) {
+                var_r1_378 -= 1;
+            }
+            sub_8049000(temp_r2_374, var_r1_378);
+            temp_r1_387 = (u8 *) ((*(void **)((s8 *)(arg0) + (0x204))) + (*(s32 *)((s8 *)(M2C_ERROR(/* Read from unset register $pc */)) + (0xF0))));
+            *temp_r1_387 &= -0x41;
+            sub_80401F0((*(void **)((s8 *)(arg0) + (0x204))), 0, -1);
+            (*(s32 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x204)))) + (0x24C))) = (s32) (*(s32 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x200)))) + (0x14)));
+        }
+        if (*((*(s32 *)((s8 *)(M2C_ERROR(/* Read from unset register $pc */)) + (0xC4))) + arg0) != 0x30) {
+
+        } else if ((*(s32 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x204)))) + (0x25C))) != -1) {
+
+        } else {
+            temp_r1_434 = (void *) ((*(void **)((s8 *)(arg0) + (0x200))));
+            (*(u16 *)((s8 *)(temp_r1_434) + (4))) = (u16) ((*(u16 *)((s8 *)(temp_r1_434) + (4))) + 1);
+            temp_r1_439 = (void *) ((*(void **)((s8 *)(arg0) + (0x204))));
+            (*(u16 *)((s8 *)(temp_r1_439) + (4))) = (u16) ((*(u16 *)((s8 *)(temp_r1_439) + (4))) + 1);
+            temp_r1_445 = (u8 *) ((*(void **)((s8 *)(arg0) + (0x204))) + (*(s32 *)((s8 *)(M2C_ERROR(/* Read from unset register $pc */)) + (0x80))));
+            *temp_r1_445 &= -0x41;
+            (*(u8 *)((s8 *)(arg0) + (0x208))) = (u8) ((*(u8 *)((s8 *)(arg0) + (0x208))) | 1);
+            (*(s16 *)((s8 *)((*(void **)((s8 *)((*(void **)((s8 *)(arg0) + (0x200)))) + (0x294)))) + (4))) = 0x100;
+            (*(s16 *)((s8 *)((*(void **)((s8 *)((*(void **)((s8 *)(arg0) + (0x200)))) + (0x294)))) + (6))) = 0x100;
+            *((*(void **)((s8 *)(arg0) + (0x200))) + (*(s32 *)((s8 *)(M2C_ERROR(/* Read from unset register $pc */)) + (0x54)))) = 0;
+            temp_r2_474 = (void *) ((*(void **)((s8 *)(arg0) + (0x204))));
+            (*(u8 *)((s8 *)(temp_r2_474) + (0x214))) = (u8) ((-8 & (*(u8 *)((s8 *)(temp_r2_474) + (0x214)))) | 3);
+            temp_r0_486 = (void *) ((*(void **)((s8 *)(arg0) + (0x200))));
+            (*(u8 *)((s8 *)(temp_r0_486) + (0x214))) = (u8) ((-8 & (*(u8 *)((s8 *)(temp_r0_486) + (0x214)))) | 3);
+            temp_r2_492 = (void *) ((*(void **)((s8 *)(arg0) + (0x204))));
+            if ((*(u8 *)((s8 *)(temp_r2_492) + (0x54))) == 0) {
+                sub_8049000(temp_r2_492, (*(s32 *)((s8 *)(M2C_ERROR(/* Read from unset register $pc */)) + (0x20))));
+                sub_8049000((*(void **)((s8 *)(arg0) + (0x200))), (*(s32 *)((s8 *)(M2C_ERROR(/* Read from unset register $pc */)) + (8))));
+            } else {
+                sub_8049000(temp_r2_492, (*(s32 *)((s8 *)(M2C_ERROR(/* Read from unset register $pc */)) + (0x18))));
+                sub_8049000((*(void **)((s8 *)(arg0) + (0x200))), (*(s32 *)((s8 *)(M2C_ERROR(/* Read from unset register $pc */)) + (0x14))));
+            }
+            *((*(s32 *)((s8 *)(M2C_ERROR(/* Read from unset register $pc */)) + (0x10))) + arg0) = 8;
+        }
+        break;
+    case 4:
+    case 12:
+        temp_r1_538 = (u16 *) ((*(s32 *)((s8 *)(M2C_ERROR(/* Read from unset register $pc */)) + (0x68))) + arg0);
+        temp_r0_540 = *temp_r1_538 - 1;
+        *temp_r1_538 = temp_r0_540;
+        if ((temp_r0_540 << 0x10) != 0) {
+
+        } else {
+            temp_r1_550 = (void *) ((*(void **)((s8 *)(arg0) + (0x200))));
+            (*(u16 *)((s8 *)(temp_r1_550) + (4))) = (u16) ((*(u16 *)((s8 *)(temp_r1_550) + (4))) + 1);
+            temp_r1_557 = (void *) ((*(void **)((s8 *)(arg0) + (0x204))));
+            (*(u16 *)((s8 *)(temp_r1_557) + (4))) = (u16) ((*(u16 *)((s8 *)(temp_r1_557) + (4))) + 1);
+            temp_r2_561 = (void *) ((*(void **)((s8 *)(arg0) + (0x200))));
+            temp_r3_563 = (*(u8 *)((s8 *)(temp_r2_561) + (0x24)));
+            (*(u8 *)((s8 *)(temp_r2_561) + (0x24))) = (u8) ((-8 & temp_r3_563) | ((((u32) (temp_r3_563 << 0x1D) >> 0x1D) + 4) & 7));
+            sub_80401F0((*(void **)((s8 *)(arg0) + (0x200))), (*(s32 *)((s8 *)(M2C_ERROR(/* Read from unset register $pc */)) + (0x20))), 0x75, -1);
+            temp_r1_581 = (void *) ((*(void **)((s8 *)(arg0) + (0x200))));
+            (*(u8 *)((s8 *)(temp_r1_581) + (0x214))) = (u8) ((-8 & (*(u8 *)((s8 *)(temp_r1_581) + (0x214)))) | 1);
+        }
+        break;
+    case 5:
+    case 13:
+        sub_80402C4((*(void **)((s8 *)(arg0) + (0x200))));
+        sub_80465D8((*(void **)((s8 *)(arg0) + (0x200))));
+        sub_804FB64((*(void **)((s8 *)(arg0) + (0x200))), arg0 + 0x28, 0, 0);
+        temp_r1_609 = (void *) ((*(void **)((s8 *)(arg0) + (0x200))));
+        temp_r5_613 = (*(s32 *)((s8 *)(temp_r1_609) + (0x25C)));
+        if (temp_r5_613 != -1) {
+
+        } else {
+            (*(u16 *)((s8 *)(temp_r1_609) + (4))) = (u16) ((*(u16 *)((s8 *)(temp_r1_609) + (4))) + 1);
+            temp_r1_626 = (void *) ((*(void **)((s8 *)(arg0) + (0x204))));
+            (*(u16 *)((s8 *)(temp_r1_626) + (4))) = (u16) ((*(u16 *)((s8 *)(temp_r1_626) + (4))) + 1);
+            temp_r2_630 = (void *) ((*(void **)((s8 *)(arg0) + (0x200))));
+            var_r1_634 = (*(s32 *)((s8 *)(M2C_ERROR(/* Read from unset register $pc */)) + (0x2C)));
+            if ((*(u8 *)((s8 *)(temp_r2_630) + (0x54))) == 0) {
+                var_r1_634 -= 0x1E;
+            }
+            sub_8049000(temp_r2_630, var_r1_634);
+            *((*(s32 *)((s8 *)(M2C_ERROR(/* Read from unset register $pc */)) + (0x24))) + arg0) = 0x3C;
+            var_r1_648 = 0xFE;
+            if ((*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x200)))) + (0x54))) == 0) {
+                var_r1_648 = 0xF0;
+            }
+            play_sfx_80195B4(var_r1_648, temp_r5_613);
+        }
+        break;
+    case 6:
+    case 14:
+        temp_r1_664 = (u16 *) ((*(s32 *)((s8 *)(M2C_ERROR(/* Read from unset register $pc */)) + (0x5C))) + arg0);
+        temp_r0_666 = *temp_r1_664 - 1;
+        *temp_r1_664 = temp_r0_666;
+        if ((temp_r0_666 << 0x10) != 0) {
+
+        } else {
+            temp_r4_676 = (void *) ((*(void **)((s8 *)(arg0) + (0x204))));
+            temp_r2_680 = (void *) ((*(void **)((s8 *)(arg0) + (0x200))));
+            (*(u8 *)((s8 *)(temp_r2_680) + (0x214))) = (u8) ((-8 & (*(u8 *)((s8 *)(temp_r2_680) + (0x214)))) | 3);
+            (*(u8 *)((s8 *)(temp_r4_676) + (0x214))) = (u8) ((-8 & (*(u8 *)((s8 *)(temp_r4_676) + (0x214)))) | 3);
+            temp_r6_697 = (void *) ((*(void **)((s8 *)(arg0) + (0x204))));
+            if ((*(u8 *)((s8 *)(temp_r6_697) + (0x54))) == 0) {
+                sub_8049000(temp_r6_697, (*(s32 *)((s8 *)(M2C_ERROR(/* Read from unset register $pc */)) + (0x14))));
+                sub_8049000((*(void **)((s8 *)(arg0) + (0x200))), (*(s32 *)((s8 *)(M2C_ERROR(/* Read from unset register $pc */)) + (0xC))));
+            } else {
+                sub_8049000(temp_r6_697, (*(s32 *)((s8 *)(M2C_ERROR(/* Read from unset register $pc */)) + (0x8C))));
+                sub_8049000((*(void **)((s8 *)(arg0) + (0x200))), (*(s32 *)((s8 *)(M2C_ERROR(/* Read from unset register $pc */)) + (0x88))));
+            }
+            temp_r1_729 = (u8 *) ((*(void **)((s8 *)(arg0) + (0x204))) + (*(s32 *)((s8 *)(M2C_ERROR(/* Read from unset register $pc */)) + (0x7C))));
+            *temp_r1_729 &= -0x41;
+            if (!(0x40 & *((*(s32 *)((s8 *)(M2C_ERROR(/* Read from unset register $pc */)) + (0x74))) + arg0))) {
+                temp_r1_742 = (void *) ((*(void **)((s8 *)(arg0) + (0x204))));
+                temp_r2_746 = (void *) ((*(void **)((s8 *)(arg0) + (0x200))));
+                var_r3_747 = (*(s32 *)((s8 *)(temp_r2_746) + (0xC)));
+                if (var_r3_747 < 0) {
+                    var_r3_747 += 0xFF;
+                }
+                if ((s32) (*(s32 *)((s8 *)(temp_r2_746) + (0x10))) < 0) {
+
+                }
+                var_r0_760 = (*(s32 *)((s8 *)(temp_r2_746) + (0x14)));
+                if (var_r0_760 < 0) {
+                    var_r0_760 += 0xFF;
+                }
+                sub_8045A94(temp_r1_742, 1, 0, var_r3_747 >> 8, var_r0_760 >> 8, (s32) *(s32 *)(temp_r1_742 + (*(s32 *)((s8 *)(M2C_ERROR(/* Read from unset register $pc */)) + (0x3C)))));
+            }
+            temp_r1_779 = (void *) ((*(void **)((s8 *)(arg0) + (0x200))));
+            (*(u16 *)((s8 *)(temp_r1_779) + (4))) = (u16) ((*(u16 *)((s8 *)(temp_r1_779) + (4))) + 1);
+            temp_r1_786 = (void *) ((*(void **)((s8 *)(arg0) + (0x204))));
+            (*(u16 *)((s8 *)(temp_r1_786) + (4))) = (u16) ((*(u16 *)((s8 *)(temp_r1_786) + (4))) + 1);
+        }
+        break;
+    case 7:
+    case 15:
+        if ((((sub_802DC0C(arg0, (*(void **)((s8 *)(arg0) + (0x204)))) << 0x18) == 0) && ((temp_r1_811 = (*(void **)((s8 *)(arg0) + (0x204))), ((*(s32 *)((s8 *)(temp_r1_811) + (0x18))) == 0)) || ((s8) (*(u8 *)((s8 *)(temp_r1_811) + (1))) != -1))) || ((sub_8047B78((*(void **)((s8 *)(arg0) + (0x204)))) << 0x18) == 0)) {
+            if (sub_8047B78((*(void **)((s8 *)(arg0) + (0x204)))) == 1) {
+                temp_r1_838 = (void *) ((*(void **)((s8 *)(arg0) + (0x204))));
+                temp_r2_840 = (*(s32 *)((s8 *)(M2C_ERROR(/* Read from unset register $pc */)) + (0xC0)));
+                (*(s32 *)((s8 *)(temp_r1_838) + (0xC))) = (s32) ((*(s32 *)((s8 *)(temp_r1_838) + (0xC))) & temp_r2_840);
+                temp_r1_843 = (void *) ((*(void **)((s8 *)(arg0) + (0x204))));
+                (*(s32 *)((s8 *)(temp_r1_843) + (0x10))) = (s32) ((*(s32 *)((s8 *)(temp_r1_843) + (0x10))) & temp_r2_840);
+            }
+            sub_8046980((*(void **)((s8 *)(arg0) + (0x204))));
+            *(*(s8 **)((s8 *)((*(void **)((s8 *)(arg0) + (0x200)))) + (0x368))) = 0;
+            *(*(s8 **)((s8 *)((*(void **)((s8 *)(arg0) + (0x204)))) + (0x368))) = 0;
+            (*(u16 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x200)))) + (4))) = 0U;
+            (*(u16 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x204)))) + (4))) = 0U;
+            temp_r2_868 = (void *) ((*(void **)((s8 *)(arg0) + (0x204))));
+            temp_r1_869 = (void *) ((*(void **)((s8 *)(arg0) + (0x200))));
+            (*(u8 *)((s8 *)(temp_r1_869) + (0x358))) = (u8) (-9 & (*(u8 *)((s8 *)(temp_r1_869) + (0x358))));
+            (*(u8 *)((s8 *)(temp_r2_868) + (0x358))) = (u8) (-9 & (*(u8 *)((s8 *)(temp_r2_868) + (0x358))));
+            temp_r6_886 = (*(s32 *)((s8 *)(M2C_ERROR(/* Read from unset register $pc */)) + (0x68)));
+            temp_r2_887 = (u8 *) ((*(void **)((s8 *)(arg0) + (0x200))) + temp_r6_886);
+            *temp_r2_887 &= -0x41;
+            temp_r3_894 = (u8 *) ((*(void **)((s8 *)(arg0) + (0x204))) + temp_r6_886);
+            *temp_r3_894 &= -0x41;
+            temp_r3_899 = (*(s32 *)((s8 *)(M2C_ERROR(/* Read from unset register $pc */)) + (0x50)));
+            temp_r1_900 = (u8 *) ((*(void **)((s8 *)(arg0) + (0x204))) + temp_r3_899);
+            *temp_r1_900 &= -0x21;
+            temp_r1_907 = (u8 *) ((*(void **)((s8 *)(arg0) + (0x204))) + temp_r3_899);
+            *temp_r1_907 |= 0x40;
+            temp_r1_914 = (u8 *) ((*(void **)((s8 *)(arg0) + (0x204))) + (*(s32 *)((s8 *)(M2C_ERROR(/* Read from unset register $pc */)) + (0x38))));
+            *temp_r1_914 &= -3;
+            temp_r2_921 = (u8 *) ((*(s32 *)((s8 *)(M2C_ERROR(/* Read from unset register $pc */)) + (0x30))) + arg0);
+            *temp_r2_921 &= 0x7F;
+            temp_r1_927 = (u8 *) ((*(s32 *)((s8 *)(M2C_ERROR(/* Read from unset register $pc */)) + (0x28))) + arg0);
+            *temp_r1_927 &= -9;
+            sub_802DF80(arg0, 0);
+        }
+        break;
+    }
+    temp_r0_946 = (*(u16 *)((s8 *)(arg0) + (0x272))) - 1;
+    (*(u16 *)((s8 *)(arg0) + (0x272))) = temp_r0_946;
+    if ((temp_r0_946 << 0x10) == 0) {
+        play_sfx_80195B4(0xD6, -1);
+    }
+}
 #endif
 
 #ifndef NONMATCHING
