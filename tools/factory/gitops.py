@@ -970,6 +970,61 @@ def object_size_matches(name: str) -> tuple:
     return True, f"{stem}.o .text 0x{got:X}, unchanged"
 
 
+_UNDEF_DEBUG_LABEL_RE = re.compile(
+    r"(build/src/\w+\.o):\(\.debug_info\+0x[0-9a-f]+\): undefined reference to `\.LI\d+_\d+'")
+
+# Mirrors the Makefile's own per-object CFLAGS/CFLAGS_NODEBUG/CPPFLAGS exactly
+# (Makefile lines ~31-51) -- kept in sync by hand since this is a narrow,
+# rarely-hit retry path, not worth a shared-parsing dependency for.
+_CPPFLAGS = ["-I", "tools/agbcc/include", "-nostdinc", "-undef", "-iquote", "include",
+             "-Wno-trigraphs"]
+_CFLAGS_NODEBUG = ["-O2", "-mthumb-interwork", "-fno-common", "-Wimplicit",
+                   "-Wparentheses", "-Werror", "-ffix-debug-line"]
+
+
+def _recompile_without_debug_info(bad_objects: list[str]) -> tuple[bool, str]:
+    """Rebuild each `build/src/X.o` in `bad_objects` WITHOUT -g, in place.
+
+    Exists for a failure the Makefile's own per-object fallback (the `note:
+    X tripped agbcc's debug-line bug` you'll see in a normal build log)
+    does NOT catch: that fallback only fires when the ASSEMBLER rejects the
+    object. Found live on sub_80F110C.o (2026-08-27): the assembler
+    accepts it fine, but the .debug_info it emits references a line label
+    (`.LI1_83`) that was never actually defined -- so the object builds
+    clean and only the LINKER catches it, at `mlss.elf` time, as an
+    undefined reference. Same root bug family (agbcc's -g output is
+    unreliable), different failure surface.
+
+    Deliberately NOT a Makefile change: the per-object rule runs on EVERY
+    build, including the live factory's validator every few minutes, and
+    THE LAW's own worst landmine is "make can report OK against a broken
+    tree" -- a mistake in a shared rule is invisible until something
+    downstream breaks. This is scoped to finish_match()'s own retry only,
+    same mechanism (CFLAGS_NODEBUG), zero change to the normal build path.
+    Byte-neutral for the same reason the Makefile's existing fallback
+    already is: -g only affects the .debug_info/.debug_line sections,
+    never .text.
+    """
+    for obj_rel in bad_objects:
+        stem = Path(obj_rel).stem  # e.g. sub_80F110C
+        src_c = f"src/{stem}.c"
+        if not (REPO / src_c).is_file():
+            return False, f"can't map {obj_rel} back to a src/*.c file (expected {src_c})"
+        script = (
+            f"CPP=$(which arm-none-eabi-cpp) && "
+            f"$CPP {' '.join(_CPPFLAGS)} {src_c} -o build/src/{stem}.i && "
+            f"tools/agbcc/bin/agbcc build/src/{stem}.i {' '.join(_CFLAGS_NODEBUG)} "
+            f"-o build/src/{stem}.s && "
+            f'printf "\\t.text\\n\\t.align 2, 0\\n" >> build/src/{stem}.s && '
+            f"arm-none-eabi-as -mcpu=arm7tdmi -mthumb-interwork -I . "
+            f"-o build/src/{stem}.o build/src/{stem}.s"
+        )
+        r = run(["./container.sh", "bash", "-c", script])
+        if r.returncode != 0:
+            return False, f"recompiling {obj_rel} without -g failed: {r.stdout[-800:]}{r.stderr[-800:]}"
+    return True, "recompiled without -g"
+
+
 def finish_match(name: str) -> tuple[bool, str]:
     """The one non-negotiable check every match in this project requires:
     delete the now-unused fragment, rm -rf build/, make, confirm
@@ -1005,6 +1060,21 @@ def finish_match(name: str) -> tuple[bool, str]:
     shutil.rmtree(REPO / "build", ignore_errors=True)
     r = run(["./container.sh", "make"])
     if "mlss.gba: OK" not in r.stdout:
+        combined = r.stdout + r.stderr
+        bad_objects = sorted(set(_UNDEF_DEBUG_LABEL_RE.findall(combined)))
+        if bad_objects:
+            # See _recompile_without_debug_info's docstring -- a DIFFERENT
+            # function's undefined debug-line reference, unrelated to
+            # whether `name`'s own candidate is right. Retry once.
+            ok, detail = _recompile_without_debug_info(bad_objects)
+            if ok:
+                r2 = run(["./container.sh", "make"])
+                if "mlss.gba: OK" in r2.stdout:
+                    return True, (f"mlss.gba: OK (after recompiling {', '.join(bad_objects)} "
+                                   f"without -g -- see _recompile_without_debug_info)")
+                return False, (f"still failed after -g retry on {bad_objects}: "
+                                f"{r2.stdout[-1200:]}{r2.stderr[-300:]}")
+            return False, f"debug-info retry itself failed: {detail}"
         return False, (r.stdout[-1500:] + r.stderr[-500:])
     return True, "mlss.gba: OK"
 
