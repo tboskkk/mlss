@@ -77,15 +77,10 @@ volatile int sub_819B9D0(s32 arg0)
   sub_819B418((u16) (arg0 | 0x5000));
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_819B9E8.s\"");
-#else
-s32 sub_819B418(u16);                           /* extern */
-
-void sub_819B9E8(s32 arg0) {
-    sub_819B418((u16) (arg0 | 0x6000));
+short sub_819B9E8(s32 arg0)
+{
+  sub_819B418((u16) (arg0 | 0x6000));
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_819BA00.s\"");
