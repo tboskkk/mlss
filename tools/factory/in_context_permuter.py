@@ -107,6 +107,15 @@ def splice_in_memory(name: str, body: str, work: Path) -> Path:
     so this sees exactly the declaration repairs the real pipeline would
     apply -- pointed at the scratch path, never the tracked one.
 
+    Prepends gitops.rom_symbol_declarations(body) first -- found live
+    running the Round 2 batch: 25 of 27 retries still failed, now on
+    `X undeclared`, because the real TU a ghost's OTHER neighbors don't
+    happen to reference this ghost's own callees, so nothing in the file
+    declares them either. compiler_variants.py's stage() already does
+    this for isolation staging for exactly this reason (see its own
+    docstring: "X undeclared" was the single largest no-score class,
+    104/335). Declarations only, no codegen effect -- safe to always add.
+
     Falls back to the sa2/tmc-style ASM_FUNC/NONMATCH convention (CLAUDE.md's
     "NONMATCHING convention", migrated corpus-wide 2026-08-24) when the old
     #ifndef NONMATCHING search finds nothing -- found live running the
@@ -116,6 +125,12 @@ def splice_in_memory(name: str, body: str, work: Path) -> Path:
     actually trying. Mirrors gitops._splice_candidate_new_format() exactly,
     just writing to the scratch copy instead of the tracked file.
     """
+    try:
+        decls = gitops.rom_symbol_declarations(body)
+    except Exception:
+        decls = ""
+    body = (decls or "") + body
+
     c_path, block = gitops.find_guard_block(name)
     if c_path is not None:
         scratch = work / c_path.name
