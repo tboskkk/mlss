@@ -222,15 +222,87 @@ asm_unified(".include \"asm/nonmatching/sub_80CA5D8.s\"");
    counts this as unmatched. Write the C here, replacing this comment. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80CAA98.s\"");
-#else
-/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
-   compiles a whole translation unit at a time, so an #error here fails
-   every OTHER function in this file under NONMATCHING=1. Guard intact, so
-   the real ROM still gets the verbatim retail bytes and progress.py still
-   counts this as unmatched. Write the C here, replacing this comment. */
-#endif
+s32 sub_807E680(void *, s32, s32, s32, s32);    /* extern */
+s32 sub_807EA24(void *);                        /* extern */
+s32 sub_807F448();                              /* extern */
+s32 sub_80CB890(void *);                        /* extern */
+extern s32 sub_80CA510;
+void sub_80CAA98(void *arg0)
+{
+  s32 temp_r0_58;
+  s32 new_var2;
+  s32 temp_r0_64;
+  s32 temp_r0_92;
+  s32 temp_r1_109;
+  s32 temp_r1_21;
+  s32 temp_r1_81;
+  s32 var_r0_37;
+  int new_var;
+  s32 var_r0_48;
+  void *temp_r0_12;
+  void *temp_r4_13;
+  void *temp_r5_15;
+  void *temp_r6_18;
+  s32 new_var3;
+  temp_r0_12 = *((void **) 0x03000FD8);
+  temp_r4_13 = (void *) (*((void **) (((s8 *) temp_r0_12) + 0x70)));
+  temp_r5_15 = (void *) (temp_r4_13 + 8);
+  temp_r6_18 = (void *) ((*((s32 *) (((s8 *) temp_r0_12) + 0x74))) + 8);
+  temp_r1_21 = *((s32 *) (((s8 *) temp_r4_13) + 0xA8));
+  if (temp_r1_21 != 0)
+  {
+    sub_807E680(temp_r6_18, temp_r1_21, 0, -0x30, 0);
+  }
+  var_r0_37 = (*((s16 *) (((s8 *) temp_r4_13) + 0xB6))) * 0xE6;
+  if (var_r0_37 < 0)
+  {
+    var_r0_37 += 0xFF;
+  }
+  *((s16 *) (((s8 *) temp_r4_13) + 0xB6)) = (s16) (var_r0_37 >> 8);
+  var_r0_48 = (*((s16 *) (((s8 *) temp_r4_13) + 0xB8))) * 0xE6;
+  if (var_r0_48 < 0)
+  {
+    var_r0_48 += 0xFF;
+  }
+  new_var2 = var_r0_48;
+  *((s16 *) (((s8 *) temp_r4_13) + 0xB8)) = (s16) (new_var2 >> 8);
+  temp_r0_58 = (*((s32 *) (((s8 *) temp_r5_15) + 0x10))) + (*((s16 *) (((s8 *) temp_r4_13) + 0xB6)));
+  *((s32 *) (((s8 *) temp_r5_15) + 0x10)) = temp_r0_58;
+  *((s32 *) (((s8 *) temp_r6_18) + 0x10)) = temp_r0_58;
+  temp_r0_64 = (*((s32 *) (((s8 *) temp_r5_15) + 0x14))) + (*((s16 *) (((s8 *) temp_r4_13) + 0xB8)));
+  *((s32 *) (((s8 *) temp_r5_15) + 0x14)) = temp_r0_64;
+  *((s32 *) (((s8 *) temp_r6_18) + 0x14)) = temp_r0_64;
+  if ((*((s32 *) (((s8 *) temp_r4_13) + 0xA8))) != 0)
+  {
+    sub_80CB890(temp_r6_18);
+    new_var = 0x0300034C;
+    if (0xF3 & (*((u16 *) (((s8 *) ((void *) new_var)) + 0x3C))))
+    {
+      *((s32 *) (((s8 *) temp_r4_13) + 0xA8)) = 0;
+      new_var3 = *((s32 *) (((s8 *) temp_r5_15) + 0x2C));
+      temp_r1_81 = *((s32 *) (((s8 *) temp_r6_18) + 0x2C));
+      if (new_var3 != temp_r1_81)
+      {
+        *((s32 *) (((s8 *) temp_r5_15) + 0x2C)) = temp_r1_81;
+      }
+      sub_807EA24(temp_r6_18);
+      sub_807F448();
+    }
+  }
+  temp_r0_92 = *((s32 *) (((s8 *) temp_r5_15) + 0x9C));
+  if (temp_r0_92 > 0)
+  {
+    *((s32 *) (((s8 *) temp_r5_15) + 0x9C)) = (s32) (temp_r0_92 - 1);
+    return;
+  }
+  sub_807EA24(temp_r6_18);
+  sub_807F448();
+  temp_r1_109 = 6 & (*((u8 *) (((s8 *) arg0) + 0x76)));
+  if ((temp_r1_109 == 2) || (temp_r1_109 == 4))
+  {
+    *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_80CA510;
+  }
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80CAB8C.s\"");
