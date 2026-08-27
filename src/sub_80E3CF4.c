@@ -7,18 +7,18 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80E3CF4.s\"");
-#else
 s32 sub_8116620(s32);                               /* extern */
-
-s32 sub_80E3CF4(void) {
-    if ((sub_8116620((*(s32 *)((s8 *)(*(void **)0x03000FD8) + (0x248)))) << 0x18) == 0) {
-        return 0;
-    }
-    return 1;
+s32 sub_80E3CF4(void)
+{
+  unsigned long new_var;
+  if (((unsigned char) 0) == (sub_8116620(*((s32 *) (((s8 *) (*((void **) 0x03000FD8))) + 0x248))) << 0x18))
+  {
+    new_var = 0;
+    return (double) new_var;
+  }
+  new_var = 1;
+  return new_var;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80E3D1C.s\"");
