@@ -259,35 +259,32 @@ asm_unified(".include \"asm/nonmatching/sub_80C8418.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80C8608.s\"");
-#else
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 s32 sub_8086700(void *);                        /* extern */
 extern s32 sub_80C82B0;
-
-void sub_80C8608(void *arg0) {
-    s32 temp_r1_35;
-    void *temp_r0_14;
-    void *temp_r2_46;
-    void *temp_r3_13;
-    void *temp_r4_10;
-    void *temp_r5_12;
-
-    temp_r4_10 = (*(void **)((s8 *)(*(void **)0x03000FD8) + (0x70)));
-    temp_r5_12 = temp_r4_10 + 8;
-    temp_r3_13 = (*(void **)((s8 *)(arg0) + (0x2C)));
-    temp_r0_14 = (*(void **)((s8 *)(temp_r3_13) + (0x28)));
-    (*(u8 *)((s8 *)(temp_r0_14) + (0x111))) = (u8) (-3 & (*(u8 *)((s8 *)(temp_r0_14) + (0x111))));
-    if (M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */) == 0) {
-        sub_8086700(temp_r3_13);
-    }
-    temp_r1_35 = 6 & (*(u8 *)((s8 *)(temp_r4_10) + (0x7E)));
-    if ((temp_r1_35 == 2) || (temp_r1_35 == 4)) {
-        sub_8082E1C(temp_r5_12, 6, 0x2034, 0);
-        temp_r2_46 = (*(void **)((s8 *)(temp_r5_12) + (8)));
-        (*(u8 *)((s8 *)(temp_r2_46) + (0x12))) = (u8) ((-7 & (*(u8 *)((s8 *)(temp_r2_46) + (0x12)))) | 2);
-    }
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80C82B0;
+void sub_80C8608(void *arg0)
+{
+  s32 temp_r1_35;
+  void *temp_r0_14;
+  void *temp_r2_46;
+  void *temp_r3_13;
+  void *temp_r4_10;
+  void *temp_r5_12;
+  temp_r4_10 = *((void **) (((s8 *) (*((void **) 0x03000FD8))) + 0x70));
+  temp_r5_12 = temp_r4_10 + 8;
+  temp_r3_13 = *((void **) (((s8 *) arg0) + 0x2C));
+  temp_r0_14 = *((void **) (((s8 *) temp_r3_13) + 0x28));
+  *((u8 *) (((s8 *) temp_r0_14) + 0x111)) = (u8) ((-3) & (*(((s8 *) temp_r0_14) + 0x111)));
+  if (0 == (*((s16 *) (((s8 *) (*((void **) (((s8 *) temp_r3_13) + 0x28)))) + 0xF6))))
+  {
+    sub_8086700(temp_r3_13);
+  }
+  temp_r1_35 = 6 & (*((u8 *) (((s8 *) temp_r4_10) + 0x7E)));
+  if ((temp_r1_35 == 2) || (temp_r1_35 == 4))
+  {
+    sub_8082E1C(temp_r5_12, 6, 0x2034, 0);
+    temp_r2_46 = *((void **) (((s8 *) temp_r5_12) + 8));
+    *((u8 *) (((s8 *) temp_r2_46) + 0x12)) = (u8) (((-7) & (*(((s8 *) temp_r2_46) + 0x12))) | 2);
+  }
+  *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_80C82B0;
 }
-#endif
