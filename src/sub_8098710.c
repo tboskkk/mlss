@@ -17,7 +17,7 @@ extern s32 sub_8098CBC;
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8098710.s\"");
 #else
-extern void sub_8098790();
+void sub_8098790(void *arg0);
 
 void sub_8098710(void* p0)
 {
