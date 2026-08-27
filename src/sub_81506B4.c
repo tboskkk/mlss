@@ -16,23 +16,19 @@ void sub_81506B4(s32 arg0, s32 arg1, void *arg2) {
     sub_814E8B0(arg0, arg1, arg2);
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_81506DC.s\"");
-#else
 s8 sub_8139E88(s32, void *, s32);               /* extern */
 s32 sub_815033C(void *, s32);                   /* extern */
-
-void sub_81506DC(s32 arg0, void *arg1, void *arg2) {
-    u16 temp_r0_26;
-
-    if (sub_8139E88(arg0, arg1, 0) == -1) {
-        sub_815033C(arg1, 1);
-        return;
-    }
-    temp_r0_26 = (*(u16 *)((s8 *)(arg1) + (0x1D2))) - 1;
-    (*(u16 *)((s8 *)(arg1) + (0x1D2))) = temp_r0_26;
-    if ((temp_r0_26 << 0x10) == 0) {
-        (*(s32 *)((s8 *)(arg2) + (0))) = (s32) (*(s32 *)((s8 *)(arg2) + (0xC)));
-    }
+void sub_81506DC(s32 arg0, void *arg1, void *arg2)
+{
+  u16 temp_r0_26;
+  if (sub_8139E88(arg0, arg1, 0) == (-1))
+  {
+    sub_815033C(arg1, 1);
+    return;
+  }
+  temp_r0_26 = (*((u16 *) (((s8 *) arg1) + 0x1D2)) = (*((u16 *) (((s8 *) arg1) + 0x1D2))) - 1);
+  if ((temp_r0_26 << 0x10) == 0)
+  {
+    *((s32 *) (((s8 *) arg2) + 0)) = (s32) (*((s32 *) (((s8 *) arg2) + 0xC)));
+  }
 }
-#endif
