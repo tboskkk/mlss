@@ -1079,12 +1079,12 @@ def finish_match(name: str) -> tuple[bool, str]:
     return True, "mlss.gba: OK"
 
 
-def commit(name: str, message: str) -> bool:
-    # Scoped to FACTORY_PATHS, not `git add -A` -- the unscoped version silently absorbed
-    # whatever else happened to be sitting uncommitted in the shared working tree (found live:
-    # four unrelated tool scripts got swept into an unrelated "Match ..." commit instead of
-    # ever being committed under their own message). See revert_to_clean()'s docstring for the
-    # matching bug on the revert side.
+def commit(name: str, message: str, paths: list[str | Path] | None = None) -> bool:
+    # Scoped to FACTORY_PATHS by default, not `git add -A` -- the unscoped version silently
+    # absorbed whatever else happened to be sitting uncommitted in the shared working tree
+    # (found live: four unrelated tool scripts got swept into an unrelated "Match ..." commit
+    # instead of ever being committed under their own message). See revert_to_clean()'s
+    # docstring for the matching bug on the revert side.
     #
     # The `git commit` itself ALSO needs the pathspec, not just the `git
     # add` -- `git add FACTORY_PATHS` only adds those paths, but a bare
@@ -1097,6 +1097,20 @@ def commit(name: str, message: str) -> bool:
     # easily mix in something that matters. `git commit -- <pathspec>`
     # commits only changes under those paths and leaves anything else
     # sitting staged, exactly like `git add` already was scoped to do.
-    run(["git", "add", *FACTORY_PATHS])
-    r = run(["git", "commit", "-m", message, "--", *FACTORY_PATHS])
+    #
+    # `paths`, when given, narrows BOTH the add and the commit pathspec to
+    # exactly the files this one match touched (the spliced src/*.c plus the
+    # now-deleted asm/nonmatching/<name>.s), rather than the whole
+    # asm/+src/ tree FACTORY_PATHS covers. Still not a live bug in the
+    # normal one-function-at-a-time validator loop -- FACTORY_PATHS was
+    # never wrong there, since nothing else is ever dirty under asm/ or
+    # src/ at that point. It bit for real the one time multiple candidates
+    # were spliced and committed in a tight loop outside that loop (three
+    # in-context-search matches landed in one commit, 2026-08-27), which is
+    # exactly the shape a future batch promoter could hit again -- so any
+    # caller processing more than one candidate before returning to the
+    # normal one-at-a-time loop should pass `paths` explicitly.
+    scope = [str(p) for p in paths] if paths else FACTORY_PATHS
+    run(["git", "add", *scope])
+    r = run(["git", "commit", "-m", message, "--", *scope])
     return r.returncode == 0

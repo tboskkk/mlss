@@ -228,6 +228,7 @@ def _validate_claimed(conn, row) -> str:
         name,
         f"Match {name}\n\nFactory pipeline (tools/factory), source={source}. "
         f"Verified with a from-scratch build before commit, per the project's standing rule.",
+        paths=[c_path, frag],
     )
     with db.tx(conn):
         db.set_state(conn, name, "matched", worker_id=None, candidate_body=None,
