@@ -47,14 +47,10 @@ void sub_819B95C(void) {
     sub_819AF88();
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_819B970.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+unsigned char sub_819B970(s32 arg0, s32 arg1)
+{
+  sub_819B418((u16) ((arg0 << 8) | arg1));
+}
 
 unsigned char sub_819B984(s32 arg0)
 {
