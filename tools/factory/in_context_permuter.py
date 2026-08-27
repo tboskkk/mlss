@@ -105,18 +105,40 @@ def splice_in_memory(name: str, body: str, work: Path) -> Path:
     """Write a scratch copy of `name`'s real .c with the guard replaced by
     `body`. Reuses gitops's OWN splice primitives (not a reimplementation)
     so this sees exactly the declaration repairs the real pipeline would
-    apply -- pointed at the scratch path, never the tracked one."""
+    apply -- pointed at the scratch path, never the tracked one.
+
+    Falls back to the sa2/tmc-style ASM_FUNC/NONMATCH convention (CLAUDE.md's
+    "NONMATCHING convention", migrated corpus-wide 2026-08-24) when the old
+    #ifndef NONMATCHING search finds nothing -- found live running the
+    in-context batch: 24 of 34 ghosts are already in the new format and
+    this originally just gave up on all of them (`sys.exit`), which is why
+    the first real run reported them as "Unable to compile" instead of
+    actually trying. Mirrors gitops._splice_candidate_new_format() exactly,
+    just writing to the scratch copy instead of the tracked file.
+    """
     c_path, block = gitops.find_guard_block(name)
+    if c_path is not None:
+        scratch = work / c_path.name
+        scratch.write_text(c_path.read_text())
+        body2 = gitops._repair_body_decls(scratch, body)
+        text = scratch.read_text()
+        new_text = text.replace(block, gitops._dedupe_decls(text, block, body2).strip() + "\n", 1)
+        if new_text == text:
+            sys.exit(f"{name}: splice was a no-op -- guard block not found in the copy?")
+        scratch.write_text(new_text)
+        gitops._repair_self_declaration(scratch, name, body2)
+        return scratch
+
+    c_path, block, _kind = gitops.find_new_format_guard(name)
     if c_path is None:
-        sys.exit(f"{name}: no #ifndef NONMATCHING guard block found (new-format "
-                  f"ASM_FUNC/NONMATCH convention not handled by this POC)")
+        sys.exit(f"{name}: no guard block found in either format")
     scratch = work / c_path.name
     scratch.write_text(c_path.read_text())
     body2 = gitops._repair_body_decls(scratch, body)
     text = scratch.read_text()
     new_text = text.replace(block, gitops._dedupe_decls(text, block, body2).strip() + "\n", 1)
     if new_text == text:
-        sys.exit(f"{name}: splice was a no-op -- guard block not found in the copy?")
+        sys.exit(f"{name}: new-format splice was a no-op")
     scratch.write_text(new_text)
     gitops._repair_self_declaration(scratch, name, body2)
     return scratch
