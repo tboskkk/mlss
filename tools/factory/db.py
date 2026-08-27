@@ -146,6 +146,28 @@ MIGRATIONS = [
     # never be used to propagate a candidate, only to avoid searching two
     # near-identical functions at the same time.
     ("cluster_id", "TEXT"),
+    # Signature of a permuter zero that was earned in ISOLATION and then did
+    # NOT reproduce in the function's real translation unit.
+    #
+    # This is not a failure of the search and not a lost match -- verified
+    # against ground truth (splice + rm -rf build + full make + ROM sha1) on
+    # sub_8091CC8 and three siblings: the candidate genuinely does not
+    # produce retail bytes in context, so tier2 rejecting it is CORRECT.
+    # What is wasted is doing it again: the row goes back to stalled,
+    # tier_m2c re-seeds it with the same deterministic m2c output, and the
+    # permuter re-derives the same non-transferable zero. sub_8091CC8 had
+    # done this 8+ times across several days, 22 functions did it in one
+    # 12h window, and each round costs a full search slot (up to 900s of a
+    # pinned core).
+    #
+    # The signature covers the two things that could make the SAME candidate
+    # start transferring: the candidate body itself, and the owning file's
+    # contents (a sibling's draft being fixed or matched changes what agbcc
+    # emits for the whole translation unit). If either changes, the
+    # signature no longer matches and the row is fully claimable again --
+    # so this defers work, it never strands it, which is the invariant
+    # CLAUDE.md requires of anything that declines a row.
+    ("iso_zero_sig", "TEXT"),
 ]
 
 

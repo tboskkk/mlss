@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import argparse
 import atexit
+import hashlib
 import re
 import shutil
 import signal
@@ -118,6 +119,75 @@ FARM_CPUSET = "0-11"
 FARM_CPU_COUNT = 12
 
 OUTPUT_DIR_RE = re.compile(r"^output-(\d+)-\d+$")
+
+
+def iso_zero_signature(name: str, body: str | None) -> str | None:
+    """Fingerprint of "this candidate, in this translation unit".
+
+    Identifies a permuter zero that was earned in ISOLATION and then failed
+    to reproduce in the real file, so the same dead end is not re-searched
+    until something that could change the outcome actually changes. The two
+    inputs are exactly those things:
+
+      * the candidate body -- a new seed is a genuinely new attempt;
+      * the owning src/*.c in full -- agbcc compiles a whole translation
+        unit, so a sibling's draft being fixed, matched or spliced changes
+        what it emits for THIS function too. That is not theoretical: it is
+        the same translation-unit coupling documented all over this file.
+
+    Returns None when the owning file cannot be determined, which callers
+    must treat as "cannot answer" -- never as "not stale". A signature that
+    silently defaults would suppress a row forever.
+    """
+    if not body:
+        return None
+    stem = gitops._owning_source_stem(name)
+    if stem is None:
+        return None
+    c_path = gitops.REPO / "src" / f"{stem}.c"
+    try:
+        file_text = c_path.read_text(errors="ignore")
+    except OSError:
+        return None
+    h = hashlib.md5()
+    h.update(body.encode("utf-8", "replace"))
+    h.update(b"\0")
+    h.update(file_text.encode("utf-8", "replace"))
+    return h.hexdigest()
+
+
+def is_known_dead_iso_zero(row) -> bool:
+    """True if this row already produced an isolation-only zero under
+    exactly the current candidate AND the current owning-file contents.
+
+    Deliberately fails OPEN (returns False) whenever the signature cannot
+    be computed -- an unanswerable question must not silently suppress a
+    row, same rule as everywhere else in this pipeline.
+    """
+    stored = row["iso_zero_sig"] if "iso_zero_sig" in row.keys() else None
+    if not stored:
+        return False
+    cur = iso_zero_signature(row["name"], row["candidate_body"])
+    return cur is not None and cur == stored
+
+
+def _mark_dead_iso_zero(name: str, body: str | None) -> None:
+    """Record that `body` produced an isolation-only zero for `name` in the
+    file as it stands right now. Best-effort: a failure here costs a
+    repeated search, never correctness, so it must not break the poll loop."""
+    try:
+        sig = iso_zero_signature(name, body)
+        if sig is None:
+            return
+        conn = db.connect()
+        try:
+            with db.tx(conn):
+                conn.execute("UPDATE functions SET iso_zero_sig = ? WHERE name = ?",
+                             (sig, name))
+        finally:
+            conn.close()
+    except Exception as e:
+        print(f"  {name}: could not record iso-zero signature ({e})")
 
 
 def best_score_seen(name: str) -> int | None:
@@ -875,6 +945,27 @@ def run_pool(jobs: int, stall_min: float, max_functions: int):
             name = row["name"]
             body = row["candidate_body"]
 
+            # A known dead end: this exact candidate already reached zero in
+            # ISOLATION and failed to reproduce in this exact translation
+            # unit. Re-running the search re-derives the same answer -- m2c
+            # re-seeds deterministically, so the candidate comes back
+            # identical -- and burns a full slot doing it. Measured: 22
+            # functions did this in one 12h window, sub_8091CC8 8+ times
+            # over several days.
+            #
+            # Bump escalation_count and release rather than filing anywhere
+            # terminal: the row stays in tier2_ready and becomes claimable
+            # for real the moment its candidate or its file changes (which
+            # is exactly when the outcome could differ), and the bump sends
+            # it to the back of its band so this loop cannot spin on it.
+            if is_known_dead_iso_zero(row):
+                resolve(name, "tier2_ready", bump_escalation=True,
+                        notes="skipped: isolation-only zero already known not to "
+                              "reproduce in this translation unit (same candidate, "
+                              "same file) -- claimable again when either changes")
+                print(f"  {name}: known non-transferable iso-zero -> skipped")
+                continue
+
             # Cheap win first: if it already matches, skip the permuter
             # entirely and hand it straight to the validator.
             #
@@ -1083,6 +1174,10 @@ def run_pool(jobs: int, stall_min: float, max_functions: int):
                             _active.pop(name, None)
                             processed += 1
                             continue
+                        # Remember this exact (candidate, translation unit)
+                        # dead end so it is not re-searched until one of
+                        # them changes -- see iso_zero_signature().
+                        _mark_dead_iso_zero(name, candidate_body_of(name))
                         resolve(name, "stalled", event="t2_exit_no_zero",
                                 notes="permuter reached score 0 in isolation but no "
                                       "declaration prefix made it match in its real "
@@ -1110,6 +1205,7 @@ def run_pool(jobs: int, stall_min: float, max_functions: int):
                         resolve(name, "validating", event="converged", detail=detail, body=body)
                         print(f"  {name}: converged -- {detail}")
                     elif body:
+                        _mark_dead_iso_zero(name, body)
                         resolve(name, "stalled", event="t2_exit_no_zero",
                                 notes="permuter reached score 0 in isolation but the "
                                       "candidate does not match in its real source file")
