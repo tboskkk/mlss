@@ -43,23 +43,20 @@ void sub_80E1924(void* p0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80E1940.s\"");
-#else
-extern void sub_80DF2B0();
-
-void sub_80E1940(void* p0) {
-    u32* r1 = *(u32**)((u8*)p0 + 0x0C);
-    u16 r2 = *(u16*)(r1);
-    *(u16*)((u8*)p0 + 0x10) = r2;
-    r1 += 1;
-    *(u32*)((u8*)p0 + 0x0C) = r1;
-    *(u32*)((u8*)p0 + 0x04) = (u32)sub_80DF2B0;
-    ((void(*)())*(u32*)((u8*)p0 + 0x04))();
-    p0 = *(void**)((u8*)p0 + 0x00);
-    ((void(*)())p0)();
+s32 sub_80DF2B0();                              /* extern */
+void sub_80E1940(void *arg0)
+{
+  u16 *temp_r1_7;
+  u16 *new_var;
+  void *new_var2;
+  temp_r1_7 = *((u16 **) (0xC + ((s8 *) arg0)));
+  new_var2 = arg0;
+  *(new_var = (u16 *) (((s8 *) new_var2) + 0x10)) = (u16) (*temp_r1_7);
+  new_var2 = temp_r1_7;
+  *((u16 **) (((s8 *) arg0) + 0xC)) = (u16 *) (new_var2 + 2);
+  *((s32 (**)()) (((s8 *) arg0) + 4)) = sub_80DF2B0;
+  sub_80DF2B0();
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80E195C.s\"");
