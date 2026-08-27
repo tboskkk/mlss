@@ -269,14 +269,24 @@ void sub_8075BE8(struct Entity *arg0) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8075C10.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+s32 sub_807F47C(void *);
+s32 sub_8087124();
+extern s32 sub_80757C0;
+s32 sub_8075C10(void *arg0)
+{
+  s32 var_r0_8;
+  var_r0_8 = sub_8087124();
+  if (var_r0_8 == 0)
+  {
+    sub_807F47C(arg0);
+    sub_8082E1C(arg0, 1, 0, 0);
+    var_r0_8 = 0x4C;
+    *((s16 *) (((s8 *) arg0) + 0xAC)) = 0x1E;
+    *((s32 **) (((s8 *) arg0) + var_r0_8)) = &sub_80757C0;
+    var_r0_8 = 0;
+  }
+  return var_r0_8;
+}
 
 extern s32 sub_8075C8C;
 

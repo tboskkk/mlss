@@ -87,44 +87,58 @@ asm_unified(".include \"asm/nonmatching/sub_808C224.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_808C274.s\"");
-#else
-s32 sub_80873B8(void *, s32, s32);              /* extern */
 extern s32 sub_808B7D0;
-
-void sub_808C274(void *arg0, s16 arg1) {
-    s16 var_r1_0;
-    s32 temp_r0_10;
-    void *temp_r5_8;
-
-    var_r1_0 = arg1;
-    temp_r5_8 = (*(void **)((s8 *)(arg0) + (0x2C)));
-    temp_r0_10 = (*(s32 *)((s8 *)(arg0) + (0x98)));
-    if (temp_r0_10 != 1) {
-        if (temp_r0_10 <= 1) {
-            if (temp_r0_10 != 0) {
-
-            } else {
-                goto block_6;
-            }
-        } else if ((temp_r0_10 == 2) || (temp_r0_10 == 3)) {
-            goto block_6;
-        }
-    } else {
-block_6:
-        var_r1_0 = 8;
+void sub_808C274(void *arg0, unsigned int arg1)
+{
+  int var_r1_0;
+  s32 temp_r0_10;
+  s8 *new_var3;
+  int new_var;
+  void *temp_r5_8;
+  s8 *new_var2;
+  var_r1_0 = arg1;
+  temp_r5_8 = *((void **) (((s8 *) arg0) + 0x2C));
+  temp_r0_10 = *((s32 *) (((s8 *) arg0) + 0x98));
+  if (temp_r0_10 != 1)
+  {
+    if (temp_r0_10 <= 1)
+    {
+      if (temp_r0_10 != 0)
+      {
+      }
+      else
+      {
+        goto block_6;
+      }
     }
-    (*(s16 *)((s8 *)(arg0) + (0xAC))) = var_r1_0;
-    if (M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */) == -1) {
-        sub_80873B8(arg0, 2, 8);
+    else
+    {
+      new_var = 2;
+      if ((temp_r0_10 == new_var) || (temp_r0_10 == 3))
+      {
+        goto block_6;
+      }
     }
-    if (M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */) == -2) {
-        sub_80873B8(arg0, 6, 8);
-    }
-    (*(s32 **)((s8 *)(arg0) + (0x50))) = &sub_808B7D0;
+  }
+  else
+  {
+    block_6:
+    var_r1_0 = 8;
+
+  }
+  new_var3 = (s8 *) temp_r5_8;
+  *((s16 *) (((s8 *) arg0) + 0xAC)) = var_r1_0;
+  if ((*((s16 *) (((s8 *) (*((void **) (new_var3 + 0x28)))) + 0xEC))) == (-1))
+  {
+    sub_80873B8(arg0, 2, 8);
+  }
+  new_var2 = new_var3;
+  if ((*((s16 *) (((s8 *) (*((void **) (new_var2 + 0x28)))) + 0xEC))) == (-2))
+  {
+    sub_80873B8(arg0, 6, 8);
+  }
+  *((s32 **) (((s8 *) arg0) + 0x50)) = &sub_808B7D0;
 }
-#endif
 
 void sub_808C2E0(void *arg0) {
     s32 temp_r5_9;
