@@ -531,6 +531,7 @@ def generate(name: str) -> str | None:
     c = fix_uncast_address_dereference(c)
     c = fix_indirect_call_precedence(c)
     c = fix_untyped_address_access(c, name)
+    c = fix_pointer_assign_without_cast(c)
     return restore_omitted_leading_params(c, name)
 
 
@@ -770,6 +771,81 @@ def _classify_untyped_head(head: str, local_types: dict) -> str | None:
     if t and t.endswith("*") and t != "void*":
         return None  # already a real, non-void pointer, nothing to fix
     return "s32"
+
+
+_PTR_ASSIGN_RE = re.compile(
+    r"^(\s*)(\w+)(\s*=\s*)(.+?);\s*$", re.MULTILINE)
+
+
+def fix_pointer_assign_without_cast(c: str) -> str:
+    """Cast the RHS when a POINTER local is assigned untyped integer
+    arithmetic: `void *p; p = (i * 4) + (*(s32 *)(...));`
+
+    THE SAME ROOT DEFECT AS fix_untyped_address_access BELOW, AT A
+    DIFFERENT SITE. That rule handles an untyped address that is
+    dereferenced or called; this one handles it being STORED into a
+    declared pointer. agbcc warns `assignment makes pointer from integer
+    without a cast`, and the real Makefile flags carry -Werror, so the
+    warning is fatal and the seed is thrown away as "produced output but
+    it doesn't compile".
+
+    MEASURED, which is why this exists rather than being assumed: 852 rows
+    reach the queue with NO candidate at all, and 468 of them are that
+    exact "produced output but doesn't compile" note. Sampling those and
+    clustering agbcc's own diagnostics (per CLAUDE.md's "cluster on the
+    fatal error" rule) gives, across 8 sampled functions:
+
+        15x  assignment makes pointer from integer without a cast   <- this
+         6x  comparison is always true due to limited range
+         4x  assignment from incompatible pointer type
+         1x  assignment makes integer from pointer without a cast
+
+    The dominant cluster, and every one of them is a -Werror-promoted
+    WARNING rather than a hard syntax error -- the C is structurally fine,
+    it is missing casts.
+
+    CONSERVATIVE BY CONSTRUCTION, deliberately narrower than the warning:
+
+      * the LHS must be a plain local m2c itself declared as a pointer
+        (_local_types()), never a field, an array element or a deref -- so
+        the declared type is known exactly and is not being guessed;
+      * the RHS must NOT already start with a cast or `&`, so a correct
+        assignment is never touched;
+      * the RHS must contain no comparison or logical operator, which
+        would make `(void *)` change the parse rather than just the type.
+
+    Anything else is left alone. The cast is a no-op at the machine level
+    (agbcc emits identical code for `p = x` and `p = (void *)x` once the
+    warning is silenced), so this changes whether a seed COMPILES, never
+    what it means -- and the seed still faces the identical from-scratch
+    validator gate as everything else.
+    """
+    types = _local_types(c)
+    if not types:
+        return c
+
+    def repl(m: re.Match) -> str:
+        indent, lhs, eq, rhs = m.group(1), m.group(2), m.group(3), m.group(4)
+        ctype = types.get(lhs)
+        if not ctype or "*" not in ctype:
+            return m.group(0)
+        r = rhs.strip()
+        # already cast, or an address-of -- both are correct as written
+        if r.startswith("&") or re.match(r"^\(\s*\w[\w\s]*\*+\s*\)", r):
+            return m.group(0)
+        # a bare identifier or a call is not the untyped-arithmetic shape
+        # this targets, and casting it could mask a real type error
+        if re.fullmatch(r"[\w\.\->\[\]]+", r) or re.fullmatch(r"\w+\(.*\)", r):
+            return m.group(0)
+        # must look like address arithmetic, and must not contain an
+        # operator whose parse a cast would change
+        if not re.search(r"[+\-]", r):
+            return m.group(0)
+        if re.search(r"(\?|\|\||&&|[=!<>]=|(?<![<>=!])[<>](?!=))", r):
+            return m.group(0)
+        return f"{indent}{lhs}{eq}({ctype.replace('*', ' *')}) ({r});"
+
+    return _PTR_ASSIGN_RE.sub(repl, c)
 
 
 def fix_untyped_address_access(c: str, name: str) -> str:
