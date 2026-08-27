@@ -19,15 +19,20 @@ void sub_810FE1C(struct Entity *arg0);
 
 s32 sub_80883A0();
 s32 sub_8082E1C();
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_810D70C.s\"");
-#else
-void sub_810D70C(void *arg0) {
-    (*(s16 *)((s8 *)((void *)0x0400001A) + (0))) = (s16) (*(u16 *)0x0200001A + (*(u16 *)((s8 *)(arg0) + (0x14))));
-    (*(s16 *)((s8 *)((void *)0x0400001A) + (4))) = (s16) (*(u16 *)0x0200001E + (*(u16 *)((s8 *)(arg0) + (0x14))));
-    (*(s32 *)((s8 *)(arg0) + (4))) = 0;
+void sub_810D70C(void *arg0)
+{
+  int new_var4;
+  s16 *new_var2;
+  void *new_var;
+  s32 *new_var3;
+  new_var = (void *) 0x0400001A;
+  new_var4 = (*((u16 *) 0x0200001A)) + (*((u16 *) (((s8 *) arg0) + 0x14)));
+  *((s16 *) (((s8 *) ((void *) 0x0400001A)) + 0)) = (s16) new_var4;
+  new_var2 = (s16 *) (((s8 *) new_var) + 4);
+  new_var3 = (s32 *) (new_var = ((s8 *) arg0) + 4);
+  *new_var2 = (s16) ((*((u16 *) (((s8 *) arg0) + 0x14))) + (*((u16 *) 0x0200001E)));
+  *new_var3 = 0;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_810D738.s\"");
