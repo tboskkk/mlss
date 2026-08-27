@@ -173,15 +173,18 @@ void sub_81580A4(void *arg0, s32 arg1)
   sub_81649AC(*((s32 *) new_var), arg1, new_var3, 0x50, 1);
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_81580E0.s\"");
-#else
 s32 sub_816504C(s32);                               /* extern */
-
-s32 sub_81580E0(void *arg0) {
-    if (sub_816504C((*(s32 *)((s8 *)(arg0) + (0x30)))) == 0) {
-        return 0;
+s32 sub_81580E0(void *arg0)
+{
+  void *new_var2;
+  int new_var;
+ goto dummy_label_3245; dummy_label_3245: ; new_var2 = arg0; new_var = 0;
+  if (0 == sub_816504C(*((s32 *) (((s8 *) arg0) + 0x30))))
+  {
+    if ((new_var2 && arg0) && arg0)
+    {
     }
-    return 1;
+    return new_var;
+  }
+  return (short) 1;
 }
-#endif
