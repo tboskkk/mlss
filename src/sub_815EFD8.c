@@ -9,6 +9,9 @@ asm_unified(".include \"asm/macros.inc\"");
 
 
 
+
+s32 sub_815F97C();
+
 s32 sub_815FB14();
 
 int sub_815FAA4();
@@ -89,22 +92,21 @@ s32 sub_815F08C(void *arg0, s32 *arg3) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_815F0CC.s\"");
-#else
-s32 sub_815F97C(void *, s32);                   /* extern */
 void *sub_815FA3C(void *);                          /* extern */
-
-void sub_815F0CC(void *arg0) {
-    sub_815F97C(arg0, 0);
-    if ((*(u8 *)((s8 *)(arg0) + (0x26))) == 1) {
-        (*(s16 *)((s8 *)(sub_815FA3C(arg0)) + (4))) = 0x140;
-        (*(s16 *)((s8 *)(sub_815FA3C(arg0)) + (6))) = 0x140;
-    }
-    (*(s32 *)((s8 *)(arg0) + (8))) = 0xA000;
-    (*(s32 (**)(void *))((s8 *)((*(void **)((s8 *)(arg0) + (0x30)))) + (0x34)))(arg0 + M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */));
+void sub_815F0CC(void *arg0)
+{
+  int new_var;
+  void *temp_r1_27;
+  sub_815F97C(arg0, 0);
+  if ((*((u8 *) (((s8 *) arg0) + 0x26))) == 1)
+  {
+    *((s16 *) (((s8 *) sub_815FA3C(arg0)) + 4)) = (new_var = 0x140);
+    *((s16 *) (((s8 *) sub_815FA3C(arg0)) + 6)) = new_var;
+  }
+  *((s32 *) (((s8 *) arg0) + 8)) = 0xA000;
+  temp_r1_27 = *((void **) (((s8 *) arg0) + 0x30));
+  (*((s32 (**)(void *)) (((s8 *) temp_r1_27) + 0x34)))(arg0 + (*((s16 *) (((s8 *) temp_r1_27) + 0x30))));
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_815F110.s\"");
