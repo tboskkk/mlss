@@ -101,44 +101,47 @@ asm_unified(".include \"asm/nonmatching/sub_8136EFC.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8136FB4.s\"");
-#else
 s32 sub_80473DC(void *);                        /* extern */
 s32 sub_804761C(void *, s32);                   /* extern */
 s32 sub_804776C(void *, s32);                   /* extern */
 s32 sub_8047F60(void *, s32, s32, s32, s32, s32); /* extern */
 extern s32 sub_8139260;
-
-void sub_8136FB4(s32 arg0, void *arg1) {
-    s32 temp_r6_52;
-    s32 temp_r6_98;
-    void *temp_r5_37;
-    void *temp_r5_83;
-
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg1) + (0x294)))) + (0x12)))) {
-        sub_80473DC(arg1);
-        (*(s32 **)((s8 *)(arg1) + (0x198))) = &sub_8139260;
-        temp_r5_37 = (*(void **)((s8 *)((((*(u8 *)((s8 *)(arg1) + (0x54))) * 4) + arg0)) + (0x2C)));
-        if (!(1 & (*(u8 *)((s8 *)(temp_r5_37) + (0x20C)))) && (temp_r6_52 = 6 & (*(u8 *)((s8 *)(temp_r5_37) + (0x33C))), (temp_r6_52 == 0))) {
-            sub_804761C(temp_r5_37, 1);
-            sub_804776C(temp_r5_37, 1);
-            sub_8047F60(temp_r5_37, (*(s32 *)((s8 *)(arg1) + (0xC))), (*(s32 *)((s8 *)(arg1) + (0x10))) + 0x100, (*(s32 *)((s8 *)(arg1) + (0x14))) + (*(s32 *)((s8 *)(arg1) + (0x18))) + 0x1000, 1, temp_r6_52);
-        } else {
-            temp_r5_83 = (*(void **)((s8 *)((((*(u8 *)((s8 *)(arg1) + (0x54))) * 4) + arg0)) + (0x30)));
-            if (!(1 & (*(u8 *)((s8 *)(temp_r5_83) + (0x20C))))) {
-                temp_r6_98 = 6 & (*(u8 *)((s8 *)(temp_r5_83) + (0x33C)));
-                if (temp_r6_98 == 0) {
-                    sub_804761C(temp_r5_83, 1);
-                    sub_804776C(temp_r5_83, 1);
-                    sub_8047F60(temp_r5_83, (*(s32 *)((s8 *)(arg1) + (0xC))), (*(s32 *)((s8 *)(arg1) + (0x10))) + 0x100, (*(s32 *)((s8 *)(arg1) + (0x14))) + (*(s32 *)((s8 *)(arg1) + (0x18))) + 0x1000, 1, temp_r6_98);
-                }
-            }
-        }
-        (*(s16 *)((s8 *)((arg1 + 0x58)) + (0x17A))) = 0x78;
+void sub_8136FB4(s32 arg0, void *arg1)
+{
+  s32 temp_r6_52;
+  void *new_var;
+  unsigned int temp_r6_98;
+  void *temp_r5_37;
+  void *temp_r5_83;
+  new_var = arg1 + 0x58;
+  if (8 & (*((u8 *) (((s8 *) (*((void **) (((s8 *) arg1) + 0x294)))) + 0x12))))
+  {
+    sub_80473DC(arg1);
+    *((s32 **) (((s8 *) arg1) + 0x198)) = &sub_8139260;
+    temp_r5_37 = *((void **) (((s8 *) (((*((u8 *) (((s8 *) arg1) + 0x54))) * 4) + arg0)) + 0x2C));
+    if ((!(1 & (*((u8 *) (((s8 *) temp_r5_37) + 0x20C))))) && ((temp_r6_52 = 6 & (*((u8 *) (((s8 *) temp_r5_37) + 0x33C))), temp_r6_52 == 0)))
+    {
+      sub_804761C(temp_r5_37, 1);
+      sub_804776C(temp_r5_37, 1);
+      sub_8047F60(temp_r5_37, *((s32 *) (((s8 *) arg1) + 0xC)), (*((s32 *) (((s8 *) arg1) + 0x10))) + 0x100, ((*((s32 *) (((s8 *) arg1) + 0x14))) + (*((s32 *) (((s8 *) arg1) + 0x18)))) + 0x1000, 1, temp_r6_52);
     }
+    else
+    {
+      temp_r5_83 = *((void **) (((s8 *) (((*((u8 *) (((s8 *) arg1) + 0x54))) * 4) + arg0)) + 0x30));
+      if (!(1 & (*((u8 *) (((s8 *) temp_r5_83) + 0x20C)))))
+      {
+        temp_r6_98 = 6 & (*((u8 *) (((s8 *) temp_r5_83) + 0x33C)));
+        if (temp_r6_98 == 0)
+        {
+          sub_804761C(temp_r5_83, 1);
+          sub_804776C(temp_r5_83, 1);
+          sub_8047F60(temp_r5_83, *((s32 *) (((s8 *) arg1) + 0xC)), (*((s32 *) (((s8 *) arg1) + 0x10))) + 0x100, ((*((s32 *) (((s8 *) arg1) + 0x14))) + (*((s32 *) (((s8 *) arg1) + 0x18)))) + 0x1000, 1, temp_r6_98);
+        }
+      }
+    }
+    *((s16 *) (((s8 *) new_var) + 0x17A)) = 0x78;
+  }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81370C4.s\"");
