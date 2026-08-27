@@ -96,3 +96,54 @@ Note that existing `nonmatchings/<name>/settings.toml` directories still carry
 `compiler_type = "gcc"` baked in from when they were imported. `tools/permute.py`
 regenerates them, so a function re-isolated after this change picks up
 `"agbcc"`; ones left over from before do not.
+
+## 0002 - diff-directed randomization weights
+
+`scorer.py`'s `Scorer.score()` already classifies every scored candidate's
+diff into stack/regalloc/reordering/insertion/deletion penalties before
+collapsing them into one scalar for the search loop -- the breakdown was
+computed on every single iteration and then thrown away. Mutation selection
+had no way to tell "this function's gap is almost entirely register
+allocation" from "this function is structurally wrong", so it spent equal
+probability on cast/type mutations (relevant to the second case) even when
+the first was true, and vice versa.
+
+Measured on this project's own corpus, not assumed: classifying 107 real
+near-miss candidates' diffs by objdump column, ~70% of differing instructions
+were pure register allocation (same opcode, same operand shape, different
+register), ~30% were a genuinely wrong opcode or immediate. No permuter
+mutation fixes a wrong constant; no cast-guessing mutation fixes a register
+choice. They need different mutation strategies, and the tool already had the
+right passes for both (`perm_reorder_decls`/`perm_temp_for_expr` for the
+first, `perm_ins_block`/`perm_remove_ast`/`perm_condition` for the second) --
+it just had no way to pick between them per function.
+
+The patch stashes the breakdown as `Scorer.last_penalties` (additive: the
+`score()` return signature is untouched, so nothing else needed to change),
+then `Permuter.__init__` reads it ONCE, right after the base candidate is
+scored, and biases `randomization_weights` for the whole search accordingly.
+Classification uses the SAME `PENALTY_*` weights the scorer itself uses for
+the score (not raw instruction counts) -- a single insertion/deletion is
+worth 100 points, a regalloc mismatch 5, so "which category actually drives
+the number down" is not the same question as "which category has the most
+instructions", and only the first one is the right thing to bias on. Below a
+50% share, no category clearly dominates and the corpus-tuned `[agbcc]`
+weights are left alone rather than biasing on a weak signal.
+
+ONCE, not per-iteration across all workers: workers are forked (Linux
+default) after this runs, so every worker inherits the adjusted weights with
+no cross-process synchronization needed. A per-iteration version would need
+that synchronization for a benefit nobody has measured yet.
+
+Purely a WEIGHT change, and this is the property that bounds its risk to
+search efficiency, same as 0001: it can only change which existing pass gets
+tried more often, never what a mutation does or whether a wrong mutation
+becomes "valid" -- every candidate still goes through the identical
+compile-and-score gate. Verified end to end via the real CLI (`permuter.py
+-j 2`, not just direct construction): 1,789 real iterations in 25s against
+`nonmatchings/sub_8053FC4`, no crash, base score reproduced exactly
+(315, matching a direct-construction test), search explored down to 245.
+
+Not yet measured over a real multi-hour production window -- see "Measuring
+whether this helped" above; the same `t2_launch` vs `converged` comparison
+applies here.

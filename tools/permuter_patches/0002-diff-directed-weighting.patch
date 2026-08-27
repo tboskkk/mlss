@@ -1,0 +1,154 @@
+diff --git a/src/permuter.py b/src/permuter.py
+index a350e14..61d3f1b 100644
+--- a/src/permuter.py
++++ b/src/permuter.py
+@@ -65,6 +65,100 @@ FeedbackItem = Union[Finished, Message, NeedMoreWork, WorkDone]
+ Feedback = Tuple[FeedbackItem, int, Optional[str]]
+ 
+ 
++# MLSS LOCAL PATCH (0002-diff-directed-weighting).
++#
++# WHY. Scorer.score() (see scorer.py) already classifies every scored
++# candidate's diff into stack/regalloc/reordering/insertion/deletion
++# penalties -- that breakdown is computed on every single iteration and was
++# previously discarded the moment the scalar score left score(). Mutation
++# selection then had no way to tell "this function's near-miss is almost
++# entirely register allocation" from "this function is structurally wrong",
++# so it spent equal probability on cast/type passes (relevant to the second
++# case) when the first was true, and vice versa.
++#
++# Measured on this project's own corpus (not assumed): classifying 107
++# near-miss candidates' diffs by column, ~70% of differing instructions were
++# pure register-allocation (same opcode, same operand shape, different
++# register), ~30% were a genuinely wrong opcode/immediate. Those need
++# different mutation strategies entirely -- no permuter mutation fixes a
++# wrong constant, and no cast-guessing mutation fixes a register choice.
++#
++# WHAT THIS DOES, AND WHAT IT DELIBERATELY DOES NOT DO. Classifies ONCE,
++# from the BASE candidate's own diff against target (computed unconditionally
++# at Permuter construction, so this adds no extra compile), and biases
++# randomization_weights for the WHOLE search accordingly -- not per-iteration
++# across all workers, which would need cross-process synchronization for no
++# measured benefit over a per-search decision made once up front. Workers are
++# forked (multiprocessing's default on Linux) AFTER this runs, so every
++# worker inherits the adjusted weights with no IPC needed.
++#
++# Purely a WEIGHT change: which existing pass gets tried more often. It
++# cannot change what a mutation DOES or make an incorrect mutation "valid" --
++# every candidate still goes through the identical compile-and-score gate,
++# so a bad bias only costs search time, never a wrong result.
++_REGALLOC_BOOST = {
++    "perm_reorder_decls": 3.0,
++    "perm_temp_for_expr": 2.0,
++    "perm_reorder_stmts": 2.0,
++    "perm_split_assignment": 2.0,
++    "perm_chain_assignment": 1.5,
++    "perm_long_chain_assignment": 1.5,
++    "perm_duplicate_assignment": 1.5,
++}
++_STRUCTURAL_BOOST = {
++    "perm_ins_block": 2.0,
++    "perm_remove_ast": 2.0,
++    "perm_condition": 1.5,
++    "perm_inline": 1.5,
++    "perm_expand_expr": 1.5,
++    "perm_empty_stmt": 1.5,
++}
++_STACK_BOOST = {
++    "perm_pad_var_decl": 5.0,
++}
++_DOMINANCE_BOOSTS = {
++    "regalloc": _REGALLOC_BOOST,
++    "reordering": _REGALLOC_BOOST,
++    "insertion": _STRUCTURAL_BOOST,
++    "deletion": _STRUCTURAL_BOOST,
++    "stack": _STACK_BOOST,
++}
++# The scorer's own weighting of each penalty kind for the SCORE -- reused
++# here so "dominant" means "what actually drives the number down", not an
++# arbitrary raw instruction count (one insertion is worth 100 regalloc
++# mismatches to the score; classifying on raw counts would call a function
++# "regalloc-dominated" when a single missing instruction is the real gap).
++_PENALTY_WEIGHT = {
++    "stack": Scorer.PENALTY_STACKDIFF,
++    "regalloc": Scorer.PENALTY_REGALLOC,
++    "reordering": Scorer.PENALTY_REORDERING,
++    "insertion": Scorer.PENALTY_INSERTION,
++    "deletion": Scorer.PENALTY_DELETION,
++}
++# Below this share of the weighted total, no single category clearly
++# explains the gap -- leave the corpus-tuned [agbcc] weights alone rather
++# than bias on a weak signal.
++_DOMINANCE_THRESHOLD = 0.5
++
++
++def _diff_directed_weights(
++    base_weights: Mapping[str, float], penalties: Dict[str, int]
++) -> Mapping[str, float]:
++    weighted = {k: penalties.get(k, 0) * w for k, w in _PENALTY_WEIGHT.items()}
++    total = sum(weighted.values())
++    if total <= 0:
++        return base_weights
++    dominant = max(weighted, key=lambda k: weighted[k])
++    if weighted[dominant] / total < _DOMINANCE_THRESHOLD:
++        return base_weights
++    boost = _DOMINANCE_BOOSTS[dominant]
++    adjusted = dict(base_weights)
++    for pass_name, factor in boost.items():
++        if pass_name in adjusted:
++            adjusted[pass_name] = adjusted[pass_name] * factor
++    return adjusted
++
++
+ class Permuter:
+     """
+     Represents a single source from which permutation candidates can be generated,
+@@ -132,6 +226,13 @@ class Permuter:
+             self.base_hash,
+             self.base_source,
+         ) = self._create_and_score_base()
++        # MLSS LOCAL PATCH (0002-diff-directed-weighting): bias mutation
++        # selection using the base candidate's own diff, classified above.
++        # self.scorer.last_penalties reflects the base candidate specifically
++        # -- score() was just called on it and nothing else has run yet.
++        self.randomization_weights = _diff_directed_weights(
++            self.randomization_weights, self.scorer.last_penalties
++        )
+         self.best_score = self.base_score
+         self.hashes = {self.base_hash}
+         self._cur_cand: Optional[Candidate] = None
+diff --git a/src/scorer.py b/src/scorer.py
+index 5249c26..db2285a 100644
+--- a/src/scorer.py
++++ b/src/scorer.py
+@@ -34,6 +34,12 @@ class Scorer:
+             autojunk=False
+         )
+         self.difflib_differ.set_seq2([line.mnemonic for line in self.target_seq])
++        # MLSS LOCAL PATCH (0002-diff-directed-weighting): the penalty
++        # breakdown below is already computed every call and then collapsed
++        # into one scalar before it leaves score() -- stashed here so the
++        # caller can read WHICH kind of difference dominates a given
++        # candidate, not just how large the difference is.
++        self.last_penalties: Dict[str, int] = {}
+ 
+     def _objdump(self, o_file: str) -> Tuple[str, List[Line]]:
+         lines = objdump(o_file, self.arch, stack_differences=self.stack_differences)
+@@ -235,4 +241,17 @@ class Scorer:
+             + num_deletion_penalties * self.PENALTY_DELETION
+         )
+ 
++        # MLSS LOCAL PATCH (0002-diff-directed-weighting): raw counts, not
++        # the weighted contributions -- the caller decides how to weigh them
++        # for its own purpose (dominance classification), which need not
++        # match PENALTY_* (those are tuned for score comparability, not for
++        # picking a mutation strategy).
++        self.last_penalties = {
++            "stack": num_stack_penalties,
++            "regalloc": num_regalloc_penalties,
++            "reordering": num_reordering_penalties,
++            "insertion": num_insertion_penalties,
++            "deletion": num_deletion_penalties,
++        }
++
+         return (final_score, hashlib.sha256(objdump_output.encode()).hexdigest())
