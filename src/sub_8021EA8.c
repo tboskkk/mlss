@@ -52,39 +52,48 @@ asm_unified(".include \"asm/nonmatching/sprite_hide_8021F20.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8021F7C.s\"");
-#else
-s32 sub_801E68C(void *);                        /* extern */
-s32 sub_8021308(void *);                        /* extern */
-
-void sub_8021F7C(void) {
-    s32 temp_r0_28;
-    u8 temp_r1_22;
-    void *temp_r5_12;
-    void *var_r4_8;
-
-    var_r4_8 = (*(void **)((s8 *)((void *)0x0203FFB8) + (0x30)));
-    if (var_r4_8 != NULL) {
-        do {
-            temp_r5_12 = (*(void **)((s8 *)(var_r4_8) + (0x68)));
-            if (0x40 & (*(u8 *)((s8 *)(var_r4_8) + (0x29)))) {
-                sub_801E68C(var_r4_8);
-                temp_r1_22 = (*(u8 *)((s8 *)(var_r4_8) + (0x12)));
-                if (8 & temp_r1_22) {
-                    temp_r0_28 = 6 & temp_r1_22;
-                    if (temp_r0_28 == 4) {
-                        sprite_hide_8021F20(var_r4_8);
-                    } else if (temp_r0_28 == 6) {
-                        sub_8021308(var_r4_8);
-                    }
-                }
-            }
-            var_r4_8 = temp_r5_12;
-        } while (var_r4_8 != NULL);
+s32 sub_801E68C(struct Sprite *);               /* extern */
+s32 sub_8021308(struct Sprite *);               /* extern */
+void sub_8021F7C(void);
+s32 sub_801E68C(struct Sprite *);
+s32 sub_8021308(struct Sprite *);
+void sub_8021F7C(void)
+{
+  s32 temp_r0_28;
+  struct Sprite *temp_r5_12;
+  void *new_var;
+  struct Sprite *var_r4_8;
+  u8 temp_r1_22;
+  new_var = (void *) 0x0203FFB8;
+  var_r4_8 = *((struct Sprite **) (((s8 *) new_var) + 0x30));
+  if (var_r4_8 != ((void *) 0))
+  {
+    do
+    {
+      temp_r5_12 = *((struct Sprite **) (((s8 *) var_r4_8) + 0x68));
+      if (0x40 & (*((u8 *) (((s8 *) var_r4_8) + 0x29))))
+      {
+        sub_801E68C(var_r4_8);
+        temp_r1_22 = *((u8 *) (((s8 *) var_r4_8) + 0x12));
+        if (8 & temp_r1_22)
+        {
+          temp_r0_28 = 6 & temp_r1_22;
+          if (temp_r0_28 == 4)
+          {
+            sprite_hide_8021F20(var_r4_8);
+          }
+          else
+            if (temp_r0_28 == 6)
+          {
+            sub_8021308(var_r4_8);
+          }
+        }
+      }
+      var_r4_8 = temp_r5_12;
     }
+    while (var_r4_8 != ((void *) 0));
+  }
 }
-#endif
 
 s32 sub_80208F4();                              /* extern */
 void sub_8021FD4(void);
