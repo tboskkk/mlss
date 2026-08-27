@@ -81,39 +81,40 @@ volatile int sub_80722E0(void *arg0, s32 arg1)
  new_var4 = (new_var3 = 0x4C); do { new_var = (s32 **) (((s8 *) arg0) + new_var4); new_var2 = (s32 *) &sub_80722F8; *new_var = new_var2; } while (0);
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80722F8.s\"");
-#else
-s32 sub_807C298(void *);                        /* extern */
-s32 sub_807F47C(void *);                        /* extern */
-
-void sub_80722F8(void *arg0) {
-    s32 temp_r2_12;
-    s32 var_r0_20;
-    s32 var_r0_34;
-
-    temp_r2_12 = (*(s32 *)((s8 *)(arg0) + (0xA0))) + 0x14;
-    (*(s32 *)((s8 *)(arg0) + (0xA0))) = temp_r2_12;
-    if ((*(s32 *)((s8 *)(arg0) + (0x9C))) == 0) {
-        var_r0_20 = (*(s32 *)((s8 *)(arg0) + (0x10))) - temp_r2_12;
-        (*(s32 *)((s8 *)(arg0) + (0x10))) = var_r0_20;
-        if (var_r0_20 < 0) {
-            var_r0_20 += 0xFF;
-        }
-        if ((s32) (var_r0_20 >> 8) <= -0x20) {
-            goto block_8;
-        }
-    } else {
-        var_r0_34 = (*(s32 *)((s8 *)(arg0) + (0x10))) + temp_r2_12;
-        (*(s32 *)((s8 *)(arg0) + (0x10))) = var_r0_34;
-        if (var_r0_34 < 0) {
-            var_r0_34 += 0xFF;
-        }
-        if ((s32) (var_r0_34 >> 8) > 0xFF) {
-block_8:
-            sub_807F47C(arg0);
-            sub_807C298(arg0);
-        }
+void sub_80722F8(void *arg0)
+{
+  s32 temp_r2_12;
+  s32 var_r0_20;
+  s32 var_r0_34;
+  temp_r2_12 = (*((s32 *) (((s8 *) arg0) + 0xA0))) + 0x14;
+  *((s32 *) (((s8 *) arg0) + 0xA0)) = temp_r2_12;
+  if ((*((s32 *) (((s8 *) arg0) + 0x9C))) == 0)
+  {
+    var_r0_20 = (*((s32 *) (((s8 *) arg0) + 0x10))) - temp_r2_12;
+    *((s32 *) (((s8 *) arg0) + 0x10)) = var_r0_20;
+    if (var_r0_20 < 0)
+    {
+      var_r0_20 += 0xFF;
     }
+    if (((s32) (var_r0_20 >> 8)) <= (-0x20))
+    {
+ do { goto block_8; } while (0);
+    }
+  }
+  else
+  {
+    var_r0_34 = (*((s32 *) (((s8 *) arg0) + 0x10))) + temp_r2_12;
+    *((s32 *) (((s8 *) arg0) + 0x10)) = var_r0_34;
+    if (var_r0_34 < 0)
+    {
+      var_r0_34 += 0xFF;
+    }
+    if (((s32) (var_r0_34 >> 8)) > 0xFF)
+    {
+      block_8:
+      sub_807F47C(arg0);
+
+      sub_807C298(arg0);
+    }
+  }
 }
-#endif
