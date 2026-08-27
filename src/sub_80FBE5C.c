@@ -18,19 +18,22 @@ s32 sub_80FBE5C(s32 arg0, void **arg1) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80FBE7C.s\"");
-#else
-s32 sub_80FBE7C(s32 arg0, void **arg1) {
-    u8 temp_r0_11;
-
-    temp_r0_11 = (*(u8 *)((s8 *)(*arg1) + (0x1D6)));
-    if (!(((u32) (temp_r0_11 << 0x1C) >> 0x1F) & ((u32) (temp_r0_11 << 0x1D) >> 0x1F))) {
-        return 1;
+s32 sub_80FBE7C(s32 arg0, void **arg1)
+{
+  u8 temp_r0_11;
+  int new_var;
+  temp_r0_11 = (short) (*((u8 *) (((s8 *) (*arg1)) + 0x1D6)));
+  new_var = ((u32) (temp_r0_11 << 0x1D)) >> 0x1F;
+  if (!((((u32) ((temp_r0_11 << 14) << 14)) >> 0x1F) & new_var))
+  {
+ do { } while (0); new_var = 1;
+    if (new_var)
+    {
+      return new_var;
     }
-    return 0;
+  }
+  return 0;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80FBEA0.s\"");
