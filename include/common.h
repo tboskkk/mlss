@@ -61,7 +61,32 @@ struct Entity {
 /* 0x4C */ s32 *handler;
 /* 0x50 */ u8  pad50[0x24];
 /* 0x74 */ s32 unk74;
-/* 0x78 */ u8  pad78[0x06];
+/* 0x78 */ struct {
+    /* u32 is NOT cosmetic here -- it is mandatory. A u8-typed bitfield
+     * container compiles unreliably under agbcc (verified: in one
+     * isolated test it produced a complete no-op, zero memory writes at
+     * all) and, when it does emit code, the surrounding struct/union gets
+     * silently misaligned to the next 4-byte boundary regardless of the
+     * declared u8 width -- confirmed live: with a u8 container here the
+     * compiler addressed this field at +0x7C instead of +0x79. A u32
+     * container forces the alignment agbcc was already going to apply,
+     * so the offset comes out correct instead of silently wrong.
+     *
+     * Despite the u32 declaration, agbcc still narrows a single-bit
+     * set/clear to the exact byte it lives in (ldrb/strb at the right
+     * offset, not a full-word read-modify-write) -- verified
+     * byte-identical against the hand-written mask/shift form on two
+     * real functions (sub_8068F3C, sub_80751A8). This is a readability
+     * change, not a register-allocation fix: agbcc already compiled the
+     * mask/shift form optimally, so this recovers correctness (the u8
+     * form was silently broken or wrong) without changing codegen at
+     * offsets already handled correctly by hand-written casts. */
+    u32 b78_0:1, b78_1:1, b78_2:1, b78_3:1, b78_4:1, b78_5:1, b78_6:1, b78_7:1,
+        b79_0:1, b79_1:1, b79_2:1, b79_3:1, b79_4:1, b79_5:1, b79_6:1, b79_7:1,
+        b7A_0:1, b7A_1:1, b7A_2:1, b7A_3:1, b7A_4:1, b7A_5:1, b7A_6:1, b7A_7:1,
+        b7B_0:1, b7B_1:1, b7B_2:1, b7B_3:1, b7B_4:1, b7B_5:1, b7B_6:1, b7B_7:1;
+} unk78_bits;                     /* 0x78-0x7B, u32 container -- see above */
+/* 0x7C */ u8  pad7C[0x02];
 /* 0x7E */ u8  unk7E;
 /* 0x7F */ u8  pad7F[0x01];
 /* 0x80 */ u8  pad80[0x04];
