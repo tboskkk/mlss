@@ -96,6 +96,32 @@ def _claim(conn, state: str):
     return row
 
 
+def _ghost_zero_source(name: str) -> Path | None:
+    """Path to a genuine isolation-zero permuter output for `name` still
+    sitting on disk (nonmatchings/<name>/output-0-*/source.c with a
+    score.txt of exactly "0"), or None.
+
+    Found live 2026-08-27 on sub_81458C8: a real decomp-permuter search hit
+    score 0 in isolation on 2026-08-23, but the row's `seed_ruleset` went
+    stale three separate times afterward and `_claim_stale_seed` below
+    reseeded it from a fresh, dumber m2c draft each time -- discarding the
+    proven candidate and leaving only its ORPHANED output-0-*/ directory as
+    evidence it ever existed. `best_score` in the DB is not proof either:
+    it is set by whatever tier2 run last touched the row, and a later
+    reseed can walk right past it the same way it walked past this. This
+    checks the filesystem directly because that is the one place the
+    score-0 result cannot have been silently overwritten.
+    """
+    d = gitops.REPO / "nonmatchings" / name
+    if not d.is_dir():
+        return None
+    for hit in sorted(d.glob("output-0-*/source.c")):
+        score_file = hit.parent / "score.txt"
+        if score_file.is_file() and score_file.read_text().strip() == "0":
+            return hit
+    return None
+
+
 def _claim_stale_seed(conn):
     """Claim a tier2_ready row whose stored seed predates the current ruleset.
 
@@ -112,6 +138,13 @@ def _claim_stale_seed(conn):
     `worker_id IS NULL` keeps this off rows another process holds. tier2 moves
     a row tier2_ready -> permuting inside a transaction, so the worst case is
     a lost race sqlite serialises, not a double claim.
+
+    `best_score != 0` is a CHEAP first filter for the sub_81458C8 class
+    above (a row the permuter proved byte-exact in isolation), but it is not
+    sufficient on its own -- best_score can be stale or absent for reasons
+    unrelated to this bug. process_one() re-checks the filesystem directly
+    via `_ghost_zero_source()` before it ever overwrites candidate_body,
+    which is the check that actually matters.
     """
     cur = m2c_bridge.ruleset_version()
     with db.tx(conn):
@@ -119,6 +152,7 @@ def _claim_stale_seed(conn):
             "SELECT * FROM functions WHERE state = 'tier2_ready' "
             "AND worker_id IS NULL "
             "AND seed_ruleset IS NOT NULL AND seed_ruleset != ? "
+            "AND (best_score IS NULL OR best_score != 0) "
             "AND (notes IS NULL OR notes NOT LIKE ?) "
             "ORDER BY updated_at ASC LIMIT 1",
             (cur, f"m2c:{cur}:%"),
@@ -136,6 +170,7 @@ def process_one(conn, no_score: bool = False) -> str | None:
     row = _claim(conn, "needs_attempt")
     if row is None:
         row = _claim(conn, "stalled")
+    via_stale_seed = row is None
     if row is None:
         # LAST, deliberately: a tier2_ready row whose seed came from an OLDER
         # ruleset. Genuinely unseeded work and stalled work come first, so
@@ -153,6 +188,23 @@ def process_one(conn, no_score: bool = False) -> str | None:
     if row is None:
         return None
     name = row["name"]
+
+    # HARD LOCK, checked directly against disk (not the DB -- see
+    # _ghost_zero_source's docstring for why best_score alone isn't
+    # trustworthy). A reseed about to overwrite candidate_body on a row that
+    # once hit a genuine isolation-zero must abort instead, or it destroys
+    # proven work exactly as it did to sub_81458C8 three times over.
+    if via_stale_seed:
+        ghost = _ghost_zero_source(name)
+        if ghost is not None:
+            with db.tx(conn):
+                db.set_state(conn, name, row["state"], worker_id=None,
+                             notes=row["notes"] or "")
+            db.log_event(conn, name, "ghost_zero_guard",
+                         f"reseed aborted: {ghost.relative_to(gitops.REPO)} is a proven "
+                         f"isolation-zero -- candidate_body left untouched")
+            print(f"      -> {name}: reseed BLOCKED, ghost zero at {ghost}")
+            return name
 
     # Same reason tier3 checks this: a sibling still on the #error
     # placeholder fails the WHOLE translation unit, regardless of how
