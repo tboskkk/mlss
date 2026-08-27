@@ -531,6 +531,7 @@ def generate(name: str) -> str | None:
     c = fix_uncast_address_dereference(c)
     c = fix_indirect_call_precedence(c)
     c = fix_untyped_address_access(c, name)
+    c = fix_scaled_pointer_arithmetic(c, name)
     c = fix_pointer_assign_without_cast(c)
     c = fix_integer_assign_from_pointer(c)
     return restore_omitted_leading_params(c, name)
@@ -862,12 +863,37 @@ def fix_pointer_assign_without_cast(c: str) -> str:
             return m.group(0)
         if re.search(r"(\?|\|\||&&|[=!<>]=|(?<![<>=!])[<>](?!=))", r):
             return m.group(0)
+        # NOT `KNOWN_TYPED_NONBYTE_POINTER +/- offset`. An outer cast here
+        # would silence the warning without fixing anything: `s32 *p; p + 8`
+        # already scales by sizeof(s32)=4 BEFORE any outer cast is applied,
+        # so `(void *) (p + 8)` compiles cleanly while still meaning "32
+        # bytes past p", not "8". Confirmed live, not hypothetical: sampling
+        # 60 m2c-seeded rows AFTER this rule shipped found 5 already holding
+        # exactly this shape (e.g. `sp2C = (s32 *) (temp_r1_31 + 8)` with
+        # temp_r1_31 declared `s32 *`). fix_scaled_pointer_arithmetic below
+        # is the correct fix for this shape; this rule must stay out of its
+        # way rather than paper over it.
+        base_m = re.match(r"^(\w+)\s*(?:\+|-(?!>))", r)
+        if base_m:
+            base_t = types.get(base_m.group(1))
+            if base_t and base_t.endswith("*") and base_t not in BYTE_PTR_TYPES:
+                return m.group(0)
         return f"{indent}{lhs}{eq}({ctype.replace('*', ' *')}) ({r});"
 
     return _PTR_ASSIGN_RE.sub(repl, c)
 
 
-_INT_ASSIGN_FROM_PTR_RE = re.compile(r"^(\s*)(\w+)(\s*=\s*)(\w+)(\s*[+\-]\s*.+?);\s*$", re.MULTILINE)
+
+# `[+\-]` alone also matches the `-` inside `->`, so `x = base->field;`
+# (already-correct code) would be misread as `base` MINUS `>field` and
+# rewritten around that fiction -- (?!>) excludes exactly that one case
+# without excluding a real `-` followed by anything else. Found live: see
+# fix_scaled_pointer_arithmetic's docstring below for the concrete case
+# that caught it (`sp8 = arg0->field_20;` mangled into a cast-then-arrow on
+# a non-struct type, which cannot compile).
+_ARITH_OP = r"(?:\+|-(?!>))"
+_INT_ASSIGN_FROM_PTR_RE = re.compile(
+    rf"^(\s*)(\w+)(\s*=\s*)(\w+)(\s*{_ARITH_OP}\s*.+?);\s*$", re.MULTILINE)
 
 # Pointer types where `ptr +/- N` is guaranteed to be pure byte arithmetic --
 # the pointee is one byte wide, so there is no sizeof-scaling to get wrong.
@@ -912,6 +938,87 @@ def fix_integer_assign_from_pointer(c: str) -> str:
         return f"{indent}{lhs}{eq}({lhs_type}) ({base}{rest});"
 
     return _INT_ASSIGN_FROM_PTR_RE.sub(repl, c)
+
+
+_PARAM_LIST_RE = r"^[\w \*]+?\b{}\s*\(([^;{{)]*)\)\s*\{{"
+_PARAM_ITEM_RE = re.compile(
+    r"^(struct\s+\w+\s*\*|(?:void|u8|s8|u16|s16|u32|s32|u64|s64)\s*\*?)\s*(\w+)$")
+
+
+def _param_types(c: str, name: str) -> dict:
+    """name -> declared C type for each of `name`'s OWN parameters,
+    including struct-typed ones (`struct Sprite *`) that _local_types()
+    cannot see at all -- LOCAL_DECL_RE's keyword set has no `struct`
+    alternative, and this scans a completely different part of the source
+    (the signature, not the body) regardless.
+
+    Needed because the scaled-pointer-arithmetic bug below is not confined
+    to locals: `void sub_801E150(struct Sprite *arg0, ...)` then
+    `var = arg0 + 0x23` is exactly the same defect, and arg0 only appears
+    in the signature, never in a body declaration.
+    """
+    m = re.search(_PARAM_LIST_RE.format(re.escape(name)), c, re.MULTILINE)
+    if not m:
+        return {}
+    types = {}
+    for param in m.group(1).split(","):
+        pm = _PARAM_ITEM_RE.match(param.strip())
+        if pm:
+            types[pm.group(2)] = re.sub(r"\s+", " ", pm.group(1)).strip().replace(" ", "")
+    return types
+
+
+def fix_scaled_pointer_arithmetic(c: str, name: str) -> str:
+    """Route `TYPED_PTR +/- OFFSET` through an explicit byte cast when
+    TYPED_PTR's pointee is wider than one byte: `struct Sprite *arg0; var =
+    arg0 + 0x23;` becomes `var = (var's type) ((s8 *)(arg0) + 0x23);`
+
+    THE BUG THIS FIXES, FOUND WHILE EXTENDING fix_pointer_assign_without_cast
+    ABOVE TO ALSO HANDLE THIS SHAPE -- it must not, and this is why. `struct
+    Sprite *arg0; arg0 + 0x23` scales by sizeof(struct Sprite) as a plain
+    property of C's pointer arithmetic, BEFORE any outer cast is applied --
+    an outer `(void *)` changes the RESULT's type, not what the addition
+    computed, so it would silence the "incompatible pointer type" warning
+    while leaving the value wrong. Confirmed live: sampling 60 m2c-seeded
+    rows found 5 already holding exactly that shape from the unguarded
+    version of the other rule (e.g. `sp2C = (s32 *) (temp_r1_31 + 8)`,
+    temp_r1_31 declared `s32 *` -- silently 32 bytes past temp_r1_31, not 8).
+
+    NO SIZEOF KNOWLEDGE NEEDED to fix this correctly, despite first looking
+    like it would need one: m2c reconstructs every address from raw machine
+    code, which is always byte-addressed, so it NEVER means scaled
+    arithmetic -- forcing byte semantics via `(s8 *)` is unconditionally
+    correct regardless of the pointee's actual size, the same idiom already
+    used everywhere else in this project's m2c output
+    (`*(TYPE *)((s8 *)(base) + (offset))`).
+
+    Deliberately narrow: only fires on `IDENT +/- OFFSET` where IDENT's type
+    is known (from _local_types() or _param_types()) and is a pointer whose
+    pointee is NOT one byte wide (see fix_integer_assign_from_pointer's
+    BYTE_PTR_TYPES -- those are exactly the types with no scaling to fix).
+    Leaves the LHS's own type as the outer cast, so the assignment's
+    apparent type is unchanged; only the inner arithmetic's semantics move
+    from scaled to byte-wise, which is the actual bug being fixed.
+    """
+    types = {**_local_types(c), **_param_types(c, name)}
+    if not types:
+        return c
+
+    def repl(m: re.Match) -> str:
+        indent, lhs, eq, base, rest = m.group(1), m.group(2), m.group(3), m.group(4), m.group(5)
+        lhs_type = types.get(lhs)
+        base_type = types.get(base)
+        if not lhs_type or "*" not in lhs_type:
+            return m.group(0)  # only useful when the result is itself a pointer
+        if not base_type or not base_type.endswith("*") or base_type in BYTE_PTR_TYPES:
+            return m.group(0)
+        return f"{indent}{lhs}{eq}({lhs_type.replace('*', ' *')}) ((s8 *)({base}){rest});"
+
+    return _PTR_ASSIGN_RE_SCALED.sub(repl, c)
+
+
+_PTR_ASSIGN_RE_SCALED = re.compile(
+    rf"^(\s*)(\w+)(\s*=\s*)(\w+)(\s*{_ARITH_OP}\s*.+?);\s*$", re.MULTILINE)
 
 
 def fix_untyped_address_access(c: str, name: str) -> str:
