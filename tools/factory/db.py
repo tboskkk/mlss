@@ -131,6 +131,21 @@ MIGRATIONS = [
     # ordering as an OR'd admission path alongside ISO_SCORE_CEILING, not
     # a replacement.
     ("objdiff_score", "REAL"),
+    # Fuzzy structural cluster (cluster_index.py). shape_hash above is an
+    # EXACT md5 of normalised instructions, so it groups only functions whose
+    # shapes are identical; measured on this corpus that is 242 groups / 493
+    # avoidable searches. Clustering on instruction-sequence SIMILARITY
+    # instead finds 257 clusters / 1,011 avoidable searches -- +518 over the
+    # exact grouping, because near-identical functions that differ by an
+    # instruction or two are invisible to a hash.
+    #
+    # DEDUPLICATION ONLY. shape_hash members differ solely in immediates and
+    # symbol names, which is why validator.propagate_to_twins() can generate
+    # one member's C from another's by substitution. Cluster members differ
+    # STRUCTURALLY, so no such substitution is valid -- this column must
+    # never be used to propagate a candidate, only to avoid searching two
+    # near-identical functions at the same time.
+    ("cluster_id", "TEXT"),
 ]
 
 

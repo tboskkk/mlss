@@ -775,15 +775,31 @@ def run_pool(jobs: int, stall_min: float, max_functions: int):
             # query about to ship, instead of trusting the edit on sight.
             # Plain OR across all three signals is what that measurement
             # used and is what actually admits them.
+            # The same deferral, one step wider. cluster_id (cluster_index.py)
+            # groups by assembly SIMILARITY rather than an exact hash, which
+            # catches near-identical functions a hash cannot: measured on this
+            # corpus, 385 clusters / 1,064 avoidable searches against
+            # shape_hash's 242 / 493. Both guards apply -- they overlap
+            # heavily but neither is a superset, and a row is only deferred
+            # while a sibling is ACTIVELY permuting.
+            #
+            # Deduplication ONLY. Cluster members differ structurally, not
+            # just in constants, so nothing may generate one member's C from
+            # another the way validator.propagate_to_twins() does for
+            # shape_hash twins. See cluster_index.py's docstring.
+            dedup = ("(shape_hash IS NULL OR shape_hash NOT IN "
+                     "(SELECT shape_hash FROM functions "
+                     " WHERE state = 'permuting' AND shape_hash IS NOT NULL)) "
+                     "AND (cluster_id IS NULL OR cluster_id NOT IN "
+                     "(SELECT cluster_id FROM functions "
+                     " WHERE state = 'permuting' AND cluster_id IS NOT NULL))")
             row = db.claim_for_worker(
                 conn, "tier2_ready", WORKER_ID, order_by=order,
                 extra_where="((iso_score IS NOT NULL AND iso_score < ?) "
                             "OR (objdiff_score IS NOT NULL AND objdiff_score >= ?) "
                             "OR (iso_score IS NULL AND objdiff_score IS NULL "
                             "    AND (best_score IS NULL OR best_score < ?))) "
-                            "AND (shape_hash IS NULL OR shape_hash NOT IN "
-                            "(SELECT shape_hash FROM functions "
-                            " WHERE state = 'permuting' AND shape_hash IS NOT NULL))",
+                            "AND " + dedup,
                 params=(ISO_SCORE_CEILING, OBJDIFF_ADMIT_FLOOR, SEED_SCORE_CEILING))
             if row is not None:
                 return row
@@ -792,9 +808,7 @@ def run_pool(jobs: int, stall_min: float, max_functions: int):
             # the waste this is here to remove.
             return db.claim_for_worker(
                 conn, "tier2_ready", WORKER_ID, order_by=order,
-                extra_where="(shape_hash IS NULL OR shape_hash NOT IN "
-                            "(SELECT shape_hash FROM functions "
-                            " WHERE state = 'permuting' AND shape_hash IS NOT NULL))")
+                extra_where=dedup)
         finally:
             conn.close()
 
