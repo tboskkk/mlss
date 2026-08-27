@@ -41,14 +41,26 @@ s32 sub_80F112C(s32 arg0, s32 arg1, void *arg2, void *arg3) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80F1170.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+s32 script_enable_flag_2(void *, s32, s32, s32);
+s32 sub_8045A94(s32, s32, s32, s32, s32, s32, s32);
+s32 sub_80F1170(void *arg0, s32 arg1, s32 arg2, void *arg3)
+{
+  s8 *new_var;
+  void *temp_r2_16;
+  int new_var2;
+  new_var = (s8 *) arg3;
+  temp_r2_16 = *((void **) (((s8 *) (((*((s32 *) (new_var + 0))) * 4) + (*((s32 *) (((s8 *) arg0) + 0x14))))) + 0x28));
+  new_var2 = 4;
+  new_var = new_var;
+  if ((sub_8045A94(arg1, 2, 0, (((s32) (*((s32 *) (((s8 *) temp_r2_16) + 0xC)))) >> 8) + (*((s32 *) (new_var + new_var2))), (((s32) (*((s32 *) (((s8 *) temp_r2_16) + 0x10)))) >> 8) + (*((s32 *) (new_var + 8))), (((s32) (*((s32 *) (((s8 *) temp_r2_16) + 0x14)))) >> 8) + (*((s32 *) (new_var + 0xC))), 1) << 0x18) == 0)
+  {
+    return 1;
+ dummy_label_808729: ;
+    goto dummy_label_808729;
+  }
+  script_enable_flag_2(arg0, arg1, arg2, 0);
+  return 0;
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80F11D0.s\"");
