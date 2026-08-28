@@ -1001,8 +1001,23 @@ def _owning_source_stem(name: str):
     runs, splice_candidate() has already REMOVED the guard (that is what
     makes it a match), so the `asm/nonmatching/<name>.s` needle it searches
     for is gone and it returns None. Fall back to looking for the function's
-    own definition."""
+    own definition.
+
+    Also tries find_new_format_guard() before giving up -- find_guard_block()
+    only recognizes the OLD #ifndef NONMATCHING convention, so a function
+    still in its NEW-FORMAT (ASM_FUNC/NONMATCH) guard was invisible to both
+    this function's first check AND its regex fallback (which only matches a
+    real, unguarded definition). Found live 2026-08-28: this made
+    rescore_seeds.plain_score() return None for sub_806A730 -- a genuine
+    in-context zero, 3/3 workers -- which already_matches() then read as
+    "no verdict" and rejected via its legacy asm_differ_matches() fallback,
+    the exact `already_matches()` docstring's own "false negative is
+    harmless" case, just traced to its actual cause instead of shrugged off
+    as noise."""
     c_path, _ = find_guard_block(name)
+    if c_path is not None:
+        return c_path.stem
+    c_path, _block, _kind = find_new_format_guard(name)
     if c_path is not None:
         return c_path.stem
     pattern = re.compile(rf"^[\w \*]*\b{re.escape(name)}\s*\(", re.MULTILINE)
