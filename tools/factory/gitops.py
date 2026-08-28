@@ -470,6 +470,34 @@ _DECL_RE = re.compile(
     r"^\s*(?:extern\s+)?[A-Za-z_][\w \t\*]*?\b(\w+)\s*(?:\([^;]*\))?\s*;.*$")
 
 
+_DEAD_ELSE_RE = re.compile(
+    r'#ifndef NONMATCHING\n(asm_unified\("\.include \\"[^\\]*?\.s\\""\);\n)#else\n.*?\n#endif\n?',
+    re.DOTALL,
+)
+
+
+def _strip_dead_else_branches(text: str) -> str:
+    """Under the plain (non -DNONMATCHING) build every real splice/promotion
+    happens under, an `#ifndef NONMATCHING / asm_unified(...) / #else /
+    <C draft> / #endif` guard's #else branch never actually compiles --
+    cpp discards it before agbcc ever sees it. Strips it back out here so a
+    declaration or definition sitting only in a DEAD #else branch is not
+    mistaken for one that's really in scope.
+
+    Found live reconstructing sub_808F2A8 (2026-08-27): an unrelated
+    neighbour's still-unmatched `#else` draft declared `sub_808DD2C` as
+    DATA (`extern s32 sub_808DD2C;`), which is unreachable code today, but
+    `_dedupe_decls` (below) still saw it as a real prior declaration and
+    dropped this function's own correct one -- producing `sub_808DD2C'
+    undeclared` even though the real translation unit never contains that
+    stale declaration at all. Old-format guards only; the new ASM_FUNC/
+    NONMATCH convention doesn't have a dead branch to strip -- both of
+    ASM_FUNC's macro expansions (include/global.h) are real, unconditional
+    C in the .c file's own text, the #ifdef lives inside the macro
+    definition instead."""
+    return _DEAD_ELSE_RE.sub(lambda m: "#ifndef NONMATCHING\n" + m.group(1) + "#endif\n", text)
+
+
 def _dedupe_decls(text: str, block: str, body: str) -> str:
     """Drop declarations from `body` for symbols the destination file already
     declares at file scope.
@@ -503,7 +531,7 @@ def _dedupe_decls(text: str, block: str, body: str) -> str:
     since it never looked at order at all.
     """
     insert_pos = text.index(block)
-    before = text[:insert_pos]
+    before = _strip_dead_else_branches(text[:insert_pos])
     # file-scope declarations already present BEFORE the insertion point
     depth, scope = 0, []
     for ch in before:
