@@ -58,24 +58,22 @@ void sub_8072390(void *arg0)
   }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8072400.s\"");
-#else
 s32 sub_8087124();                                  /* extern */
 extern s32 sub_8071900;
-
-s32 sub_8072400(void *arg0) {
-    s32 var_r0_8;
-
-    var_r0_8 = sub_8087124();
-    if (var_r0_8 == 0) {
-        (*(s32 *)((s8 *)(arg0) + (0x8C))) = 0x300;
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8071900;
-        var_r0_8 = 0;
-    }
-    return var_r0_8;
+s32 sub_8072400(void *arg0)
+{
+  s32 new_var;
+  s32 var_r0_8;
+  new_var = sub_8087124();
+  var_r0_8 = new_var;
+  if (var_r0_8 == 0)
+  {
+    *((s32 *) (((s8 *) arg0) + (var_r0_8 = 0x8C))) = 0x300;
+    *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_8071900;
+    var_r0_8 = 0;
+  }
+  return var_r0_8;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8072428.s\"");
