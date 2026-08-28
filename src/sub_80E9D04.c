@@ -14,14 +14,16 @@ void sub_80E9D04(void) {
     *(s32 *)0x03000FC0 = 0;
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80E9D1C.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+void *alloc_heap_8018CEC(bool32 heapId, u32 size, char *tag);
+void sub_80E9D1C(void)
+{
+  void **new_var;
+  void *temp_r0_13;
+  new_var = (void **) 0x03000FC0;
+  temp_r0_13 = alloc_heap_8018CEC(1U, 0x570U, (s8 *) 0x08200190);
+  *new_var = temp_r0_13;
+  (*((s32 (**)(s32, void *, s32)) 0x03001034))(0, temp_r0_13, 0x570);
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80E9D50.s\"");
