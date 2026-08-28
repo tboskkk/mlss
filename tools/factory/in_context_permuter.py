@@ -311,6 +311,60 @@ def retail_symbol(name: str, work: Path):
     return data, relocs
 
 
+_SIMPLE_SYMBOL_RE = re.compile(r"^(\w+)\s*=\s*(0x[0-9A-Fa-f]+);\s*$")
+
+
+def _load_simple_symbol_values() -> dict[str, int]:
+    """{name: value} for every symbols.txt entry that is a bare exact-value
+    linker-script equality (`name = 0xNNNNNNNN;`) -- 61 of them currently,
+    e.g. `loc_819832C = 0x0819832C;`. These are addresses this project has
+    named but which don't need real linking to resolve: their value is
+    already fully known, unlike a real function/data symbol whose final
+    address depends on where the linker actually places it."""
+    path = REPO / "symbols.txt"
+    if not path.is_file():
+        return {}
+    values = {}
+    for line in path.read_text().splitlines():
+        m = _SIMPLE_SYMBOL_RE.match(line.strip())
+        if m:
+            values[m.group(1)] = int(m.group(2), 16)
+    return values
+
+
+def resolve_known_symbol_relocs(data: bytes, relocs: set, symbol_values: dict):
+    """Patch each R_ARM_ABS32 relocation whose target is a KNOWN exact-value
+    symbol (see _load_simple_symbol_values) into `data` at its offset, and
+    drop that entry from the returned reloc set. Mirrors exactly what
+    `--just-symbols=symbols.txt` does for the real linker -- applied here
+    at MEASUREMENT time only.
+
+    WHY NOT REWRITE THE RETAIL .s FRAGMENT INSTEAD (the tempting, wrong
+    fix). Every isolation tool in this project -- this file's own
+    retail_symbol(), compiler_variants.py's staging, isolation_exact.py --
+    bare-assembles a fragment with no link step (confirmed: no --defsym,
+    no --just-symbols anywhere in this file's `arm-none-eabi-as` calls).
+    A `.4byte loc_819832C` in the TRACKED fragment would sit as an
+    unresolved relocation and read back as zero bytes in every one of
+    them -- corrupting the retail comparison far worse than today's
+    benign "candidate has a relocation, retail's raw literal doesn't"
+    mismatch. This is exactly CLAUDE.md's already-rejected finding
+    ("the literal-pool rewrite half is reverted, not applied ... broke
+    compiler_variants.py's isolation staging"), just about to be repeated
+    on a different file. Resolving in the SCORER instead touches nothing
+    tracked and can't affect any other tool.
+    """
+    symbol_values = symbol_values or _load_simple_symbol_values()
+    data = bytearray(data)
+    kept = set()
+    for off, rtype, sym in relocs:
+        if rtype == "R_ARM_ABS32" and sym in symbol_values:
+            data[off:off + 4] = symbol_values[sym].to_bytes(4, "little")
+        else:
+            kept.add((off, rtype, sym))
+    return bytes(data), kept
+
+
 def score_in_context(name: str, body: str, work: Path, tag: str = "cand", arm_mode: bool = False):
     """The primitive this whole POC exists to demonstrate: splice `body`
     into `name`'s REAL file, compile the WHOLE translation unit, extract
@@ -331,6 +385,7 @@ def score_in_context(name: str, body: str, work: Path, tag: str = "cand", arm_mo
     if cand_bytes is None:
         return {"error": f"{name} not found in compiled object (wrong guard splice?)",
                 "elapsed": time.time() - t0}
+    cand_bytes, cand_relocs = resolve_known_symbol_relocs(cand_bytes, cand_relocs, None)
     retail_bytes, retail_relocs = retail_symbol(name, work)
     n = min(len(cand_bytes), len(retail_bytes))
     diff = sum(1 for i in range(n) if cand_bytes[i] != retail_bytes[i]) + abs(len(cand_bytes) - len(retail_bytes))

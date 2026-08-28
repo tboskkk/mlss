@@ -225,6 +225,7 @@ class InContextScorer(Scorer):
 
     def __init__(self, name: str, work: Path):
         self.retail_bytes, self.retail_relocs = icp.retail_symbol(name, work)
+        self._symbol_values = icp._load_simple_symbol_values()
         self.last_penalties = {}
 
     def score(self, cand_o):
@@ -235,6 +236,12 @@ class InContextScorer(Scorer):
                 data, relocs = pickle.load(f)
         except Exception:
             return Scorer.PENALTY_INF, ""
+        # See in_context_permuter.resolve_known_symbol_relocs's docstring:
+        # patches KNOWN exact-value symbols.txt addresses (loc_819832C and
+        # 60 others) into `data` here, at measurement time only -- never
+        # touches the tracked retail .s fragment every isolation tool in
+        # this project bare-assembles with no link step.
+        data, relocs = icp.resolve_known_symbol_relocs(data, relocs, self._symbol_values)
         n = min(len(data), len(self.retail_bytes))
         diff = sum(1 for i in range(n) if data[i] != self.retail_bytes[i])
         diff += abs(len(data) - len(self.retail_bytes))
