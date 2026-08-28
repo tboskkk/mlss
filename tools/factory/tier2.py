@@ -75,6 +75,19 @@ ISO_SCORE_CEILING = 200
 # treats as near-certain, it can never make anything less claimable.
 OBJDIFF_ADMIT_FLOOR = 90.0
 
+# Measured 2026-08-27, ~5h into the post-arity-fix resume: the near-miss
+# band (421 rows) had gone almost entirely bimodal on escalation_count --
+# 321 rows sitting at exactly 11, another 17 at 10, only 69 total below
+# that. With 12 slots against 421 rows the band never empties, so under
+# the strict two-tier CASE below (near-miss always ahead of everything
+# else) the far band -- including 12 arity-corrected rows below the 90%
+# floor -- received ZERO launches all session despite being fixed hours
+# earlier. Not a few "doomed" outliers blocking the rest; the whole band
+# saturated together and, because near-miss always wins the top tier
+# outright, permanently outranked every far row regardless of how many
+# times it had already failed.
+EXHAUSTED_ESCALATION = 10
+
 # Cap on wall-clock time run_pool() spends refilling slots before it must
 # reach the monitoring loop below. Each refill can do a blocking build
 # (already_matches() splices+builds+asm-diffs; ensure_isolated() runs
@@ -812,7 +825,26 @@ def run_pool(jobs: int, stall_min: float, max_functions: int):
             # iso_score/best_score, so they are claimed whenever the
             # near-miss band is exhausted or fully in flight, and the band
             # drains as its rows either match or escalate.
-            order = ("CASE WHEN objdiff_score >= " + repr(OBJDIFF_ADMIT_FLOOR) + " THEN 0 ELSE 1 END ASC, "
+            # THIRD TIER, added 2026-08-27: a near-miss row that has already
+            # escalated past EXHAUSTED_ESCALATION drops OUT of the
+            # always-wins-outright top tier and into the same tier as far
+            # rows -- not excluded, not demoted to a separate state (no new
+            # terminal bucket to go stale the way needs_human's did; see
+            # CLAUDE.md's "stale terminal state" entry in THE LAW), just no
+            # longer able to indefinitely outrank work that has had zero
+            # chances yet. escalation_count ASC still runs as the tiebreaker
+            # inside this tier same as every other, so it keeps competing
+            # for slots on equal footing with far rows rather than being cut
+            # off -- a row that finally converges here still matches exactly
+            # as before. Deliberately NOT gated on "no best_score
+            # improvement" as well: checked live, the escalation_count
+            # distribution is already cleanly bimodal (69 rows at 1-4, 338 at
+            # 10-11, nothing between), so the count alone already identifies
+            # the same rows a stricter joint condition would.
+            order = ("CASE WHEN objdiff_score >= " + repr(OBJDIFF_ADMIT_FLOOR) +
+                     " AND escalation_count < " + repr(EXHAUSTED_ESCALATION) + " THEN 0 "
+                     "WHEN objdiff_score IS NULL OR objdiff_score < " + repr(OBJDIFF_ADMIT_FLOOR) + " THEN 1 "
+                     "ELSE 2 END ASC, "
                      "escalation_count ASC, "
                      "iso_score IS NULL ASC, iso_score ASC, "
                      "best_score IS NULL ASC, best_score ASC")
