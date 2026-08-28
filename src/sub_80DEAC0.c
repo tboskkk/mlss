@@ -27,22 +27,22 @@ extern s32 sub_80DE4A4;
 
 int sub_807C298();
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80DEAC0.s\"");
-#else
-void sub_80DEAC0(void *arg0) {
-    s32 temp_r2_8;
-    s32 var_r0_14;
-
-    temp_r2_8 = (*(s32 *)((s8 *)(arg0) + (0x18)));
-    if (temp_r2_8 > 0x200) {
-        var_r0_14 = temp_r2_8 + 0xFFFFFE00;
-    } else {
-        var_r0_14 = 0;
-    }
-    (*(s32 *)((s8 *)(arg0) + (0x18))) = var_r0_14;
+void sub_80DEAC0(void *arg0)
+{
+  s32 temp_r2_8;
+  s32 var_r0_14;
+  temp_r2_8 = *((s32 *) (((s8 *) arg0) + 0x18));
+  if (0x200 < temp_r2_8)
+  {
+    var_r0_14 = 0xFFFFFE00;
+    var_r0_14 = temp_r2_8 + var_r0_14;
+  }
+  else
+  {
+    var_r0_14 = 0;
+  }
+ do { *((s32 *) (((s8 *) arg0) + 0x18)) = var_r0_14; } while (0);
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80DEAE0.s\"");
