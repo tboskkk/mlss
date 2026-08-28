@@ -22,19 +22,21 @@ void sub_814B67C(s32 arg0, void *arg1, void *arg2) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_814B6CC.s\"");
-#else
 extern s32 sub_814A428;
-
-void sub_814B6CC(s32 arg0, void *arg1, s32 **arg2) {
-    (*(s32 *)((s8 *)(arg1) + (0x2C4))) = (s32) ((*(s32 *)((s8 *)(arg1) + (0x14))) + (*(s32 *)((s8 *)(arg1) + (0x18))));
-    (*(s32 *)((s8 *)(arg1) + (0x2D4))) = (s32) ((*(s32 *)((s8 *)(arg1) + (0x1E4))) + (*(s32 *)((s8 *)(arg1) + (0x1E8))));
-    (*(u16 *)((s8 *)(arg1) + (0x2DC))) = (u16) (*(u16 *)((s8 *)((((*(u16 *)((s8 *)(arg1) + (0x1D0))) * 2) + (*(s32 *)((s8 *)(arg1) + (0x1B0))))) + (0x44)));
-    (*(s16 *)((s8 *)(arg1) + (0x1D4))) = 1;
-    *arg2 = &sub_814A428;
+void sub_814B6CC(s32 arg0, void *arg1, s32 **arg2)
+{
+  s8 *new_var;
+  u16 new_var3;
+  s32 new_var2;
+  new_var2 = *((s32 *) (((s8 *) arg1) + 0x1B0));
+  new_var = (s8 *) arg1;
+  *((s32 *) (new_var + 0x2C4)) = (s32) ((*((s32 *) (new_var + 0x14))) + (*((s32 *) (new_var + 0x18))));
+  *((s32 *) (((s8 *) arg1) + 0x2D4)) = (s32) ((*((s32 *) (((s8 *) arg1) + 0x1E4))) + (*((s32 *) (((s8 *) arg1) + 0x1E8))));
+  new_var3 = *((u16 *) (((s8 *) (((*((u16 *) (((s8 *) arg1) + 0x1D0))) * 2) + new_var2)) + 0x44));
+  *((u16 *) (((s8 *) arg1) + 0x2DC)) = (u16) new_var3;
+  *((s16 *) (((s8 *) arg1) + 0x1D4)) = 1;
+  *arg2 = &sub_814A428;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_814B730.s\"");
