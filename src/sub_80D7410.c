@@ -162,7 +162,16 @@ void sub_80D8DC4(void *arg0)
 
 ASM_FUNC("asm/nonmatching/sub_80D8E5C.s", void sub_80D8E5C(void *arg0));
 ASM_FUNC("asm/nonmatching/sub_80D8EE4.s", void sub_80D8EE4(void *arg0));
-ASM_FUNC("asm/nonmatching/sub_80D8F68.s", void sub_80D8F68(void *arg0));
+extern s32 sub_808750C;
+
+void sub_80D8F68(void *arg0) {
+    if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
+        stop_sfx_80195A8(0x81);
+        sub_8082E1C(arg0, 2, 0, 0);
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_808750C;
+    }
+}
+
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80D8F94.s\"");
 #else
