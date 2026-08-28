@@ -7,15 +7,12 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8159974.s\"");
-#else
-u16 sub_8159974(u16 param_1) {
-    u16 *ptr = &param_1;
-    *ptr |= 0x01;
-    return param_1;
+void sub_8159974(void *arg0)
+{
+  u16 new_var;
+  new_var = (u16) (1 | (*((u16 *) (((s8 *) arg0) + 0x528))));
+  *((u16 *) (((s8 *) arg0) + 0x528)) = new_var;
 }
-#endif
 
 void sub_8159984(void *arg0, s16 arg1) {
     (*(s16 *)((s8 *)(arg0) + (0x518))) = 1;
