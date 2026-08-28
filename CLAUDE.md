@@ -770,6 +770,50 @@ knowing before re-spending a session on either:
 
 ## Housekeeping outstanding
 
+- **`rescore_seeds.plain_score`/`validator._matches_in_plain_build` structurally
+  cannot accept a candidate that references a known address via its
+  MINTED NAME (`symbols.txt`) where retail's own disassembled `.s`
+  fragment shows that same address as a bare hex literal.** Found and
+  fully diagnosed on `sub_8029080` (2026-08-28), NOT a compiler-heuristic
+  ceiling like the Score-2/Score-4 register-allocation walls above —
+  this one is a real gap in our own pipeline, and the underlying C is
+  provably correct. `*(s32*)0x03000C78` (raw hex) let agbcc constant-fold
+  it against the immediately-preceding `0x03000C24` access (both derived
+  from the same base, differing by exactly `0x54`) into a single `adds`
+  instead of retail's separate `ldr [pc,#N]` — the exact literal-pool
+  class already documented above. Naming it (`dword_3000C78`/
+  `sub_800063C`, both already in `symbols.txt`/`common.h`) blocks the
+  fold and reaches **byte-exact** via `in_context_permuter.py` (which
+  resolves known symbols before comparing, same technique as the
+  `sub_808F2A8` fix). Verified independently at the raw object level too:
+  `arm-none-eabi-objdump -dr` on the real spliced `.o` shows every
+  instruction byte-identical end to end, and the candidate carries
+  correct `R_ARM_ABS32` relocations at the two symbol offsets. Rejected
+  anyway by `validator.py`, traced to its actual cause rather than
+  assumed: `plain_score`/`_matches_in_plain_build` compare **pre-link**
+  `.o` files — the candidate's relocation there is genuinely still
+  unresolved (placeholder bytes), while retail's raw-hex `.s` produces no
+  relocation at that offset at all, so the byte comparison sees a real
+  difference that would vanish after the actual `--just-symbols` link
+  step `finish_match()` performs. Confirmed this really is
+  `plain_score`'s fault and not a wrong assumption: manually forced the
+  DB row straight to `validating` to skip the pre-check — `validator.py`
+  still rejected it via the exact same `_matches_in_plain_build` call
+  before ever reaching `finish_match()`, since that pre-check is
+  unconditional in `_validate_claimed()`, not skippable from outside.
+  **Deliberately not patched this session** — `plain_score` is imported
+  live by both `validator.py` and `tier2.py`, and correctly resolving
+  known symbols before this specific comparison (mirroring
+  `in_context_permuter.resolve_known_symbol_relocs`) is a real, scoped,
+  worth-doing fix, just not one to rush through a widely-shared,
+  safety-adjacent comparison function under time pressure. `sub_8029080`
+  itself is safe as left: it bounced back to `tier2_ready` automatically,
+  nothing was lost or corrupted (this is exactly the "false negative is
+  harmless, the real gate is unaffected" case `already_matches()`'s own
+  docstring describes, just for the sibling check instead). Next
+  session: fix `plain_score` to call `resolve_known_symbol_relocs`
+  (or equivalent) on the pre-link object before its byte comparison, then
+  re-promote `sub_8029080` through the normal path.
 - **`gitops._owning_source_stem` fixed 2026-08-28** — it fell back from
   `find_guard_block()` (old `#ifndef NONMATCHING` convention only)
   straight to a regex matching a real, unguarded definition, so a
