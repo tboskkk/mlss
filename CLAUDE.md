@@ -654,8 +654,53 @@ DB if resuming):
 - `sub_808F2A8`: root cause found (agbcc const-folds a literal address
   subtraction that's really two already-minted `symbols.txt` addresses,
   `loc_819832C`/`loc_8198220` — referencing them as real symbols instead
-  of raw hex forces the runtime subtraction retail actually has). diff
-  163→19 bytes via `in_context_search.py --allocator-attack`, not zero.
+  of raw hex forces the runtime subtraction retail actually has). A prior
+  session (2026-08-27, same day) reported reaching diff 19 via
+  `in_context_search.py --allocator-attack`, but that source was **never
+  persisted anywhere** — `in_context_search.py` only wrote `best_source`
+  to disk on a genuine zero, and the scratch dir it lived in was cleaned
+  up before compaction. **Fixed the tool, not just re-derived the
+  function**: `main()` now always saves a near-miss (`best_score < 10000`,
+  i.e. below the reloc-mismatch penalty band) to
+  `nonmatchings/<name>/output-incontext-best/`, and resumes from it on
+  the next invocation instead of always restarting from the isolated-zero
+  baseline — this class of loss can't recur. Also added `--out-file` so
+  several parallel workers on the same function don't race on one shared
+  path.
+
+  Rebuilt the reconstruction from scratch (the lost 19-byte source could
+  not be recovered) using `title_screen.c`'s own proven idiom for this
+  exact symbol pair — `(dword_3001038 + (&loc_819832C -
+  &loc_8198220))(args)` — instead of the original's hand-rolled
+  `register ... asm("r2")` veneer. Diagnosed the remaining gap by direct
+  `objdump`-level comparison (not guessing): candidate is a flat 8 bytes
+  shorter than retail, entirely from **literal-pool placement, not
+  register allocation** — retail's compiler flushes the `0x2025` literal
+  pool separately near each of the 3 switch-case call sites (forcing a
+  short skip-branch each time); the candidate's compiler dedups all 3
+  into one shared pool entry at function end, needing no branch. Exact
+  byte accounting: relocation offsets for `sub_808FC54`/the 3
+  `sub_8082E1C` calls run flat 4 bytes short after the veneer block, then
+  a further 4 bytes short after each of 2 switch-case transitions (8
+  total). Tested and ruled out, not assumed: rewriting the switch as an
+  explicit if-`else if` cascade (matching retail's actual `bgt` chain)
+  recovers only 4 of the 8 bytes at the cost of a *higher* raw diff
+  (146 vs 122) from unrelated instruction-selection differences; the
+  original register-forced asm-veneer idiom scores about the same as the
+  clean idiom (122 vs 128), so the veneer/no-veneer choice isn't the
+  lever either. A fresh 3-worker/600s `in_context_search.py
+  --allocator-attack` run against the clean-idiom base plateaued at
+  10047–10073 — **never crossed under the 10000 reloc-mismatch penalty
+  band**, i.e. never got the size deficit to zero by chance. This is a
+  compiler literal-pool-flush-distance heuristic, not a source-shape bug;
+  closing it may need deliberately padding the function with extra
+  (later-removable) instructions to push the pool-flush point to where
+  retail's put it, not further hand-restructuring. **The DB's
+  `candidate_body` for this function is still the pre-fix draft** (raw
+  hex `0x03001038 + 0x10C`, no symbol references) — don't trust it as the
+  current best; the real starting point for a resumed attempt is this
+  section plus `nonmatchings/sub_808F2A8/output-incontext-best/` once a
+  future run populates it.
 - `sub_81649AC`: confirmed a genuine dead store IN RETAIL ITSELF (a
   computed value immediately, unconditionally overwritten) that m2c
   correctly dropped as dead but retail's own compiler didn't optimize
@@ -706,6 +751,46 @@ DB if resuming):
   tools/factory/in_context_search.py sub_8091CC8` (or any of the ~20
   ghosts in `find_ghost_zeros.py`'s output still failing on
   `redeclared as different kind of symbol` / `conflicting types`).
+  **Measured 2026-08-27, not just found on one function:** ran every row
+  in the escalation-exhausted near-miss pool
+  (`objdiff_score>=90 AND escalation_count>=10`, 319 rows) through a
+  from-scratch splice+compile, capturing the real `agbcc`/`as`/`cpp`
+  stderr per failure instead of trusting `branch_deficit_scan.py`'s
+  silent `None` (a fresh diagnostic script, not a stored count — see THE
+  LAW on stored vs. live). 32 rows failed to build either side.
+  **16 of 32 (50%) are this exact bug** — `conflicting types for X` /
+  `previous declaration`, same family as `sub_8091CC8`, just never
+  counted before. Full breakdown: 16 self/body-declaration conflicts (this
+  bug), 10 warning-as-error pointer/int type mismatches (a different,
+  m2c-signature-inference-adjacent class — NOT this bug, don't conflate),
+  3 arity (`too few arguments to function` — the already-rejected
+  call-site signature-inference class, see Clean Negatives), 3 the
+  already-known `agbcc -g` debug-line assembler bug (`asm/macros.inc:1:
+  junk at end of line`), 1 `redeclared as different kind of symbol` (same
+  family, different agbcc wording). **This makes the
+  `_repair_self_declaration` fix the single largest lever in the
+  build-failure pool** — over half, not a one-off — reinforcing rather
+  than changing the original "fix when idle" call.
+
+  **The 3-row `-g` debug-line class was fixed the same session, not left
+  standing.** It wasn't just "not mirrored in the standalone tool" as
+  first assumed — it's real and non-deterministic (confirmed live on
+  `sub_81495A4`'s BASE candidate: failed 2 runs straight, then a traced
+  in-process reproduction caught the actual `.as.err`, then 5/5 fresh
+  attempts succeeded once the fix below landed — consistent with
+  `PYTHONHASHSEED` randomizing pycparser's set/dict iteration order
+  between processes and shifting exactly what debug-line info agbcc
+  emits for pycparser's AST-regenerated source). `in_context_permuter.py`
+  had `-g -ffix-debug-line` in its `CFLAGS` but, unlike the real
+  Makefile's `%.o` rule, no fallback retry. Added `CFLAGS_NODEBUG` and a
+  retry in `compile_tu()`: on the exact `asm/macros.inc:1` signature,
+  recompile with `-g`/`-ffix-debug-line` dropped (byte-neutral per the
+  Makefile's own comment) and re-assemble. Verified, not assumed: all 3
+  sampled rows (`sub_8087444`, `sub_810835C`, `sub_814BB80`) compile now.
+  Since `in_context_search.py`/`branch_deficit_scan.py` both import
+  `compile_tu` from this module, the fix is corpus-wide, not local to
+  these 3 — the real remaining "31 build failures" count is whatever's
+  left after re-running the scan, almost certainly lower than 32.
 - **A genuine, unexplained 1-halfword branch-offset gap recurs across at
   least 4 unrelated functions**: `sub_8072400`, `sub_81132D4`,
   `sub_806A180`, `sub_806A730` — each otherwise byte-identical to retail

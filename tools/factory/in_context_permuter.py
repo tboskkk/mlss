@@ -58,6 +58,22 @@ import gitops  # noqa: E402
 REPO = gitops.REPO
 CFLAGS = ["-O2", "-mthumb-interwork", "-fno-common", "-Wimplicit",
           "-Wparentheses", "-Werror", "-g", "-ffix-debug-line"]
+CFLAGS_NODEBUG = [f for f in CFLAGS if f not in ("-g", "-ffix-debug-line")]
+# Same fallback the real Makefile's %.o rule already has (see its own
+# comment: "tripped agbcc's debug-line bug -- recompiling it without -g",
+# and CLAUDE.md's landmines section) -- agbcc's -g debug-line emission is
+# buggy on some translation units and can make the ASSEMBLER (not agbcc
+# itself) fail with a misleading error naming an innocent file:
+# `asm/macros.inc:1: junk at end of line, first unrecognized character is
+# '@'`. Confirmed live 2026-08-27 on sub_81495A4's base candidate (not
+# hypothesized -- reproduced via direct .as.err inspection) and non-
+# deterministically, since it depends on exactly what line/column debug
+# info agbcc emits for pycparser's AST-regenerated source, which is not
+# byte-stable run to run (e.g. PYTHONHASHSEED affects set/dict iteration
+# order inside pycparser). CFLAGS_NODEBUG reproduces rom.sha1 exactly for
+# the real build (Makefile's own comment) -- byte-neutral for .text, so
+# retrying with it here is safe.
+_DEBUG_LINE_BUG_RE = re.compile(r"asm/macros\.inc:1: Error: junk at end of line")
 CPPFLAGS = ["-I", "tools/agbcc/include", "-nostdinc", "-undef",
             "-iquote", "include", "-Wno-trigraphs"]
 
@@ -218,6 +234,19 @@ def compile_tu(c_path: Path, work: Path, tag: str, arm_mode: bool = False) -> Pa
                          "-I", str(REPO), str(asm_s), "-o", str(obj_o)],
                         cwd=REPO, capture_output=True, text=True)
     if r.returncode != 0:
+        if not arm_mode and _DEBUG_LINE_BUG_RE.search(r.stderr):
+            # Same retry the real Makefile's %.o rule does -- see
+            # CFLAGS_NODEBUG's comment above.
+            r2 = subprocess.run([cc1, str(cpp_i), *CFLAGS_NODEBUG, "-o", str(asm_s)],
+                                 cwd=REPO, capture_output=True, text=True)
+            if r2.returncode == 0:
+                r3 = subprocess.run(["arm-none-eabi-as", "-mcpu=arm7tdmi", "-mthumb-interwork",
+                                      "-I", str(REPO), str(asm_s), "-o", str(obj_o)],
+                                     cwd=REPO, capture_output=True, text=True)
+                if r3.returncode == 0:
+                    return obj_o
+                (work / f"{tag}.as.err").write_text(r3.stderr)
+                return None
         (work / f"{tag}.as.err").write_text(r.stderr)
         return None
     return obj_o

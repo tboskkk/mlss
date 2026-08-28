@@ -330,9 +330,25 @@ def main() -> int:
                      help="randomly inject 0-4 escaping volatile locals per mutation "
                           "attempt, automating the TU-register-pressure fix proved by "
                           "hand on sub_81458C8 (see inject_escaping_dummies)")
+    ap.add_argument("--out-file", help="write best_source here unconditionally instead of "
+                     "nonmatchings/<name>/output-incontext-best -- for running several "
+                     "parallel workers on the same function without a shared-file race")
     args = ap.parse_args()
 
-    body = Path(args.body_file).read_text() if args.body_file else _ghost_zero_source_raw(args.name)
+    best_dir = gitops.REPO / "nonmatchings" / args.name / "output-incontext-best"
+    prior_score = None
+    if args.body_file:
+        body = Path(args.body_file).read_text()
+    else:
+        # Resume from a previous in-context near-miss if one beats the
+        # isolated-zero baseline -- otherwise every re-run discards prior
+        # search progress and restarts from scratch each time.
+        prior_score_file = best_dir / "score.txt"
+        if prior_score_file.is_file():
+            prior_score = int(prior_score_file.read_text().strip())
+            body = (best_dir / "source.c").read_text()
+        else:
+            body = _ghost_zero_source_raw(args.name)
     if body is None:
         sys.exit(f"{args.name}: no --body-file and no ghost-zero source on disk")
 
@@ -342,6 +358,22 @@ def main() -> int:
                    allocator_attack=args.allocator_attack)
         print(r if "error" in r else
               {k: v for k, v in r.items() if k != "best_source"})
+        if r.get("error"):
+            pass
+        elif args.out_file:
+            Path(args.out_file).write_text(r["best_source"])
+            Path(args.out_file + ".score").write_text(str(r["best_score"]))
+        elif prior_score is not None and prior_score < r["best_score"]:
+            print(f"[{args.name}] prior in-context best ({prior_score}) beats this "
+                  f"run's best ({r['best_score']}) -- leaving {best_dir} untouched")
+        elif r["best_score"] < 10000:
+            # Below the InContextScorer's fatal-error/build-failure penalty
+            # band -- a real, compiling near-miss worth keeping regardless
+            # of whether it hit true zero.
+            best_dir.mkdir(parents=True, exist_ok=True)
+            (best_dir / "source.c").write_text(r["best_source"])
+            (best_dir / "score.txt").write_text(str(r["best_score"]))
+            print(f"[{args.name}] saved best-so-far ({r['best_score']}) to {best_dir}")
         if r.get("found_zero"):
             out_dir = gitops.REPO / "nonmatchings" / args.name / "output-0-incontext"
             out_dir.mkdir(parents=True, exist_ok=True)
