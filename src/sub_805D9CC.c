@@ -102,7 +102,15 @@ void sub_805DD74(struct Entity *arg0) {
     }
 }
 
-ASM_FUNC("asm/nonmatching/sub_805DDD4.s", void sub_805DDD4(void *arg0));
+extern s32 sub_808750C;
+
+void sub_805DDD4(void *arg0) {
+    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+        sub_8082E1C(arg0, 2, 0, 0);
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_808750C;
+    }
+}
+
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_805DE00.s\"");
 #else
