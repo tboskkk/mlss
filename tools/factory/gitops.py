@@ -414,10 +414,20 @@ def _repair_body_decls(c_path: Path, body: str) -> str:
     """
     try:
         import fix_decl_conflicts
-        repaired, _syms = fix_decl_conflicts.repair(body, c_path.read_text())
+        file_text = c_path.read_text()
+        repaired, _syms = fix_decl_conflicts.repair(body, file_text)
+        body = repaired if repaired else body
+        # A fifth shape repair() above doesn't cover: the candidate's OWN
+        # declaration for some OTHER symbol it calls/address-takes disagrees
+        # with the FILE's real definition of that symbol in parameter types
+        # (not the DATA-vs-function case repair() targets). See
+        # repair_body_signature_mismatch's own docstring -- measured
+        # 2026-08-27 at 3 of 16 build failures repair_stale_prototype alone
+        # didn't reach.
+        body = fix_decl_conflicts.repair_body_signature_mismatch(file_text, body)
     except Exception:
         return body
-    return repaired if repaired else body
+    return body
 
 
 def _repair_self_declaration(c_path: Path, name: str, body: str) -> bool:
@@ -460,10 +470,20 @@ def _repair_self_declaration(c_path: Path, name: str, body: str) -> bool:
         return False
     text = c_path.read_text()
     out, _proto = fix_decl_conflicts.repair_file_scope(text, name, body)
-    if out is None or out == text:
-        return False
-    c_path.write_text(out)
-    return True
+    if out is not None and out != text:
+        c_path.write_text(out)
+        return True
+    # The DATA-shaped `extern s32 X;` case above doesn't cover a stale
+    # FUNCTION-prototype declaration with a mismatched return type (e.g.
+    # `s32 sub_8091CC8(void *); /* extern */` when the real definition
+    # returns `void`) -- measured 2026-08-27 at 16 of 32 build failures in
+    # the escalation-exhausted pool, the majority of them this shape, not
+    # the DATA one. See repair_stale_prototype's own docstring.
+    out2 = fix_decl_conflicts.repair_stale_prototype(text, name, body)
+    if out2 is not None and out2 != text:
+        c_path.write_text(out2)
+        return True
+    return False
 
 
 _DECL_RE = re.compile(
