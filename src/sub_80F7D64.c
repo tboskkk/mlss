@@ -7,20 +7,18 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80F7D64.s\"");
-#else
-u32 sub_80F7D64(u32 param_1) {
-    u32 *puVar1;
-    u8 uVar2;
-    
-    puVar1 = (u32 *)(param_1 + 0x2C);
-    *puVar1 = *puVar1 + 0x179D;
-    uVar2 = *(u8 *)*puVar1 & 0xFFFFFFFC;
-    *(u8 *)*puVar1 = uVar2 | 1;
-    return 1;
+s32 sub_80F7D64(void *arg0)
+{
+  void *temp_r2_6;
+  s8 *new_var2;
+  s8 *new_var;
+  temp_r2_6 = (void *) (*((void **) (((s8 *) arg0) + 0x2C)));
+  new_var = (s8 *) temp_r2_6;
+  new_var2 = new_var + 0x179D;
+  new_var = &(*((u8 *) (((s8 *) temp_r2_6) + 0x179D)));
+  *((u8 *) new_var2) = (u8) (((-4) & (*new_var)) | 1);
+  return 1;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80F7D80.s\"");
