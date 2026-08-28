@@ -87,7 +87,20 @@ def _cpp() -> str:
 
 
 _PERMUTER_TYPEDEF_PREAMBLE = re.compile(
-    r"^typedef\s+\w[\w ]*\s+(int8_t|int16_t|int32_t|uint8_t|u8|s8|s16|s32);\s*$")
+    r"^typedef\s+\w[\w ]*\s+(int8_t|int16_t|int32_t|uint8_t|uint16_t|uint32_t|"
+    r"u8|u16|u32|s8|s16|s32);\s*$")
+# uint16_t/u16/u32/uint32_t added 2026-08-27: the whitelist only had the
+# widths every ghost tested so far happened to use. sub_80E3D1C's own real
+# base.c (nonmatchings/sub_80E3D1C/base.c) carries `typedef unsigned short
+# uint16_t; typedef uint16_t u16;` -- neither matched, so stripping left
+# them in the spliced body and they collided with common.h's real ones.
+# decomp-permuter's OWN parser needs the OPPOSITE: u16 must stay present
+# in whatever source Permuter() parses, or its pycparser-based AST step
+# fails outright ("Syntax error in base.c... after PERM expansion") since
+# it has no other source for what `u16` means. Confirmed live testing
+# sub_80E3D1C: removing u16 from the preamble broke Permuter() construction
+# entirely, restoring it (and widening this regex to strip it correctly at
+# splice time) fixed both ends at once.
 
 
 def _strip_permuter_preamble(body: str) -> str:
