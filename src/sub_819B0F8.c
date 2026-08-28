@@ -7,17 +7,15 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_819B0F8.s\"");
-#else
-u32* sub_819B0F8(u32 index, u32 value) {
-    u32* ptr = (u32*)0x03007FF0;
-    ptr = (u32*)((u32)ptr + 0x4A4);
-    ptr = (u32*)((u32)ptr + (index << 2));
-    *ptr = value;
-    return ptr;
+void sub_819B0F8(s32 arg0, s32 arg1)
+{
+  int new_var3;
+  s32 new_var2;
+  int new_var;
+  new_var2 = *((s32 *) 0x03007FF0);
+  new_var = 4 * arg0;
+  *((s32 *) ((new_var3 = new_var2 + 0x4A4) + new_var)) = arg1;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_819B110.s\"");
