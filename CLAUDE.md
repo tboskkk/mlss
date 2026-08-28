@@ -714,6 +714,60 @@ DB if resuming):
   Real gap is likely the `goto`-heavy control flow these two still have,
   not investigated further.
 
+## Heuristic walls found 2026-08-28 (in-context permuter, near-miss pool)
+
+Two real, verified ceilings on what the permuter can close, both worth
+knowing before re-spending a session on either:
+
+- **`agbcc` register-allocation is not influenceable from plain C for an
+  ordinary (non-inline-asm) statement.** Found on the `sub_816B0E0` twin
+  group (`sub_816B0E0`/`816B21C`/`816B3C4`/`816D6C0`/`81367AC` — same
+  shape, a one-line pointer-store-then-call stub): candidate and retail
+  are byte-identical except ONE register choice (candidate emits `r1`,
+  retail emits `r2`, for the exact same store). Two closing attempts,
+  both verified failed, not assumed: (1) extended random search, 2
+  workers × 300s × all 5 functions, ~330,000 combined tries, converged to
+  exactly this 2-byte gap every single time with zero further movement;
+  (2) an explicit `register s32 *p asm("r2")` hint on the local — agbcc
+  **silently ignored it** and still emitted `r1` (confirmed via direct
+  disassembly, not just the score). This matches known GCC-family
+  behavior: a register-variable hint is only honored inside a real
+  inline-asm operand context (which is why it worked for this project's
+  own `_call_via_r2`/`_call_via_rX` veneer calls elsewhere), never for an
+  ordinary C statement. The only remaining lever seen is hand-written
+  inline asm hardcoding the instruction sequence directly — deliberately
+  NOT done: it would produce byte-exact output without deriving from any
+  C source, which stops being decompilation for that line. Leave this
+  group as a documented, permuter-unreachable case rather than re-chasing
+  it with more search time or more register-hint variants.
+
+- **`decomp-permuter`'s `Randomizer.randomize()` has an unconditional
+  infinite retry loop** (`tools/decomp-permuter/src/randomizer.py`,
+  `while True: method = random_weighted(...); try: method(...); break
+  except RandomizationFailure: pass`) with no attempt cap and no
+  timeout inside the loop body itself. Normally invisible because the
+  default weight table has ~35 passes active, so *some* mutation almost
+  always applies. Triggered live trying to isolate an in-context search
+  to ONLY `perm_reorder_decls` (zeroing every other weight, to test
+  "declaration-reordering + allocator-attack only" in isolation): on
+  `sub_816B0E0`, `perm_reorder_decls` apparently cannot ever apply to
+  this function's declarations, so with it as the only nonzero-weighted
+  pass the loop spun forever, burning ~90%+ CPU indefinitely — had to
+  `podman kill` the container directly; the process ignored plain
+  SIGTERM for several minutes (likely a signal-delivery quirk of a tight
+  CPython loop with no I/O or bytecode-boundary yield opportunities, not
+  investigated further). **Do not zero out decomp-permuter's
+  randomization weights down to a single pass for an arbitrary
+  function** — no guarantee that pass can ever apply to any given
+  candidate's specific declarations/statements, and the vendored fork
+  has no cap protecting against exactly that case. If isolating passes
+  is ever needed again, either patch a retry cap into `randomize()`
+  first (a real, scoped, worthwhile fix — but a change to the vendored
+  fork, see "Local m2c patches" policy for the analogous decomp-permuter
+  equivalent) or leave at least 2-3 broadly-applicable passes weighted
+  (e.g. `perm_reorder_decls` + `perm_reorder_stmts` + `perm_sameline`)
+  so there's always a fallback.
+
 ## Housekeeping outstanding
 
 - `tools/apply_library_matches.py` is real, tested, round-trip-verified
