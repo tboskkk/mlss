@@ -768,14 +768,18 @@ knowing before re-spending a session on either:
   (e.g. `perm_reorder_decls` + `perm_reorder_stmts` + `perm_sameline`)
   so there's always a fallback.
 
-- **A third wall shape, distinct from the register-swap and negative-
+- **A third wall SYMPTOM, distinct from the register-swap and negative-
   immediate classes above: candidates that plateau FLAT inside the
   +10000 reloc-mismatch penalty band with zero movement across
-  thousands of tries.** `sub_80292EC`, `sub_8095028`, `sub_80F3FE8` all
-  show this signature. Confirmed as two DIFFERENT real causes, not one,
-  and confirmed NOT the `sub_808C070`-style trailing-function
-  measurement artifact above (none of the three appear in
-  `split_trailing.py --list`):
+  thousands of tries.** `sub_80292EC`, `sub_8095028`, `sub_80F3FE8`,
+  `sub_81064F8` all show this signature. **Root-caused 3 of the 4, and
+  they are 3 DIFFERENT real causes, not one** — "flat in the penalty
+  band" is a symptom of "the required change isn't reachable through
+  any available mutation," not a single compiler feature. Don't go
+  looking for one unifying cause; diagnose each instance on its own.
+  Confirmed NOT the `sub_808C070`-style trailing-function measurement
+  artifact above (none of the four appear in `split_trailing.py
+  --list`):
   - `sub_80292EC`: a genuine LOOP-SHAPE difference. Retail's real code
     is the classic "jump to condition check, body, fall-through
     compare-and-branch-back" transform (check-at-bottom); the
@@ -794,10 +798,23 @@ knowing before re-spending a session on either:
     registers across an indirect call rather than spilling and
     reloading. This is exactly what `--allocator-attack` targets; it
     just hasn't found the right combination in the runs so far.
+  - `sub_81064F8`: an ARITHMETIC-IDENTITY / instruction-selection
+    choice, a third distinct shape. The C computes `(orig - 1) -
+    (val >> 8)`, already grouped the same way retail's disassembly
+    implies (`subs r2,r0,#1` then `subs r0,r2,shifted`) — so this is
+    NOT an expression-phrasing bug. Retail computes it exactly that
+    way; the candidate's compile instead rewrites it via the algebraic
+    identity `(a-1)-b == ~b+a` (`mvns r1,r1; adds r1,r1,r2`) — same
+    result, different instruction sequence, agbcc's own internal
+    choice. Also carries a smaller, separate 2-instruction-vs-1
+    inefficiency in the `>>8` step itself (`lsls #16; asrs #24` where
+    retail does one `asrs #8`) that's mathematically equivalent for a
+    promoted `s16`. Not reachable by rephrasing the source; this is the
+    compiler picking a different identity, not a different computation.
   - `sub_80F3FE8`: same flat-penalty-band symptom observed, not yet
     root-caused to this level of detail — grouped here by symptom, not
     confirmed cause. Worth the same objdump-diff treatment before
-    assuming it matches either of the other two.
+    assuming it matches any of the other three.
 
 ## Housekeeping outstanding
 
