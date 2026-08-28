@@ -32,17 +32,11 @@ asm_unified(".include \"asm/nonmatching/sub_808C08A.s\"");
    counts this as unmatched. Write the C here, replacing this comment. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_808C098.s\"");
-#else
-s32 sub_8087540(void *);                        /* extern */
-
 void sub_808C098(void *arg0) {
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
         sub_8087540(arg0);
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_808C0B2.s\"");
