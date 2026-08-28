@@ -487,11 +487,26 @@ def _dedupe_decls(text: str, block: str, body: str) -> str:
     considered (that is where m2c puts them), the symbol must already be
     declared at file scope OUTSIDE the block being replaced, and anything
     that does not parse cleanly as a declaration is left alone.
+
+    POSITION MATTERS: only a declaration BEFORE the insertion point counts.
+    Originally scanned the whole rest of the file regardless of position,
+    which is wrong by C's own forward-declaration rule -- a declaration or
+    definition appearing AFTER the splice point cannot resolve a use
+    inside it. Found live in_context_permuter'ing sub_80632C0
+    (2026-08-27): its candidate's own `extern s32 sub_8063384;` got
+    dropped because that symbol is DEFINED later in the same file (a
+    still-unmatched neighbor's own guard block references it), and the
+    result was `used prior to declaration`. This only ever manifests
+    splicing into a multi-function file where the relevant declaration or
+    definition sits after the target -- exactly the shape a ghost/ghost-
+    adjacent ordinary match can hit, not something the old scan could see
+    since it never looked at order at all.
     """
-    rest = text.replace(block, "", 1)
-    # file-scope declarations already present elsewhere in the file
+    insert_pos = text.index(block)
+    before = text[:insert_pos]
+    # file-scope declarations already present BEFORE the insertion point
     depth, scope = 0, []
-    for ch in rest:
+    for ch in before:
         if ch == "{":
             depth += 1
         elif ch == "}":
