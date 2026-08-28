@@ -100,6 +100,21 @@ def inject_escaping_dummies(source: str, fn_name: str, rng: random.Random) -> st
     Regex-based, not AST-based, on purpose: the exact insertion point
     (right after the function's own opening brace) is all that matters,
     and every existing local declaration afterward is untouched.
+
+    ALL DECLARATIONS, NO BARE STATEMENTS -- agbcc is C89-strict and every
+    declaration in a block must precede every statement in that block.
+    The escape read-back (`*p = *p`) is semantically a statement, but the
+    original function's OWN declarations sit immediately after wherever
+    this inserts, so a bare statement here would land BETWEEN two runs of
+    declarations and fail with exactly the syntax error this produced the
+    first time this ran for real (`syntax error before 'var_r2_14'` on
+    sub_80E3D1C -- caught the SAME turn this was written, not assumed
+    fixed). Folded the read-back into the pointer's own initializer via a
+    GNU statement-expression (agbcc already relies on other GNU
+    extensions -- __attribute__((naked)) is used corpus-wide), so the
+    whole thing is one declaration line: legal anywhere another
+    declaration is, however many of the function's own declarations
+    follow it.
     """
     n = rng.randint(0, 4)
     if n == 0:
@@ -107,13 +122,14 @@ def inject_escaping_dummies(source: str, fn_name: str, rng: random.Random) -> st
     m = re.search(rf"\b{re.escape(fn_name)}\s*\([^;{{]*\)\s*\{{", source)
     if not m:
         return source
-    decls = "".join(f"volatile s32 _pattack_dummy{i};\n  " for i in range(n))
-    escapes = "".join(
-        f"{{ s32 *_pattack_esc{i} = (s32 *) &_pattack_dummy{i}; *_pattack_esc{i} = *_pattack_esc{i}; }}\n  "
+    decls = "".join(
+        f"volatile s32 _pattack_dummy{i};\n  "
+        f"s32 *_pattack_esc{i} = ({{ *(volatile s32 *) &_pattack_dummy{i} = "
+        f"*(volatile s32 *) &_pattack_dummy{i}; (s32 *) &_pattack_dummy{i}; }});\n  "
         for i in range(n)
     )
     insert_at = m.end()
-    return source[:insert_at] + "\n  " + decls + escapes + source[insert_at:]
+    return source[:insert_at] + "\n  " + decls + source[insert_at:]
 
 
 class InContextCompiler(Compiler):
