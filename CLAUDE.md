@@ -579,6 +579,96 @@ separate Mario Bros. ROM embedded for the multiplayer minigame. **Confirmed by
 the maintainer: excluded from "100%".** Tracked separately everywhere. If that
 ever changes, nothing blocks it.
 
+## In-context permuter (2026-08-27 session)
+
+A whole new toolkit, built to close the specific class of near-miss the
+scheduling fix below finally exposed: a candidate byte-exact in
+**isolation** that still doesn't match spliced into its **real**
+translation unit, because agbcc's register/stack allocation is coupled
+across the whole file (proved by hand on `sub_81458C8`; the isolated
+1-function compile has registers free to spare that the real 45-function
+file doesn't).
+
+- **`tools/factory/in_context_permuter.py`** — the primitive: splice a
+  candidate into a scratch copy of its real file (never the tracked one),
+  compile the WHOLE translation unit, extract one symbol by real ELF
+  boundary, diff against retail (bytes + relocations). `resolve_known_
+  symbol_relocs()` additionally patches `symbols.txt`'s 61 exact-value
+  addresses into candidate bytes at scoring time — mirrors
+  `--just-symbols`, touches nothing tracked (rewriting the retail `.s`
+  fragment instead was checked and rejected: every isolation tool here
+  bare-assembles with no link step, so a symbolic relocation in the
+  TRACKED source reads back as zero bytes in all of them — this is
+  CLAUDE.md's own already-rejected literal-pool-rewrite finding, almost
+  repeated on a different file).
+- **`tools/factory/in_context_search.py`** — wires decomp-permuter's real
+  mutation engine (unmodified, imported directly) to the above via
+  dependency injection (`InContextCompiler`/`InContextScorer`), not by
+  patching the vendored fork. `--allocator-attack` automates the
+  sub_81458C8 fix (0-4 escaping `volatile` locals, forced to survive
+  dead-code elimination via a GNU statement-expression so the C89
+  declarations-before-statements rule isn't violated). `hide_asm_regions`
+  lets a candidate use real GNU inline-asm (needed for `_call_via_r2`-
+  style forced-register calls, which plain C can't express) without
+  breaking decomp-permuter's pycparser-based parser — wrap the block in
+  `/*PATTACK_ASM_START*/.../*PATTACK_ASM_END*/`, it's hidden as an opaque
+  call for parsing/mutation and restored before every real compile.
+- **`tools/factory/in_context_batch.py`** / **`branch_deficit_scan.py`** —
+  batch runner, and a corpus-wide scanner comparing branch-instruction
+  COUNT (candidate vs retail) across the escalation-exhausted pool to
+  distinguish control-flow collapse from register-pressure gaps. Verdict,
+  re-run at `--min-deficit 1` after the dedup fix below: **8 of 288 rows
+  (2.8%)** show a real deficit — collapse is a real but minority pattern,
+  not the dominant one.
+
+Five real bugs found and fixed building this, each verified against the
+specific case that surfaced it, not assumed fixed: new-format `ASM_FUNC`/
+`NONMATCH` guards unhandled in the splice helper; missing `rom_symbol_
+declarations()` prepend; `_dedupe_decls`/`_strip_permuter_preamble`
+whitelist too narrow (`u16`/`uint16_t`); C89 declarations-after-statements
+in the allocator-attack injection; and the big one — **`_dedupe_decls`
+scanned dead `#else` branches of unrelated neighbors' unmatched drafts as
+if they were live declarations**, since it reads raw un-preprocessed
+source text with no regard for which `#ifndef NONMATCHING` branch the
+plain build actually takes. Fixed via `_strip_dead_else_branches()`.
+
+**Also corrected**, not just found: last session's claim that
+`sub_806A180`/`sub_806A730` were ARM-mode functions was WRONG — the bug
+was in `retail_symbol()` assembling header-less new-format fragments in
+the assembler's own default mode (ARM) for lack of an explicit
+`thumb_func_start`. Both are ordinary Thumb. Fixed in the same function
+that had the dead-`#else` bug.
+
+**tier2 scheduling**: near-miss rows (`objdiff>=90`) past
+`escalation_count>=10` now drop into the same priority tier as far rows
+instead of permanently outranking them — the near-miss band had gone
+80% saturated at escalation 10-11 with 12 slots against 400+ rows, so far
+rows (including 12 already-arity-fixed ones) got zero launches all
+session under the old strict two-tier ordering. Query-ordering change
+only, deliberately not a new DB state (see THE LAW's stale-terminal-state
+entries).
+
+**Three real reconstructions in progress, none closed yet** (scratch work,
+not committed — rebuild from `nonmatchings/<name>/candidate_body` in the
+DB if resuming):
+- `sub_808F2A8`: root cause found (agbcc const-folds a literal address
+  subtraction that's really two already-minted `symbols.txt` addresses,
+  `loc_819832C`/`loc_8198220` — referencing them as real symbols instead
+  of raw hex forces the runtime subtraction retail actually has). diff
+  163→19 bytes via `in_context_search.py --allocator-attack`, not zero.
+- `sub_81649AC`: confirmed a genuine dead store IN RETAIL ITSELF (a
+  computed value immediately, unconditionally overwritten) that m2c
+  correctly dropped as dead but retail's own compiler didn't optimize
+  away. Reconstructing it (forced to escape via `volatile`, same
+  mechanism as `sub_81458C8`) moved diff 416→372. Large function, likely
+  more spots like this one, not fully closed.
+- `sub_81495A4`/`sub_814BB80`: the "classic bitfield artifact" hypothesis
+  for their shift-based bit tests (`(x<<31)!=0` etc.) is **refuted** —
+  rewriting to a clean bitmask made the diff WORSE (86→132). Retail's own
+  codegen is shift-based too; this was never an m2c representation issue.
+  Real gap is likely the `goto`-heavy control flow these two still have,
+  not investigated further.
+
 ## Housekeeping outstanding
 
 - `tools/apply_library_matches.py` is real, tested, round-trip-verified
