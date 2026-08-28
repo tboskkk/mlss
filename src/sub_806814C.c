@@ -24,20 +24,16 @@ void sub_806814C(struct Entity *arg0) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8068168.s\"");
-#else
-void sub_8067DC8(void *arg0);                       /* extern */
+extern s32 sub_8067DC8;
 
 s32 sub_8068168(void *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0x9C))) == 0) {
         (*(s32 *)((s8 *)(arg0) + (0x9C))) = 2;
         (*(s32 *)((s8 *)((arg0 + 0x9C)) + (4))) = 1;
     }
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_8067DC8;
+    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8067DC8;
     return 1;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8068190.s\"");
