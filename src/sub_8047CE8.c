@@ -71,14 +71,15 @@ asm_unified(".include \"asm/nonmatching/sub_8047E50.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8047EB8.s\"");
-#else
-void sub_8047EB8(void *arg0) {
-    (*(s32 *)((s8 *)(arg0) + (0x25C))) = -1;
-    (*(u8 *)((s8 *)(arg0) + (0x213))) = (u8) (-0x21 & (*(u8 *)((s8 *)(arg0) + (0x213))));
-    (*(s32 *)((s8 *)(arg0) + (0x250))) = -1;
-    (*(s32 *)((s8 *)(arg0) + (0x24C))) = -1;
-    (*(u16 *)((s8 *)(arg0) + (0x23E))) = (u16) (*(u16 *)((s8 *)(arg0) + (0x240)));
+void sub_8047EB8(void *arg0)
+{
+  u16 new_var2;
+  s8 *new_var;
+  *((s32 *) (((s8 *) arg0) + 0x25C)) = -1;
+  *((u8 *) (((s8 *) arg0) + 0x213)) = (u8) ((-0x21) & (*(((s8 *) arg0) + 0x213)));
+  new_var = ((s8 *) arg0) + 0x24C;
+  *((s32 *) (((s8 *) arg0) + 0x250)) = -1;
+  *((s32 *) new_var) = (unsigned int) (-1);
+  new_var2 = (u16) (*((u16 *) (((s8 *) arg0) + 0x240)));
+  *((u16 *) (((s8 *) arg0) + 0x23E)) = new_var2;
 }
-#endif
