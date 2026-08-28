@@ -845,27 +845,29 @@ knowing before re-spending a session on either:
   `compile_tu` from this module, the fix is corpus-wide, not local to
   these 3 — the real remaining "31 build failures" count is whatever's
   left after re-running the scan, almost certainly lower than 32.
-- **A genuine, unexplained 1-halfword branch-offset gap recurs across at
-  least 4 unrelated functions**: `sub_8072400`, `sub_81132D4`,
-  `sub_806A180`, `sub_806A730` — each otherwise byte-identical to retail
-  (relocations included) except one `bne` whose encoded offset is
-  exactly 1 halfword short. **Not a literal-pool alignment artifact** —
-  ruled out directly: `sub_806A180` has no PC-relative literal load
-  anywhere in the function, so there is no alignment-sensitive `ldr [pc,
-  #N]` for phase to affect, and it shows the identical signature anyway.
-  The real shape, confirmed by disassembling both sides side by side: in
-  retail, the branch target is a `movs r0, #0`-style return-value write
-  that sits INSIDE the if-block as a natural fall-through (executes only
-  on the taken path); in every candidate, the equivalent write sits
-  AFTER the target, unconditionally on both paths. Same total
-  instruction count, same bytes everywhere else — just which side of the
-  branch target that one write falls on. A real, permutable structural
-  difference (decomp-permuter's own `perm_condition`/`perm_ins_block`
-  passes are aimed at exactly this shape), not measurement noise. Not
-  chased further this session; worth a targeted permuter pass or a
-  manual C restructuring (move the return-value write inside the `if`)
-  next time one of these four — or a fifth showing the same signature —
-  comes up.
+- **A genuine 1-halfword branch-offset gap recurred across at least 4
+  unrelated functions**: `sub_8072400`, `sub_81132D4`, `sub_806A180`,
+  `sub_806A730` — each otherwise byte-identical to retail (relocations
+  included) except one `bne` whose encoded offset was exactly 1 halfword
+  short. **Not a literal-pool alignment artifact** — ruled out directly:
+  `sub_806A180` has no PC-relative literal load anywhere in the function,
+  so there is no alignment-sensitive `ldr [pc, #N]` for phase to affect,
+  and it showed the identical signature anyway. The real shape, confirmed
+  by disassembling both sides side by side: in retail, the branch target
+  is a `movs r0, #0`-style return-value write that sits INSIDE the
+  if-block as a natural fall-through (executes only on the taken path);
+  in every candidate, the equivalent write sat AFTER the target,
+  unconditionally on both paths. Same total instruction count, same
+  bytes everywhere else — just which side of the branch target that one
+  write falls on. A real, permutable structural difference
+  (decomp-permuter's own `perm_condition`/`perm_ins_block` passes are
+  aimed at exactly this shape), confirmed by that prediction landing:
+  `sub_8072400` was confirmed matched via ordinary in-context search
+  with `--allocator-attack` on 2026-08-28 (converged to a genuine zero
+  across 3 independent workers, promoted through the real production
+  gate, committed `b7e07bc1`) — the permuter found the restructuring on
+  its own, no manual C rewrite needed. `sub_81132D4`, `sub_806A180`,
+  `sub_806A730` remain open; try the same treatment on them next.
 - **A previous version of this section incorrectly claimed `sub_806A180`
   and `sub_806A730` were ARM-mode functions retail compiled differently
   from the rest of the corpus.** That was wrong, and the error was in the
