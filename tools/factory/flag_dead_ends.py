@@ -21,15 +21,25 @@ WHY THIS EXISTS. These rows are otherwise indistinguishable from a good
 leaf candidate (their tracked callees ARE all state='matched'), so an
 ad hoc "pick the next N leaf rows" query keeps re-selecting them and
 burning a full 300s/3-worker search on a build that can never succeed.
-Flagging lets a future query filter with `notes NOT LIKE
-'%cross-file-arity-dead-end%'`.
+Flagging lets a future query filter with `dead_end_reason IS NULL`.
 
-DELIBERATELY NON-DESTRUCTIVE: only appends to `notes`, never touches
-`state`. tier2/tier_m2c's OWN live scheduling is untouched by this --
-this is a standalone maintenance pass, not a wired-in scheduling change,
-specifically so it carries no risk to the live pipeline. Safe to run
-against a live factory (read-mostly; the only writes are notes appends
-under db.tx()).
+DEDICATED COLUMN, NOT THE SHARED `notes` FIELD. An earlier version of
+this tool appended a tag to `notes` -- found live 2026-08-28 that the
+live pipeline's own routine claim/resolve/reseed writes to that same
+column reliably clobbered the tag between one flagging run and the
+next (`sub_813D570`/`sub_813C7D8`/`sub_813C72C`/`sub_813D74C` all lost
+their tags this way), making the tool unreliable unattended. `notes`
+was never meant to be a durable machine-readable marker; too many other
+writers share it. `dead_end_reason` (db.py's MIGRATIONS list) is
+written ONLY by this tool -- nothing else in the pipeline touches it,
+so it can't be silently overwritten by unrelated activity.
+
+DELIBERATELY NON-DESTRUCTIVE: only sets `dead_end_reason`, never touches
+`state` or `notes`. tier2/tier_m2c's OWN live scheduling is untouched by
+this -- this is a standalone maintenance pass, not a wired-in scheduling
+change, specifically so it carries no risk to the live pipeline. Safe to
+run against a live factory (read-mostly; the only writes are single-column
+updates under db.tx()).
 
     python3 tools/factory/flag_dead_ends.py                # scan the leaf pool
     python3 tools/factory/flag_dead_ends.py --limit 50
@@ -46,11 +56,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import db  # noqa: E402
 import gitops  # noqa: E402
 import in_context_permuter as icp  # noqa: E402
-
-TAG = "cross-file-arity-dead-end"
-# Name kept for backward compat with rows already tagged 2026-08-28 --
-# the class this covers is broader than arity now (see below), but
-# retagging already-flagged rows isn't worth the churn.
 
 _ARITY_ERR_RE = re.compile(
     r"(?:too few arguments to function|conflicting types for|redeclared as different kind of symbol) "
@@ -74,8 +79,7 @@ def leaf_pool(conn, limit: int):
         "SELECT name, candidate_body, objdiff_score FROM functions "
         "WHERE state IN ('tier2_ready','stalled','needs_attempt') "
         "AND candidate_body IS NOT NULL "
-        "AND (notes IS NULL OR notes NOT LIKE ?)",
-        (f"%{TAG}%",),
+        "AND dead_end_reason IS NULL"
     ).fetchall()
     matched = {r["name"] for r in conn.execute(
         "SELECT name FROM functions WHERE state='matched'").fetchall()}
@@ -138,21 +142,18 @@ def main() -> int:
         callee = check_one(row["name"], row["candidate_body"], work)
         if callee:
             flagged.append((row["name"], callee))
+            reason = (f"cross-file signature dead end: callee {callee} real "
+                      f"signature disagrees, not auto-fixable")
             with db.tx(conn):
-                cur_notes = conn.execute(
-                    "SELECT notes FROM functions WHERE name=?", (row["name"],)
-                ).fetchone()["notes"] or ""
-                new_notes = (cur_notes + f" [{TAG}: callee {callee} real signature "
-                             f"disagrees, cross-file, not auto-fixable]").strip()
-                conn.execute("UPDATE functions SET notes=? WHERE name=?",
-                             (new_notes, row["name"]))
+                conn.execute("UPDATE functions SET dead_end_reason=? WHERE name=?",
+                             (reason, row["name"]))
         if i % 20 == 0:
             print(f"  ...{i}/{len(rows)}", file=sys.stderr)
 
     import shutil
     shutil.rmtree(work, ignore_errors=True)
 
-    print(f"\nflagged {len(flagged)} row(s) as {TAG}:")
+    print(f"\nflagged {len(flagged)} row(s) via dead_end_reason:")
     for name, callee in flagged:
         print(f"  {name} (blocked by {callee})")
     conn.close()

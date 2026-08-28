@@ -168,6 +168,17 @@ MIGRATIONS = [
     # so this defers work, it never strands it, which is the invariant
     # CLAUDE.md requires of anything that declines a row.
     ("iso_zero_sig", "TEXT"),
+    # Dedicated column for tools/factory/flag_dead_ends.py's cross-file
+    # signature-mismatch marker (NULL = not flagged; non-NULL = the reason,
+    # e.g. "callee sub_813D514 real signature disagrees, cross-file, not
+    # auto-fixable"). Previously this overloaded the shared `notes` column,
+    # which every tier's ordinary claim/resolve/reseed writes also touch --
+    # found live 2026-08-28: `sub_813D570`/`sub_813C7D8`/`sub_813C72C`/
+    # `sub_813D74C`'s tags were silently clobbered between one flagging run
+    # and the next by the live pipeline's own routine notes writes, making
+    # the whole tool unreliable unattended. A dedicated column nothing else
+    # in the pipeline ever writes to is immune to that by construction.
+    ("dead_end_reason", "TEXT"),
 ]
 
 
