@@ -89,6 +89,21 @@ clean:
 tools:
 	@$(MAKE) -C tools/gbafix
 
+# A second, distinct symptom of the same agbcc debug-line bug the %.o
+# rule's assembler fallback below already handles: for these files the
+# GENERATED .s assembles just fine (so the fallback's `$(AS) ... || {...}`
+# never fires) but agbcc still emits a dangling DWARF debug-line-table
+# reference that only surfaces as a LINKER error, `undefined reference to
+# '.LI<N>_<M>'` -- confirmed live 2026-08-27 on sub_80F110C.c
+# (`.LI1_83`), which broke `make` from a genuinely clean `rm -rf build/`,
+# not a stale-object artifact. Same fix, same byte-neutrality argument as
+# CFLAGS_NODEBUG's own comment above (a full from-scratch ROM build
+# without -g reproduces rom.sha1 exactly) -- just applied up front via a
+# target-specific variable instead of after an assembler failure, since
+# there is nothing for the per-object rule to catch at assemble time.
+LINK_DEBUG_BUG_SRCS := sub_80F110C
+$(foreach f,$(LINK_DEBUG_BUG_SRCS),$(eval $(C_BUILDDIR)/$(f).o: CFLAGS := $(CFLAGS_NODEBUG)))
+
 $(C_BUILDDIR)/%.o : $(C_SUBDIR)/%.c
 	@$(CPP) $(CPPFLAGS) $< -o $(C_BUILDDIR)/$*.i
 	@$(CC1) $(C_BUILDDIR)/$*.i $(CFLAGS) -o $(C_BUILDDIR)/$*.s
