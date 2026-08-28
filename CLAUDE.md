@@ -596,6 +596,65 @@ ever changes, nothing blocks it.
   separate Node/TS lifter instead of m2c's Python one. Not fixed here —
   patching a third-party Node package's own disassembler is out of scope
   for a quick check, flagged as a real, well-scoped lever for later.
+- **`gitops._repair_self_declaration` misses a stale forward-declaration
+  placed AFTER a function's own definition when it has a mismatched
+  return type.** Found live on `sub_8091CC8` (2026-08-27): its real file
+  already carries `s32 sub_8091CC8(void *); /* extern */` a few lines
+  below the (correct, `void`-returning) definition — left over from
+  whatever neighbor originally needed a forward-reference — and splicing
+  a fresh candidate in hits `conflicting types for 'sub_8091CC8'` /
+  `previous declaration`. This is the same declare-vs-define-conflict
+  family `_repair_body_decls`'s own docstring describes (function
+  declared as the wrong kind), just the AFTER-the-splice-point case and
+  in the self-declaration repair rather than the body-declaration one.
+  `_dedupe_decls` already got a position-aware fix for its own version of
+  "after the splice point doesn't count" (2026-08-27, commit `61b2e0be`);
+  `_repair_self_declaration` needs the analogous fix. **Deliberately not
+  patched yet** — touches the same shared `gitops.py` every live worker
+  imports, and three other fixes already landed there in one session;
+  do this one when the pipeline is idle, not mid-rush. Repro: `python3
+  tools/factory/in_context_search.py sub_8091CC8` (or any of the ~20
+  ghosts in `find_ghost_zeros.py`'s output still failing on
+  `redeclared as different kind of symbol` / `conflicting types`).
+- **A genuine, unexplained 1-halfword branch-offset gap recurs across at
+  least 4 unrelated functions**: `sub_8072400`, `sub_81132D4`,
+  `sub_806A180`, `sub_806A730` — each otherwise byte-identical to retail
+  (relocations included) except one `bne` whose encoded offset is
+  exactly 1 halfword short. **Not a literal-pool alignment artifact** —
+  ruled out directly: `sub_806A180` has no PC-relative literal load
+  anywhere in the function, so there is no alignment-sensitive `ldr [pc,
+  #N]` for phase to affect, and it shows the identical signature anyway.
+  The real shape, confirmed by disassembling both sides side by side: in
+  retail, the branch target is a `movs r0, #0`-style return-value write
+  that sits INSIDE the if-block as a natural fall-through (executes only
+  on the taken path); in every candidate, the equivalent write sits
+  AFTER the target, unconditionally on both paths. Same total
+  instruction count, same bytes everywhere else — just which side of the
+  branch target that one write falls on. A real, permutable structural
+  difference (decomp-permuter's own `perm_condition`/`perm_ins_block`
+  passes are aimed at exactly this shape), not measurement noise. Not
+  chased further this session; worth a targeted permuter pass or a
+  manual C restructuring (move the return-value write inside the `if`)
+  next time one of these four — or a fifth showing the same signature —
+  comes up.
+- **A previous version of this section incorrectly claimed `sub_806A180`
+  and `sub_806A730` were ARM-mode functions retail compiled differently
+  from the rest of the corpus.** That was wrong, and the error was in the
+  measurement, not the ROM: `tools/factory/in_context_permuter.py`'s
+  `retail_symbol()` assembled these two functions' fragments (new-format,
+  header-less) without ever invoking `thumb_func_start`, so the assembler
+  fell back to its own default mode — ARM — and the resulting spurious
+  `R_ARM_CALL`/`R_ARM_V4BX` relocations looked exactly like genuine ARM
+  code, self-confirmed further when `agbcc_arm` also produced ARM-typed
+  relocations against the same broken comparison. Fixed 2026-08-27
+  (commit `e1dcd3b3`) by synthesizing the same header
+  `compiler_variants.py`'s `stage()` already synthesizes for exactly this
+  case. Both functions are ordinary Thumb, both are the 1-halfword
+  branch-offset class immediately above. THE LAW, once more: an
+  instrument that has never been checked against a known-good case is not
+  a check — this one produced a fully self-consistent-looking wrong
+  answer for most of a session before a plain side-by-side disassembly
+  caught it.
 
 CI already runs `tools/gen_readme_progress.py --check` (closes the old
 "no CI posts a progress badge" item) and `twins.py`'s docstring already
