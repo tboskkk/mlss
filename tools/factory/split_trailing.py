@@ -145,6 +145,31 @@ def trailing_start_address(name: str, text: str) -> int | None:
 _HANDLER_SETTER_SIG = bytes([0x01, 0x49, 0xC1, 0x64, 0x01, 0x20, 0x70, 0x47])
 
 
+def _fragment_has_code_before(name: str, trailing_text: str) -> bool:
+    """False when the fragment's ENTIRE body IS the trailing run -- e.g. a
+    fragment write_split() itself already produced (bare `.byte` under a
+    label, no code at all). Without this, a just-split fragment that
+    happens to start with a known signature re-matches its own bytes as
+    if a NEW trailing function were hiding after itself. Found live
+    2026-08-28: splitting sub_808C070 etc. made sub_808C08A etc. show up
+    in the next --list run, pointing at themselves."""
+    frag = gitops.REPO / "asm" / "nonmatching" / f"{name}.s"
+    text = frag.read_text()
+    idx = text.find(trailing_text)
+    if idx == -1:
+        return True  # can't locate it, don't block on an unrelated bug
+    for line in text[:idx].splitlines():
+        s = line.strip()
+        if not s or s.startswith((
+                "//", "@", ".syntax", ".text", "thumb_func_start",
+                "non_word_aligned_thumb_func_start")):
+            continue
+        if s.endswith(":") or s.startswith(".byte"):
+            continue  # a label, or an earlier/different data run
+        return True  # a real instruction line
+    return False
+
+
 def split_candidates() -> list[tuple[str, int, str]]:
     """-> [(fragment_name, n_bytes, label)] that look like real functions
     rather than padding."""
@@ -153,6 +178,8 @@ def split_candidates() -> list[tuple[str, int, str]]:
         name = os.path.basename(p)[:-2]
         trailing = gitops.fragment_trailing_bytes(name)
         if not trailing:
+            continue
+        if not _fragment_has_code_before(name, trailing):
             continue
         vals = BYTE_RE.findall(trailing)
         if len(vals) < 4:
@@ -295,6 +322,14 @@ def write_split(src_name: str, new_name: str, addr: int, raw: bytes,
         return False, f"{new_frag.name} already exists"
 
     c_path, block = gitops.find_guard_block(src_name)
+    if c_path is None:
+        # Old-format-only, by design (see find_new_format_guard()'s own
+        # docstring: callers fall back to it explicitly). This one hadn't --
+        # found live 2026-08-28 on 4 of 14 batch-processed splits, same gap
+        # already fixed for _owning_source_stem() this same session. The
+        # new function being split out doesn't need to match src_name's own
+        # guard convention; it just needs `block`'s span to insert after.
+        c_path, block, _kind = gitops.find_new_format_guard(src_name)
     if c_path is None:
         return False, f"no guard block found for {src_name}"
 
