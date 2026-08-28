@@ -294,7 +294,20 @@ ASM_FUNC("asm/nonmatching/sub_8069DC8.s", void sub_8069DC8(void *arg0));
 ASM_FUNC("asm/nonmatching/sub_8069EC8.s", void sub_8069EC8(void *arg0));
 ASM_FUNC("asm/nonmatching/sub_806A058.s", void sub_806A058(void *arg0));
 ASM_FUNC("asm/nonmatching/sub_806A118.s", void sub_806A118(void *arg0));
-ASM_FUNC("asm/nonmatching/sub_806A180.s", s32 sub_806A180(void *arg0));
+s32 sub_806A180(void *arg0)
+{
+  unsigned int new_var;
+  s32 var_r0_8;
+  var_r0_8 = (new_var = sub_8086D80());
+  if (var_r0_8 == 0)
+  {
+    var_r0_8 = 0x9C;
+    *((s32 *) (((s8 *) arg0) + var_r0_8)) = 1;
+    var_r0_8 = 0;
+  }
+  return var_r0_8;
+}
+
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 extern s32 sub_808750C;
 void sub_806A19C(void *arg0)
