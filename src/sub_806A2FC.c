@@ -46,7 +46,25 @@ ASM_FUNC("asm/nonmatching/sub_806A3F8.s", void sub_806A3F8(void *arg0));
 ASM_FUNC("asm/nonmatching/sub_806A47C.s", void sub_806A47C(void *arg0));
 ASM_FUNC("asm/nonmatching/sub_806A510.s", void sub_806A510(void *arg0));
 ASM_FUNC("asm/nonmatching/sub_806A638.s", void sub_806A638(void *arg0));
-ASM_FUNC("asm/nonmatching/sub_806A730.s", s32 sub_806A730(void *arg0, s32 arg1, s32 arg2));
+s32 stop_sfx_80195A8(s32);                      /* extern */
+s32 sub_8086C64(void *, s32, s32);                  /* extern */
+extern s32 sub_806A77C;
+s32 sub_806A730(void *arg0, s32 arg1, s32 arg2)
+{
+  s32 var_r0_15;
+  s32 new_var;
+  stop_sfx_80195A8(0x111);
+  new_var = arg2;
+  var_r0_15 = sub_8086C64(arg0, arg1, new_var);
+  if (0 == var_r0_15)
+  {
+    var_r0_15 = 0x4C;
+    *((s32 **) (((s8 *) arg0) + var_r0_15)) = &sub_806A77C;
+    var_r0_15 = 0;
+  }
+  return var_r0_15;
+}
+
 s32 sub_806A760(struct Entity *arg0) {
     sub_810DD7C(arg0, (*(s32 *)((s8 *)(arg0) + (0x2C))), 0xFF);
     arg0->handler = (s32 *) &sub_806A638;
