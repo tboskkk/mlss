@@ -14,9 +14,6 @@ s32 sub_808C064(struct Entity *arg0) {
     return 1;
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_808C070.s\"");
-#else
 s32 sub_8087540(void *);                        /* extern */
 
 void sub_808C070(void *arg0) {
@@ -24,7 +21,6 @@ void sub_808C070(void *arg0) {
         sub_8087540(arg0);
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_808C08A.s\"");
