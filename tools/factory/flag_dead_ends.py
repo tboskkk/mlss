@@ -48,10 +48,22 @@ import gitops  # noqa: E402
 import in_context_permuter as icp  # noqa: E402
 
 TAG = "cross-file-arity-dead-end"
+# Name kept for backward compat with rows already tagged 2026-08-28 --
+# the class this covers is broader than arity now (see below), but
+# retagging already-flagged rows isn't worth the churn.
 
 _ARITY_ERR_RE = re.compile(
     r"(?:too few arguments to function|conflicting types for|redeclared as different kind of symbol) "
     r"`(\w+)'"
+    # Widened 2026-08-28 after sub_8199D78: "passing arg N of `X' [from
+    # incompatible pointer type|makes pointer from integer without a
+    # cast|makes integer from pointer without a cast]" is the SAME
+    # cross-file "candidate's own guessed signature disagrees with the
+    # real, already-matched definition elsewhere" class, just a pointer-
+    # type or pointer<->integer mismatch instead of an arity mismatch --
+    # same fix scope (repair_body_signature_mismatch is same-file only,
+    # deliberately), same reason it's not auto-fixable, same dead end.
+    r"|passing arg \d+ of `(\w+)'"
 )
 
 
@@ -102,7 +114,7 @@ def check_one(name: str, body: str, work: Path):
     m = _ARITY_ERR_RE.search(err)
     if not m:
         return None
-    callee = m.group(1)
+    callee = m.group(1) or m.group(2)
     if callee == name:
         return None  # a self-declaration issue, different class entirely
     return callee
