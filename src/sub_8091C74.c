@@ -31,16 +31,21 @@ s32 sub_8091C74(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8091CC8.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+extern s32 sub_8091E00;
+void sub_8091CC8(void *arg0)
+{
+  unsigned long long new_var;
+  void *temp_r2_22;
+  play_sfx_80195B4(0x2B, -1);
+  *((s32 *) (((s8 *) arg0) + 0x94)) = -0x48;
+  sub_8082E1C(arg0, 5, 0x204D, 0);
+  temp_r2_22 = (void *) (*((void **) (((s8 *) arg0) + 8)));
+  new_var = -7;
+  *((u8 *) (((s8 *) temp_r2_22) + 0x12)) = (u8) ((new_var & (*((u8 *) (((s8 *) temp_r2_22) + 0x12)))) | 2);
+  *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_8091E00;
+}
 
-s32 sub_8091CC8(void *);                        /* extern */
+void sub_8091CC8(void *arg0);
 
 void sub_8091D10(struct Entity *arg0) {
     s32 temp_r0_11;
