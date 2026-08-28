@@ -768,8 +768,80 @@ knowing before re-spending a session on either:
   (e.g. `perm_reorder_decls` + `perm_reorder_stmts` + `perm_sameline`)
   so there's always a fallback.
 
+- **A third wall shape, distinct from the register-swap and negative-
+  immediate classes above: candidates that plateau FLAT inside the
+  +10000 reloc-mismatch penalty band with zero movement across
+  thousands of tries.** `sub_80292EC`, `sub_8095028`, `sub_80F3FE8` all
+  show this signature. Confirmed as two DIFFERENT real causes, not one,
+  and confirmed NOT the `sub_808C070`-style trailing-function
+  measurement artifact above (none of the three appear in
+  `split_trailing.py --list`):
+  - `sub_80292EC`: a genuine LOOP-SHAPE difference. Retail's real code
+    is the classic "jump to condition check, body, fall-through
+    compare-and-branch-back" transform (check-at-bottom); the
+    candidate's m2c-generated `goto`-based loop compiles to a
+    check-at-top structure instead. Tested the obvious fix — rewrote
+    the `goto` as a genuine C `for` loop — and it made things WORSE
+    (`size_delta` -6 → +4, a different register allocation entirely,
+    still check-at-top). decomp-permuter's mutation passes
+    (`perm_reorder_stmts`/`perm_condition`/etc.) operate on existing C
+    loop constructs; none of them convert one loop SHAPE into another,
+    so this may be genuinely unreachable by search as currently built.
+  - `sub_8095028`: a register-PRESSURE/spill difference, the same
+    class as the already-documented `sub_81458C8` case. Retail's real
+    prologue is `push {r4,r5,r6,r7,lr}` (5 registers); the candidate's
+    is `push {r4,lr}` (2) — retail keeps more locals alive in real
+    registers across an indirect call rather than spilling and
+    reloading. This is exactly what `--allocator-attack` targets; it
+    just hasn't found the right combination in the runs so far.
+  - `sub_80F3FE8`: same flat-penalty-band symptom observed, not yet
+    root-caused to this level of detail — grouped here by symptom, not
+    confirmed cause. Worth the same objdump-diff treatment before
+    assuming it matches either of the other two.
+
 ## Housekeeping outstanding
 
+- **`tools/factory/split_trailing.py` has 211 unacted-on candidates worth
+  56,964 bytes, confirmed live 2026-08-28 while chasing an unrelated
+  question.** This tool already exists, is already verified-safe (checks
+  every split against a from-scratch build, exactly like everything
+  else in this project), and has apparently never been run at scale —
+  its own `--list` right now reports 211 fragments each carrying a real,
+  never-labeled function after them (push-prologue-confirmed, not
+  guessed). This is a MUCH bigger, separate lever from anything else in
+  this session's work and deserves its own dedicated pass:
+  `python3 tools/factory/split_trailing.py --list` to see the current
+  set, then `--dry-run NAME` / `NAME` per CLAUDE.md's existing
+  Phase-3 note above (already documents ~94 candidates as of an earlier
+  count; this is a fresh, larger, re-verified number, not a duplicate of
+  that entry).
+- **A related, narrower gap in the SAME tool**: `split_trailing.py` only
+  confirms a trailing function via an unambiguous Thumb `push {...,lr}`
+  prologue (`0xB4xx`/`0xB5xx`). Found live on the `sub_808C070`/
+  `sub_808C098`/`sub_808C0C0` twins (2026-08-28, chasing their identical
+  "stuck at score 14" symptom): all three are followed by a real,
+  complete, NO-PROLOGUE leaf function — `ldr r1,[pc,#N]; str r1,[r0,
+  0x4C]; movs r0,#1; bx lr` (a bare "install `handler` and return 1"
+  routine, needing no `lr` save since it never calls anything) — the
+  exact same shape as this file's OWN already-matched `sub_808C064`
+  (`arg0->handler = &X; return 1;`). Confirmed by direct byte comparison
+  (not guessed): the candidate's own compiled bytes are byte-identical
+  to retail across their true extent with correct relocations; the
+  entire apparent "gap" (score 14 in-context, 300 via `plain_score`'s
+  whole-object `-o` mode — see CLAUDE.md's own already-documented
+  landmine, still live) is 100% positional drift from this uncounted
+  trailing function, not a real difference in the twins' own
+  reconstruction. Because it has no push prologue, `split_trailing.py`'s
+  current heuristic can't see it and it does NOT appear in the 211-item
+  `--list` above — a real, scoped extension (detect a plausible leaf
+  function shape too, not just a push prologue) that would likely
+  recover more than just these 3. **Deliberately not implemented this
+  session** — extending a trailing-function detector's heuristics
+  carries the same "guessing at unlabeled bytes" risk CLAUDE.md's
+  landmines section already warns about for this exact class, and
+  wants the same from-scratch-build verification discipline
+  `split_trailing.py`'s own author already built in, not a rushed
+  addition.
 - **`rescore_seeds.plain_score`/`validator._matches_in_plain_build` structurally
   cannot accept a candidate that references a known address via its
   MINTED NAME (`symbols.txt`) where retail's own disassembled `.s`
