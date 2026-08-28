@@ -31,27 +31,25 @@ void sub_8111174(void *arg0)
   }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_81111C0.s\"");
-#else
 s32 stop_sfx_80195A8(s32);                      /* extern */
-s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
-void sub_8110CB0(void *arg0);                       /* extern */
-
-void sub_81111C0(void *arg0) {
-    s32 var_r1_20;
-    void *temp_r2_29;
-
-    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
-        var_r1_20 = 4;
-        if ((0 - M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */)) != 1) {
-            var_r1_20 = 7;
-        }
-        sub_8082E1C(arg0, var_r1_20, 0, 0);
-        temp_r2_29 = (*(void **)((s8 *)(arg0) + (8)));
-        (*(u8 *)((s8 *)(temp_r2_29) + (0x12))) = (u8) ((-7 & (*(u8 *)((s8 *)(temp_r2_29) + (0x12)))) | 2);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_8110CB0;
-        stop_sfx_80195A8(0x89);
+extern s32 sub_8110CB0;
+void sub_81111C0(void *arg0)
+{
+  int new_var;
+  void *temp_r2_29;
+  s32 var_r1_20;
+  if (8 & (*((u8 *) (((s8 *) (*((void **) (((s8 *) arg0) + 8)))) + 0x12))))
+  {
+    new_var = 0 - (*((s16 *) (((s8 *) (*((void **) (((s8 *) (*((void **) (((s8 *) arg0) + 0x2C)))) + 0x28)))) + 0xEC)));
+    var_r1_20 = 4;
+    if (new_var != 1)
+    {
+      var_r1_20 = 7;
     }
+    sub_8082E1C(arg0, var_r1_20, 0, 0);
+    temp_r2_29 = (void *) (*((void **) (((s8 *) arg0) + 8)));
+    *((u8 *) (((s8 *) temp_r2_29) + 0x12)) = (u8) (((-7) & (*(((s8 *) temp_r2_29) + 0x12))) | 2);
+    *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_8110CB0;
+    stop_sfx_80195A8(0x89);
+  }
 }
-#endif
