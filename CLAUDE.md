@@ -841,7 +841,15 @@ knowing before re-spending a session on either:
   landmines section already warns about for this exact class, and
   wants the same from-scratch-build verification discipline
   `split_trailing.py`'s own author already built in, not a rushed
-  addition.
+  addition. **A 4th instance found the same day**: `sub_8098C78`
+  (identical C body to the twins — same condition, same callee
+  `sub_8087540`) carries the byte-for-byte identical trailer pattern
+  in its own retail `.s` fragment, just a different embedded target
+  address (`0x08098CA1` vs. `0x0808C39D`/`0x08098C09` for the others).
+  This is not a coincidence — it's the same repeated "entity subtype
+  flag check" engine idiom recurring across the corpus, which is why
+  the scoped `split_trailing.py` extension above is worth doing: this
+  family is very unlikely to stop at 4.
 - **`rescore_seeds.plain_score`/`validator._matches_in_plain_build` structurally
   cannot accept a candidate that references a known address via its
   MINTED NAME (`symbols.txt`) where retail's own disassembled `.s`
