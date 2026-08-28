@@ -36,17 +36,15 @@ void sub_813B1A4(s32 arg0, void *arg1, s32 (**arg2)(s32, void *)) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_813B1E8.s\"");
-#else
-void sub_813B1E8(s32 arg0, void *arg1, s32 *arg2) {
-    u16 temp_r0_12;
-
-    temp_r0_12 = (*(u16 *)((s8 *)(arg1) + (0x1D2))) - 1;
-    (*(u16 *)((s8 *)(arg1) + (0x1D2))) = temp_r0_12;
-    if ((temp_r0_12 << 0x10) == 0) {
-        (*(u8 *)((s8 *)(arg1) + (0x1D6))) = (u8) (((*(u8 *)((s8 *)(arg1) + (0x1D6))) | 1) & ~2);
-        *arg2 = (*(s32 *)((s8 *)(arg1) + (0x1AC)));
-    }
+void sub_813B1E8(s32 arg0, void *arg1, s32 *arg2)
+{
+  int temp_r0_12;
+  temp_r0_12 = (*((u16 *) (((s8 *) arg1) + 0x1D2))) - 1;
+  *((u16 *) (((s8 *) arg1) + 0x1D2)) = temp_r0_12;
+  if ((temp_r0_12 << 0x10) == 0)
+  {
+    temp_r0_12 = 2;
+    *((u8 *) (((s8 *) arg1) + 0x1D6)) = (u8) (((*((u8 *) (((s8 *) arg1) + 0x1D6))) | 1) & (~temp_r0_12));
+    *arg2 = *((s32 *) (((s8 *) arg1) + 0x1AC));
+  }
 }
-#endif
