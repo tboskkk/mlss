@@ -425,6 +425,57 @@ def _repair_body_decls(c_path: Path, body: str) -> str:
         # 2026-08-27 at 3 of 16 build failures repair_stale_prototype alone
         # didn't reach.
         body = fix_decl_conflicts.repair_body_signature_mismatch(file_text, body)
+        # repair()'s MIRROR IMAGE: the FILE holds a stale `extern s32 X;`
+        # (some earlier sibling only address-took X) while THIS candidate
+        # CALLS X as a function. fix_decl_conflicts.repair_file_third_party
+        # already implements it -- byte-neutral by the identical argument
+        # repair() itself documents -- but was only ever wired into
+        # rescue_isolated_zeros.py, the exact gap repair()'s own docstring
+        # above already complains about for a DIFFERENT function and never
+        # got fixed for this one. Found live 2026-08-27 on sub_8088858
+        # (calls sub_8087540, matched elsewhere; sub_808862C.c's OWN file
+        # scope still carries a sibling's stale `extern s32 sub_8087540;`)
+        # while triaging the remaining escalation-exhausted build
+        # failures. Modifies file_text, not body, so it writes directly
+        # rather than returning through this function's body-only return
+        # value -- the subsequent read in the caller picks it up.
+        #
+        # MUST scope the search to _strip_dead_else_branches(file_text)
+        # first -- caught live by the very next regression run, not
+        # assumed safe: repair_file_third_party's regex has no position
+        # awareness, so unscoped it can match an `extern s32 X;` sitting
+        # in some UNRELATED sibling's still-unmatched #else draft (dead
+        # code under the plain build _dedupe_decls already has to guard
+        # against for the same reason) and rewrite text inside a guard
+        # block that hasn't been spliced yet -- corrupting the very
+        # `block` substring splice_candidate/splice_into_else captured
+        # before calling this, so the later `text.replace(block, ...)`
+        # raises "substring not found". Reproduced on sub_8064B88 and
+        # sub_806BDA4: their own guard blocks got silently rewritten
+        # (`extern s32 sub_8064C00;` -> `void sub_8064C00(void *arg0);`
+        # etc.) before the real splice ever ran.
+        try:
+            file_text2 = c_path.read_text()
+            dead_spans = [m.span() for m in _DEAD_ELSE_RE.finditer(file_text2)]
+            out3, syms3 = fix_decl_conflicts.repair_file_third_party(file_text2, body)
+            if out3 is not None and out3 != file_text2 and syms3:
+                # Only accept the fix if EVERY symbol it touched has its
+                # `extern s32 SYM;` occurrence outside every dead span --
+                # otherwise it rewrote a not-yet-live draft, which is what
+                # corrupted sub_8064B88/sub_806BDA4's own not-yet-spliced
+                # guard blocks. All-or-nothing: a single bad symbol voids
+                # the whole batch rather than trying to reconcile a
+                # partial rewrite.
+                safe = all(
+                    not any(s <= m.start() < e for s, e in dead_spans)
+                    for sym in syms3
+                    for m in re.finditer(r'^extern\s+s32\s+%s;\s*$' % re.escape(sym),
+                                          file_text2, re.M)
+                )
+                if safe:
+                    c_path.write_text(out3)
+        except Exception:
+            pass
     except Exception:
         return body
     return body
