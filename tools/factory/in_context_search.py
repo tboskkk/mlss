@@ -43,6 +43,8 @@ from __future__ import annotations
 
 import argparse
 import pickle
+import random
+import re
 import sys
 import tempfile
 import time
@@ -75,15 +77,57 @@ from src.error import CandidateConstructionFailure  # noqa: E402
 from src.helpers import get_default_randomization_weights  # noqa: E402
 
 
+def inject_escaping_dummies(source: str, fn_name: str, rng: random.Random) -> str:
+    """Insert 0-4 `volatile s32` locals at the top of `fn_name`'s body, each
+    forced to escape (address-taken, read back) rather than sit dead.
+
+    THE MECHANISM THIS AUTOMATES. Proved by hand on sub_81458C8
+    (2026-08-27): a candidate byte-exact in isolation can still be short
+    exactly the stack agbcc reserves in the REAL translation unit, because
+    the real 45-function file leaves the register allocator enough free
+    registers to avoid a spill the 1-function isolated compile does not
+    have. Ordinary statement-level mutation never reaches this class,
+    because it never changes how much stack the function claims. A
+    genuinely UNUSED local, volatile or not, gets optimized away
+    regardless (tested directly, six variants, zero effect) -- what
+    closed sub_81458C8 was forcing the dummy's ADDRESS to escape
+    (`*p = *p` through a pointer to it), which a simple liveness check
+    cannot eliminate. This is that fix as a repeatable mutation instead
+    of a one-off hand edit: 0 dummies most of the time (so the search
+    still spends most of its budget on ordinary mutations), 1-4 when it
+    fires.
+
+    Regex-based, not AST-based, on purpose: the exact insertion point
+    (right after the function's own opening brace) is all that matters,
+    and every existing local declaration afterward is untouched.
+    """
+    n = rng.randint(0, 4)
+    if n == 0:
+        return source
+    m = re.search(rf"\b{re.escape(fn_name)}\s*\([^;{{]*\)\s*\{{", source)
+    if not m:
+        return source
+    decls = "".join(f"volatile s32 _pattack_dummy{i};\n  " for i in range(n))
+    escapes = "".join(
+        f"{{ s32 *_pattack_esc{i} = (s32 *) &_pattack_dummy{i}; *_pattack_esc{i} = *_pattack_esc{i}; }}\n  "
+        for i in range(n)
+    )
+    insert_at = m.end()
+    return source[:insert_at] + "\n  " + decls + escapes + source[insert_at:]
+
+
 class InContextCompiler(Compiler):
     """Drop-in for decomp-permuter's Compiler. Never calls compile_cmd --
     overrides compile() entirely, so the base class is just for the
     isinstance/typing contract."""
 
-    def __init__(self, name: str, work: Path, arm_mode: bool = False):
+    def __init__(self, name: str, work: Path, arm_mode: bool = False,
+                 allocator_attack: bool = False, seed: int = 0):
         self.name = name
         self.work = work
         self.arm_mode = arm_mode
+        self.allocator_attack = allocator_attack
+        self._rng = random.Random(seed)
         self._i = 0
         self.show_errors = False
         self.debug_mode = False
@@ -91,6 +135,8 @@ class InContextCompiler(Compiler):
     def compile(self, source: str, *, show_errors: bool = False):
         self._i += 1
         tag = f"m{self._i}"
+        if self.allocator_attack:
+            source = inject_escaping_dummies(source, self.name, self._rng)
         body = icp._strip_permuter_preamble(source)
         try:
             c_path = icp.splice_in_memory(self.name, body, self.work)
@@ -135,8 +181,8 @@ class InContextScorer(Scorer):
 
 
 def search(name: str, body: str, seconds: float, work: Path, verbose: bool = True,
-           arm_mode: bool = False):
-    compiler = InContextCompiler(name, work, arm_mode=arm_mode)
+           arm_mode: bool = False, allocator_attack: bool = False):
+    compiler = InContextCompiler(name, work, arm_mode=arm_mode, allocator_attack=allocator_attack)
     scorer = InContextScorer(name, work)
     c_source = preprocess_string(body)
     # "agbcc" matches CLAUDE.md's local weight profile (tools/permuter_patches/):
@@ -202,6 +248,10 @@ def main() -> int:
                      help="compile with agbcc_arm instead of agbcc, for functions "
                           "retail built as ARM rather than Thumb (see CFLAGS_ARM "
                           "in in_context_permuter.py)")
+    ap.add_argument("--allocator-attack", action="store_true",
+                     help="randomly inject 0-4 escaping volatile locals per mutation "
+                          "attempt, automating the TU-register-pressure fix proved by "
+                          "hand on sub_81458C8 (see inject_escaping_dummies)")
     args = ap.parse_args()
 
     body = Path(args.body_file).read_text() if args.body_file else _ghost_zero_source_raw(args.name)
@@ -210,7 +260,8 @@ def main() -> int:
 
     work = Path(tempfile.mkdtemp(prefix=f"icsearch.{args.name}."))
     try:
-        r = search(args.name, body, args.seconds, work, arm_mode=args.arm)
+        r = search(args.name, body, args.seconds, work, arm_mode=args.arm,
+                   allocator_attack=args.allocator_attack)
         print(r if "error" in r else
               {k: v for k, v in r.items() if k != "best_source"})
         if r.get("found_zero"):
