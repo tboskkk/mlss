@@ -16,28 +16,24 @@ void sub_81132AC(struct Entity *arg0) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_81132D4.s\"");
-#else
 s32 sub_8087124();                                  /* extern */
 extern s32 sub_8112CE4;
-
-s32 sub_81132D4(void *arg0, void *arg1) {
-    s32 var_r0_9;
-    void *temp_r2_12;
-
-    var_r0_9 = sub_8087124();
-    if (var_r0_9 == 0) {
-        temp_r2_12 = (*(void **)((s8 *)(arg1) + (0x28)));
-        (*(u8 *)((s8 *)(temp_r2_12) + (0x7E))) = (u8) ((*(u8 *)((s8 *)(temp_r2_12) + (0x7E))) | 0x80);
-        (*(u8 *)((s8 *)(temp_r2_12) + (0x7F))) = (u8) ((*(u8 *)((s8 *)(temp_r2_12) + (0x7F))) | 0x20);
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8112CE4;
-        (*(s8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x20))) = 0x10;
-        var_r0_9 = 0;
-    }
-    return var_r0_9;
+s32 sub_81132D4(void *arg0, void *arg1)
+{
+  s32 var_r0_9;
+  void *temp_r2_12;
+  var_r0_9 = sub_8087124();
+  if (var_r0_9 == 0)
+  {
+    temp_r2_12 = (void *) (*((void **) (((s8 *) arg1) + 0x28)));
+    *((u8 *) (((s8 *) temp_r2_12) + 0x7E)) = (u8) ((*((u8 *) (((s8 *) temp_r2_12) + 0x7E))) | 0x80);
+    *((u8 *) (((s8 *) temp_r2_12) + 0x7F)) = (u8) ((*((u8 *) (((s8 *) temp_r2_12) + 0x7F))) | 0x20);
+ do { *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_8112CE4; } while (0);
+    *((s8 *) (((s8 *) (*((void **) (((s8 *) arg0) + 8)))) + (var_r0_9 = 0x20))) = 0x10;
+    var_r0_9 = 0;
+  }
+  return var_r0_9;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8113314.s\"");
