@@ -250,12 +250,37 @@ def retail_symbol(name: str, work: Path):
     cause), so extract_symbol()'s symbol-table size lookup sees 0 here.
     Sidestepped exactly the way compiler_variants.py does: the fragment is
     the ONLY thing in this .s file, so the assembled .text section's
-    length already IS the function's size -- no symbol lookup needed."""
+    length already IS the function's size -- no symbol lookup needed.
+
+    CRITICAL FIX (2026-08-27): new-format (ASM_FUNC/NONMATCH) fragments
+    carry NO `.syntax unified`/`.thumb`/`thumb_func_start` header -- that
+    context normally comes from the NAKED C wrapper agbcc compiles around
+    them in the real build (include/global.h's ASM_FUNC/NONMATCH expand to
+    `NAKED decl { asm_unified(...) }`, and agbcc, compiling that in its
+    only mode, Thumb, supplies the missing header for free). Concatenating
+    macros.inc + the bare fragment with NEITHER thumb_func_start NOR
+    arm_func_start ever invoked left the assembler's OWN default mode in
+    effect, which is ARM -- so this was assembling headerless fragments as
+    ARM code and calling the result "retail". That produced a fully fake
+    "sub_806A180/sub_806A730 are ARM-mode functions" finding: relocation
+    TYPES really did read as R_ARM_CALL/R_ARM_V4BX, matching what agbcc_arm
+    also produced, which read as confirmation -- but reassembling with the
+    header these fragments actually need (below) gives R_ARM_THM_CALL, the
+    SAME relocations the ordinary Thumb candidate already had, and the
+    candidate then comes out 1 byte off retail, not the 79 the broken
+    comparison reported. A measurement bug excused an entire ARM-mode
+    detour last turn; see CLAUDE.md's THE LAW. compiler_variants.py's
+    stage() already carries the identical check for the isolation path;
+    this function just never had it.
+    """
     frag = REPO / "asm" / "nonmatching" / f"{name}.s"
     if not frag.is_file():
         frag = REPO / "asm" / f"{name}.s"
+    frag_text = frag.read_text()
+    if not frag_text.lstrip().startswith(".syntax"):
+        frag_text = f"\t.syntax unified\n\t.text\n\n\tthumb_func_start {name}\n{name}:\n" + frag_text
     combined = work / "retail.s"
-    combined.write_text((REPO / "asm" / "macros.inc").read_text() + "\n" + frag.read_text())
+    combined.write_text((REPO / "asm" / "macros.inc").read_text() + "\n" + frag_text)
     obj = work / "retail.o"
     subprocess.run(["arm-none-eabi-as", "-mcpu=arm7tdmi", "-mthumb-interwork",
                      "-I", str(REPO), str(combined), "-o", str(obj)], check=True)
