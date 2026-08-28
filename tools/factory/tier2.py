@@ -841,10 +841,43 @@ def run_pool(jobs: int, stall_min: float, max_functions: int):
             # distribution is already cleanly bimodal (69 rows at 1-4, 338 at
             # 10-11, nothing between), so the count alone already identifies
             # the same rows a stricter joint condition would.
+            # LEAF-NODE TIEBREAK, added 2026-08-28. A row whose every tracked
+            # callee is already state='matched' can only be blocked by a
+            # register-allocation/control-flow gap, never by an unknown
+            # callee signature -- a real, useful signal this project's own
+            # topology (the edges table) already carries and nothing was
+            # reading. Measured before shipping: 123 rows in the
+            # escalation-exhausted band (tier B, the ELSE bucket above) are
+            # leaves, several already at iso_score 2-3 (sub_806E690,
+            # sub_8071244, sub_816B0E0 and siblings) but ranked BELOW
+            # ordinary non-leaf rows in that same band under the old
+            # escalation-then-iso_score ordering.
+            #
+            # Positioned as a tiebreaker AFTER the existing tier CASE and
+            # BEFORE escalation_count, not as a new CASE branch -- verified
+            # by dry-running the composed query against the live DB before
+            # shipping (same technique this file's own history already
+            # relies on), specifically checking it could NOT move a row
+            # between tiers. Two more aggressive placements were drafted and
+            # REJECTED, not just considered: making leaf-ness outrank the
+            # tier CASE entirely would have buried the 14 admitted
+            # iso_score=1 rows (literally 1 byte from retail) behind 500
+            # leaf rows including ones at objdiff=0%; splitting only the
+            # unscored/far tier by leaf-ness would have left the actual 123
+            # target rows (all in the escalation-exhausted tier) completely
+            # unaffected. This tiebreaker-only version touches neither
+            # failure mode: it can only reorder rows the tier CASE already
+            # placed together, so the escalation-exhausted band still ranks
+            # exactly where the 2026-08-27 fix (see "THIRD TIER" above) put
+            # it relative to fresh near-misses and far rows -- only which
+            # row wins WITHIN that band changes.
+            leaf = ("NOT EXISTS (SELECT 1 FROM edges e JOIN functions cf ON cf.name = e.callee "
+                    "WHERE e.caller = functions.name AND cf.state != 'matched')")
             order = ("CASE WHEN objdiff_score >= " + repr(OBJDIFF_ADMIT_FLOOR) +
                      " AND escalation_count < " + repr(EXHAUSTED_ESCALATION) + " THEN 0 "
                      "WHEN objdiff_score IS NULL OR objdiff_score < " + repr(OBJDIFF_ADMIT_FLOOR) + " THEN 1 "
                      "ELSE 2 END ASC, "
+                     "CASE WHEN " + leaf + " THEN 0 ELSE 1 END ASC, "
                      "escalation_count ASC, "
                      "iso_score IS NULL ASC, iso_score ASC, "
                      "best_score IS NULL ASC, best_score ASC")
