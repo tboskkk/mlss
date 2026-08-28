@@ -80,9 +80,10 @@ class InContextCompiler(Compiler):
     overrides compile() entirely, so the base class is just for the
     isinstance/typing contract."""
 
-    def __init__(self, name: str, work: Path):
+    def __init__(self, name: str, work: Path, arm_mode: bool = False):
         self.name = name
         self.work = work
+        self.arm_mode = arm_mode
         self._i = 0
         self.show_errors = False
         self.debug_mode = False
@@ -95,7 +96,7 @@ class InContextCompiler(Compiler):
             c_path = icp.splice_in_memory(self.name, body, self.work)
         except SystemExit:
             return None
-        obj = icp.compile_tu(c_path, self.work, tag)
+        obj = icp.compile_tu(c_path, self.work, tag, arm_mode=self.arm_mode)
         if obj is None:
             return None
         data, relocs = icp.extract_symbol(obj, self.name, self.work)
@@ -133,8 +134,9 @@ class InContextScorer(Scorer):
         return score, f"{data.hex()}|{sorted(relocs)}"
 
 
-def search(name: str, body: str, seconds: float, work: Path, verbose: bool = True):
-    compiler = InContextCompiler(name, work)
+def search(name: str, body: str, seconds: float, work: Path, verbose: bool = True,
+           arm_mode: bool = False):
+    compiler = InContextCompiler(name, work, arm_mode=arm_mode)
     scorer = InContextScorer(name, work)
     c_source = preprocess_string(body)
     # "agbcc" matches CLAUDE.md's local weight profile (tools/permuter_patches/):
@@ -196,6 +198,10 @@ def main() -> int:
     ap.add_argument("--body-file")
     ap.add_argument("--seconds", type=float, default=300)
     ap.add_argument("--keep", action="store_true")
+    ap.add_argument("--arm", action="store_true",
+                     help="compile with agbcc_arm instead of agbcc, for functions "
+                          "retail built as ARM rather than Thumb (see CFLAGS_ARM "
+                          "in in_context_permuter.py)")
     args = ap.parse_args()
 
     body = Path(args.body_file).read_text() if args.body_file else _ghost_zero_source_raw(args.name)
@@ -204,7 +210,7 @@ def main() -> int:
 
     work = Path(tempfile.mkdtemp(prefix=f"icsearch.{args.name}."))
     try:
-        r = search(args.name, body, args.seconds, work)
+        r = search(args.name, body, args.seconds, work, arm_mode=args.arm)
         print(r if "error" in r else
               {k: v for k, v in r.items() if k != "best_source"})
         if r.get("found_zero"):

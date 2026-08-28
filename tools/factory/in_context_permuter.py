@@ -61,6 +61,23 @@ CFLAGS = ["-O2", "-mthumb-interwork", "-fno-common", "-Wimplicit",
 CPPFLAGS = ["-I", "tools/agbcc/include", "-nostdinc", "-undef",
             "-iquote", "include", "-Wno-trigraphs"]
 
+# ARM-mode compile, for the small set of functions retail built as ARM
+# rather than Thumb -- found live 2026-08-27 on sub_806A730/sub_806A180,
+# whose RETAIL relocations are R_ARM_CALL/R_ARM_V4BX, architecturally
+# impossible to produce from Thumb code. `agbcc_arm` is a real, separate
+# binary in tools/agbcc/bin/ (gcc 2.9-arm-000512 for ARM/elf, vs. the
+# default agbcc's Thumb/elf) -- already known to exist and cover the crt0
+# ARM code (docs/plan-2026-08-22-toolchain-overhaul.md), never wired up
+# for ordinary functions before. NOT the same question compiler_variants.py
+# already answered ("one configuration", CLAUDE.md F15/T.5) -- that
+# experiment's VARIANTS dict never included agbcc_arm at all, only
+# old_agbcc and -fprologue-bugfix. `-ffix-debug-line` is agbcc's own local
+# patch flag and agbcc_arm rejects it outright (`Invalid option`), so ARM
+# builds drop both -g and -ffix-debug-line -- byte-neutral for .text the
+# same way CFLAGS_NODEBUG already is elsewhere in this project.
+CFLAGS_ARM = ["-O2", "-mthumb-interwork", "-fno-common", "-Wimplicit",
+              "-Wparentheses", "-Werror"]
+
 
 def _cpp() -> str:
     r = subprocess.run(["which", "arm-none-eabi-cpp"], capture_output=True, text=True)
@@ -159,10 +176,16 @@ def splice_in_memory(name: str, body: str, work: Path) -> Path:
     return scratch
 
 
-def compile_tu(c_path: Path, work: Path, tag: str) -> Path | None:
+def compile_tu(c_path: Path, work: Path, tag: str, arm_mode: bool = False) -> Path | None:
     """cpp + agbcc + as the WHOLE translation unit at c_path. Returns the
     assembled .o, or None if any stage failed (stderr left on disk under
-    the same tag for inspection -- never silently swallowed)."""
+    the same tag for inspection -- never silently swallowed).
+
+    `arm_mode` swaps in agbcc_arm + CFLAGS_ARM -- see the module-level
+    comment by CFLAGS_ARM. Everything else (cpp, the assembler) is
+    identical: the .s file agbcc_arm emits carries no `.thumb`/`.code 16`
+    directive, so `arm-none-eabi-as` disassembles/assembles it as ARM by
+    simply following what's actually in the file, no extra flag needed."""
     cpp_i = work / f"{tag}.i"
     asm_s = work / f"{tag}.s"
     obj_o = work / f"{tag}.o"
@@ -171,7 +194,9 @@ def compile_tu(c_path: Path, work: Path, tag: str) -> Path | None:
     if r.returncode != 0:
         (work / f"{tag}.pp.err").write_text(r.stderr)
         return None
-    r = subprocess.run(["tools/agbcc/bin/agbcc", str(cpp_i), *CFLAGS, "-o", str(asm_s)],
+    cc1 = "tools/agbcc/bin/agbcc_arm" if arm_mode else "tools/agbcc/bin/agbcc"
+    cflags = CFLAGS_ARM if arm_mode else CFLAGS
+    r = subprocess.run([cc1, str(cpp_i), *cflags, "-o", str(asm_s)],
                         cwd=REPO, capture_output=True, text=True)
     if r.returncode != 0:
         (work / f"{tag}.cc.err").write_text(r.stderr)
@@ -248,7 +273,7 @@ def retail_symbol(name: str, work: Path):
     return data, relocs
 
 
-def score_in_context(name: str, body: str, work: Path, tag: str = "cand"):
+def score_in_context(name: str, body: str, work: Path, tag: str = "cand", arm_mode: bool = False):
     """The primitive this whole POC exists to demonstrate: splice `body`
     into `name`'s REAL file, compile the WHOLE translation unit, extract
     ONLY `name`'s bytes by ELF symbol, and diff against retail (bytes AND
@@ -261,7 +286,7 @@ def score_in_context(name: str, body: str, work: Path, tag: str = "cand"):
     """
     t0 = time.time()
     c_path = splice_in_memory(name, body, work)
-    obj = compile_tu(c_path, work, tag)
+    obj = compile_tu(c_path, work, tag, arm_mode=arm_mode)
     if obj is None:
         return {"error": f"compile failed, see {work}/{tag}.*.err", "elapsed": time.time() - t0}
     cand_bytes, cand_relocs = extract_symbol(obj, name, work)
