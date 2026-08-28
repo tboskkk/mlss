@@ -132,17 +132,62 @@ def inject_escaping_dummies(source: str, fn_name: str, rng: random.Random) -> st
     return source[:insert_at] + "\n  " + decls + source[insert_at:]
 
 
+_ASM_REGION_RE = re.compile(r"/\*PATTACK_ASM_START\*/(.*?)/\*PATTACK_ASM_END\*/", re.DOTALL)
+
+
+def hide_asm_regions(source: str) -> tuple[str, dict[str, str]]:
+    """decomp-permuter's pycparser-based Randomizer chokes outright on GCC
+    register-variable declarations (`register u32 r asm("r0");`) and
+    extended `asm volatile(...)` statements -- confirmed live trying to
+    search sub_808F2A8's hand-reconstructed C, which needs exactly this to
+    call `_call_via_r2` correctly (its target has to land in r2 while real
+    arguments occupy r0/r1, which plain C cannot express). The search
+    doesn't need to MUTATE inside the asm anyway -- forcing specific
+    physical registers is the whole point, permuting it would defeat it.
+
+    Wrap the block in `/*PATTACK_ASM_START*/ ... /*PATTACK_ASM_END*/` in
+    the source and this replaces it with a plain, parseable, argument-free
+    function call before handing anything to Permuter(); the real content
+    is saved here and restored by restore_asm_regions() right before the
+    (possibly mutated-around, but never mutated-into) result is actually
+    compiled. The placeholder has no arguments or return value the
+    Randomizer could see a reason to touch, so ordinary mutations are free
+    to move code around it same as any other statement.
+    """
+    saved: dict[str, str] = {}
+
+    def repl(m: re.Match) -> str:
+        key = f"_pattack_opaque_{len(saved)}"
+        saved[key] = m.group(1)
+        return f"{key}();"
+
+    new_source = _ASM_REGION_RE.sub(repl, source)
+    if saved:
+        decls = "".join(f"void {k}(void);\n" for k in saved)
+        new_source = decls + new_source
+    return new_source, saved
+
+
+def restore_asm_regions(source: str, saved: dict[str, str]) -> str:
+    for key, content in saved.items():
+        source = re.sub(rf"void {re.escape(key)}\(void\);\n?", "", source)
+        source = source.replace(f"{key}();", content)
+    return source
+
+
 class InContextCompiler(Compiler):
     """Drop-in for decomp-permuter's Compiler. Never calls compile_cmd --
     overrides compile() entirely, so the base class is just for the
     isinstance/typing contract."""
 
     def __init__(self, name: str, work: Path, arm_mode: bool = False,
-                 allocator_attack: bool = False, seed: int = 0):
+                 allocator_attack: bool = False, seed: int = 0,
+                 asm_saved: dict[str, str] | None = None):
         self.name = name
         self.work = work
         self.arm_mode = arm_mode
         self.allocator_attack = allocator_attack
+        self.asm_saved = asm_saved or {}
         self._rng = random.Random(seed)
         self._i = 0
         self.show_errors = False
@@ -153,6 +198,8 @@ class InContextCompiler(Compiler):
         tag = f"m{self._i}"
         if self.allocator_attack:
             source = inject_escaping_dummies(source, self.name, self._rng)
+        if self.asm_saved:
+            source = restore_asm_regions(source, self.asm_saved)
         body = icp._strip_permuter_preamble(source)
         try:
             c_path = icp.splice_in_memory(self.name, body, self.work)
@@ -198,7 +245,11 @@ class InContextScorer(Scorer):
 
 def search(name: str, body: str, seconds: float, work: Path, verbose: bool = True,
            arm_mode: bool = False, allocator_attack: bool = False):
-    compiler = InContextCompiler(name, work, arm_mode=arm_mode, allocator_attack=allocator_attack)
+    body, asm_saved = hide_asm_regions(body)
+    if asm_saved and verbose:
+        print(f"[{name}] hid {len(asm_saved)} PATTACK_ASM region(s) from the parser")
+    compiler = InContextCompiler(name, work, arm_mode=arm_mode, allocator_attack=allocator_attack,
+                                  asm_saved=asm_saved)
     scorer = InContextScorer(name, work)
     c_source = preprocess_string(body)
     # "agbcc" matches CLAUDE.md's local weight profile (tools/permuter_patches/):
@@ -238,6 +289,10 @@ def search(name: str, body: str, seconds: float, work: Path, verbose: bool = Tru
             if result.score == 0:
                 found_zero = True
                 break
+    if asm_saved:
+        # Written-out/promoted source must carry the REAL asm, never the
+        # opaque placeholder this function existed to feed the parser.
+        best_source = restore_asm_regions(best_source, asm_saved)
     return {
         "tries": tries, "elapsed": time.time() - t0, "base_score": permuter.best_score,
         "best_score": best, "found_zero": found_zero, "best_source": best_source,
