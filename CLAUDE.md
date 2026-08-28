@@ -770,6 +770,23 @@ knowing before re-spending a session on either:
 
 ## Housekeeping outstanding
 
+- **`gitops._owning_source_stem` fixed 2026-08-28** — it fell back from
+  `find_guard_block()` (old `#ifndef NONMATCHING` convention only)
+  straight to a regex matching a real, unguarded definition, so a
+  function still in its NEW-FORMAT (`ASM_FUNC`/`NONMATCH`) guard was
+  invisible to both checks and `_owning_source_stem` returned `None`.
+  Found live promoting `sub_806A730`'s genuine in-context zero:
+  `rescore_seeds.plain_score()` silently returned `None` (its own
+  first line is `if stem is None: return None`), which
+  `already_matches()` read as "no readable verdict" and rejected via its
+  legacy `asm_differ_matches()` fallback — a real false negative, not a
+  real mismatch, exactly the class `already_matches()`'s own docstring
+  already anticipates ("harmless... falls through to the permuter") but
+  this time traced to its actual cause rather than left as unexplained
+  noise. Fixed by also trying `find_new_format_guard()`, matching every
+  other splice/repair path in this file. Verified: `plain_score()`
+  returns 0 for `sub_806A730` now, both decl-prefix variants, where it
+  returned `None` before.
 - `tools/apply_library_matches.py` is real, tested, round-trip-verified
   infrastructure that ended up unused (every match this pass was the "rename an
   existing label" case). **Don't delete it as dead code.**
@@ -866,8 +883,13 @@ knowing before re-spending a session on either:
   with `--allocator-attack` on 2026-08-28 (converged to a genuine zero
   across 3 independent workers, promoted through the real production
   gate, committed `b7e07bc1`) — the permuter found the restructuring on
-  its own, no manual C rewrite needed. `sub_81132D4`, `sub_806A180`,
-  `sub_806A730` remain open; try the same treatment on them next.
+  its own, no manual C rewrite needed. **All four resolved 2026-08-28**:
+  `sub_81132D4` turned out to already be matched (the live factory found
+  it independently, unrelated to this investigation); `sub_806A180` and
+  `sub_806A730` closed the same way as `sub_8072400`, 3/3 workers each.
+  `sub_806A730`'s promotion surfaced one more real bug on the way out —
+  see the `_owning_source_stem` entry in Housekeeping below. This
+  specific class is fully closed; no known recurrence.
 - **A previous version of this section incorrectly claimed `sub_806A180`
   and `sub_806A730` were ARM-mode functions retail compiled differently
   from the rest of the corpus.** That was wrong, and the error was in the
