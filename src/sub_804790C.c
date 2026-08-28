@@ -7,20 +7,13 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_804790C.s\"");
-#else
-u32 sub_804790C(u32 param_1, s16 param_2) {
-    u32 *puVar1;
-    u32 uVar2;
-    
-    puVar1 = (u32 *)((param_2 << 0x18 >> 0x18) + param_1 + 0x239);
-    *puVar1 = (u32)param_2;
-    uVar2 = ((param_2 & 0xff) << 2) + param_1;
-    *(u8 *)(uVar2 + 0x20) = (u8)param_2;
-    return uVar2;
+void sub_804790C(void *arg0, u8 arg1) {
+    u8 temp_r1_7;
+
+    temp_r1_7 = arg1;
+    (*(u8 *)((s8 *)(arg0) + (0x239))) = temp_r1_7;
+    (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x294)))) + (0x20))) = temp_r1_7;
 }
-#endif
 
 void sub_8047928(void *arg0) {
     void *temp_r0_11;
