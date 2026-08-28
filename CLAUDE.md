@@ -772,14 +772,14 @@ knowing before re-spending a session on either:
   immediate classes above: candidates that plateau FLAT inside the
   +10000 reloc-mismatch penalty band with zero movement across
   thousands of tries.** `sub_80292EC`, `sub_8095028`, `sub_80F3FE8`,
-  `sub_81064F8` all show this signature. **Root-caused 3 of the 4, and
-  they are 3 DIFFERENT real causes, not one** — "flat in the penalty
-  band" is a symptom of "the required change isn't reachable through
-  any available mutation," not a single compiler feature. Don't go
-  looking for one unifying cause; diagnose each instance on its own.
-  Confirmed NOT the `sub_808C070`-style trailing-function measurement
-  artifact above (none of the four appear in `split_trailing.py
-  --list`):
+  `sub_81064F8`, `sub_80F6250` all show this signature. **Root-caused 4
+  of the 5, and they are 4 DIFFERENT real causes, not one** — "flat in
+  the penalty band" is a symptom of "the required change isn't
+  reachable through any available mutation," not a single compiler
+  feature. Don't go looking for one unifying cause; diagnose each
+  instance on its own. Confirmed NOT the `sub_808C070`-style
+  trailing-function measurement artifact above (none of the five appear
+  in `split_trailing.py --list`):
   - `sub_80292EC`: a genuine LOOP-SHAPE difference. Retail's real code
     is the classic "jump to condition check, body, fall-through
     compare-and-branch-back" transform (check-at-bottom); the
@@ -811,10 +811,29 @@ knowing before re-spending a session on either:
     retail does one `asrs #8`) that's mathematically equivalent for a
     promoted `s16`. Not reachable by rephrasing the source; this is the
     compiler picking a different identity, not a different computation.
+  - `sub_80F6250`: a REGISTER-PRESSURE overflow into a high register,
+    a fourth distinct shape (related to `sub_8095028`'s class but the
+    opposite direction and with a second-order effect). Retail's real
+    prologue fits entirely in low registers — `push {r4,r5,r6,r7,lr}`,
+    nothing more. The candidate's needs one more live value than that,
+    spilling into r8 — visible as literal extra prologue/epilogue
+    instructions Thumb has to emit for a high-register save
+    (`mov r7,r8; push {r7}`, and the mirrored pop), since Thumb `push`/
+    `pop` can only directly name r0-r7. That excess pressure has a
+    knock-on cost: retail's leaner allocation can dedicate a register
+    as a post-incrementing pointer and load two consecutive fields with
+    one `ldmia r6!,{r1}` per field (auto-increment addressing); the
+    candidate's tighter register budget can't spare that pointer
+    register, so it computes each field access as a separate `ldr` at
+    a fixed offset instead — functionally identical, structurally
+    longer. Likely improvable by reducing the CANDIDATE's own C-level
+    temporary count (several of `temp_r1_16`/`temp_r2_24`/`temp_r6_28`
+    look mergeable), the opposite direction from `--allocator-attack`
+    (which ADDS pressure) — not attempted this session.
   - `sub_80F3FE8`: same flat-penalty-band symptom observed, not yet
     root-caused to this level of detail — grouped here by symptom, not
     confirmed cause. Worth the same objdump-diff treatment before
-    assuming it matches any of the other three.
+    assuming it matches any of the other four.
 
 ## Housekeeping outstanding
 
