@@ -209,55 +209,58 @@ block_26:
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8086090.s\"");
-#else
-void sub_8086090(void *arg0) {
-    s32 temp_r0_73;
-    s32 temp_r0_84;
-    s32 temp_r4_28;
-    s32 temp_r5_18;
-    s32 var_r0_23;
-    s32 var_r0_44;
-    s32 var_r0_54;
-    s32 var_r1_13;
-    void *temp_r0_93;
-    void *temp_r3_8;
-
-    temp_r3_8 = (*(void **)((s8 *)(arg0) + (0x28)));
-    var_r1_13 = (*(s32 *)((s8 *)(temp_r3_8) + (0xD8))) - (*(s32 *)((s8 *)(arg0) + (0x38)));
-    if (var_r1_13 < 0) {
-        var_r1_13 += 0x1F;
+void sub_8086090(void *arg0)
+{
+  s16 temp_r0_73;
+  s16 temp_r0_84;
+  s32 temp_r4_28;
+  s32 temp_r5_18;
+  s32 var_r0_23;
+  s32 var_r0_44;
+  s32 var_r0_54;
+  s32 var_r1_13;
+  void *temp_r0_93;
+  void *temp_r3_8;
+  temp_r3_8 = (void *) (*((void **) (((s8 *) arg0) + 0x28)));
+  var_r1_13 = (*((s32 *) (((s8 *) temp_r3_8) + 0xD8))) - (*((s32 *) (((s8 *) arg0) + 0x38)));
+  if (var_r1_13 < 0)
+  {
+    var_r1_13 += 0x1F;
+  }
+  temp_r5_18 = var_r1_13 >> 5;
+  var_r0_23 = (*((s32 *) (((s8 *) temp_r3_8) + 0xE0))) - (*((s32 *) (((s8 *) arg0) + 0x40)));
+  if (var_r0_23 < 0)
+  {
+    var_r0_23 += 0x1F;
+  }
+  temp_r4_28 = var_r0_23 >> 5;
+  *((u16 *) (((s8 *) arg0) + 0xAE)) = (u16) ((*((u16 *) (((s8 *) arg0) + 0xAE))) + temp_r5_18);
+  *((u16 *) (((s8 *) arg0) + 0xB2)) = (u16) (var_r0_23 = (*((u16 *) (((s8 *) arg0) + 0xB2))) + temp_r4_28);
+  temp_r3_8 = ((s8 *) arg0) + 0x4C;
+  var_r0_44 = ((s16) (*((u16 *) (((s8 *) arg0) + 0xAE)))) * 0xF2;
+  if (var_r0_44 < 0)
+  {
+    var_r0_44 += 0xFF;
+  }
+  *((u16 *) (((s8 *) arg0) + 0xAE)) = (u16) (var_r0_44 >> 8);
+  var_r0_54 = ((s16) (*((u16 *) (((s8 *) arg0) + 0xB2)))) * 0xF2;
+  if (var_r0_54 < 0)
+  {
+    var_r0_54 += 0xFF;
+  }
+  *((u16 *) (((s8 *) arg0) + 0xB2)) = (u16) (var_r0_54 >> 8);
+  *((s32 *) (((s8 *) arg0) + 0x10)) = (s32) ((*((s32 *) (((s8 *) arg0) + 0x10))) + ((s16) (*((u16 *) (((s8 *) arg0) + 0xAE)))));
+  *((s32 *) (((s8 *) arg0) + 0x18)) = (s32) ((*((s32 *) (((s8 *) arg0) + 0x18))) + ((s16) (*((u16 *) (((s8 *) arg0) + 0xB2)))));
+  temp_r0_73 = (s16) (*((u16 *) (((s8 *) arg0) + 0xAE)));
+  if (((s32) ((temp_r0_73 * temp_r0_73) + (temp_r5_18 * temp_r5_18))) <= 0x40)
+  {
+    temp_r0_84 = (s16) (*((u16 *) (((s8 *) arg0) + 0xB2)));
+    if (((s32) ((temp_r0_84 * temp_r0_84) + (temp_r4_28 * temp_r4_28))) <= 0x40)
+    {
+      temp_r0_93 = (void *) (*((void **) (((s8 *) arg0) + 0x28)));
+      *((s32 *) (((s8 *) arg0) + 0x10)) = (s32) (*((s32 *) (((s8 *) temp_r0_93) + 0xD8)));
+      *((s32 *) (((s8 *) arg0) + 0x18)) = (s32) (*((s32 *) (((s8 *) temp_r0_93) + 0xE0)));
+      *((s32 *) temp_r3_8) = 0;
     }
-    temp_r5_18 = var_r1_13 >> 5;
-    var_r0_23 = (*(s32 *)((s8 *)(temp_r3_8) + (0xE0))) - (*(s32 *)((s8 *)(arg0) + (0x40)));
-    if (var_r0_23 < 0) {
-        var_r0_23 += 0x1F;
-    }
-    temp_r4_28 = var_r0_23 >> 5;
-    (*(u16 *)((s8 *)(arg0) + (0xAE))) = (u16) ((*(u16 *)((s8 *)(arg0) + (0xAE))) + temp_r5_18);
-    (*(u16 *)((s8 *)(arg0) + (0xB2))) = (u16) ((*(u16 *)((s8 *)(arg0) + (0xB2))) + temp_r4_28);
-    var_r0_44 = M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */) * 0xF2;
-    if (var_r0_44 < 0) {
-        var_r0_44 += 0xFF;
-    }
-    (*(u16 *)((s8 *)(arg0) + (0xAE))) = (u16) (var_r0_44 >> 8);
-    var_r0_54 = M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */) * 0xF2;
-    if (var_r0_54 < 0) {
-        var_r0_54 += 0xFF;
-    }
-    (*(u16 *)((s8 *)(arg0) + (0xB2))) = (u16) (var_r0_54 >> 8);
-    (*(s32 *)((s8 *)(arg0) + (0x10))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x10))) + M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */));
-    (*(s32 *)((s8 *)(arg0) + (0x18))) = (s32) ((*(s32 *)((s8 *)(arg0) + (0x18))) + M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */));
-    temp_r0_73 = M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */);
-    if ((s32) ((temp_r0_73 * temp_r0_73) + (temp_r5_18 * temp_r5_18)) <= 0x40) {
-        temp_r0_84 = M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */);
-        if ((s32) ((temp_r0_84 * temp_r0_84) + (temp_r4_28 * temp_r4_28)) <= 0x40) {
-            temp_r0_93 = (*(void **)((s8 *)(arg0) + (0x28)));
-            (*(s32 *)((s8 *)(arg0) + (0x10))) = (s32) (*(s32 *)((s8 *)(temp_r0_93) + (0xD8)));
-            (*(s32 *)((s8 *)(arg0) + (0x18))) = (s32) (*(s32 *)((s8 *)(temp_r0_93) + (0xE0)));
-            (*(s32 *)((s8 *)(arg0) + (0x4C))) = 0;
-        }
-    }
+  }
 }
-#endif
