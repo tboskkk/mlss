@@ -45,17 +45,11 @@ u32 sub_808C190(u32* param_1) {
     return 1;
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_808C19C.s\"");
-#else
-s32 sub_8087540(void *);                        /* extern */
-
 void sub_808C19C(void *arg0) {
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
         sub_8087540(arg0);
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_808C1B6.s\"");
