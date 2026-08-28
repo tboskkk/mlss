@@ -15,7 +15,7 @@ in service of modding tools, asset editors, and understanding the engine
 (physics/collision is the maintainer's specific interest).
 
 **Run `tools/progress.py` for the live count. Never trust a number in a doc.**
-As of 2026-08-23: ~1,578 of 5,996 matched (26.3%). `asm/mariobros.s` is a
+As of 2026-08-28: 1,711 of 6,012 matched (28.5%). `asm/mariobros.s` is a
 separate embedded Mario Bros. ROM — **out of scope by maintainer decision**,
 tracked apart from "game proper" everywhere.
 
@@ -837,55 +837,84 @@ knowing before re-spending a session on either:
 
 ## Housekeeping outstanding
 
-- **`tools/factory/split_trailing.py` has 211 unacted-on candidates worth
-  56,964 bytes, confirmed live 2026-08-28 while chasing an unrelated
-  question.** This tool already exists, is already verified-safe (checks
-  every split against a from-scratch build, exactly like everything
-  else in this project), and has apparently never been run at scale —
-  its own `--list` right now reports 211 fragments each carrying a real,
-  never-labeled function after them (push-prologue-confirmed, not
-  guessed). This is a MUCH bigger, separate lever from anything else in
-  this session's work and deserves its own dedicated pass:
-  `python3 tools/factory/split_trailing.py --list` to see the current
-  set, then `--dry-run NAME` / `NAME` per CLAUDE.md's existing
-  Phase-3 note above (already documents ~94 candidates as of an earlier
-  count; this is a fresh, larger, re-verified number, not a duplicate of
-  that entry).
-- **A related, narrower gap in the SAME tool**: `split_trailing.py` only
-  confirms a trailing function via an unambiguous Thumb `push {...,lr}`
-  prologue (`0xB4xx`/`0xB5xx`). Found live on the `sub_808C070`/
-  `sub_808C098`/`sub_808C0C0` twins (2026-08-28, chasing their identical
-  "stuck at score 14" symptom): all three are followed by a real,
-  complete, NO-PROLOGUE leaf function — `ldr r1,[pc,#N]; str r1,[r0,
-  0x4C]; movs r0,#1; bx lr` (a bare "install `handler` and return 1"
-  routine, needing no `lr` save since it never calls anything) — the
-  exact same shape as this file's OWN already-matched `sub_808C064`
-  (`arg0->handler = &X; return 1;`). Confirmed by direct byte comparison
-  (not guessed): the candidate's own compiled bytes are byte-identical
-  to retail across their true extent with correct relocations; the
-  entire apparent "gap" (score 14 in-context, 300 via `plain_score`'s
-  whole-object `-o` mode — see CLAUDE.md's own already-documented
-  landmine, still live) is 100% positional drift from this uncounted
-  trailing function, not a real difference in the twins' own
-  reconstruction. Because it has no push prologue, `split_trailing.py`'s
-  current heuristic can't see it and it does NOT appear in the 211-item
-  `--list` above — a real, scoped extension (detect a plausible leaf
-  function shape too, not just a push prologue) that would likely
-  recover more than just these 3. **Deliberately not implemented this
-  session** — extending a trailing-function detector's heuristics
-  carries the same "guessing at unlabeled bytes" risk CLAUDE.md's
-  landmines section already warns about for this exact class, and
-  wants the same from-scratch-build verification discipline
-  `split_trailing.py`'s own author already built in, not a rushed
-  addition. **A 4th instance found the same day**: `sub_8098C78`
-  (identical C body to the twins — same condition, same callee
-  `sub_8087540`) carries the byte-for-byte identical trailer pattern
-  in its own retail `.s` fragment, just a different embedded target
-  address (`0x08098CA1` vs. `0x0808C39D`/`0x08098C09` for the others).
-  This is not a coincidence — it's the same repeated "entity subtype
-  flag check" engine idiom recurring across the corpus, which is why
-  the scoped `split_trailing.py` extension above is worth doing: this
-  family is very unlikely to stop at 4.
+- **`tools/factory/flag_dead_ends.py` (new, 2026-08-28) flags leaf-pool
+  rows whose candidate build fails on a cross-file signature disagreement
+  against an already-matched callee** (`too few arguments`/`conflicting
+  types`/`redeclared as different kind of symbol`/pointer-type-mismatch
+  against a real definition elsewhere with a genuinely different
+  signature — not auto-fixable by `repair_stale_prototype`/
+  `repair_body_signature_mismatch`, both deliberately same-file/same-
+  arity only). Existed to stop an ad hoc "pick the next leaf row" query
+  from repeatedly re-selecting a row that can never succeed and burning
+  a full search on it.
+
+  **Uses a dedicated `dead_end_reason` column (`db.py`'s `MIGRATIONS`),
+  not the shared `notes` field.** An earlier version tagged `notes`
+  instead — found live 2026-08-28 that the pipeline's own routine
+  claim/resolve/reseed writes to that same column reliably clobbered the
+  tag between one flagging run and the next (lost on `sub_813D570`/
+  `sub_813C7D8`/`sub_813C72C`/`sub_813D74C`), making the tool unreliable
+  unattended. `dead_end_reason` is written ONLY by this tool, so nothing
+  else in the pipeline can silently overwrite it — verified both
+  structurally (`set_state()` only ever touches columns a caller
+  explicitly passes, and nothing else in the pipeline passes this one)
+  and empirically (a simulated dummy pipeline write to the row changed
+  `notes` but left `dead_end_reason` untouched). Deliberately
+  non-destructive: only sets `dead_end_reason`, never `state`/`notes`,
+  so it carries no risk to live scheduling — a standalone maintenance
+  pass, safe to run against a live factory.
+
+      python3 tools/factory/flag_dead_ends.py
+
+- **`split_trailing.py`'s push-prologue-only heuristic was extended and
+  run against the "handler-setter" leaf shape, 2026-08-28 — the prior
+  entry here ("deliberately not implemented this session") is now stale,
+  superseded by this one.** The twins/echo this project already knew
+  about (`sub_808C070`/`098`/`0C0`, `sub_8098C78`) turned out to be one
+  instance of a repeated leaf idiom with no push prologue at all — `ldr
+  r1,[pc,#4]; str r1,[r0,#0x4C]; movs r0,#1; bx lr` (`arg0->handler =
+  ptr; return 1`), preceded by up to 2 bytes of genuine `.align`
+  padding. Matched against the exact confirmed byte signature (not a
+  general code/data classifier — same precision tradeoff the existing
+  push-prologue check already makes), plus an `mlss.map`-based address
+  fallback for fragments whose last label is a CODE label (real Thumb
+  instructions, including a 4-byte `bl`, between it and the trailing
+  run — the old label-walk only handled a data-label tail and can't
+  guess instruction widths, so it fell back to real linker output
+  instead of guessing).
+
+  **Two more real bugs surfaced running it at batch scale, both fixed**:
+  (1) fragments `split_trailing.py` itself had already split out
+  (bare `.byte` under a label, no code) were re-matching their own
+  bytes as a "new" trailing function hiding after themselves — fixed
+  via `_fragment_has_code_before()`, which also dropped 10 stale false
+  positives out of the previously-reported "211" push-prologue count
+  (real number: **201**). (2) `write_split()` called
+  `gitops.find_guard_block()` (old-format only) with no fallback to
+  `find_new_format_guard()` — the same class of gap already fixed for
+  `_owning_source_stem()` earlier this session, just in a different
+  caller; failed 4 of 14 in the batch before the fix, 0 after.
+
+  **Result, all verified with a from-scratch `mlss.gba: OK` under
+  `repo_lock`**: 19 confirmed handler-setter instances found and
+  processed (1, `sub_809EB8C`, was no longer applicable — its trailing
+  bytes got a real label from other live pipeline activity between
+  scans, nothing left to split). **9 already reached `matched`** — 5
+  needed nothing but the split itself (the candidate C was already
+  correct; the un-splittable trailing bytes were the entire gap), 4
+  more matched shortly after on their own via the live factory, no
+  extra permuter time spent. The rest moved from artificially blocked
+  (66.7% objdiff, structurally unfixable as long as the phantom bytes
+  stayed in the comparison) to genuinely close (66–85% objdiff, real
+  remaining diffs) — workable by the ordinary pipeline now, not a
+  free win but no longer wasting search time on an unwinnable gap.
+  Commits: `bc398eba`, `3fdf8a8b`; splits/matches follow from there.
+
+  **Still open**: 201 push-prologue candidates (worth re-confirming the
+  byte total post-dedup-fix, not yet done) remain unbatched — this
+  entry only closed the handler-setter sub-class. Re-running
+  `python3 tools/factory/split_trailing.py --list` gives the current,
+  now-deduped set.
 - **`rescore_seeds.plain_score`/`validator._matches_in_plain_build` structurally
   cannot accept a candidate that references a known address via its
   MINTED NAME (`symbols.txt`) where retail's own disassembled `.s`
