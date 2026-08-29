@@ -610,10 +610,27 @@ def fix_uncast_address_dereference(c: str) -> str:
             if j < n:
                 inner = c[i + 2:j]
                 stripped = inner.lstrip()
-                # Only touch a raw address expression. A cast inside
-                # (`(u8 *)x`) means m2c already knew the width, and a
-                # non-hex start is a normal pointer variable.
-                if stripped.startswith("0x") and "*)" not in inner:
+                # Only touch a raw address expression (a non-hex start is a
+                # normal pointer variable, already typed).
+                #
+                # Used to also require `"*)" not in inner`, meant to skip an
+                # expression that ALREADY has a pointer cast at its head
+                # (`*(0x1234 *)x`, which can't actually occur once
+                # stripped.startswith("0x") is already true -- a hex literal
+                # can't itself be a cast). What it actually did: bail out
+                # whenever a cast appeared ANYWHERE in the inner text, which
+                # is common and harmless when it belongs to an unrelated
+                # NESTED sub-dereference, e.g.
+                # `*(0x083B873C + (s32)((*(u8 *)0x03000E7C * 6) + ...))`
+                # (sub_8070990) -- the substring `*)` from the inner `(u8 *)`
+                # cast made the rule skip the OUTER deref entirely, leaving
+                # it untouched and the function uncompilable. Wrapping the
+                # whole inner expression in a pointer cast is always valid
+                # regardless of what's nested inside it (it evaluates to an
+                # integer either way), so there was never a real case this
+                # guarded against -- confirmed by removing it and testing
+                # against this exact function, not just reasoned about.
+                if stripped.startswith("0x"):
                     width = "s32"
                     before = "".join(out).rstrip()
                     for cast in ("(u8)", "(s8)", "(u16)", "(s16)", "(u32)", "(s32)"):
