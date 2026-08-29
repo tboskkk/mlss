@@ -189,7 +189,7 @@ asm_unified(".include \"asm/nonmatching/sub_8171EB0.s\"");
 #endif
 
 #ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_08171ECC.s\"");
+asm_unified(".include \"asm/nonmatching/sub_8171ECC.s\"");
 #else
 /* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
    compiles a whole translation unit at a time, so an #error here fails
@@ -199,7 +199,7 @@ asm_unified(".include \"asm/nonmatching/sub_08171ECC.s\"");
 #endif
 
 #ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_08171F2C.s\"");
+asm_unified(".include \"asm/nonmatching/sub_8171F2C.s\"");
 #else
 /* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
    compiles a whole translation unit at a time, so an #error here fails
