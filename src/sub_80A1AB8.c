@@ -7,16 +7,16 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80A1AB8.s\"");
-#else
 extern s32 sub_80A19F8;
-
-void sub_80A1AB8(void *arg0) {
-    (*(s16 *)((s8 *)(arg0) + (0xB2))) = 0xFE4D;
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_80A19F8;
+void sub_80A1AB8(void *arg0)
+{
+  s8 *new_var;
+  unsigned int new_var2;
+  new_var = ((s8 *) arg0) + 0xB2;
+  new_var2 = 0xFE4D;
+  *((s16 *) new_var) = new_var2;
+  *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_80A19F8;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80A1AD0.s\"");
