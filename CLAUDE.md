@@ -15,7 +15,7 @@ in service of modding tools, asset editors, and understanding the engine
 (physics/collision is the maintainer's specific interest).
 
 **Run `tools/progress.py` for the live count. Never trust a number in a doc.**
-As of 2026-08-28: 1,777 of 6,210 matched (28.6%). `asm/mariobros.s` is a
+As of 2026-08-29: 1,777 of 6,227 matched (28.5%). `asm/mariobros.s` is a
 separate embedded Mario Bros. ROM — **out of scope by maintainer decision**,
 tracked apart from "game proper" everywhere.
 
@@ -1113,15 +1113,31 @@ knowing before re-spending a session on either:
   algorithm's output as a fast starting point for a human reading the
   real disassembly, never as the verdict itself.
 
-  **Executed on 3 of the 48**, each independently confirmed by hand
-  before running: `sub_80479DC`→2 functions, `sub_8084004`→2,
-  `sub_80E4308`→3 (`b3769c43`). Verified from-scratch each time and once
-  more for the whole batch. **The other 45, including the 92-function
-  `sub_8196ACC`, are still open** — same tool, same discipline, just not
-  reached yet. `write_multi_split(src_name, segments, src_text)` is
-  ready to use once a segmentation is confirmed: `segments[0]` keeps
-  `src_name`'s own identity (truncated in place), `segments[1:]` are
-  new symbols with fresh guards inserted right after it.
+  **Executed on 18 of the 48 as of 2026-08-29**, each independently
+  confirmed by hand before running: `sub_80479DC`→2, `sub_8084004`→2,
+  `sub_80E4308`→3, `sub_805A9E8`→2, `sub_8117B34`→2, `sub_815D440`→2,
+  `sub_8160C98`→3, `sub_805BA78`→2 (this one's pool is genuinely 10
+  words — confirmed every one individually referenced well before the
+  return, not assumed from the count alone), `sub_806E838`→3 (the
+  algorithm itself only proposed 2 here — its `MIN_SEGMENT_LEN` floor
+  merges two real ~12-byte leaf functions into one reported span when
+  they're too small individually to clear it; hand-reading the
+  disassembly found the true 3-way boundary and that's what got
+  executed, not the tool's own output), `sub_80E38A0`→2, `sub_816D778`→2,
+  `sub_8134B90`→2, `sub_8161128`→2, `sub_812A930`→2, `sub_8132474`→2,
+  `sub_813B040`→2, `sub_8171C9C`→2, `sub_81583FC`→2. Verified
+  from-scratch after each batch. **The other 30, including the
+  92-function `sub_8196ACC`, are still open** — same tool, same
+  discipline, just not reached yet. `write_multi_split(src_name,
+  segments, src_text)` is ready to use once a segmentation is confirmed:
+  `segments[0]` keeps `src_name`'s own identity (truncated in place),
+  `segments[1:]` are new symbols with fresh guards inserted right after
+  it. **Do not trust the algorithm's own proposed span count blindly**
+  even on a fragment it otherwise gets right — `sub_806E838` shows it
+  can UNDER-split (merge two real tiny functions together) as well as
+  over-split, for the same underlying reason (short real functions and
+  the length-floor safety guard interact) — always read the real
+  disassembly before executing, not just the tool's printed spans.
 - **`rescore_seeds.plain_score`/`validator._matches_in_plain_build` structurally
   cannot accept a candidate that references a known address via its
   MINTED NAME (`symbols.txt`) where retail's own disassembled `.s`
