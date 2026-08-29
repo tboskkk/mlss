@@ -131,16 +131,12 @@ void sub_8171DF0(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8171E2C.s\"");
-#else
 s32 sub_8171E2C(void *arg0) {
     if (((*(s32 *)((s8 *)(arg0) + (0xA8))) != 0) || ((*(s32 *)((s8 *)(arg0) + (0xAC))) != 0) || ((*(s32 *)((s8 *)(arg0) + (0xB0))) != 0) || ((*(s32 *)((s8 *)(arg0) + (0xB4))) != 0) || ((*(s32 *)((s8 *)(arg0) + (0xB8))) != 0) || ((*(s32 *)((s8 *)(arg0) + (0xBC))) != 0) || ((*(s32 *)((s8 *)(arg0) + (0xC0))) != 0) || ((*(s32 *)((s8 *)(arg0) + (0xC4))) != 0) || ((*(s32 *)((s8 *)(arg0) + (0xC8))) != 0) || ((*(s32 *)((s8 *)(arg0) + (0xCC))) != 0) || ((*(s32 *)((s8 *)(arg0) + (0xD0))) != 0) || ((*(s32 *)((s8 *)(arg0) + (0xD4))) != 0)) {
         return 1;
     }
     return 0;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8171EB0.s\"");
