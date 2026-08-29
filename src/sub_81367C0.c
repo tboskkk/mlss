@@ -15,9 +15,6 @@ void *sub_81367C0(struct Entity *arg0, u8 arg1) {
     return arg0;
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_81367DC.s\"");
-#else
 s32 process_remove(void *, s32);                /* extern */
 s32 sub_81367AC(s32, s32);                      /* extern */
 
@@ -36,7 +33,6 @@ void sub_81367DC(void *arg0) {
         process_remove(arg0, 3);
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_813681C.s\"");
