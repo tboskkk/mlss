@@ -930,17 +930,60 @@ knowing before re-spending a session on either:
     branch (`blt.n` back to the body) — no second unconditional branch
     anywhere. The candidate's check sits at the TOP of the body, and
     needs its own separate unconditional `b.n` back to the top after
-    the body runs, which retail's shape never needs. A genuinely
-    untried lever, not yet attempted: hand-write the C as an explicit
-    guarded `do`/`while` —
-    `if (var_r5_8 < N) { do { ...; var_r5_8++; } while (var_r5_8 < N); }`
-    — which directly hands the compiler retail's exact shape (test
-    once up front, then one shared test-and-loop-back at the bottom)
-    instead of relying on agbcc's own loop-rotation heuristic to find
-    it from a `for`/`while`, which is the thing the earlier `for`-loop
-    attempt showed doesn't fire the same way here. Not attempted this
-    session (diagnosis only, per what was asked) — flagged as the next
-    concrete thing to try before writing this off as unreachable.
+    the body runs, which retail's shape never needs.
+
+    **Tested 2026-08-29, both the guarded-`do`/`while` idiom AND the
+    real fix that followed it, via `in_context_permuter.score_in_context`
+    (raw diff, not the +10000-penalty search score) against
+    `nonmatchings/sub_80292EC/target.o`/`base.o`:**
+    - The guarded `if (cond) { do {...} while(cond); }` idiom
+      (`if (var_r5_8 < N) { do {...; var_r5_8++;} while (var_r5_8 < N); }`)
+      — the thing flagged as "the next lever" — **made it WORSE**
+      (in-context diff 146 vs. baseline 55), for a concrete, checked
+      reason: agbcc compiled the `if` guard and the `do`/`while`'s own
+      condition as TWO SEPARATE, redundant comparisons rather than
+      reusing one, since agbcc doesn't do loop-rotation/CSE across
+      that boundary. This is the same lesson as the earlier `for`-loop
+      attempt, generalized: **agbcc does not rotate loops from ANY
+      higher-level C construct here — it compiles literally whatever
+      CFG shape the C already expresses.**
+    - Following that lesson to its conclusion instead of stopping at
+      it: hand-wrote the ALREADY-ROTATED shape directly as `goto`/label
+      C, mirroring retail's real CFG edge-for-edge (`goto check;
+      loop: ...body...; check: if (cond) goto loop;`). This reproduced
+      retail's control-flow structure EXACTLY, byte-for-byte, on the
+      first try (confirmed by objdump side-by-side: identical
+      `b.n`-to-check / body / shared test-and-branch-back shape). That
+      dropped the gap from 55 to 138 initially (an unrelated
+      instruction-selection difference in the address computation got
+      exposed once the CFG matched), then two more rounds of
+      deliberately mirroring retail's OWN operand computation order
+      (materializing `arg0+0x28` as one temp and `var_r5_8*4` as
+      ANOTHER separate temp, in that specific order, rather than one
+      flattened index expression) walked it down to **diff_bytes=3,
+      size_delta=0, relocs_equal=True** — i.e., a genuine near-miss
+      safely under the +10000 reloc-mismatch penalty, not a structural
+      gap at all any more. Full loop body, check, AND the entire 8-call
+      `free_heap_8018DA8` epilogue are now byte-identical; the only 3
+      differing bytes are one `movs r3,#206` (retail) vs `movs r1,#206`
+      (candidate) — the SAME register-choice class as the already-
+      documented Score-2/Score-4 "agbcc register allocation is not
+      influenceable from plain C" wall below, just newly hit here.
+      **Confirmed unreachable by search, not just assumed**: fed this
+      exact 3-byte-away source through `in_context_search.py`'s real
+      permuter (13,912 tries, plain randomization, no allocator-attack
+      — not a register-pressure case) and it plateaued at 3 with zero
+      movement, exactly like the documented wall's own signature.
+      Saved to `nonmatchings/sub_80292EC/output-incontext-best/`
+      (`source.c` + `score.txt`) per that directory's own established
+      resume convention, so this is the correct starting point for any
+      future attempt — not the DB's stale `candidate_body`, and not
+      the loop-shape-only fix. **The real, generalizable finding here**:
+      when agbcc's output shows a loop-rotated shape, the fix is to
+      write the ALREADY-ROTATED C directly (`goto`/labels matching the
+      real CFG), not to reach for a higher-level construct (`for`,
+      `while`, `do`/`while`) and hope agbcc rotates it — it doesn't,
+      for any of the three tried here.
   - `sub_8095028`: a register-PRESSURE/spill difference, the same
     class as the already-documented `sub_81458C8` case. Retail's real
     prologue is `push {r4,r5,r6,r7,lr}` (5 registers); the candidate's
@@ -1383,10 +1426,48 @@ knowing before re-spending a session on either:
     class the whole "48 flagged fragments" saga above is about, just
     never flagged by that scan (it must have looked single-return
     under whatever check ran then, or postdates it). Correctly declined
-    by the bridge rather than guessed at — this needs the same
-    hand-verified `write_multi_split()` treatment as the other 46, not
-    a bridge fix. Worth a fresh `split_trailing.py`-style sweep for
-    more of these rather than assuming 48 was the true final count.
+    by the bridge rather than guessed at. **Resolved 2026-08-29**: hand-
+    verified all three segments (F1 0x0–0x7c including its own 5-word
+    pool at 0x68–0x7c, cross-referenced against every `ldr rX,[pc,#N]`
+    in F1's own code; F2 0x7c–0x90; F3 0x90–0xa4, all pads confirmed
+    `0x0000`, total accounts for all 164 bytes exactly), executed via
+    `write_multi_split()` → `sub_816D61C`/`sub_816D698`/`sub_816D6AC`,
+    verified from-scratch `mlss.gba: OK`, committed `95052313`.
+
+  **A quick sweep for more of these in the bridge-decline pool (95
+  rows at the time) found this is NOT rare — worth reading in full
+  before re-running blind.** Counting return-matching lines flagged
+  41 of 95 (43%) as having more than one — but per THE LAW's own
+  lesson from the original 48-fragment saga, **a raw return count is
+  NOT evidence of a merge**: `sub_8135BF8` and `sub_801B0B8`, both
+  already-confirmed false positives from that saga, are IN this same
+  41-row list (their known coincidental-return-byte-pattern issue
+  doesn't care which scan found it). The 41 is a candidate list for
+  the same hand-verify-then-`write_multi_split()` discipline already
+  proven 49 times now (46 original + these 3), not a confirmed count
+  — do not batch-execute it without reading each one's real
+  disassembly first.
+
+  Spot-checked and resolved 3 of the 41 as a sample, all genuine (0
+  more false positives found in this sample, though the full 41 still
+  needs the same read-before-split discipline):
+  - `sub_8062078` (72B → 2 functions) and `sub_8132500` (40B → 2
+    functions): both turn out to be the SAME already-known
+    "handler-setter" leaf idiom from the 2026-08-28 housekeeping entry
+    above (`ldr r1,[pc,#4]; str r1,[r0,#0x4C]; movs r0,#1; bx lr`) —
+    `split_trailing.py --list`/`--dry-run` already detects both
+    (`_HANDLER_SETTER_SIG`) but correctly refuses to auto-split either
+    (2 return-matching lines each, the same ambiguity guard as
+    everywhere else) — confirms the guard is doing its job, not that
+    the tool is broken. Hand-verified and split via `write_multi_split`
+    (`e1acb325`, `21e06168`) rather than teaching the automatic path to
+    trust a 2-return handler-setter shape, since that's exactly the
+    kind of special-casing THE LAW's own history warns against.
+  - `sub_8134740` (128B → 2 functions, `sub_8134740`/`sub_8134788`,
+    `597d2ff1`): a plain 2-way merge, no literal pool at all in either
+    half, two near-duplicate reference-count-style functions back to
+    back. Not a handler-setter instance — a reminder that the 41 is a
+    mixed bag of shapes, not one pattern.
 
 - **`rescore_seeds.plain_score`/`validator._matches_in_plain_build` structurally
   cannot accept a candidate that references a known address via its
