@@ -68,3 +68,13 @@ void sub_819AA38(void *arg0) {
     (*(s16 *)((s8 *)((*(s32 *)0x03007FF0 + ((3 & (*(u8 *)((s8 *)(arg0) + (0x12)))) * 0xC))) + (0x4D0))) = sub_819A96C(var_r4_21);
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_819AA9C.s\"");
+#else
+/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
+   compiles a whole translation unit at a time, so an #error here fails
+   every OTHER function in this file under NONMATCHING=1. Guard intact, so
+   the real ROM still gets the verbatim retail bytes and progress.py still
+   counts this as unmatched. Write the C here, replacing this comment. */
+#endif
