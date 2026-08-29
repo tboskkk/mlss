@@ -88,14 +88,38 @@ def pick_pool(conn, limit: int, names: list[str] | None):
 
 
 def triage(rows, work: Path) -> list[str]:
-    """Stage + build every row in isolation, then classify by comparing
-    normalized (mnemonic-only, no comments/symbol annotations) instruction
-    streams. Returns the names worth attacking -- same instruction count as
-    retail but with real content differences, OR a differing instruction
-    count (a bigger structural gap `--allocator-attack` might still help,
-    since it's cheap to find out). Excludes rows whose mnemonics are
-    IDENTICAL to retail's (the parked register-swap wall -- CLAUDE.md's own
-    formal policy: don't re-chase with allocator-attack)."""
+    """Stage + build every row in ISOLATION (single function alone, the
+    same primitive `isolation_exact.py` uses), then classify by comparing
+    normalized instruction streams two ways: a raw compare (catches a true
+    match modulo comments/symbol annotations) and a register-blinded compare
+    (every bare register token mapped to a placeholder before comparing --
+    CLAUDE.md's own diagnostic for the register-swap wall is "same mnemonic,
+    same immediate, same operand count, only a swapped register", which
+    survives the second compare but not the first).
+
+    KNOWN, ACCEPTED LIMITATION, found live testing this fix: this still
+    UNDER-DETECTS the wall, because it measures the wrong context. The wall
+    is a REAL-FILE, whole-translation-unit register-allocation effect (the
+    in-context permuter's entire reason for existing -- CLAUDE.md: "agbcc's
+    register/stack allocation is coupled across the whole compilation unit").
+    Building a candidate ALONE, as this function does, can have a
+    DIFFERENT register-pressure profile than the real file -- confirmed on
+    `sub_816B0E0` itself, the exact function CLAUDE.md names as the proven,
+    330,000-try wall: isolated here, its only difference from retail is an
+    extra alignment `.short 0x0000` padding line (a length-based artifact,
+    not a register swap at all), so neither compare parks it, and it gets
+    queued for `--allocator-attack` again despite being already-proven
+    futile. This is a THROUGHPUT bug, not a correctness one -- the wasted
+    180s per already-parked function can never produce a false match, since
+    `--allocator-attack` itself does the real in-context compile during its
+    own search and simply plateaus, exactly as before. A complete fix would
+    triage via `in_context_permuter.score_in_context()` (real file, like the
+    attack itself) instead of isolated `compiler_variants.stage()` -- not
+    done here: there is no batched-many-functions-in-one-podman-invocation
+    primitive for the in-context path the way `cv.stage()`/`cv.SCRIPT`
+    provides for isolation, so it would cost one podman container startup
+    PER function just to triage it, likely erasing most of the time this
+    triage step is meant to save. Left as real, scoped follow-up work."""
     ctx = m2c_bridge.ensure_context()
     if ctx is None:
         sys.exit("could not build the preprocessed context")
@@ -109,10 +133,26 @@ def triage(rows, work: Path) -> list[str]:
          cv.IMAGE, "bash", "-c", script],
         capture_output=True, text=True, timeout=3600)
 
+    # Two comparisons, not one. The first (rnorm/cnorm) catches a TRUE
+    # byte-for-byte-except-cosmetics match. That alone is not enough to spot
+    # the register-swap wall: `ldr r2,[pc,#N]` vs `ldr r1,[pc,#N]` are
+    # DIFFERENT TEXT (the operand list is part of the compared line), so a
+    # pure register swap survives as "DIFFERS" under rnorm/cnorm alone --
+    # confirmed live, the first real run of this tool queued sub_816B0E0/
+    # 816B21C/816B2E0, CLAUDE.md's own named, ~330,000-try-proven-unreachable
+    # wall group, for a fresh 180s attack each. The second comparison
+    # (rblind/cblind) additionally maps every bare register token to a
+    # placeholder before comparing -- CLAUDE.md's own diagnostic signature
+    # for this wall is "same mnemonic, same immediate/offset, same operand
+    # COUNT, only a swapped register", which is exactly what surviving a
+    # register-blind compare while still failing the raw one means.
     classify_script = r"""
 set -u
 cd /w
 : > classify.log
+blind() {
+  sed -E 's/\br(1[0-5]|[0-9])\b/REG/g; s/\b(sp|lr|pc|ip)\b/REG/g'
+}
 for n in $(cat names.txt); do
   ro="$n.retail.o"; co="$n.agbcc.o"
   [ -s "$ro" ] || continue
@@ -121,6 +161,12 @@ for n in $(cat names.txt); do
   cnorm=$(arm-none-eabi-objdump -d -j .text "$co" | awk -F'\t' 'NF>=3{print $3}' | sed -E 's/@.*$//; s/<[^>]*>//g; s/[ \t]+$//')
   if [ "$rnorm" == "$cnorm" ]; then
     echo "$n IDENTICAL_MNEMONICS" >> classify.log
+    continue
+  fi
+  rblind=$(echo "$rnorm" | blind)
+  cblind=$(echo "$cnorm" | blind)
+  if [ "$rblind" == "$cblind" ]; then
+    echo "$n REGISTER_SWAP_ONLY" >> classify.log
     continue
   fi
   echo "$n DIFFERS" >> classify.log
