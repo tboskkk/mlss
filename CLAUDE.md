@@ -867,6 +867,33 @@ knowing before re-spending a session on either:
   group as a documented, permuter-unreachable case rather than re-chasing
   it with more search time or more register-hint variants.
 
+  **FORMAL PARKING POLICY, set 2026-08-29 once the Tier 2 survey below
+  showed this wall accounts for the majority of the whole near-miss
+  pool, not just one twin group:** any function whose `target.o`/
+  `base.o` diff shows an identical instruction sequence (same mnemonic,
+  same immediate/offset, same operand count) with ONLY a swapped
+  register — `ldr r2,[pc,#N]` vs `ldr r1,[pc,#N]`, `lsls r5,r2,#16` vs
+  `lsls r5,r1,#16`, `adds r4,r3,#0` vs `adds r4,r2,#0`, and so on —
+  should be PARKED, not chased further with `--allocator-attack`,
+  manual C rephrasing, or more permuter time. This is the exact
+  already-proven-unreachable wall above, generalized: agbcc's register
+  allocator makes this choice internally and no plain-C lever reaches
+  it (register hints are silently ignored outside real inline-asm
+  operand context). Diagnostic signature to check for BEFORE parking
+  anything: strip cosmetic `@ (0xADDR)`/`<symbol+0xN>` annotations
+  before comparing objdump text (comparing raw text without this gives
+  false "differences" that are really just symbol-table display
+  artifacts between an isolated `target.o` and a real-file `base.o` —
+  hit and fixed live during the Tier 2 survey below). Once confirmed,
+  leave the row at its current `tier2_ready` state/score rather than
+  re-scoring it — there is no lever in this project's current toolkit
+  that closes it, and burning search time on it starves rows that
+  ARE reachable (the `ldmia`/stack-size classes below). Revisit only if
+  a future session builds the compiler-wrapper or permuter-macro lever
+  this wall has always needed (hand-written inline asm forcing the
+  exact instruction, the only thing ever shown to work, deliberately
+  not done per the "stops being decompilation" reasoning above).
+
 - **`decomp-permuter`'s `Randomizer.randomize()` has an unconditional
   infinite retry loop** (`tools/decomp-permuter/src/randomizer.py`,
   `while True: method = random_weighted(...); try: method(...); break
@@ -1209,24 +1236,89 @@ expected to mostly fail exactly the way `sub_8095028` did, not because
 the tooling is broken but because the wall itself is real and already
 proven unreachable from C. The two minority classes are the better
 near-term targets:
-- **`ldmia`-vs-`ldr` (16%)**: same lever already proven to work on
-  `sub_80F6250` (`--allocator-attack`, since it's fundamentally a
-  register-pressure question) — worth running the pool's own rows
-  through it specifically, not just the two originally-flagged
-  functions.
-- **stack-size mismatch (8%)**: a genuinely new, undiagnosed class.
-  Likely the same family as N.6's undeclared-`spNN` stack-struct idiom
-  (`m2c_bridge.fix_undeclared_stack_slots`) or a plain missed local
-  array in m2c's own declaration inference — not root-caused further
-  this session, a real scoped next investigation.
+- **`ldmia`-vs-`ldr` (16%): TESTED AT BATCH SCALE 2026-08-29, and the
+  lever holds up — 5/5 hit.** Ran `in_context_search.py
+  --allocator-attack --seconds 200 --out-file` on 5 rows from this
+  class in parallel (`sub_80EAEBC`, `sub_80EAEE0`, `sub_80F0540`,
+  `sub_80F08C0`, `sub_80F10E0`), independently re-verified every result
+  via a fresh `score_in_context` call on the exact saved file (not
+  trusted from the search's own printout):
 
-**Not attempted this session**: actually running `--allocator-attack`
-against a real batch from this pool (this was a survey/categorization
-pass, per what was asked, not an attack pass) — the two sample
-functions checked in detail (`sub_8142C18`, `sub_8150270`, both
-stack-size class) and the register-swap majority were read from
-existing `nonmatchings/<name>/target.o`/`base.o` pairs already on disk
-from prior permuter escalation, not freshly generated.
+  | function | base score | final | notes |
+  |---|---|---|---|
+  | `sub_80EAEBC` | 54 | **5** | |
+  | `sub_80EAEE0` | 10040 | **6** | escaped the +10000 penalty band entirely |
+  | `sub_80F0540` | 60 | **3** | `size_delta=0` — closest of the 5 |
+  | `sub_80F08C0` | 10090 | **5** | escaped the +10000 penalty band entirely |
+  | `sub_80F10E0` | 62 | **7** | |
+
+  None reached a byte-exact 0, so none were promoted to `matched` (per
+  the user's own instruction: byte-exact gets committed, single-digit
+  gets saved as a near-miss) — all 5 compile in isolation, saved to
+  their own `nonmatchings/<name>/output-incontext-best/`, and the DB's
+  `candidate_body`/`notes` updated so a future session can resume from
+  the improved seed instead of the stale m2c-only draft. **This is a
+  real, repeatable, batch-scale result, not a fluke on the two
+  originally-flagged functions** — worth running the REMAINING ~6 rows
+  of this class the same way in a future session, and worth checking
+  whether the same lever generalizes to OTHER near-miss shapes beyond
+  the specific `ldmia` signature (the mechanism — forcing extra
+  register pressure via an escaping `volatile` local — isn't inherently
+  tied to auto-increment addressing specifically).
+- **stack-size mismatch (8%): ROOT-CAUSED AND FIXED, all 4 known
+  instances now real matches, 2026-08-29.** The mechanism: these
+  functions declare a local (`s32 sp0;`) and pass its ADDRESS to a
+  callee (`sub_8139BB0`/`sub_8139CAC`, both format/init-style
+  utilities) that writes a MULTI-WORD buffer through that pointer, then
+  a second callee reads the same buffer back. m2c only sees the
+  caller's own instructions — it never dereferences `sp0` past offset
+  0 itself, so it has NO way to infer the buffer is bigger than one
+  word. This isn't a bug in any one tool; it's a structural limit of
+  per-function decompilation (the true size is a fact about the
+  CALLEE's contract, invisible in the caller's own disassembly). The
+  fix is mechanical and reliable: **retail's own `sub sp, #N` is
+  already the ground truth for the buffer's real size** — declare the
+  local as `s32 spN[N/4]` instead of a scalar, and pass the bare array
+  name (decays to the same pointer) instead of `&spN`.
+
+  One real wrinkle, caught by not stopping at "byte count matches":
+  `sub_8150270`/`sub_814B4F4` call a SECOND function
+  (`sub_80FBB50`) with a 5th argument, which needs its OWN separate
+  4-byte compiler-managed stack slot beyond the declared buffer — sizing
+  the array to cover retail's WHOLE `sub sp` reservation (5 words)
+  overshot by exactly one word (a real, caught mistake: `size_delta`
+  landed at 0 but `diff_bytes` stayed at 2 either way, both differences
+  in the `sub`/`add sp` immediate itself — re-reading the objdump found
+  the extra 4-byte arg-passing slot immediately). Corrected to a 4-word
+  array once the wrinkle was understood, and both landed byte-exact.
+
+  All 4 confirmed instances closed as REAL matches, verified through
+  the full `finish_match()` pipeline (delete guard, `rm -rf build/ &&
+  make`, confirm `mlss.gba: OK`) under `repo_lock()`, not just scored
+  in isolation: `sub_8142C18`, `sub_814DCC4`, `sub_8150270`,
+  `sub_814B4F4`. **Landing `sub_814B4F4` hit a real operational bug in
+  MY OWN process, not the codebase**: editing the source file and
+  calling `finish_match()` as two separate steps left a window where a
+  live-factory worker's own revert on that SAME shared file clobbered
+  the uncommitted edit in between (confirmed: `git status` showed the
+  file clean, i.e. reverted, right after a `finish_match()` failure
+  whose error was "can't open asm/nonmatching/sub_814B4F4.s" — the
+  fragment `finish_match()` itself had already deleted, proving the
+  source file was back to its pre-edit, still-guarded state when `make`
+  ran). Redone as a single `repo_lock()`-atomic script (read, edit,
+  finish_match, all inside one lock acquisition) and it landed clean.
+  **Lesson for next time**: any edit-then-verify-then-commit sequence
+  on a file the live factory might also touch needs the EDIT itself
+  inside the lock, not just the build step — the same shape as the
+  batch-5/6 `rm -rf build/&&make` contention already documented, just
+  hitting file content instead of the build directory this time.
+
+  This class is likely small (4 known instances, all now closed) but
+  worth remembering as a category: any `objdiff`-tracked function
+  whose FIRST byte difference is in the `sub sp, #N` / `add sp, #N`
+  immediate, with an otherwise-identical instruction sequence, is this
+  same fix — check retail's own reservation size directly rather than
+  guessing.
 
 ## Housekeeping outstanding
 
