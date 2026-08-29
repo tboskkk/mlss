@@ -53,21 +53,17 @@ void sub_814DC6C(s32 arg0, void *arg1, s32 **arg2)
   *arg2 = &sub_814DDF8;
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_814DCC4.s\"");
-#else
 s32 sub_80FBDE0(s32 *, s32, s32, s32);          /* extern */
 s32 sub_8139BB0(s32 *, s32, s32, s32);      /* extern */
 
 s32 sub_814DCC4(s32 arg0) {
-    s32 sp0;
+    s32 sp0[4];
     s32 var_r1_19;
 
-    sub_8139BB0(&sp0, arg0, 0x22, 0);
-    var_r1_19 = sub_80FBDE0(&sp0, arg0, 0x7FFF, 0);
+    sub_8139BB0(sp0, arg0, 0x22, 0);
+    var_r1_19 = sub_80FBDE0(sp0, arg0, 0x7FFF, 0);
     if ((var_r1_19 << 0x18) != 0) {
         var_r1_19 = 1;
     }
     return var_r1_19;
 }
-#endif
