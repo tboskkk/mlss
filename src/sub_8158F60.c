@@ -17,17 +17,20 @@ void sub_8158F60(void *arg0)
   }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8158F88.s\"");
-#else
-void sub_8158F88(void *arg0, s16 arg1) {
-    if (M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */) != arg1) {
-        (*(s16 *)((s8 *)(arg0) + (0x1F28))) = arg1;
-        (*(s16 *)((s8 *)(arg0) + (0x1F2A))) = 0x5A;
-        play_sfx_80195B4(arg1, -1);
-    }
+void play_sfx_80195B4(int, int);
+void sub_8158F88(void *arg0, int arg1)
+{
+  int new_var2;
+  int new_var;
+  new_var = 0x5A;
+  if ((*((s16 *) (((s8 *) arg0) + 0x1F28))) != arg1)
+  {
+    new_var2 = 0x1F28;
+    *((s16 *) ((0, ((s8 *) arg0) + new_var2))) = arg1;
+    *((s16 *) (((s8 *) arg0) + 0x1F2A)) = new_var;
+    play_sfx_80195B4((s32) arg1, -1);
+  }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8158FBC.s\"");
