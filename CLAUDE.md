@@ -1461,6 +1461,149 @@ relative of the parked register-swap wall, worth distinguishing because
 it blocks relocations, not just instruction content), and a fourth
 confirmed instance of the compile-time-constant-mask-folding defect.
 
+## Veneer-symbol wall: partially reachable after all
+
+**Correction to the veneer-symbol wall named above, found testing a
+register-variable workaround on `sub_813CAEC`**: unlike the ordinary
+register-swap wall (where a `register X asm("rN")` hint on a plain
+scalar is silently ignored outside real inline-asm operand context —
+confirmed via disassembly on `sub_816B0E0`), the SAME hint DOES work
+when the variable is a function pointer used immediately in an
+indirect call:
+
+```c
+register s32 (*fptr)(s32) asm("r3");
+fptr = (*(s32 (**)(s32))((s8 *)(arg1) + (0x1A0)));
+fptr(arg0);
+```
+
+This forced `sub_813CAEC`'s candidate to emit `bl _call_via_r3` —
+byte-for-byte the same veneer relocation retail has (confirmed via
+direct objdump: the setup instructions loading r3 now match retail's
+`ldr r3,[r2,#0]` exactly in spirit, just still landing in a different
+base register for the address computation). **Not a full match** —
+the aggregate score (171 diff bytes, size_delta +4, relocs_equal still
+False) was UNCHANGED before and after adding the hint, because this
+function's total structural gap (the twin/`sub_813CAEC` stack-size
+fix's own remaining issues, still not fully closed) dominates and the
+`relocs_equal` check compares the WHOLE relocation set at fixed
+offsets — one relocation matching doesn't flip the aggregate boolean
+while others still sit at shifted offsets from the unresolved
+size_delta. The veneer fix is real and worth keeping regardless (it's
+one less true divergence from retail), just not sufficient alone here.
+
+**Generalizable finding, distinct from (and not a contradiction of)
+the existing register-hint-is-ignored finding**: a `register` hint
+appears to be honored specifically when the hinted variable is used as
+a called function pointer (the compiler's indirect-call codegen must
+consult the variable's storage class more directly than ordinary
+arithmetic does), but is silently ignored for a plain scalar used in
+an ordinary statement. **Practical rule going forward**: when a
+near-miss's ONLY reloc mismatch is a `_call_via_rN` veneer symbol (not
+also a structural size/CSE gap), try declaring the function pointer as
+a `register ... asm("rN")` local matching retail's veneer register
+before parking it as unreachable — this is a real, cheap, first-try
+lever, not a dead end. Only park a veneer-symbol case once tried this
+way and confirmed unreachable, or once confirmed the reloc set has
+other unrelated mismatches that dominate anyway (as with
+`sub_813CAEC` itself, still not landed).
+
+## Broad Tier 2 pool survey (2026-08-29, same session)
+
+The near-miss band (`objdiff>=90`) is a small, already-well-mapped
+slice of `tier2_ready` (2,701 rows total). Sampled 3 functions from
+the much larger FAR population instead — high real byte distance
+(`iso_score>500`) — to see what actually blocks the bulk of the pool.
+**Important scheduling observation made getting the sample**: genuinely
+bad functions (low `objdiff_score`, huge `iso_score`) mostly sit at
+`escalation_count` 0–1, not high — the near-miss-first scheduling fix
+already documented elsewhere in this file works exactly as intended,
+which means "high escalation AND terrible score" is nearly an EMPTY
+population right now (a direct, explicit search for it returned 0
+rows at `escalation>=8`). That absence is itself the finding: the far
+pool isn't being starved of search time by anything mis-scheduled: it
+simply hasn't accumulated escalation because the scheduler correctly
+prefers closer rows. Sampled by `iso_score` instead, at low escalation.
+
+Three DIFFERENT structural walls, diagnosed via direct isolated
+objdump diff (`compiler_variants.stage()`, same primitive
+`isolation_exact.py` uses) — not one shared root cause:
+
+- **`sub_8136470`: not a hard function at all — a measurement
+  artifact, THE LAW again.** The candidate's 5 real instructions
+  (`movs r1,#0; str r1,[r0,#0]; str r1,[r0,#4]; str r1,[r0,#8]; bx
+  lr`) are BYTE-IDENTICAL to retail's. The reported 524-byte gap is
+  100% retail's own `.s` fragment carrying unsplit trailing bytes
+  after the real `bx lr` — and those bytes are NOT padding or data:
+  disassembling them by hand finds a genuine `push {r4,r5,r6,lr}`
+  Thumb prologue sitting right there, i.e. a second, never-labeled,
+  never-split real function hiding in the same fragment. This is
+  CLAUDE.md's own "trailing orphaned data on the last function
+  extracted from a file" landmine, recurring on a fragment the
+  existing `split_trailing.py`/multi-return-backlog sweeps never
+  reached. Not fixed this session (out of scope for a diagnosis pass)
+  — a real, concrete, ready-to-split candidate for a future one.
+- **`sub_81604A8`: a computed-goto jump table mis-modeled as a
+  function-pointer call.** Retail ends its dispatch with `mov pc, r0`
+  — an ARM/Thumb computed GOTO that jumps to a case body INLINE,
+  still inside the same function/stack frame (Luvdis's own documented
+  blind spot, `tools/decode_jumptable.py`'s whole reason for
+  existing). The candidate C instead calls the computed address as a
+  genuine separate FUNCTION (`bl _call_via_r0`) — a different
+  operation entirely, with its own push/pop frame, so the two
+  diverge completely from that point on. The index computation itself
+  also differs (retail: mask-then-subtract-then-compare via `bls`;
+  candidate: shift-then-add-then-compare via `bhi`) — a second,
+  compounding divergence in the same function. This is exactly the
+  "jump tables" item already tracked as open in Phase 3 (~94
+  candidates), now with a second confirmed concrete instance outside
+  that tool's own scan.
+- **`sub_81148B8`: genuine goto-heavy control-flow reconstruction gone
+  wrong, not a mechanical gap.** A large (239-line, ~460+ byte)
+  multi-way dispatch on a small integer field. The FIRST few branches
+  structurally match retail (`cmp`/`bgt`/`beq` sequence identical), but
+  the case-1 BODY itself is substantively different content: retail's
+  case 1 branches far away to a shared handler block (`b.n` to an
+  offset outside this diff's window); the candidate's case 1 instead
+  inlines a direct call to `sub_8116620` — not a register or ordering
+  difference, a different IMPLEMENTATION. This is m2c's documented
+  `goto`-heavy-control-flow fallback for complex CFGs losing track of
+  which case does what, not a mechanical or register-allocation issue
+  — would need hand-reading the real disassembly's full case list
+  against the C, the same discipline as the multi-return-merge saga,
+  not a quick fix.
+
+**Takeaway for future targeting**: the far pool's walls are NOT one
+thing — measurement artifacts (fixable in seconds once spotted),
+jump-table misdecompilation (needs the existing jump-table tooling,
+not a C rewrite), and genuine complex-CFG misreconstruction (needs
+hand-verification against the real disassembly) all coexist. Don't
+assume "far" means "hard" — `sub_8136470` proves a function can be
+byte-for-byte DONE and still show as the worst score in the whole pool
+because of what it's being measured against, not what it is.
+
+## Batch tooling: `tools/factory/allocator_sweep.py` (new, 2026-08-29)
+
+Automates the manual per-function loop this session ran by hand dozens
+of times: stage the WHOLE near-miss pool in isolation in one batch,
+classify each by comparing normalized mnemonic sequences against
+retail (skip anything IDENTICAL — the parked register-swap wall, per
+its own formal policy — rather than burning `--allocator-attack` time
+on a proven-unreachable case), then run the attack in parallel on
+what's left and feed improved seeds straight back into the DB
+(`candidate_body`/`notes`), exactly the manual convention used all
+session. **Deliberately does not touch tracked files or commit** —
+promotion is left to the existing validator/tier2 pipeline, which
+already proved (via `sub_8087444`, closed by the live factory on its
+own once this session's improved seed hit the DB) that it can safely
+turn a good seed into a real committed match without this tool's help.
+
+Smoke-tested on 8 rows before the real run: triage correctly parked 2
+of 8 (register-swap wall) and the attack improved all 6 of the
+remaining 6 to `diff=1` in 60s each — validates both halves of the
+pipeline before trusting it unattended. Launched for real at
+`--limit 100 --parallel 6 --seconds-per-fn 180` immediately after.
+
 ## Housekeeping outstanding
 
 - **`tools/factory/flag_dead_ends.py` (new, 2026-08-28) flags leaf-pool
