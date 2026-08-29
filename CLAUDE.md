@@ -15,7 +15,7 @@ in service of modding tools, asset editors, and understanding the engine
 (physics/collision is the maintainer's specific interest).
 
 **Run `tools/progress.py` for the live count. Never trust a number in a doc.**
-As of 2026-08-29: 1,778 of 6,392 matched (27.8%). `asm/mariobros.s` is a
+As of 2026-08-29: 1,781 of 6,395 matched (27.8%). `asm/mariobros.s` is a
 separate embedded Mario Bros. ROM — **out of scope by maintainer decision**,
 tracked apart from "game proper" everywhere.
 
@@ -1158,14 +1158,13 @@ knowing before re-spending a session on either:
   spread across the full range (start, several midpoints, end) rather
   than just the first few. All came back clean on both fragments — no
   further corrections needed, unlike `sub_806E838`/`sub_8158FBC`.
-  **Final tally: 45 of the original 48 flagged fragments resolved.**
-  The remaining 3 (`sub_8135BF8`, `sub_801B0B8`, `sub_81DC44C`) are
-  deliberately left unsplit — the first two are CONFIRMED single, real,
-  correct functions with no merge at all (false positives in the
-  original flagging, documented above with exactly why each one fooled
-  the checker); the third is a genuine unresolved ambiguity (a bare
-  `bx lr` with no setup at all) needing an actual human judgment call
-  this session had no grounds to make. `write_multi_split(src_name,
+  **Final tally: 46 of the original 48 flagged fragments resolved**
+  (45 as of the previous session + `sub_81DC44C`, closed 2026-08-29 —
+  see immediately below). The remaining 2 (`sub_8135BF8`, `sub_801B0B8`)
+  are deliberately left unsplit — CONFIRMED single, real, correct
+  functions with no merge at all (false positives in the original
+  flagging, documented above with exactly why each one fooled the
+  checker). `write_multi_split(src_name,
   segments, src_text)` is ready to use once a segmentation is confirmed:
   `segments[0]` keeps `src_name`'s own identity (truncated in place),
   `segments[1:]` are new symbols with fresh guards inserted right after
@@ -1190,19 +1189,81 @@ knowing before re-spending a session on either:
   flagged 48, exactly as it should until someone re-derives its
   boundary (there is none — it's one function) properly.
 
-  **`sub_81DC44C` is a genuine, unresolved AMBIGUITY, deliberately left
-  unsplit rather than guessed at — a third shape distinct from the two
-  false-positive patterns above.** The algorithm proposes 3 functions;
-  the first two boundaries check out cleanly (a real `pop {r4,pc}`
-  return, real pool), but the second segment's own first byte is a
-  bare `bx lr` with NOTHING before it in that segment — no setup, no
-  arguments used, nothing — either a genuinely degenerate zero-body
-  "function" (a real, if strange, empty stub/placeholder some code
-  elsewhere calls) or 2 orphaned bytes of dead/padding code that
-  happen to be a valid instruction, and unlike the other cases in
-  this section there's no independent evidence (no `bl`/pointer-table
-  reference found) to decide which. Needs a human judgment call this
-  session didn't have grounds to make confidently.
+  **`sub_81DC44C` CLOSED 2026-08-29.** Real objdump-level disassembly
+  (`arm-none-eabi-objdump`, not the automated segmentation algorithm)
+  showed 3 clean functions plus one ambiguous 2-byte span: a bare
+  `bx lr` at offset `0x14` (real address `0x081DC460`) with nothing
+  before it in that span — no setup, no argument use. Ruled out all
+  three shapes the question was originally framed around: not a
+  branchless fall-through (the preceding function already returns
+  cleanly one instruction earlier via `pop {r4,pc}`), not an
+  intermingled literal pool (no `ldr [pc,#N]` anywhere in the fragment
+  targets that address), not a non-standard prologue (the next real
+  function's own prologue, 2 bytes later past ordinary alignment pad,
+  is an entirely ordinary `push {r4,lr}`). Decisive point: `0x14` is
+  already word-aligned on its own — if `bx lr` were alignment filler,
+  it wouldn't need to exist to reach a boundary that's already there,
+  and this project's actual pad convention is `0x00,0x00`, not a real
+  instruction encoding. Resolved as its own minimal function
+  (`sub_81DC460`, 4 bytes: `bx lr` + the standard 2-byte pad) rather
+  than an `unk_ADDR:` data label — it behaves exactly like every other
+  `bx lr`/`pop{...,pc}`-terminated span in this corpus, just with an
+  empty body, and a future `void sub_81DC460(void) {}` C attempt is a
+  trivial, high-confidence match once tried. 4-way split executed via
+  `write_multi_split()`, verified with a from-scratch `mlss.gba: OK`,
+  committed `d5a2958e`. No cross-reference to `0x081DC460` was found
+  anywhere in `asm/*.s`/`src/*.c` (grepped directly) to confirm it as a
+  callback-table entry specifically, so the "why does this exist"
+  question stays genuinely open — only "is the split safe" was closed.
+
+- **MAJOR FINDING, 2026-08-29: every function `split_trailing.py` has
+  EVER produced is invisible to m2c, 402 of 402, zero exceptions, zero
+  ever matched.** Found while trying to seed the 117 functions this
+  session's 46-fragment remediation unlocked, for the requested
+  "wide pass to gauge difficulty" — every one of the first 10 tried
+  (and, once checked, literally all 402 `needs_attempt` rows whose
+  name came out of a `split_trailing.py` commit) carries the identical
+  `tier_m2c` note `declined (outside current translation coverage)`.
+  Root-caused directly at the m2c source, not inferred: running
+  `python3 tools/m2c/m2c.py --target gba --valid-syntax
+  asm/nonmatching/<name>.s` on any of them prints `Function <name>
+  contains no instructions. Maybe it is rodata?` — and
+  `tools/m2c/m2c/asm_file.py`'s `data_directives` dict lists `.byte`
+  (alongside `.word`/`.4byte`/etc.) as a DATA directive. `write_split`/
+  `write_multi_split` deliberately emit trailing bytes as raw `.byte`
+  under a real `thumb_func_start` (see that function's own docstring:
+  "byte-identical BY CONSTRUCTION" — a genuinely correct, deliberate
+  safety choice for the ROM) rather than reconstructed mnemonic
+  assembly like every OTHER fragment in this corpus (compare
+  `asm/nonmatching/sub_8052C50.s`, real Luvdis-style `push`/`ldr`/`bl`
+  text). m2c parses assembler mnemonics to build a control-flow graph;
+  a fragment that is 100% `.byte` lines has no mnemonics for it to see
+  at all, so it's classified as pure data before decompilation is ever
+  attempted. This is not a hard-function or heuristic-ceiling problem
+  like the walls documented elsewhere in this file — it's a total,
+  mechanical block that has applied to every one of these functions
+  since the very first `split_trailing.py` split, confirmed by the
+  `matched` count above: 0 of 402.
+  **Not fixed this session** — the real fix is teaching `write_split`/
+  `write_multi_split` (or a preprocessing step in `m2c_bridge.py`) to
+  emit genuine disassembled mnemonic text instead of `.byte`, the same
+  job `tools/decode_jumptable.py` already does for jump-table
+  fragments, likely by reassembling `split_trailing.disassemble()`'s
+  existing objdump output into resolved-label GNU-syntax source (branch
+  targets, literal-pool `.4byte`s, `bl`s) — real, scoped, and does NOT
+  touch the byte-safety guarantee `write_split`'s own docstring cares
+  about, since the reassembled mnemonics still get diffed against
+  retail bytes before being trusted, exactly like every other fragment.
+  No Luvdis wrapper exists in this repo (checked) to shortcut it.
+  Until this lands, these 402 functions (and the 117 from this
+  session's own batch) are NOT the "high surface area for immediate
+  matches" they look like from tractability metadata alone — they are
+  100% stuck at the first pipeline stage, and the live factory's
+  `tier1`/`tier2` never see them either (both depend on a seed
+  `tier_m2c` never produces). This also means the intended "3-worker,
+  300-second in-context search on the first batch of 10" from this
+  session's own request produced no scores to report: there is no
+  candidate body for the permuter to mutate yet on any of them.
 - **`rescore_seeds.plain_score`/`validator._matches_in_plain_build` structurally
   cannot accept a candidate that references a known address via its
   MINTED NAME (`symbols.txt`) where retail's own disassembled `.s`
