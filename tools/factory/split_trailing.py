@@ -145,14 +145,48 @@ def trailing_start_address(name: str, text: str) -> int | None:
 _HANDLER_SETTER_SIG = bytes([0x01, 0x49, 0xC1, 0x64, 0x01, 0x20, 0x70, 0x47])
 
 
-def _fragment_has_code_before(name: str, trailing_text: str) -> bool:
-    """False when the fragment's ENTIRE body IS the trailing run -- e.g. a
-    fragment write_split() itself already produced (bare `.byte` under a
-    label, no code at all). Without this, a just-split fragment that
-    happens to start with a known signature re-matches its own bytes as
-    if a NEW trailing function were hiding after itself. Found live
-    2026-08-28: splitting sub_808C070 etc. made sub_808C08A etc. show up
-    in the next --list run, pointing at themselves."""
+def _fragment_is_already_resolved(name: str, trailing_text: str) -> bool:
+    """True when the fragment's ENTIRE body already IS exactly one
+    validated function+pool with nothing left over -- e.g. a fragment
+    write_split() itself already produced (bare `.byte` under a label,
+    no surrounding code). split_candidates() should skip these.
+
+    Does NOT just check "is there real code before the trailing run" --
+    that was this function's original, cruder form, and it is WRONG for
+    a real case: a fragment that is ENTIRELY `.byte` (nothing precedes
+    the trailing run at all, by construction, for anything write_split()
+    itself ever emits) can still have MORE than one hidden function
+    packed into it, if the split that created it was accepted on a
+    WEAKER version of looks_complete_with_pool() before this check
+    existed. Blanket-excluding every code-free fragment would make such
+    a case permanently invisible to this tool -- exactly what happened
+    live 2026-08-28 on sub_80479DC (produced by an earlier run, actually
+    TWO complete mini-functions merged under one label): the original
+    "no code precedes it" rule skipped it forever, since by definition
+    nothing ever precedes a write_split() fragment's own trailing run.
+
+    Reuses looks_complete_with_pool() itself -- the same address-verified
+    check that decides whether a NEW split is safe now also decides
+    whether an EXISTING one still has leftover content, so both checks
+    stay correct together instead of drifting apart. A fragment that
+    genuinely is one complete function+pool (the common, correct case
+    for split_trailing.py's own output) validates and is excluded, same
+    as the original guard; one that isn't (a merge bug, old or new)
+    fails to validate and is correctly kept as a fresh candidate.
+    """
+    vals = BYTE_RE.findall(trailing_text)
+    if len(vals) < 4:
+        return True  # too short to be a real function -- nothing to re-split
+    raw = bytes(int(v, 16) for v in vals)
+    disasm = disassemble(raw, 0)
+    if not disasm:
+        return True  # can't tell -- don't block on an unrelated failure
+    if looks_complete(disasm) or looks_complete_with_pool(disasm, raw):
+        return True  # already exactly one function+pool, nothing left over
+    # Fall back to the original, narrower signal for anything that isn't
+    # pure .byte (a real, not-yet-split fragment whose trailing run is
+    # preceded by genuine code) -- unrelated to the bug above, still a
+    # valid signal on its own.
     frag = gitops.REPO / "asm" / "nonmatching" / f"{name}.s"
     text = frag.read_text()
     idx = text.find(trailing_text)
@@ -166,7 +200,16 @@ def _fragment_has_code_before(name: str, trailing_text: str) -> bool:
             continue
         if s.endswith(":") or s.startswith(".byte"):
             continue  # a label, or an earlier/different data run
-        return True  # a real instruction line
+        return False  # a real instruction line precedes it -- keep as a candidate
+    # Pure .byte, and it didn't validate as one clean function+pool above
+    # either -- keep it as a candidate rather than excluding it. This is
+    # the sub_80479DC case: nothing "precedes" a write_split()-produced
+    # fragment by construction, but that says nothing about whether ITS
+    # OWN content is fully resolved. main()'s own completeness checks
+    # re-validate independently before writing anything, so including a
+    # fragment here that turns out not to be safely splittable just means
+    # it gets declined again, harmlessly -- excluding it here instead
+    # would make a real, still-broken case permanently invisible.
     return False
 
 
@@ -179,7 +222,7 @@ def split_candidates() -> list[tuple[str, int, str]]:
         trailing = gitops.fragment_trailing_bytes(name)
         if not trailing:
             continue
-        if not _fragment_has_code_before(name, trailing):
+        if _fragment_is_already_resolved(name, trailing):
             continue
         vals = BYTE_RE.findall(trailing)
         if len(vals) < 4:
@@ -248,39 +291,84 @@ def looks_complete_with_pool(disasm: str, raw: bytes) -> bool:
     keeps its simple, already-proven logic -- this one has a real
     correctness argument of its own (address cross-referencing) that is
     worth being able to reason about on its own.
+
+    FIRES ONLY WHEN THE WHOLE DISASSEMBLY HAS EXACTLY ONE return-matching
+    LINE. Deliberately conservative -- multiple candidates mean picking
+    the right one requires distinguishing "an early/internal return with
+    real code still following" from "the true end, with a second hidden
+    function stacked after it", and three different attempts at that
+    distinction each shipped a real, different bug before this one, all
+    found by auditing already-completed splits rather than caught before
+    commit:
+
+    1. Take the LAST candidate, walked backward, accept whichever
+       validates: a pool WORD can itself decode as something matching
+       the return regex (`pop {r3,r6,r7,pc}` is indistinguishable from
+       real code by pattern alone -- common, not rare, since a
+       fragment's own pool sits right after its real return by
+       construction), so the backward search would find a LATER hidden
+       function's own genuine return-then-pool, validate THAT, and
+       report the WHOLE multi-function blob complete. Confirmed on
+       sub_803FDBC (three stacked functions) and sub_80479BC (two) --
+       write_split() would label all of them as one function. Byte-
+       identical to the ROM (write_split() only ever emits verbatim
+       bytes) but permanently unmatchable as C and wrong about what's
+       actually there. This version reached 2 of the 128 already-
+       completed splits before being caught by an audit of the finished
+       batch, not before commit.
+    2. Take ONLY the first candidate, unconditionally: right question
+       for a short function, wrong for a long one with a genuine early
+       exit. sub_8135934 (808 bytes, a real, correct, single function)
+       has its first return-matching line at 0xa2, an early branch
+       inside ordinary control flow, nowhere near its actual end at
+       0x31e -- anchoring there found real code after it (not pool),
+       declined, and would have made a perfectly fine function invisible
+       to this tool forever.
+    3. Walk forward through every candidate, and at each one, treat "a
+       byte pattern matching a fresh push{...,lr} prologue sits exactly
+       where the referenced-pool run stops" as proof of a second stacked
+       function, otherwise keep advancing. Reasonable-sounding, but the
+       byte pattern for a push instruction is common enough that it
+       shows up by pure coincidence inside a long function's own real,
+       CONTINUING code (confirmed live on sub_8135934 again: its own
+       first, early return's "boundary" byte happened to look exactly
+       like a fresh prologue, so this version declined it too, for a
+       different reason than attempt 2 but the same wrong outcome).
+
+    No byte-pattern heuristic reliably tells "early return, code
+    continues" apart from "true end, a second function starts here" --
+    both look like ordinary Thumb code at the boundary, because in the
+    first case that is EXACTLY what it is. The only case that can be
+    decided WITHOUT that ambiguity is the one where there's nothing to
+    decide between: a single return-matching line, whose own referenced
+    pool either accounts for everything remaining (complete) or doesn't
+    (decline). Multi-return fragments are consequently left to
+    looks_complete()/manual review rather than guessed at -- narrower
+    coverage than the three attempts above tried for, but each of those
+    shipped a real bug this one structurally cannot.
     """
     lines = [m for m in (_LINE_RE.match(l) for l in disasm.splitlines()) if m]
-    if not lines:
+    candidates = [int(m.group(1), 16) for m in lines if _RETURN_RE.search(m.group(2))]
+    if len(candidates) != 1:
         return False
-    ret_idx = None
-    for i, m in enumerate(lines):
-        if _RETURN_RE.search(m.group(2)):
-            ret_idx = i
-    if ret_idx is None:
-        return False
-    ret_off = int(lines[ret_idx].group(1), 16)
+    ret_off = candidates[0]
+    refs = {int(h, 16) for h in _PC_REF_RE.findall(disasm)}
     tail_start = ret_off + 2  # every Thumb return here is one 2-byte halfword
     tail = raw[tail_start:]
     if not tail:
-        return True  # nothing trails the return at all
-    # Referenced pool addresses, relative to the start of `raw` (objdump's
-    # own printed target minus this slice's own base -- disassemble()
-    # numbers from 0 regardless of the real ROM address, so `@ (0xADDR)`
-    # is already relative here, not absolute).
-    refs = {int(h, 16) for h in _PC_REF_RE.findall(disasm)}
+        return True  # nothing trails this return at all
+    # Referenced pool addresses are relative to the start of `raw`
+    # (objdump's own printed target minus this slice's own base --
+    # disassemble() numbers from 0 regardless of the real ROM address,
+    # so `@ (0xADDR)` is already relative here, not absolute).
+    #
     # Up to 2 bytes of zero alignment padding may sit before the first
     # real pool word (same shape as the handler-setter case above).
-    pad = 0
-    if len(tail) % 4 != 0 and tail[:2] == b"\x00\x00":
-        pad = 2
+    pad = 2 if (len(tail) % 4 != 0 and tail[:2] == b"\x00\x00") else 0
     body = tail[pad:]
     if len(body) % 4 != 0 or len(body) == 0:
         return False
-    for i in range(0, len(body), 4):
-        word_addr = tail_start + pad + i
-        if word_addr not in refs:
-            return False  # an unaccounted-for word -- refuse, don't guess
-    return True
+    return all(tail_start + pad + i in refs for i in range(0, len(body), 4))
 
 
 def main():
