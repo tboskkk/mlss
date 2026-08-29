@@ -535,6 +535,7 @@ def generate(name: str) -> str | None:
     c = fix_pointer_assign_without_cast(c)
     c = fix_integer_assign_from_pointer(c)
     c = fix_bare_stack_pointer(c)
+    c = fix_undeclared_stack_slots(c)
     return restore_omitted_leading_params(c, name)
 
 
@@ -1012,6 +1013,79 @@ def fix_bare_stack_pointer(c: str) -> str:
     anchor = f"(&sp{hexn})" if n == 0 else f"((&sp{hexn}) - {n})"
     replacement = f"((s8 *)({anchor}))"
     return BARE_SP_RE.sub(lambda m: replacement, c)
+
+
+SP_TOKEN_RE = re.compile(r"\bsp([0-9A-Fa-f]+)\b")
+SP_ANCHOR_MAX_GAP = 0x200
+
+
+def fix_undeclared_stack_slots(c: str) -> str:
+    """CLAUDE.md's N.6: m2c fails to recognize a contiguous run of stack
+    `ldr`s feeding a struct-shaped sequence of `str`s as ONE struct
+    assignment, so it names the FIRST slot in the run (`sp44`) but keeps
+    naming the REST (`sp48`, `sp4C`, ... `sp7C`) without ever declaring
+    them -- a hard `X' undeclared` error. Worked example: `sub_8135084`.
+
+    NOT the .s-fragment-scanning detector CLAUDE.md's own census sketched
+    (finding a monotonic ldr/str run directly in the disassembly). This
+    works at the C level instead, and is simpler for a real reason, not
+    just convenience: the census's sketch was reaching for the .s
+    fragment because it assumed the C had already lost the information
+    needed to reconstruct the copy. It hasn't -- m2c's undeclared `spN`
+    tokens ARE that information, spelled out one per missing slot, and
+    the function's own surviving lines already show the exact idiom to
+    generalize (`sub_8135084`'s own last line reads offset 0x3C from
+    `&sp44` via `*(s32 *)((s8 *)(&sp44) + (0x3C))` -- m2c fell back to
+    this shape for the ONE slot past wherever its `spN`-per-offset naming
+    gives out, so the "right" C for the undeclared ones was sitting right
+    there in the same body).
+
+    THIS MUST NOT DECLARE A FRESH, UNINITIALIZED LOCAL for a missing
+    `spN` -- that would be wrong, not just uncompilable: these slots are
+    never assigned by an ordinary C statement anywhere in the function.
+    They get their real values as a SIDE EFFECT of an earlier call that
+    received a pointer to the low end of the same stack region (`sub_
+    8134CAC(&sp44, arg0, &sp0)` in the worked example) and filled it via
+    that output pointer. Declaring `s32 sp48;` fresh would compile to a
+    DIFFERENT, unrelated stack slot and read garbage -- a wrong match
+    that would only be caught later, if at all. Rewriting the reference
+    as `*(TYPE *)((s8 *)(&spANCHOR) + offset)` instead reads from the
+    SAME memory the call actually wrote, which is the only thing that
+    can be correct here.
+
+    Anchor: the DECLARED `spN` closest to the missing one (either
+    direction -- a higher anchor works via a negative offset), reusing
+    ITS type so the cast width matches the established convention for
+    that stack region rather than guessing s32 unconditionally. Declines
+    (leaves the token untouched, still uncompilable) rather than guessing
+    when the nearest declared anchor is implausibly far away
+    (SP_ANCHOR_MAX_GAP) -- a real gap that far apart is more likely a
+    genuinely different part of the frame than the same contiguous run.
+    """
+    types = _local_types(c)
+    sp_offsets: dict[int, str] = {}
+    for local_name, typ in types.items():
+        m = re.match(r"^sp([0-9A-Fa-f]+)$", local_name)
+        if m:
+            sp_offsets[int(m.group(1), 16)] = typ
+    if not sp_offsets:
+        return c
+
+    def repl(m: re.Match) -> str:
+        n = int(m.group(1), 16)
+        if n in sp_offsets:
+            return m.group(0)  # already declared -- leave it alone
+        anchor = min(sp_offsets, key=lambda k: abs(k - n))
+        if abs(anchor - n) > SP_ANCHOR_MAX_GAP:
+            return m.group(0)  # too far to trust -- refuse, don't guess
+        typ = sp_offsets[anchor]
+        base_type = typ.replace("*", "").strip()
+        cast = f"{base_type} {'*' * (typ.count('*') + 1)}"
+        diff = n - anchor
+        offset_expr = f"+ ({diff})" if diff >= 0 else f"- ({-diff})"
+        return f"(*({cast})((s8 *)(&sp{format(anchor, 'X')}) {offset_expr}))"
+
+    return SP_TOKEN_RE.sub(repl, c)
 
 
 _PARAM_LIST_RE = r"^[\w \*]+?\b{}\s*\(([^;{{)]*)\)\s*\{{"
