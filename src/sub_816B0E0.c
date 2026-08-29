@@ -18,25 +18,20 @@ void sub_816B0E0(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_816B0F4.s\"");
-#else
 s32 sub_8161C28(void *, s32);                   /* extern */
 s32 sub_8163A64(void *, s32, s32, s32);         /* extern */
 s32 sub_8163ADC(void *, s32, s32, s32, s32, s32); /* extern */
-
-void *sub_816B0F4(void *arg0, void *arg1, s32 arg2, s32 arg3) {
-    void *temp_r2_27;
-
-    sub_8161C28(arg0, 6);
-    (*(s32 *)((s8 *)(arg0) + (0xC))) = 0x08CDD1C8;
-    sub_8163ADC(arg0, 3, 0x415A, 0, 0, 2);
-    temp_r2_27 = (*(void **)((s8 *)(arg0) + (0x10)));
-    (*(u8 *)((s8 *)(temp_r2_27) + (0x12))) = (u8) ((-7 & (*(u8 *)((s8 *)(temp_r2_27) + (0x12)))) | 2);
-    sub_8163A64(arg0, (*(s32 *)((s8 *)(arg1) + (0))) - arg2, (*(s32 *)((s8 *)(arg1) + (4))), (*(s32 *)((s8 *)(arg1) + (8))) - arg3);
-    return arg0;
+void *sub_816B0F4(void *arg0, void *arg1, s32 arg2, s32 arg3)
+{
+  void *temp_r2_27;
+  sub_8161C28(arg0, 6);
+  *((s32 *) (((s8 *) arg0) + 0xC)) = 0x08CDD1C8;
+  sub_8163ADC(arg0, 3, 0x415A, 0, 0, 2);
+  temp_r2_27 = (void *) (*((void **) (((s8 *) arg0) + 0x10)));
+  *((u8 *) (((s8 *) temp_r2_27) + 0x12)) = (u8) (((-((char) 7)) & (*(((s8 *) temp_r2_27) + 0x12))) | 2);
+  sub_8163A64(arg0, (*((s32 *) (((s8 *) arg1) + 0))) - arg2, *((s32 *) (((s8 *) arg1) + 4)), (*((s32 *) (((s8 *) arg1) + 8))) - arg3);
+  return arg0;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_816B15C.s\"");
