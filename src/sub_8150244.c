@@ -27,24 +27,20 @@ s32 sub_8150244(s8 arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8150270.s\"");
-#else
 s32 sub_80FBB50(s32 *, s32, s32, s32, s32);     /* extern */
 s32 sub_8139CAC(s32 *, s32, s32, s32);      /* extern */
 
 s32 sub_8150270(s32 arg0, s32 arg1) {
-    s32 sp4;
+    s32 sp4[4];
     s32 var_r1_22;
 
-    sub_8139CAC(&sp4, arg0, 0x28, 8);
-    var_r1_22 = sub_80FBB50(&sp4, arg0, arg1, 0x30, 0x30);
+    sub_8139CAC(sp4, arg0, 0x28, 8);
+    var_r1_22 = sub_80FBB50(sp4, arg0, arg1, 0x30, 0x30);
     if ((var_r1_22 << 0x18) != 0) {
         var_r1_22 = 1;
     }
     return var_r1_22;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81502A8.s\"");
