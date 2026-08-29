@@ -1693,6 +1693,70 @@ knowing before re-spending a session on either:
     2 confirmed false positives → 3 (batch 1) + 5 (batch 2) + 8
     (batch 3) = 16 resolved → **23 remaining**, not yet reviewed.
 
+  **Batch 4 processed 2026-08-29 (the next 8 off the 24-row
+  remainder): all 8 genuine, all resolved.** The boundary-computer's
+  skip-check was improved this batch (scratch, not committed) to
+  restrict branch-scanning to each segment's own CODE range (before
+  its own return), so pool-decoded-as-branch bytes never get scanned
+  at all — the exact false-alarm class batch 3 hit twice and had to
+  hand-explain. Zero false alarms this batch as a result, not because
+  nothing needed checking.
+  - `sub_813BD38` (604B → **15 functions**) — the biggest fragment
+    this session outside the two dispatch-table cases. 10 of 15
+    segments have a `push{...,lr}` prologue, the other 5 are no-push
+    leaves; read the actual disassembly around every leaf boundary
+    (not just trusted the count) and found a clean, coherent family
+    of small vector-math helpers (componentwise multiply/add/
+    subtract/dot-product on 3-element arrays) — exactly the kind of
+    near-duplicate small-function cluster this whole backlog keeps
+    turning up.
+  - `sub_815F600` (384B → 5), `sub_81492A4` (436B → 2),
+    `sub_813681C` (144B → 3), `sub_813626C` (516B → 6, spot-checked
+    its own largest internal segment — a coherent single vector-
+    scaling function, not a hidden sub-merge), `sub_8135F68`
+    (424B → 7), `sub_8134660` (112B → 4), `sub_8121970` (84B → 2).
+  - Final consolidated verification: `rm -rf build/ && make` under
+    `repo_lock()` → clean `mlss.gba: OK`, plus `check_layout.py` OK.
+  Multi-return backlog: 16 + 8 (batch 4) = **24 resolved, 16 remaining**
+  of the original pool (the 41-flagged count itself drifted slightly
+  batch to batch as the live factory's own scanning re-ran between
+  sessions — treat "16 remaining" as the current floor, re-derive
+  fresh rather than trusting this number stale in a future session).
+
+- **`sub_80F3FE8`'s penalty-band escape formally secured 2026-08-29,
+  through the REAL CLI this time, not a hand-rolled script.** Ran
+  `python3 tools/factory/in_context_search.py sub_80F3FE8 --body-file
+  <the two-fix source from above> --seconds 280 --allocator-attack
+  --out-file <path>` directly — converged to **182 bytes,
+  size_delta +4, relocs_equal=True**, independently re-verified via a
+  fresh `in_context_permuter.score_in_context` call on the exact saved
+  file (not assumed from the search's own printout). Compiles in
+  isolation. Saved to `nonmatchings/sub_80F3FE8/output-incontext-best/`
+  (the established convention, gitignored — `nonmatchings/` and
+  `.claude/` are both outside git entirely, so there is no git-
+  trackable artifact for a non-byte-exact candidate no matter how it's
+  produced; "commit" for a near-miss means updating the DB's
+  `candidate_body`/`notes`, which is what actually happened here, not
+  a git commit of a source file). The saved candidate contains a real
+  `--allocator-attack` mutation (an escaping `volatile unsigned short
+  new_var` used for both the final shift amount and the return value,
+  set to 1 immediately before use) — semantically identical to the
+  original `>> 1` / `return 1`, just forced into a live register to
+  shift allocation pressure, exactly the technique's own documented
+  purpose.
+
+- **`sub_8095028` formally parked 2026-08-29, per the same
+  DB-is-the-only-persistence-layer caveat above.** Already sat in
+  `tier2_ready` (no state change needed). Updated `candidate_body` to
+  the verified statement-split fix (recovers `size_delta` -16 → -12)
+  and `notes` to name the exact remaining wall (agbcc's own
+  `movs`-immediate vs. `movs`+`negs` choice for a compile-time-constant
+  negative byte, the same class as `sub_81064F8`) so a future session
+  doesn't re-diagnose it from scratch or waste another `--allocator-
+  attack` run assuming the gap is still the original combined-mask
+  fold. Real fix worth keeping either way, even though it doesn't
+  close the function.
+
 - **`rescore_seeds.plain_score`/`validator._matches_in_plain_build` structurally
   cannot accept a candidate that references a known address via its
   MINTED NAME (`symbols.txt`) where retail's own disassembled `.s`
