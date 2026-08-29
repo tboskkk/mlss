@@ -10,27 +10,28 @@ asm_unified(".include \"asm/macros.inc\"");
 
 extern s32 sub_8062188;
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80620C0.s\"");
-#else
-extern s32 sub_8062188;
-
-s32 sub_80620C0(void *arg0) {
-    u32 temp_r0_10;
-    u32 var_r0_13;
-
-    temp_r0_10 = (*(u32 *)((s8 *)(arg0) + (0x9C)));
-    if (temp_r0_10 > 2U) {
-        var_r0_13 = 2;
-    } else {
-        var_r0_13 = temp_r0_10 + 2;
-    }
-    (*(u32 *)((s8 *)(arg0) + (0x9C))) = var_r0_13;
-    (*(s32 *)((s8 *)(arg0) + (0xA0))) = 0;
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8062188;
-    return 1;
+s32 sub_80620C0(void *arg0)
+{
+  u32 temp_r0_10;
+  s8 *new_var2;
+  u32 var_r0_13;
+  u32 *new_var;
+  new_var2 = ((s8 *) arg0) + 0x9C;
+  temp_r0_10 = *((u32 *) new_var2);
+  if (temp_r0_10 > 2U)
+  {
+    var_r0_13 = 2;
+  }
+  else
+  {
+    var_r0_13 = temp_r0_10 + 2;
+  }
+  new_var = &var_r0_13;
+  *((u32 *) new_var2) = *new_var;
+  *((s32 *) (((s8 *) arg0) + 0xA0)) = 0;
+  *((s32 **) (((s8 *) arg0) + 0x4C)) = &sub_8062188;
+  return 1;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80620EC.s\"");
