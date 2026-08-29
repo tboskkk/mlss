@@ -15,7 +15,7 @@ in service of modding tools, asset editors, and understanding the engine
 (physics/collision is the maintainer's specific interest).
 
 **Run `tools/progress.py` for the live count. Never trust a number in a doc.**
-As of 2026-08-29: 1,778 of 6,244 matched (28.5%). `asm/mariobros.s` is a
+As of 2026-08-29: 1,778 of 6,256 matched (28.4%). `asm/mariobros.s` is a
 separate embedded Mario Bros. ROM — **out of scope by maintainer decision**,
 tracked apart from "game proper" everywhere.
 
@@ -1128,10 +1128,12 @@ knowing before re-spending a session on either:
   `sub_813B040`→2, `sub_8171C9C`→2, `sub_81583FC`→2, `sub_8046BC8`→2,
   `sub_80552DC`→2, `sub_806204C`→2, `sub_8062CE4`→2, `sub_8068D0C`→2,
   `sub_806D3F8`→2, `sub_80E9228`→2, `sub_812182C`→2, `sub_8134A44`→2,
-  `sub_81366B8`→3, `sub_806C9FC`→3, `sub_8160FCC`→2, `sub_819AA9C`→4
-  (31 total). Verified from-scratch after each batch. **The other 17,
-  including the 92-function `sub_8196ACC`, are still open** — same tool,
-  same discipline, just not reached yet. `write_multi_split(src_name,
+  `sub_81366B8`→3, `sub_806C9FC`→3, `sub_8160FCC`→2, `sub_819AA9C`→4,
+  `sub_8067948`→3, `sub_8136130`→3, `sub_813B2E0`→4, `sub_813B428`→3,
+  `sub_8165374`→4 (36 total). Verified from-scratch after each batch.
+  **The other 12, including the 92-function `sub_8196ACC`, are still
+  open** — same tool, same discipline, just not reached yet.
+  `write_multi_split(src_name,
   segments, src_text)` is ready to use once a segmentation is confirmed:
   `segments[0]` keeps `src_name`'s own identity (truncated in place),
   `segments[1:]` are new symbols with fresh guards inserted right after
