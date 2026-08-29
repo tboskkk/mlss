@@ -28,27 +28,23 @@ void sub_814DD14(s32 arg0, s32 arg1, s32 **arg2) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_814DDF8.s\"");
-#else
 s32 sub_813B564(s32);                               /* extern */
 extern s32 sub_814D35C;
 extern s32 sub_814DC6C;
-
-void sub_814DDF8(void *arg0, s32 arg1, s32 **arg2) {
-    s32 *var_r0_29;
-
-    if ((1 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x28)))) + (0x20C)))) && (1 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x2C)))) + (0x20C))))) {
-        var_r0_29 = &sub_814D35C;
-        goto block_5;
-    }
-    if ((sub_813B564(arg1) << 0x18) == 0) {
-        var_r0_29 = &sub_814DC6C;
-block_5:
-        *arg2 = var_r0_29;
-    }
+void sub_814DDF8(void *arg0, s32 arg1, s32 **arg2)
+{
+  s32 *var_r0_29;
+  var_r0_29 = *((void **) (((s8 *) arg0) + 0x28));
+  if ((1 & (*((u8 *) (((s8 *) var_r0_29) + 0x20C)))) && (1 & (*((u8 *) (((s8 *) (*((void **) (((s8 *) arg0) + 0x2C)))) + 0x20C)))))
+  {
+    var_r0_29 = &sub_814D35C;
+    goto block_5;
+  }
+  if ((sub_813B564(arg1) << 0x18) == 0)
+  {
+ do { var_r0_29 = &sub_814DC6C; block_5: *arg2 = var_r0_29; } while (0);
+  }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_814DE4C.s\"");
