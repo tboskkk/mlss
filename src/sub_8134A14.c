@@ -7,9 +7,6 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8134A14.s\"");
-#else
 s32 sub_8134928(void *);                        /* extern */
 s32 sub_8134940(void *);                        /* extern */
 
@@ -21,7 +18,6 @@ void sub_8134A14(void *arg0, s32 arg1) {
         free_heap_8018DA8(arg0);
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8134A44.s\"");
