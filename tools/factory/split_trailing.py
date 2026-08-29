@@ -564,5 +564,135 @@ def write_split(src_name: str, new_name: str, addr: int, raw: bytes,
     return True, f"{new_name} at 0x{addr:08X}, ROM still byte-identical"
 
 
+def write_multi_split(src_name: str, segments: list[tuple[str, int, bytes]],
+                       src_text: str) -> tuple[bool, str]:
+    """Like write_split(), but for a fragment that turned out to hide MORE
+    than one function -- confirmed live 2026-08-28 (sub_80479DC was the
+    first: two byte-for-byte-identical mini-functions, differing only in
+    one embedded constant, that write_split() had merged under one
+    symbol since its own boundary check never looked past the FIRST
+    hidden function's own return-then-pool).
+
+    Every case found this way is `src_name` ITSELF being a bare `.byte`
+    fragment produced by an earlier split_trailing.py run (nothing
+    precedes it, by construction, so fragment_trailing_bytes() returns
+    its ENTIRE body) that still hides more than one function inside its
+    own bytes. `segments[0]` is what STAYS under `src_name`'s existing
+    identity -- its DB row, its existing guard block, everything --
+    just truncated in place to segments[0]'s own bytes. `segments[1:]`
+    are genuinely NEW symbols, each getting its own fresh guard inserted
+    right after `src_name`'s in ROM order. `segments` is
+    [(name, addr, raw), ...] and MUST start at `src_name`'s own address
+    with `addr` for segment 0 equal to the fragment's current start
+    (name for segment 0 may be `src_name` itself or a rename -- callers
+    that just want to keep the existing name should pass src_name as
+    segments[0][0]).
+
+    Deliberately NOT auto-invoked from split_candidates()/main()'s normal
+    flow: every attempt this session at automatically proving a
+    multi-function boundary (four of them, each more sophisticated than
+    the last -- backward search, forward-only, a "does a fresh prologue
+    byte pattern appear here" heuristic, and a fully backtracking
+    address-verified segmentation search) either merged real functions
+    together or split a real function that was fine, because a genuine
+    early/internal return inside one large function is indistinguishable
+    BY BYTE PATTERN ALONE from the true end of a function followed by a
+    second one -- confirmed live: EVERY one of the 48 fragments flagged
+    by the strict single-return checker, including one independently
+    hand-verified as a single correct function with no merge at all,
+    admits SOME multi-way decomposition under the backtracking search.
+    "does it decompose" carries no diagnostic power for this corpus.
+    This function exists to EXECUTE a segmentation a human has already
+    confirmed by reading the real disassembly, not to decide one on its
+    own -- callers must derive `segments` from actual verification, the
+    same discipline write_split()'s own callers already follow.
+    """
+    frag_dir = gitops.REPO / "asm" / "nonmatching"
+    src_frag = frag_dir / f"{src_name}.s"
+    new_segments = segments[1:]
+    for new_name, _addr, _raw in new_segments:
+        if (frag_dir / f"{new_name}.s").exists():
+            return False, f"{new_name}.s already exists"
+
+    c_path, block = gitops.find_guard_block(src_name)
+    if c_path is None:
+        c_path, block, _kind = gitops.find_new_format_guard(src_name)
+    if c_path is None:
+        return False, f"no guard block found for {src_name}"
+
+    def fmt(name: str, addr: int, raw: bytes) -> str:
+        macro = "thumb_func_start" if addr % 4 == 0 else "non_word_aligned_thumb_func_start"
+        return (
+            "\t.syntax unified\n\t.text\n\n"
+            f"\t{macro} {name}\n{name}:\n"
+            f"{format_bytes(raw)}\n"
+        )
+
+    seg0_name, seg0_addr, seg0_raw = segments[0]
+    seg0_text = fmt(seg0_name, seg0_addr, seg0_raw)
+
+    new_texts = {}
+    new_blocks = []
+    for new_name, addr, raw in new_segments:
+        new_texts[new_name] = fmt(new_name, addr, raw)
+        new_blocks.append((
+            "#ifndef NONMATCHING\n"
+            f'asm_unified(".include \\"asm/nonmatching/{new_name}.s\\"");\n'
+            "#else\n"
+            + NEW_ELSE_BRANCH +
+            "#endif\n"
+        ))
+
+    with gitops.repo_lock(what=f"multi-split {src_name} into {len(segments)} functions"):
+        original_c = c_path.read_text()
+        try:
+            src_frag.write_text(seg0_text)
+            for new_name, text in new_texts.items():
+                (frag_dir / f"{new_name}.s").write_text(text)
+            pos = original_c.find(block)
+            insertion = "\n" + "\n".join(new_blocks)
+            c_path.write_text(original_c[:pos + len(block)] + insertion + original_c[pos + len(block):])
+
+            gitops.run(["rm", "-rf", str(gitops.REPO / "build")])
+            r = gitops.run(["./container.sh", "make"])
+            if "mlss.gba: OK" not in r.stdout:
+                raise RuntimeError("ROM no longer byte-identical")
+        except Exception as e:
+            for new_name in new_texts:
+                (frag_dir / f"{new_name}.s").unlink(missing_ok=True)
+            src_frag.write_text(src_text)
+            c_path.write_text(original_c)
+            return False, f"reverted: {e}"
+
+        names_list = ", ".join(n for n, _, _ in segments)
+        gitops.commit(segments[-1][0],
+                      f"Split {src_name} into {len(segments)} functions: {names_list}\n\n"
+                      f"{src_name}'s own fragment wasn't one unlabeled function -- it was\n"
+                      f"{len(segments)}, stacked with no boundary Luvdis ever labeled, that\n"
+                      f"write_split()'s own single-return boundary check couldn't see past\n"
+                      f"the first one's own return-then-pool. Each address derived from its\n"
+                      f"own referenced literal pool (every trailing word cross-checked\n"
+                      f"against a real ldr rX,[pc,#N] target in that same function's own\n"
+                      f"code), not guessed, and the whole segmentation was confirmed by\n"
+                      f"hand against the real disassembly before this ran -- see\n"
+                      f"write_multi_split()'s own docstring for why this isn't automatic.\n"
+                      f"Emitted as .byte under real thumb_func_start labels so each is\n"
+                      f"byte-identical by construction; verified with a single\n"
+                      f"from-scratch build before committing.")
+
+    conn = db.connect()
+    try:
+        with db.tx(conn):
+            for new_name, addr, _raw in new_segments:
+                db.set_state(conn, new_name, "needs_attempt", worker_id=None,
+                             notes=f"split out of {src_name}'s own merged fragment by write_multi_split")
+        conn.commit()
+    except Exception:
+        pass
+    finally:
+        conn.close()
+    return True, f"{len(segments)} functions total ({src_name} kept, {len(new_segments)} new), ROM still byte-identical"
+
+
 if __name__ == "__main__":
     main()
