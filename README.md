@@ -24,9 +24,9 @@ No retail ROM is needed to build. Everything comes from `asm/` and `src/` in thi
 |---|---:|---:|---|
 | **matched** | 1,777 | 28.5% | compiles byte-identical to retail |
 | **in progress** | 2,654 | 42.6% | extracted, a real C attempt exists |
-| **not started** | 1,775 | 28.5% | extracted, no attempt yet |
+| **not started** | 1,779 | 28.6% | extracted, no attempt yet |
 | **not extracted** | 21 | 0.3% | still raw in `asm/*.s` |
-| | **6,227** | | **total (game proper)** |
+| | **6,231** | | **total (game proper)** |
 
 Plus **923** functions in `asm/mariobros.s` - a complete, separate *Mario Bros.* minigame ROM embedded in the cartridge. Different game, different original developers, tracked apart and **not** counted toward the totals above.
 

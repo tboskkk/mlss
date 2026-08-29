@@ -15,7 +15,7 @@ in service of modding tools, asset editors, and understanding the engine
 (physics/collision is the maintainer's specific interest).
 
 **Run `tools/progress.py` for the live count. Never trust a number in a doc.**
-As of 2026-08-29: 1,777 of 6,227 matched (28.5%). `asm/mariobros.s` is a
+As of 2026-08-29: 1,777 of 6,231 matched (28.5%). `asm/mariobros.s` is a
 separate embedded Mario Bros. ROM — **out of scope by maintainer decision**,
 tracked apart from "game proper" everywhere.
 
@@ -1125,8 +1125,9 @@ knowing before re-spending a session on either:
   disassembly found the true 3-way boundary and that's what got
   executed, not the tool's own output), `sub_80E38A0`→2, `sub_816D778`→2,
   `sub_8134B90`→2, `sub_8161128`→2, `sub_812A930`→2, `sub_8132474`→2,
-  `sub_813B040`→2, `sub_8171C9C`→2, `sub_81583FC`→2. Verified
-  from-scratch after each batch. **The other 30, including the
+  `sub_813B040`→2, `sub_8171C9C`→2, `sub_81583FC`→2, `sub_8046BC8`→2,
+  `sub_80552DC`→2, `sub_806204C`→2, `sub_8062CE4`→2 (22 total). Verified
+  from-scratch after each batch. **The other 26, including the
   92-function `sub_8196ACC`, are still open** — same tool, same
   discipline, just not reached yet. `write_multi_split(src_name,
   segments, src_text)` is ready to use once a segmentation is confirmed:
@@ -1138,6 +1139,20 @@ knowing before re-spending a session on either:
   over-split, for the same underlying reason (short real functions and
   the length-floor safety guard interact) — always read the real
   disassembly before executing, not just the tool's printed spans.
+
+  **`sub_801B0B8` is a confirmed false positive, deliberately skipped —
+  a second, independent instance of the exact bug class this whole
+  section is about, caught by the hand-verification step doing its
+  job.** The algorithm proposed `(0,134),(134,272)`, anchored on a
+  `pop {r3,r7,pc}` match at offset `0x84` — but that address is
+  genuinely dead/pool-adjacent bytes, not executed code: a `b.n 0x92`
+  at `0x80` jumps clean over it, and a separate `beq.n 0x90` from
+  earlier in the function lands just past it, meaning `0x84`'s
+  byte pattern coincidentally decodes as a return while the function's
+  real control flow never touches it. The function's genuine single
+  return is at `0x108`. Left unsplit; still shows up in `--list`/the
+  flagged 48, exactly as it should until someone re-derives its
+  boundary (there is none — it's one function) properly.
 - **`rescore_seeds.plain_score`/`validator._matches_in_plain_build` structurally
   cannot accept a candidate that references a known address via its
   MINTED NAME (`symbols.txt`) where retail's own disassembled `.s`
