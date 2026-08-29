@@ -108,23 +108,27 @@ void sub_81429BC(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8142A10.s\"");
-#else
 s32 sub_80FBDE0(s32 *, s32, s32, s32);          /* extern */
 s32 sub_8139BB0(s32 *, void *, s32, u32);   /* extern */
 
+/* retail passes the 0x7FFF literal through its own call boundary rather than
+   inline -- this wrapper reproduces the resulting argument-load order that a
+   direct call does not. */
+static inline s32 call_sub_80FBDE0(s32 *arg0, s32 arg1, s32 arg2) {
+    return sub_80FBDE0(arg0, arg1, arg2, 0);
+}
+
 s32 sub_8142A10(void *arg0, s32 arg1) {
-    s32 sp0;
+    s32 sp0[4];
     u8 temp_r5_14;
     u8 var_r4_15;
 
     temp_r5_14 = (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (0x1B4)))) + (0xB)));
     var_r4_15 = 0;
-    if ((u32) temp_r5_14 > 0U) {
+    if (var_r4_15 < temp_r5_14) {
 loop_1:
-        sub_8139BB0(&sp0, arg0, 0x22, (u32) ((var_r4_15 << 0x13) + 0xC0000) >> 0x10);
-        if ((sub_80FBDE0(&sp0, arg1, 0x7FFF, 0) << 0x18) != 0) {
+        sub_8139BB0(sp0, arg0, 0x22, (u32) ((var_r4_15 << 0x13) + 0xC0000) >> 0x10);
+        if ((call_sub_80FBDE0(sp0, arg1, 0x7FFF) << 0x18) != 0) {
             return 1;
         }
         var_r4_15 += 1;
@@ -136,4 +140,3 @@ loop_1:
 block_4:
     return 0;
 }
-#endif
