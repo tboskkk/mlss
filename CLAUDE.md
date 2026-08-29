@@ -15,7 +15,7 @@ in service of modding tools, asset editors, and understanding the engine
 (physics/collision is the maintainer's specific interest).
 
 **Run `tools/progress.py` for the live count. Never trust a number in a doc.**
-As of 2026-08-29: 1,778 of 6,275 matched (28.3%). `asm/mariobros.s` is a
+As of 2026-08-29: 1,778 of 6,392 matched (27.8%). `asm/mariobros.s` is a
 separate embedded Mario Bros. ROM — **out of scope by maintainer decision**,
 tracked apart from "game proper" everywhere.
 
@@ -1146,12 +1146,26 @@ knowing before re-spending a session on either:
   from the summary alone (152 bytes isn't unusually large for one
   function), the merge was only visible by actually reading it.
 
-  **The other 6, including the 92-function `sub_8196ACC`, are still
-  open** — same tool, same discipline, just not reached yet. The
-  remaining 6 are the largest in the batch (1480B/25 segments and the
-  5628B/92-function one, plus a few medium ones) and deserve a
-  dedicated, unhurried verification pass rather than being rushed
-  through at the tail of a long session. `write_multi_split(src_name,
+  **DONE as of 2026-08-29: all 45 resolvable fragments split, including
+  the two largest.** `sub_81651A0`→3 closed the small remainder.
+  `sub_818B048` (1480B) and `sub_8196ACC` (5628B, the 92-function
+  per-type dispatch table) each got an EXTRA cross-check beyond the
+  usual hand-reading before executing, given their size and the
+  under-split lesson just learned on `sub_8158FBC`: counted every
+  genuine `push {...,lr}` occurrence in the whole disassembly and
+  confirmed it matched the algorithm's own span count 1:1 with zero
+  discrepancy (25/25 and 92/92), then spot-checked 3–5 transitions
+  spread across the full range (start, several midpoints, end) rather
+  than just the first few. All came back clean on both fragments — no
+  further corrections needed, unlike `sub_806E838`/`sub_8158FBC`.
+  **Final tally: 45 of the original 48 flagged fragments resolved.**
+  The remaining 3 (`sub_8135BF8`, `sub_801B0B8`, `sub_81DC44C`) are
+  deliberately left unsplit — the first two are CONFIRMED single, real,
+  correct functions with no merge at all (false positives in the
+  original flagging, documented above with exactly why each one fooled
+  the checker); the third is a genuine unresolved ambiguity (a bare
+  `bx lr` with no setup at all) needing an actual human judgment call
+  this session had no grounds to make. `write_multi_split(src_name,
   segments, src_text)` is ready to use once a segmentation is confirmed:
   `segments[0]` keeps `src_name`'s own identity (truncated in place),
   `segments[1:]` are new symbols with fresh guards inserted right after
