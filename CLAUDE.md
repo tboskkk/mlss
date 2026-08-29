@@ -1168,6 +1168,66 @@ knowing before re-spending a session on either:
     to capture the winning source directly through the CLI's own save
     path, not a hand-rolled script.
 
+## Tier 2 near-miss landscape (2026-08-29 survey)
+
+Once the multi-return backlog closed, surveyed the REAL size of the
+`tier2_ready` near-miss pool before picking the next target — the 5
+penalty-band functions this file spent most of 2026-08-29 on turned out
+to be some of the WORST cases in a much bigger, much closer population.
+
+**The numbers**: 2,717 rows sit in `tier2_ready`. Of those, 357 are both
+near-miss (`objdiff_score >= 90`) AND heavily escalated (`escalation_
+count >= 10`, meaning the permuter has already tried hard and stalled) —
+this is the real target pool, not the 5 hand-picked functions. **122 of
+those 357 have `iso_score <= 10`** — i.e., 10 bytes or fewer from a real
+match, dramatically closer than any of the 5 walls documented above.
+
+**Categorized a random sample of 25 from the iso_score<=10 pool** via
+direct `target.o`/`base.o` objdump diff (stripping cosmetic label-
+annotation differences first — comparing raw disassembly text naively
+gives false positives, since `target.o`'s bare extraction and `base.o`'s
+real-symbol-table build print the SAME address as `<_08158A60>` vs
+`<sub_8158920+0x10>`, a display artifact with zero byte difference):
+
+| class | count (of 25) | shape |
+|---|---|---|
+| register-swap, same op | **15 (60%)** | `ldr r2,[pc,#N]` vs `ldr r1,[pc,#N]` (and `lsls`/`movs`/`adds` equivalents) — almost always in the FIRST few instructions. Same op, same immediate, different register. |
+| `ldmia`-vs-`ldr` (auto-increment) | 4 (16%) | retail uses `ldmia rX!, {rY}` (auto-incrementing load) where the candidate uses a plain `ldr rY,[rX,#0]` — the exact `sub_80F6250`-class register-pressure pattern already documented above, recurring. |
+| stack-size mismatch | 2 (8%) | `sub sp, #16` (retail) vs `sub sp, #4` (candidate) — candidate under-allocates a stack buffer/array m2c didn't size correctly. NOT previously documented this session. |
+| other/deeper | 4 (16%) | one inverted branch condition (`bgt.n` vs `ble.n`) worth a real look; two literal-pool VALUE mismatches (`.word 0x08cdca30` vs `.short 0x0000` — candidate has a zero/placeholder where retail has a real address, smells like a missing symbol reference, not just codegen); one with no diff in the compared prefix at all (gap is further into the function body, not diagnosed here). |
+
+**What this means for planning, stated plainly and not softened**: at
+n=25 this isn't proof, but it's a real signal, not a guess — **the
+dominant shape (60%) is the exact already-documented "agbcc register
+allocation is not influenceable from plain C for an ordinary statement"
+wall** (see "Heuristic walls found 2026-08-28" above: proven via
+~330,000 permuter tries and a silently-ignored `register asm("r2")`
+hint on the `sub_816B0E0` twin group). If that generalizes, **a
+majority of this 357-row pool may be sitting behind the SAME wall**,
+meaning blind `--allocator-attack` sweeps across the pool should be
+expected to mostly fail exactly the way `sub_8095028` did, not because
+the tooling is broken but because the wall itself is real and already
+proven unreachable from C. The two minority classes are the better
+near-term targets:
+- **`ldmia`-vs-`ldr` (16%)**: same lever already proven to work on
+  `sub_80F6250` (`--allocator-attack`, since it's fundamentally a
+  register-pressure question) — worth running the pool's own rows
+  through it specifically, not just the two originally-flagged
+  functions.
+- **stack-size mismatch (8%)**: a genuinely new, undiagnosed class.
+  Likely the same family as N.6's undeclared-`spNN` stack-struct idiom
+  (`m2c_bridge.fix_undeclared_stack_slots`) or a plain missed local
+  array in m2c's own declaration inference — not root-caused further
+  this session, a real scoped next investigation.
+
+**Not attempted this session**: actually running `--allocator-attack`
+against a real batch from this pool (this was a survey/categorization
+pass, per what was asked, not an attack pass) — the two sample
+functions checked in detail (`sub_8142C18`, `sub_8150270`, both
+stack-size class) and the register-swap majority were read from
+existing `nonmatchings/<name>/target.o`/`base.o` pairs already on disk
+from prior permuter escalation, not freshly generated.
+
 ## Housekeeping outstanding
 
 - **`tools/factory/flag_dead_ends.py` (new, 2026-08-28) flags leaf-pool
@@ -1762,6 +1822,28 @@ knowing before re-spending a session on either:
   `sub_815F81C`, `sub_8159420`, `sub_8159398`, `sub_813BBB8` — the
   entire rest of the confirmed-fresh 16-row pool, ready for a final
   batch to close this out completely.
+
+  **Batch 6 processed 2026-08-29 — the final 8, backlog CLOSED at
+  zero.** All 8 hand-verified before executing: `sub_816B3D8`
+  (132B → 7, a coherent family of tiny bitfield get/clear/set helpers
+  for two different struct offsets — same shape class as the earlier
+  handler-setter/leaf families) and `sub_813BBB8` (180B → 3,
+  dot-product-and-store helpers plus one no-push leaf) both read in
+  full by hand; the other 6 (`sub_8019744` 128B→4, `sub_81609AC`
+  620B→2, `sub_815F87C`/`sub_815F81C` 28B→2 each, `sub_8159420`/
+  `sub_8159398` 32B→2 each) matched the automated boundary-computer's
+  segments exactly with zero skip-warnings. Ran as a background
+  script again (same reasoning as batch 5 — these full rebuilds take
+  longer this session than earlier ones). Final consolidated
+  `rm -rf build/ && make` under `repo_lock()` → clean `mlss.gba: OK`;
+  `check_layout.py` → OK. Re-ran the exact same fresh-derivation query
+  used to confirm the 16 going in: **0 rows remain.** The bridge-
+  decline multi-return backlog (distinct from, and downstream of, the
+  original 48-fragment sweep) is fully closed: every flagged candidate
+  across all 6 batches has been hand-verified and either split (the
+  large majority) or confirmed a genuine false positive and correctly
+  left alone (`sub_8135BF8`, `sub_801B0B8`, the same two named
+  throughout this file's multi-function-merge saga).
 
 - **`sub_80F3FE8`'s penalty-band escape formally secured 2026-08-29,
   through the REAL CLI this time, not a hand-rolled script.** Ran
