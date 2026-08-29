@@ -448,10 +448,25 @@ def text_bytes(asm_text, vma, syms):
                 continue
             off, kind, sym = int(parts[0], 16), parts[1], parts[2]
 
+            abs_m = re.fullmatch(r"\*ABS\*(?:\+|-)?0x([0-9a-fA-F]+)", sym)
             if sym in (".text", ".text.unlikely"):
                 target = vma
             elif sym in by_name:
                 target = by_name[sym]
+            elif abs_m:
+                # `bl 0x826061e` (a bare hex branch target with no symbol at
+                # that address anywhere in mlss.map -- a real, legitimate
+                # case: nothing requires a `bl` target to already be a named
+                # symbol, only to be a real Thumb entry point) assembles to
+                # an R_ARM_THM_CALL against binutils' own `*ABS*+0xADDR`
+                # pseudo-symbol, not a real symbol table entry. That is
+                # ALREADY the fully-resolved target address, baked into the
+                # symbol's own printed name by objdump -- no lookup needed,
+                # and none was ever missing. Confirmed on sub_81604A8: its
+                # rewritten fragment calls 0x0826061E, an address with no
+                # entry anywhere in mlss.map (not yet extracted), and this
+                # is exactly as resolvable at real link time as it is here.
+                target = int(abs_m.group(1), 16)
             else:
                 # Deliberately NOT resolved from the label's own name. A
                 # `_0XXXXXXX` label this fragment does not define is precisely
