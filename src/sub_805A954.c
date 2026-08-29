@@ -20,7 +20,36 @@ void sub_805A95C(void *arg0) {
     *(s16 *)0x02000016 = 0xFF & (*(u16 *)((s8 *)(arg0) + (0x36)));
 }
 
-ASM_FUNC("asm/nonmatching/sub_805A99C.s", void sub_805A99C(void *arg0, s32 arg1));
+s32 process_remove(void *, s32);                /* extern */
+s32 sub_80184F4(s32);                           /* extern */
+
+void sub_805A99C(void *arg0, s32 arg1) {
+    void *temp_r0_14;
+    void *temp_r0_19;
+    void *temp_r0_24;
+    void *temp_r0_29;
+
+    (*(s32 *)((s8 *)(arg0) + (0x18))) = 0x08CDC2A8;
+    sub_80184F4(0x06000000);
+    temp_r0_14 = (*(void **)((s8 *)(arg0) + (0x40)));
+    if (temp_r0_14 != NULL) {
+        free_heap_8018D9C(temp_r0_14);
+    }
+    temp_r0_19 = (*(void **)((s8 *)(arg0) + (0x44)));
+    if (temp_r0_19 != NULL) {
+        free_heap_8018D9C(temp_r0_19);
+    }
+    temp_r0_24 = (*(void **)((s8 *)(arg0) + (0x3C)));
+    if (temp_r0_24 != NULL) {
+        free_heap_8018D9C(temp_r0_24);
+    }
+    temp_r0_29 = (*(void **)((s8 *)(arg0) + (0x38)));
+    if (temp_r0_29 != NULL) {
+        free_heap_8018D9C(temp_r0_29);
+    }
+    process_remove(arg0, arg1);
+}
+
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_805A9E8.s\"");
 #else
