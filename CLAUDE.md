@@ -1723,6 +1723,46 @@ knowing before re-spending a session on either:
   sessions — treat "16 remaining" as the current floor, re-derive
   fresh rather than trusting this number stale in a future session).
 
+  **Re-derived fresh 2026-08-29, exactly as CLAUDE.md's own note above
+  says to — confirmed 16, zero drift this time.** (The 17
+  "missing-from-DB" names the fresh scan also reports are harmless:
+  stale zero-padded names from BEFORE the batch-2 rename fix, still
+  sitting in old git commit messages that `git log --grep` matches —
+  not a real gap, don't re-chase.)
+
+  **Batch 5 processed 2026-08-29 (the first 8 of the freshly-confirmed
+  16): all 8 genuine, all resolved — including two by far the largest
+  functions split this entire session.** `sub_801C110` (5488B → 2,
+  one segment alone 4660 bytes) and `sub_80E1B40` (3904B → 6) were
+  each independently sanity-checked beyond the usual discipline before
+  trusting the tooling on something this size: confirmed their `bx`/
+  `pop` exit instructions matched the segment/return count exactly (no
+  hidden extra exits using an unusual epilogue shape), and for
+  `sub_80E1B40` specifically, confirmed its 2 `_BAD_RE`-flagged
+  "UNDEFINED instruction" lines both sit strictly AFTER their own
+  segment's real return (genuine literal-pool tail, the established
+  harmless class) rather than inside a live code path. Both check out
+  as real, large, coherent single functions (this game apparently has
+  at least one ~4.6KB function, plausibly a script/command
+  interpreter) — not further hidden merges the return-count alone
+  would have missed.
+  - Also split: `sub_8110FA4` (36B→2), `sub_80E4EEC` (172B→3),
+    `sub_80E3E40` (408B→2), `sub_80E168C` (244B→2, one no-push
+    trivial `return 1` leaf verified by hand), `sub_805C700` (60B→2),
+    `sub_8020784` (184B→3).
+  - Ran as a plain background script rather than the usual foreground
+    call — each `write_multi_split()` does its own full `rm -rf
+    build/ && make`, and this batch's from-scratch builds ran longer
+    than prior batches (no single cause identified; not investigated
+    further since the batch still completed correctly, just slower).
+  - Final consolidated verification: `rm -rf build/ && make` under
+    `repo_lock()` → clean `mlss.gba: OK`, plus `check_layout.py` OK.
+  Multi-return backlog: 24 + 8 (batch 5) = **32 resolved, 8 remaining**:
+  `sub_8019744`, `sub_81609AC`, `sub_816B3D8`, `sub_815F87C`,
+  `sub_815F81C`, `sub_8159420`, `sub_8159398`, `sub_813BBB8` — the
+  entire rest of the confirmed-fresh 16-row pool, ready for a final
+  batch to close this out completely.
+
 - **`sub_80F3FE8`'s penalty-band escape formally secured 2026-08-29,
   through the REAL CLI this time, not a hand-rolled script.** Ran
   `python3 tools/factory/in_context_search.py sub_80F3FE8 --body-file
