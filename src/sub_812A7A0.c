@@ -39,6 +39,16 @@ asm_unified(".include \"asm/nonmatching/sub_812A930.s\"");
    counts this as unmatched. Write the C here, replacing this comment. */
 #endif
 
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_812A984.s\"");
+#else
+/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
+   compiles a whole translation unit at a time, so an #error here fails
+   every OTHER function in this file under NONMATCHING=1. Guard intact, so
+   the real ROM still gets the verbatim retail bytes and progress.py still
+   counts this as unmatched. Write the C here, replacing this comment. */
+#endif
+
 ASM_FUNC("asm/nonmatching/sub_812A9A0.s", void * sub_812A9A0(void *arg0, u8 arg1, s8 arg3, s32 arg4));
 s32 process_remove(void *, s32);                /* extern */
 s32 sub_80184F4(s32);                           /* extern */
