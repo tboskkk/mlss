@@ -7,26 +7,30 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80E184C.s\"");
-#else
-void sub_80E184C(void *arg0, s32 arg1) {
-    s32 temp_r0_10;
+void sub_80E184C(void *arg0, void *arg1) {
+    s16 temp_r0_10;
     s32 temp_r1_12;
 
-    temp_r0_10 = M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */);
+    temp_r0_10 = (*(s16 *)((s8 *)(arg0) + (0x14)));
     temp_r1_12 = (*(s32 *)((s8 *)(arg0) + (0xC))) + temp_r0_10;
     (*(s32 *)((s8 *)(arg0) + (0xC))) = temp_r1_12;
-    if (temp_r0_10 < 0) {
-        if (temp_r1_12 < 0xFFFF8000) {
-            goto block_4;
+    /* re-reading temp_r0_10 here (rather than reusing the value above) is
+       what retail's own register allocation needs to land the exact same
+       registers -- removing it compiles fine but no longer matches. */
+    temp_r0_10 = (*(s16 *)((s8 *)(arg0) + (0x14)));
+    if ((s32) temp_r0_10 < 0) {
+        if (temp_r1_12 >= -0x8000) {
+            goto join;
         }
-    } else if ((s32) (M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */) << 8) < temp_r1_12) {
-block_4:
-        (*(s16 *)((s8 *)(arg0) + (0x16))) = 0;
+    } else {
+        if ((s32) ((*(s16 *)((s8 *)(arg1) + (6))) << 8) >= temp_r1_12) {
+            goto join;
+        }
     }
+    (*(s16 *)((s8 *)(arg0) + (0x16))) = 0;
+join:
+    ;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80E1880.s\"");
