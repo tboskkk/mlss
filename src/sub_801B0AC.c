@@ -7,13 +7,9 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_801B0AC.s\"");
-#else
 void sub_801B0AC(s16 arg0) {
     *(s16 *)0x03000D3C = arg0;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_801B0B8.s\"");
