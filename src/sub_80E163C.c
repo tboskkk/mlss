@@ -7,14 +7,15 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80E163C.s\"");
-#else
-/* Undraftable by m2c: its seed did not compile. Deliberately left empty so
-   the REST of this translation unit still builds and can be diffed under
-   NONMATCHING=1. The #ifndef branch above is unaffected -- the real ROM
-   still gets the verbatim retail bytes. */
-#endif
+void sub_80E1A2C();                                 /* extern */
+
+void sub_80E163C(void) {
+    (*(s32 (**)())((s8 *)(*(void **)0x03000FD8) + (0x260)))();
+    (*(s16 *)((s8 *)((void *)0x04000040) + (0))) = 0;
+    (*(s16 *)((s8 *)((void *)0x04000040) + (2))) = 0;
+    (*(s32 (**)(s32, s32, s32))0x03001034)(0xE1FFE1FF, 0x0600F000, 0x500);
+    sub_8018B78(2, sub_80E1A2C);
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80E168C.s\"");
