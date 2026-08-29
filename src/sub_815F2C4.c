@@ -134,15 +134,16 @@ void sub_815F530(void *arg0, s32 arg1) {
     sub_815FACC(arg0);
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_815F56C.s\"");
-#else
 s32 sub_815FAE4(s32, s32);                  /* extern */
-
-void sub_815F56C(s32 arg0, s32 arg2) {
-    sub_815FAE4(arg0, arg2);
+void sub_815F56C(unsigned long long arg0, s32 arg2)
+{
+  s32 new_var;
+  unsigned int new_var2;
+  new_var = arg0;
+  arg2 += 0;
+  new_var2 = new_var;
+  sub_815FAE4(new_var2, arg2);
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_815F578.s\"");
