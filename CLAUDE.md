@@ -15,7 +15,7 @@ in service of modding tools, asset editors, and understanding the engine
 (physics/collision is the maintainer's specific interest).
 
 **Run `tools/progress.py` for the live count. Never trust a number in a doc.**
-As of 2026-08-29: 1,790 of 6,495 matched (27.6%). `asm/mariobros.s` is a
+As of 2026-08-29: 1,794 of 6,496 matched (27.6%). `asm/mariobros.s` is a
 separate embedded Mario Bros. ROM — **out of scope by maintainer decision**,
 tracked apart from "game proper" everywhere.
 
@@ -1319,6 +1319,147 @@ near-term targets:
   immediate, with an otherwise-identical instruction sequence, is this
   same fix — check retail's own reservation size directly rather than
   guessing.
+
+## Continued Tier 2 sweep (2026-08-29, later session)
+
+**Systematic stack-size sweep, done properly this time**: rather than
+hand-picking functions, staged the WHOLE 354-row near-miss pool
+(`objdiff>=90`, `escalation>=10`) through `compiler_variants.stage()` +
+its real SCRIPT (the same primitive `isolation_exact.py` uses) and
+diffed each pair's `sub sp, #N` prologue immediate directly via
+objdump. Found **9 candidates**, not the ~24 a flat 8%-of-357
+extrapolation would predict — the earlier 8% was a small-sample (n=25)
+estimate, and the real count is lower. Of the 9:
+
+- `sub_8142A10`: **MATCHED.** Same class as the 4 already-closed
+  instances (`s32 sp0` → `s32 sp0[4]`, passed by value to
+  `sub_8139BB0`/`sub_80FBDE0`). That alone left a 6-byte in-context gap
+  in the SECOND call's argument-load order (`ldr r2,[pc,#N]` for the
+  `0x7FFF` literal scheduled before vs. after `mov r0,sp` /
+  `adds r1,r6,0`) — traced to a real, fixable cause, not the register-
+  swap wall: wrapping that one call in a small `static inline` helper
+  (`call_sub_80FBDE0(sp0, arg1, 0x7FFF)`, hardcoding the 4th arg to 0
+  inside) reproduces retail's own call-boundary argument order and
+  closes it byte-exact. Also needed the guard-based `if (var_r4_15 <
+  temp_r5_14)` loop-count comparison instead of `temp_r5_14 > 0U` (same
+  register, `cmp r4,r5;bcs` vs `cmp r5,#0;beq` — comparing the actual
+  two live registers instead of one against a synthesized zero).
+- `sub_814A814`: same array fix, PLUS two more instances of the
+  already-documented "compile-time-constant mask gets pre-folded across
+  a statement boundary" defect (`sub_8095028`'s own lesson) — one
+  three-way AND (`-0x21 & X & 0x7F & ~0x40`), one three-way OR
+  (`X | 0x20 | 0x80 | 0x40`), each needed splitting into separate
+  statements against an `s32` (not `u8`) accumulator to stop agbcc
+  folding them into one immediate. That closed the structural gap
+  (`relocs_equal` went `False`→`True`, diff 199→25) but the LAST 25
+  bytes are a `_call_via_rN`-adjacent register-swap wall — confirmed
+  unreachable: `--allocator-attack`, 150s/3200 tries, plateaued at
+  exactly 25. Saved to `nonmatchings/sub_814A814/output-incontext-best/`.
+- `sub_813CAEC`/`sub_81435E4` (twins): the array fix (`s32 sp8` → `s16
+  sp8[6]`, a 6-halfword buffer written directly by the caller itself
+  before ever being passed to a callee — visible from the C's own
+  pre-call stores, not inferred) gets `relocs_equal=True`, but hits a
+  DIFFERENT, harder wall than the ordinary register swap: the
+  function's first statement calls through a computed function pointer
+  (`(*(s32(**)(s32))(...))(arg0)`), which agbcc lowers to a
+  `_call_via_rN` veneer named for whichever register holds the pointer
+  — retail picked r3, this candidate's allocation picks r1, and since
+  the veneer names are DIFFERENT SYMBOLS, `relocs_equal` can never be
+  true regardless of instruction content. `--allocator-attack`,
+  220s/3615 tries, never left the +10000 reloc-mismatch band (plateaued
+  10104). This is a harder variant of the parked register-swap wall,
+  worth its own name (**the "veneer-symbol wall"**) since it blocks
+  more than register content — it blocks a real reloc match. No known
+  lever reaches it. `sub_81435E4` (identical shape, different
+  offsets/callees) almost certainly hits the same wall; not hand-
+  verified.
+- `sub_8146E9C`, `sub_81454A8`, `sub_814CEE8`, `sub_814BB80`: flagged by
+  the `sub sp` scan but on inspection are **NOT** the simple
+  buffer-passed-to-callee class — `relocs_equal=False` and 62-291 raw
+  diff bytes even before any fix, meaning each has a real, separate,
+  deeper structural or signature problem (`sub_814BB80` already had a
+  known-wrong `sub_80FBD44` prototype guess; the others were not root-
+  caused this session). Correctly NOT force-fitted into the array-fix
+  pattern just because the `sub sp` symptom matched — the diagnostic
+  signature (`relocs_equal` staying `False` even after the array fix)
+  is what tells the two classes apart. Left alone for a future session.
+
+**`ldmia`-vs-`ldr` class extended**: a broader `SAME_LEN` classification
+pass (comparing normalized mnemonic-only sequences between candidate
+and retail for the whole 354-row pool: 21 rows are `IDENTICAL_MNEMONICS`
+— pure register-content wall, park on sight; 270 are instruction-COUNT
+mismatches — bigger structural gaps, not this pass's target; 63 are
+`SAME_LEN` with real mnemonic differences, the useful bucket) found 5
+more `ldmia`/`ldr` instances beyond the original 5 (`script_cmd_80F17C4`,
+`sub_80F110C`, `sub_80F112C`, `sub_80F1478`, `sub_80F8900`). Ran the
+identical `--allocator-attack` lever, 200s each, in parallel: **5/5 hit
+again** (scores 3, 5, 4, 3, 6) — the lever keeps generalizing, now
+10/10 across two independent batches. All saved to their own
+`output-incontext-best/`; none reached zero.
+
+**Two genuine matches found and closed while categorizing the 63-row
+`SAME_LEN` bucket** (this is the "other/deeper" 16% category from the
+2026-08-29 survey, revisited with actual function names this time —
+the original survey never recorded which functions it sampled):
+
+- **`sub_80E184C` — MATCHED.** The real bug behind the `bge.n`/`bls.n`
+  condition-code mismatch: the C compared a signed accumulator against
+  the bare hex literal `0xFFFF8000`, which C promotes to `unsigned int`
+  (too large for `int`), forcing an UNSIGNED comparison via usual
+  arithmetic conversion — retail's real comparison is signed against
+  `-0x8000`. Fixing the literal alone wasn't enough: the remaining gap
+  was a loop/branch CFG-rotation mismatch, the same class as
+  `sub_80292EC` — my first rewrite used a direct `if (cond) goto
+  block;` (compiles to one branch straight to the target), but retail's
+  real shape is an INVERTED guard that skips FORWARD past the block on
+  the false... on closer reading, retail's actual condition guards the
+  SKIP case (`if (NOT-cond) goto join;`, falling through to the block
+  otherwise) — rewriting to mirror that edge-for-edge, plus re-reading
+  the `arg0+0x14` field a second time (redundant but required for
+  retail's own register allocation to land), closed it byte-exact.
+- `sub_8082B00`: turned out to be a case of a STALE seed, not a real
+  inverted-branch bug — the tracked `src/sub_8082B00.c` already carries
+  a hand-written positive-form attempt (`if (r1 & 0x10) return TRUE;`)
+  that matches retail's `bne.n` branch-for-branch; the DB's
+  `candidate_body` for this row was an OLDER, negated m2c seed that
+  looked like an inverted-condition bug but wasn't reflective of the
+  file's real current state. The tracked version's only remaining gap
+  is a 2-byte register swap (`ldrb` target / mask-`movs` target
+  swapped, feeding the same final `ands r0,r1`) — confirmed unreachable,
+  `--allocator-attack` 90s/10707 tries plateaued at 2. Small enough that
+  the wall is basically the WHOLE remaining diff for this function.
+- `sub_8062C94`: a CSE-driven wall, a new variant — candidate's compile
+  reuses an already-computed `arg0+0xA0` pointer for the `arg0+0xAC`
+  access 12 bytes later (recognizing `0xAC=0xA0+0xC`); retail's real
+  compile recomputes fresh from `arg0` both times. Not reachable via
+  rewriting either access as a fresh cast (both were already written
+  that way); `--allocator-attack` 220s/11111 tries plateaued at 6.
+- `sub_8087444`: a real structural fix plus a wall. The linked-list walk
+  had register roles retail keeps distinct (a "current" pointer held in
+  one register across the loop body, a separate register for the
+  updated "next" value re-loaded fresh each iteration) that the
+  original single-variable C let the compiler collapse into one
+  register. Splitting into two locals (`var_r1_9` for the loop-carried
+  value, `cur` for the in-body copy — the split m2c's own variable
+  naming was already hinting at) closed a large structural gap down to
+  2 bytes; `--allocator-attack` 90s/3524 tries confirmed the last 2 are
+  the ordinary register-swap wall.
+- `sub_80F5B5C`: partial progress only. Un-folded a `-0x11` compile-
+  time-constant AND mask back into a separate `s32` temp (the
+  `sub_8095028`/`sub_814A814` lesson, a fourth confirmed instance) —
+  moved the gap from a much larger mismatch down to 71, then
+  `--allocator-attack` (90s/2044 tries) to 61. A genuine `-10` byte
+  `size_delta` persists that is NOT just register noise and was not
+  root-caused this session — worth a fresh look, not a wall to park.
+
+**Net for this continuation**: 2 new byte-exact matches (`sub_8142A10`,
+`sub_80E184C`), 8 additional near-misses saved with documented causes
+(4 `ldmia`-class, `sub_814A814`, `sub_813CAEC`, `sub_8082B00`,
+`sub_8062C94`, `sub_8087444`, `sub_80F5B5C` — some overlapping
+categories), one new named wall (**the veneer-symbol wall**, a harder
+relative of the parked register-swap wall, worth distinguishing because
+it blocks relocations, not just instruction content), and a fourth
+confirmed instance of the compile-time-constant-mask-folding defect.
 
 ## Housekeeping outstanding
 
