@@ -7,9 +7,6 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8135F40.s\"");
-#else
 void sub_8135F40(void *arg0) {
     (*(s32 *)((s8 *)(arg0) + (0))) = 0x100;
     (*(s32 *)((s8 *)(arg0) + (4))) = 0;
@@ -28,7 +25,6 @@ void sub_8135F40(void *arg0) {
     (*(s32 *)((s8 *)(arg0) + (0x38))) = 0;
     (*(s32 *)((s8 *)(arg0) + (0x3C))) = 0x100;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8135F68.s\"");
