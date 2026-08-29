@@ -74,7 +74,16 @@ s32 sub_80632E4(struct Entity *arg0) {
     return 0;
 }
 
-ASM_FUNC("asm/nonmatching/sub_8063308.s", void sub_8063308(void *arg0));
+extern s32 sub_808750C;
+
+void sub_8063308(void *arg0) {
+    if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
+        play_sfx_80195B4(0xD8, -1);
+        sub_8082E1C(arg0, 8, 0, 0);
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_808750C;
+    }
+}
+
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_806333C.s\"");
 #else
