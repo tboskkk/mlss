@@ -13,24 +13,21 @@ void sub_8163A64(struct Entity *arg0, s32 arg1, s32 arg2, s32 arg3) {
     (*(s32 *)((s8 *)(arg0) + (0x20))) = arg3;
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8163A6C.s\"");
-#else
-u32 sub_8163A6C(u32 param_1) {
-    u16* puVar1;
-    u16* puVar2;
-    u16* puVar3;
-    u16 uVar4;
-    
-    puVar1 = (u16*)((u32)param_1 + 0x52);
-    uVar4 = *puVar1;
-    puVar2 = (u16*)((u32)puVar1 + 0x2);
-    *puVar2 = uVar4;
-    puVar3 = (u16*)((u32)puVar2 + 0x2);
-    *puVar3 = uVar4;
-    return param_1;
+void sub_8163A6C(void *arg0)
+{
+  int new_var3;
+  u16 new_var2;
+  void *temp_r0_7;
+  int new_var;
+  s8 *new_var4;
+  void *temp_r0_9;
+  temp_r0_7 = (void *) (arg0 + 0x52);
+  new_var2 = *((u16 *) (((s8 *) arg0) + 0x52));
+ temp_r0_9 = (void *) (temp_r0_7 + 2); new_var4 = ((s8 *) temp_r0_7) + 2; *((u16 *) new_var4) = (u16) new_var2; new_var3 = 2;
+  new_var = new_var3;
+  new_var2 = (u16) (*((u16 *) (((s8 *) ((void *) (temp_r0_7 + new_var3))) + new_var)));
+  *((u16 *) (((s8 *) (((void *) (temp_r0_7 + new_var)) + new_var)) + new_var)) = new_var2;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8163A80.s\"");
