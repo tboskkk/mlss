@@ -266,9 +266,29 @@ THIS fix specifically, not a re-derivation of the census total.
   anchor on. Verified: `sub_8121B5C` compiles clean in isolation; 200-row
   regression sample, 0 exceptions, rule touched 2 rows (expected — a
   narrow sub-shape of an already-small ~3.3% family). Fixed in `f0f03acd`.
-  **The broader N.6 idiom itself (the contiguous-`ldr`/`str`-run struct-
-  copy shape, `sub_8135084`'s example) is still unimplemented** — this
-  fix is the bare-`sp` sibling only, not that one.
+  **The broader N.6 idiom itself — the contiguous-`ldr`/`str`-run
+  struct-copy shape, `sub_8135084`'s own example — is now ALSO fixed**
+  (`m2c_bridge.fix_undeclared_stack_slots`, `93fc8c65`, 2026-08-28), not
+  via the census's own sketched approach (scanning the `.s` fragment for
+  a monotonic `ldr`/`str` run) but at the C level: the undeclared `spN`
+  tokens (`sp48`...`sp7C` in the worked example) ARE the missing
+  information, one per slot, and the function's own surviving code
+  already shows the exact idiom to generalize (`sub_8135084`'s last line
+  already reads offset `0x3C` from `&sp44` via `*(s32 *)((s8 *)(&sp44) +
+  (0x3C))` — m2c's own fallback once its per-offset naming runs out).
+  Rewrites each undeclared `spN` reference as pointer arithmetic from the
+  nearest DECLARED `spN` anchor rather than declaring a fresh local —
+  declaring one would be actively WRONG, not just uncompilable: these
+  slots are never assigned by an ordinary statement, they get their real
+  values as a side effect of an earlier call that received a pointer to
+  the low end of the same stack region and filled it through that output
+  pointer (`sub_8134CAC(&sp44, arg0, &sp0)`); a fresh local would read a
+  different, garbage stack slot. Verified: `sub_8135084` compiles clean
+  in isolation now (was `BOTH_FAIL`); not yet byte-exact (130 diff bytes
+  via `in_context_permuter.score_in_context`, same "seed not a match"
+  expectation as every other seed-generation fix here — needs real
+  permuter search on top). 200-row regression sample: 0 exceptions, rule
+  touched 3 rows (matches the census's own ~3.3% sizing for this idiom).
 
 ## Local m2c patches (never upstream)
 
