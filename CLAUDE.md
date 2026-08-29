@@ -15,7 +15,7 @@ in service of modding tools, asset editors, and understanding the engine
 (physics/collision is the maintainer's specific interest).
 
 **Run `tools/progress.py` for the live count. Never trust a number in a doc.**
-As of 2026-08-28: 1,711 of 6,012 matched (28.5%). `asm/mariobros.s` is a
+As of 2026-08-28: 1,732 of 6,078 matched (28.5%). `asm/mariobros.s` is a
 separate embedded Mario Bros. ROM — **out of scope by maintainer decision**,
 tracked apart from "game proper" everywhere.
 
@@ -154,15 +154,121 @@ Known rough edges: literal-pool symbol resolution is imperfect; it doesn't
 infer arrays; register-size aliasing is weak; complex control flow falls back
 to `goto`; it can't translate BIOS `swi` veneers.
 
-**The biggest known m2c defect, and the largest lever available (2026-08-23):**
-four error classes — `invalid type argument of unary *`, `called object is not
-a function`, `void value not ignored`, `invalid use of void expression`,
-**85.1% of all compile failures** — are ONE defect: m2c reconstructs an address
-as untyped arithmetic then dereferences/calls it with no cast. **1,126
-functions (77.8%)** have every diagnostic inside this family; 1,060 are
-otherwise clean. Two existing rules patch narrow slices, which is why the
-general pattern went unnoticed. Design sketch in
-`docs/review-2026-08-23-m2c-census.md`.
+**The biggest known m2c defect (2026-08-23): FIXED, not just designed —
+CLAUDE.md was stale on this point until 2026-08-28.** Four error classes —
+`invalid type argument of unary *`, `called object is not a function`,
+`void value not ignored`, `invalid use of void expression`, **85.1% of all
+compile failures** — are ONE defect: m2c reconstructs an address as untyped
+arithmetic then dereferences/calls it with no cast. **1,126 functions
+(77.8%)** had every diagnostic inside this family; 1,060 were otherwise
+clean. Full analysis in `docs/review-2026-08-23-m2c-census.md` (that doc's
+own "design sketch, not implemented" framing is now stale too — read it
+for the measurements, not for current implementation status).
+
+`tools/factory/m2c_bridge.fix_untyped_address_access()` implements the
+generalization the census sketched, wired unconditionally into
+`generate()` — added 2026-08-24, refined 2026-08-26 (three commits:
+`e79007cb`, `ba87be68`, `f4528bc3`), two days before the census-derived
+"go build this" instruction reached a session that hadn't re-checked
+whether it already existed. Walks balanced-paren `*(...)` and `(...)(`
+spans, classifies the head via `_local_types()`/`_classify_untyped_head()`
+against the function's own declared locals, and only wraps a span whose
+head is PROVABLY not already a real pointer (a declared scalar, a raw hex
+literal, or itself a `*(TYPE *)(...)` dereference — which always yields a
+scalar in C) — a bare pointer-typed identifier is left untouched, since
+adding a cast there would be a no-op at best and risks changing
+dereference width at worst.
+
+**Found and fixed live 2026-08-28, testing 4 functions an earlier session
+had filed under this defect from a leaf-candidate batch**
+(`sub_8070990`/`sub_807DFE8`/`sub_810D3B8`/`sub_8121B5C`): only 1 of the 4
+(`sub_8070990`) actually belongs to this family — the other 3 are
+different, already-documented classes (`werror_casts.py`'s pointer/int-cast
+mismatch; N.6's undeclared-`spNN` stack-struct idiom) that this rule was
+never going to touch. `sub_8070990`'s real blocker was a bug in the OLDER,
+narrower `fix_uncast_address_dereference()` (the one that predates
+`fix_untyped_address_access` and handles the bare-`0x`-literal case
+specifically): its "already has a cast, don't touch it" guard was a bare
+substring search, `"*)" not in inner`, over the WHOLE parenthesized
+expression rather than a check on its head. Since `stripped.startswith
+("0x")` already proves the head is a hex literal (which can't also be a
+cast), the guard could only ever fire on an unrelated NESTED cast deeper
+in the expression — e.g. `*(0x083B873C + (s32)((*(u8 *)0x03000E7C * 6) +
+...))`, where the inner `(u8 *)` sub-dereference's cast made the rule
+skip the outer address computation it was supposed to fix. Wrapping the
+whole inner expression in a pointer cast is always valid regardless of
+what's nested inside it (it evaluates to an integer either way), so there
+was no real case the guard protected — confirmed by removing it and
+testing, not just reasoned about. Fixed in `b958cd6e`.
+
+**Verified at scale, not just on the one named function** — isolated via
+`gitops.compiles_in_isolation()` (the census's own method; NOT
+`in_context_permuter`, which compiles the real whole file and mixes in
+sibling-function TU-poisoning noise, hit live during this check when an
+early pass reported errors inside a DIFFERENT function than the one being
+tested): a 150-row random sample of `needs_attempt`/`stalled` flipped 6
+rows from failing to compiling, and each of the 6 was confirmed to
+specifically need this fix (stashed it, re-ran the same 6 under the
+pre-fix code, all 6 failed again) rather than coinciding with something
+else. `ruleset_version()` hashes `m2c_bridge.py`'s own bytes, so this fix
+auto-bumped the ruleset stamp and re-opened every row `tier_m2c.py`
+previously declined under the old one — no manual requeue needed, exactly
+the mechanism `ruleset_version()`'s own docstring describes.
+
+**Not sized at the full 1,126/1,060 headline** — that number describes
+the whole defect family, most of which `fix_untyped_address_access()`
+already covered before this session; this fix closed one specific
+false-negative gap inside the older, narrower rule it doesn't fully
+subsume. The 150-row sample's 6/150 (~4%) is the honest measured rate for
+THIS fix specifically, not a re-derivation of the census total.
+
+**The other 3 of those 4 functions, fixed the same day (2026-08-28):**
+
+- **`werror_casts.py` had two real bugs, both hit by `sub_807DFE8`/
+  `sub_810D3B8`.** (1) Its real-file precondition check (`apply()`)
+  compiles the whole spliced `src/*.c`, so an unrelated, genuinely broken
+  SIBLING in the same file — `sub_810D3B8`'s neighbour `sub_810D34C` is
+  not valid C at all, raw register-name pseudocode — fails the "compiles
+  with warnings allowed" check for every function in the file regardless
+  of their own merit (THE LAW's TU-poisoning shape, hitting this tool
+  specifically). Fixed with an isolation fallback (`_compile_isolated`,
+  `_poisoned_by_sibling`): when the real-file precondition fails and every
+  diagnostic is attributable to a different function, retry the whole
+  precondition + cast round-loop isolated instead of declining outright.
+  (2) `_cast_comparison()`'s "cast whichever side has a `*`" heuristic
+  cast the WRONG side on `(*(s32 *)(...)) == &sub_8086960` — the `*(s32
+  *)` dereference contains `*` but evaluates to a scalar, while the real
+  pointer (`&sub_8086960`) has no `*` at all — so the cast landed on the
+  already-scalar side (a no-op) and the warning never cleared. Fixing
+  that surfaced a second bug: the tail-side branch always appended a
+  literal `;`, corrupting an `if (a == b) {` line (no trailing `;` at
+  all) into a syntax error. Replaced both with a precise pointer-
+  expression match (`&name`, a typed cast-deref) that preserves whatever
+  trailing syntax follows byte-for-byte. Verified via `apply()`'s own
+  byte-identity proof (unchanged) on both named functions, plus a 60-row
+  regression sample: 5 genuine fixes, 0 exceptions. Fixed in `accc14b7`.
+- **N.6's stack-struct family has a sibling shape, also unimplemented
+  until now: m2c's bare `sp` symbol** (`translate.py`:
+  `GlobalSymbol("sp", type=Type.ptr())`) for the raw stack-pointer
+  REGISTER value used directly (an `add rX, sp`-fed indexed access), as
+  opposed to a fixed-offset named `spN` slot. m2c never declares plain
+  `sp`, so referencing it is a hard `sp' undeclared` error. Confirmed
+  against `sub_8121B5C`'s real `.s` fragment, not guessed: `*(((3 & spC)
+  * 4) + sp)` traces to `movs r1,#3; ldr r2,[sp,#0xC]; ands r1,r2;
+  lsls r1,r1,#2; add r1,sp; ldr r1,[r1,#0]` — a genuine register add,
+  confirming `sp` really is the live stack-pointer value there. Fix
+  (`m2c_bridge.fix_bare_stack_pointer`, new): since agbcc/GBA Thumb
+  functions never move the stack pointer mid-body, `sp`'s value equals
+  the address of frame offset 0 for the whole function — point it at
+  `&spN` (or `&spN - N`) using whichever `spN` local the function already
+  declares with the lowest offset, reusing an existing declaration rather
+  than inventing one. Declines (doesn't guess) when no `spN` exists to
+  anchor on. Verified: `sub_8121B5C` compiles clean in isolation; 200-row
+  regression sample, 0 exceptions, rule touched 2 rows (expected — a
+  narrow sub-shape of an already-small ~3.3% family). Fixed in `f0f03acd`.
+  **The broader N.6 idiom itself (the contiguous-`ldr`/`str`-run struct-
+  copy shape, `sub_8135084`'s example) is still unimplemented** — this
+  fix is the bare-`sp` sibling only, not that one.
 
 ## Local m2c patches (never upstream)
 
@@ -910,11 +1016,19 @@ knowing before re-spending a session on either:
   free win but no longer wasting search time on an unwinnable gap.
   Commits: `bc398eba`, `3fdf8a8b`; splits/matches follow from there.
 
-  **Still open**: 201 push-prologue candidates (worth re-confirming the
-  byte total post-dedup-fix, not yet done) remain unbatched — this
-  entry only closed the handler-setter sub-class. Re-running
-  `python3 tools/factory/split_trailing.py --list` gives the current,
-  now-deduped set.
+  **The 201 push-prologue candidates were batch-run 2026-08-28.** Result:
+  **60 split cleanly** (verified from-scratch `mlss.gba: OK` under
+  `repo_lock` for each, plus one final whole-batch rebuild), several
+  already promoted to `matched` by the live factory once their trailing
+  block stopped poisoning the score. **The other 135 were correctly
+  DECLINED by the tool's own safety check**, not guessed at — their
+  trailing bytes don't end in a recognizable `bx`/`pop {...,pc}` return
+  within the split window, so `looks_complete()` refused rather than
+  emit a possibly-wrong split. Those 135 genuinely need a human look
+  (or a smarter completeness check, not attempted here) before they can
+  be split automatically — this is not the same population as the
+  handler-setter sub-class above, and re-running `--list` will still
+  show them since nothing was split for those names.
 - **`rescore_seeds.plain_score`/`validator._matches_in_plain_build` structurally
   cannot accept a candidate that references a known address via its
   MINTED NAME (`symbols.txt`) where retail's own disassembled `.s`
