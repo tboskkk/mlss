@@ -19,21 +19,24 @@ u8 *sub_80479A8(u8 *a0)
   return a0 + 693;
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80479BC.s\"");
-#else
-s32 sub_80479BC(void *arg0) {
-    s32 temp_r0_11;
-    s32 var_r1_12;
-
-    temp_r0_11 = 0x30 & (*(u8 *)((s8 *)(arg0) + (0x2B6)));
-    var_r1_12 = temp_r0_11;
-    if (temp_r0_11 != 0) {
-        var_r1_12 = 1;
+s32 sub_80479BC(void *arg0)
+{
+  int new_var;
+  unsigned int new_var2;
+  s32 temp_r0_11;
+  s32 var_r1_12;
+  new_var2 = *((u8 *) (((s8 *) arg0) + 0x2B6));
+ do { temp_r0_11 = 0x30 & (*((u8 *) (((s8 *) arg0) + 0x2B6))); var_r1_12 = temp_r0_11; } while (0);
+  if ((unsigned char) ((0x30 & new_var2) != 0))
+  {
+    if (1)
+    {
     }
-    return var_r1_12;
+    new_var = 1;
+    var_r1_12 = new_var;
+  }
+  return var_r1_12;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80479DC.s\"");
