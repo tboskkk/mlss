@@ -7,18 +7,16 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_819B19C.s\"");
-#else
-u8 sub_819B19C(u8 param_1) {
-    u8* puVar1;
-    
-    puVar1 = *(u8**)(0x03007FF0);
-    puVar1 = puVar1 + 0x494 + param_1;
-    *puVar1 = *puVar1 | 1;
-    return param_1;
+void sub_819B19C(s32 arg0)
+{
+  int new_var2;
+  u8 *temp_r1_10;
+  int new_var;
+  new_var2 = (*((s32 *) 0x03007FF0)) + 0x494;
+  temp_r1_10 = (u8 *) (new_var2 + arg0);
+  new_var = (*temp_r1_10) | 1;
+  *temp_r1_10 = new_var;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_819B1B8.s\"");
