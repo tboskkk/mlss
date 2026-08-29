@@ -15,7 +15,7 @@ in service of modding tools, asset editors, and understanding the engine
 (physics/collision is the maintainer's specific interest).
 
 **Run `tools/progress.py` for the live count. Never trust a number in a doc.**
-As of 2026-08-29: 1,777 of 6,236 matched (28.5%). `asm/mariobros.s` is a
+As of 2026-08-29: 1,778 of 6,244 matched (28.5%). `asm/mariobros.s` is a
 separate embedded Mario Bros. ROM — **out of scope by maintainer decision**,
 tracked apart from "game proper" everywhere.
 
@@ -1127,8 +1127,9 @@ knowing before re-spending a session on either:
   `sub_8134B90`→2, `sub_8161128`→2, `sub_812A930`→2, `sub_8132474`→2,
   `sub_813B040`→2, `sub_8171C9C`→2, `sub_81583FC`→2, `sub_8046BC8`→2,
   `sub_80552DC`→2, `sub_806204C`→2, `sub_8062CE4`→2, `sub_8068D0C`→2,
-  `sub_806D3F8`→2, `sub_80E9228`→2, `sub_812182C`→2, `sub_8134A44`→2
-  (27 total). Verified from-scratch after each batch. **The other 21,
+  `sub_806D3F8`→2, `sub_80E9228`→2, `sub_812182C`→2, `sub_8134A44`→2,
+  `sub_81366B8`→3, `sub_806C9FC`→3, `sub_8160FCC`→2, `sub_819AA9C`→4
+  (31 total). Verified from-scratch after each batch. **The other 17,
   including the 92-function `sub_8196ACC`, are still open** — same tool,
   same discipline, just not reached yet. `write_multi_split(src_name,
   segments, src_text)` is ready to use once a segmentation is confirmed:
@@ -1154,6 +1155,20 @@ knowing before re-spending a session on either:
   return is at `0x108`. Left unsplit; still shows up in `--list`/the
   flagged 48, exactly as it should until someone re-derives its
   boundary (there is none — it's one function) properly.
+
+  **`sub_81DC44C` is a genuine, unresolved AMBIGUITY, deliberately left
+  unsplit rather than guessed at — a third shape distinct from the two
+  false-positive patterns above.** The algorithm proposes 3 functions;
+  the first two boundaries check out cleanly (a real `pop {r4,pc}`
+  return, real pool), but the second segment's own first byte is a
+  bare `bx lr` with NOTHING before it in that segment — no setup, no
+  arguments used, nothing — either a genuinely degenerate zero-body
+  "function" (a real, if strange, empty stub/placeholder some code
+  elsewhere calls) or 2 orphaned bytes of dead/padding code that
+  happen to be a valid instruction, and unlike the other cases in
+  this section there's no independent evidence (no `bl`/pointer-table
+  reference found) to decide which. Needs a human judgment call this
+  session didn't have grounds to make confidently.
 - **`rescore_seeds.plain_score`/`validator._matches_in_plain_build` structurally
   cannot accept a candidate that references a known address via its
   MINTED NAME (`symbols.txt`) where retail's own disassembled `.s`
