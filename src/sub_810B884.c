@@ -191,16 +191,10 @@ void sub_810CA30(void) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_810CA8C.s\"");
-#else
-void sub_810CA30();                              /* extern */
-
 void sub_810CA8C(s8 arg0) {
     (*(s8 *)((s8 *)(*(void **)0x03000FD8) + (0x2F9))) = arg0;
     sub_810CA30();
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_810CAA8.s\"");
