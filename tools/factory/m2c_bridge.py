@@ -534,6 +534,7 @@ def generate(name: str) -> str | None:
     c = fix_scaled_pointer_arithmetic(c, name)
     c = fix_pointer_assign_without_cast(c)
     c = fix_integer_assign_from_pointer(c)
+    c = fix_bare_stack_pointer(c)
     return restore_omitted_leading_params(c, name)
 
 
@@ -955,6 +956,62 @@ def fix_integer_assign_from_pointer(c: str) -> str:
         return f"{indent}{lhs}{eq}({lhs_type}) ({base}{rest});"
 
     return _INT_ASSIGN_FROM_PTR_RE.sub(repl, c)
+
+
+BARE_SP_RE = re.compile(r"\bsp\b")
+SP_SLOT_DECL_RE = re.compile(
+    r"^\s*(?:s8|u8|s16|u16|s32|u32|s64|u64|void\s*\*)\s+sp([0-9A-Fa-f]+)\s*;", re.MULTILINE)
+
+
+def fix_bare_stack_pointer(c: str) -> str:
+    """Give m2c's bare `sp` symbol (translate.py: `GlobalSymbol("sp",
+    type=Type.ptr())`, its name for the raw stack-pointer REGISTER value
+    used directly, as opposed to `spN` -- one specific named stack SLOT at
+    frame offset N) a real, declared address to point at.
+
+    m2c emits bare `sp` when it recovers a genuine `add rX, sp` /
+    `mov rX, sp` -- the frame base computed into a register and then used
+    for INDEXED access (`ldr rX, [rX, #0]` after adding a variable
+    offset) -- rather than a single fixed-offset `[sp, #imm]` load, which
+    is what produces a named `spN` local instead. `sp` alone is simply
+    never declared as anything, a hard compile error (`sp' undeclared`).
+
+    Confirmed against the real .s fragment, not guessed from the C alone
+    (found live on sub_8121B5C): `*(((3 & spC) * 4) + sp)` traces to
+    `movs r1, #3; ldr r2, [sp, #0xC]; ands r1, r2; lsls r1, r1, #2;
+    add r1, sp; ldr r1, [r1, #0]` -- `add r1, sp` is a genuine two-
+    operand register add (r1 += sp), not `[sp, #imm]`, confirming `sp`
+    here really is the live stack-pointer VALUE at that point in the
+    function, not a typo or a different named slot.
+
+    A fixed frame with no further `add`/`sub sp` between prologue and
+    epilogue (true for every ordinary Thumb function in this project --
+    agbcc/GBA does not do alloca) means the stack pointer's value is
+    constant for the whole function body and equal to the address of
+    frame offset 0. Point `sp` at that address via whichever `spN` local
+    the function already declares with the LOWEST offset -- reusing an
+    existing declaration rather than inventing a new one, and matching
+    the SAME "&spN as a byte-pointer base" idiom this project's own m2c
+    output already uses throughout for adjacent-stack-slot access (the
+    memcpy-shaped `(*(s32 *)((s8 *)(&sp0) + (4)))` lines are the same
+    pattern, one call site over). Correct for any offset, not just 0:
+    `&spN - N` is frame offset 0's address by ordinary pointer
+    arithmetic, whether or not N is itself 0.
+
+    Only fires when the function declares at least one spN local to
+    anchor on -- if none exists, this cannot manufacture a safe address
+    and correctly declines rather than guessing one.
+    """
+    if not BARE_SP_RE.search(c):
+        return c
+    offsets = [int(h, 16) for h in SP_SLOT_DECL_RE.findall(c)]
+    if not offsets:
+        return c
+    n = min(offsets)
+    hexn = format(n, "X")
+    anchor = f"(&sp{hexn})" if n == 0 else f"((&sp{hexn}) - {n})"
+    replacement = f"((s8 *)({anchor}))"
+    return BARE_SP_RE.sub(lambda m: replacement, c)
 
 
 _PARAM_LIST_RE = r"^[\w \*]+?\b{}\s*\(([^;{{)]*)\)\s*\{{"
