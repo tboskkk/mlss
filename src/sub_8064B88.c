@@ -125,14 +125,11 @@ void sub_8064D20(struct Entity *arg0) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8064D64.s\"");
-#else
 extern s32 sub_8064E08;
 
 s32 sub_8064D64(void *arg0) {
     (*(s32 *)((s8 *)(arg0) + (0xA0))) = 0;
-    if (M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */) == -1) {
+    if ((*(s16 *)((s8 *)((*(void **)((s8 *)((*(void **)((s8 *)(arg0) + (0x2C)))) + (0x28)))) + (0xEC))) == -1) {
         (*(s32 *)((s8 *)(arg0) + (0x9C))) = 0;
     } else {
         (*(s32 *)((s8 *)(arg0) + (0x9C))) = 1;
@@ -140,7 +137,6 @@ s32 sub_8064D64(void *arg0) {
     (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8064E08;
     return 1;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8064DA0.s\"");
