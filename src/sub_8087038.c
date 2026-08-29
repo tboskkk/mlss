@@ -260,37 +260,43 @@ asm_unified(".include \"asm/nonmatching/sub_80873B8.s\"");
    still gets the verbatim retail bytes. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8087444.s\"");
-#else
-s32 sub_807FF48(s32 *, void *);             /* extern */
-s32 sub_8086700(void *);                        /* extern */
+s32 sub_8086700(void *);
 extern s32 sub_8087C20;
-
-s32 sub_8087444(void *arg0) {
-    void *temp_r5_8;
-    void *var_r1_9;
-
-    temp_r5_8 = (*(void **)((s8 *)(arg0) + (0x28)));
-    var_r1_9 = (*(void **)((s8 *)(temp_r5_8) + (0)));
-    if (var_r1_9 != NULL) {
-        do {
-            if (2 & (*(u8 *)((s8 *)(var_r1_9) + (0x111)))) {
-                sub_807FF48(&sub_8087C20, var_r1_9);
-            } else {
-                sub_8086700(var_r1_9 + 8);
-            }
-            var_r1_9 = (*(void **)((s8 *)(var_r1_9) + (0)));
-        } while (var_r1_9 != temp_r5_8);
+s32 sub_8087444(void *arg0)
+{
+  void *temp_r5_8;
+  void *var_r1_9;
+  void *cur;
+  temp_r5_8 = (void *) (*((void **) (((s8 *) arg0) + 0x28)));
+  var_r1_9 = (void *) (*((void **) (((s8 *) temp_r5_8) + 0)));
+  if (var_r1_9 != NULL)
+  {
+    do
+    {
+      cur = var_r1_9;
+      var_r1_9 = (void *) (*((void **) (((s8 *) cur) + 0)));
+      if (2 & (*((u8 *) (((s8 *) cur) + 0x111))))
+      {
+        sub_807FF48(&sub_8087C20, cur);
+      }
+      else
+      {
+        sub_8086700(cur + 8);
+      }
+      var_r1_9 = (void *) (*((void **) (((s8 *) cur) + 0)));
     }
-    if (2 & (*(u8 *)((s8 *)(temp_r5_8) + (0x111)))) {
-        sub_807FF48(&sub_8087C20, temp_r5_8);
-    } else {
-        sub_8086700(arg0);
-    }
-    return 1;
+    while (var_r1_9 != temp_r5_8);
+  }
+  if (2 & (*((u8 *) (((s8 *) temp_r5_8) + 0x111))))
+  {
+    sub_807FF48(&sub_8087C20, temp_r5_8);
+  }
+  else
+  {
+    sub_8086700(arg0);
+  }
+  return 1;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80874B4.s\"");
