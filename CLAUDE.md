@@ -15,7 +15,7 @@ in service of modding tools, asset editors, and understanding the engine
 (physics/collision is the maintainer's specific interest).
 
 **Run `tools/progress.py` for the live count. Never trust a number in a doc.**
-As of 2026-08-28: 1,732 of 6,078 matched (28.5%). `asm/mariobros.s` is a
+As of 2026-08-28: 1,777 of 6,210 matched (28.6%). `asm/mariobros.s` is a
 separate embedded Mario Bros. ROM — **out of scope by maintainer decision**,
 tracked apart from "game proper" everywhere.
 
@@ -1049,6 +1049,79 @@ knowing before re-spending a session on either:
   be split automatically — this is not the same population as the
   handler-setter sub-class above, and re-running `--list` will still
   show them since nothing was split for those names.
+
+- **135→128/135 recovered via `looks_complete_with_pool()` (same day),
+  but a real methodology bug in it reached already-committed work before
+  being caught and fixed — full history worth reading before touching
+  this population again.** Investigating 7 of the 135 stragglers found
+  every one already ends in an exit the tool recognizes (`bx r0`/`bx
+  r1`/`pop {...}; bx r0`) — the actual bug was `looks_complete()`
+  checking the *last disassembled line* of a trailing blob, which is
+  always garbage-decoded pool data after a real return, not the return
+  itself. `looks_complete_with_pool()` fixed that — but its first
+  shipped version (anchoring on the LAST return-matching line) merged
+  **multiple separate hidden functions under one symbol** whenever a
+  pool word coincidentally decoded as something matching the return
+  regex, confirmed on `sub_80479DC` (two byte-for-byte-identical
+  mini-functions, differing only in one embedded constant). Caught by
+  auditing all 128 already-completed splits, not before commit. A second
+  attempt (first-candidate-only) fixed the merge but broke the opposite
+  case — `sub_8135BF8`, a real, correct 808-byte function with an early
+  internal return, got permanently declined. **The shipped fix
+  (`47252d94`) is conservative on purpose**: `looks_complete_with_pool()`
+  now fires ONLY when a fragment has exactly one return-matching line,
+  eliminating the ambiguity structurally rather than guessing — narrower
+  coverage, but neither bug can recur through it.
+
+  **~48 of the 128 are still flagged** (multiple return-matching lines,
+  declined by the conservative checker) and need individual manual
+  review — `sub_8135BF8` above is a CONFIRMED false positive (fine,
+  no merge) sitting in this same list, which matters for what's below.
+
+- **A recursive, address-verified segmentation search
+  (`write_multi_split()`'s design notes, `b3769c43`) can PROPOSE
+  boundaries for the 48 — do not let it decide for itself.** It walks
+  return-matching candidates and recursively carves a fragment into
+  spans, each proven only by its own literal-pool cross-referencing (an
+  address is only "this span's pool" if referenced by an `ldr rX,[pc,#N]`
+  strictly inside that same span) — no byte-pattern guessing about what
+  a fresh prologue looks like. It exactly reproduces every
+  hand-confirmed boundary tried: `sub_80479DC` (2), `sub_8084004` (2),
+  `sub_80E4308` (3), and `sub_8196ACC` (92 — apparently a per-type
+  dispatch table, near-identical ~60-byte entries at dead-regular
+  intervals; no direct `bl` reference to any entry found anywhere in the
+  tracked corpus, so it's likely reached only through a computed
+  function-pointer table elsewhere — the regularity itself is the
+  strongest evidence for this one specifically).
+
+  **It cannot self-certify, though — measured, not assumed.** Run
+  against all 48, it proposes SOME multi-way decomposition for every
+  single one, including `sub_8135BF8` (the confirmed-fine false
+  positive above) — an early return's coincidental push-looking byte
+  pattern is enough to fool the recursion into a spurious full
+  resolution. Three additional guards were tried and NONE discriminated
+  the false case from the four confirmed-real ones: a minimum segment
+  length (the real cases all clear it easily; the false positive's
+  spurious segments include two 4-byte "functions", but raising the
+  floor just finds a different spurious 9-way split instead of the
+  correct 1-way answer), independently re-verifying each proposed
+  segment on its own (they all pass, by construction — the same
+  single-return check the recursion is built from), and cross-
+  referencing candidate addresses against the whole tracked corpus (zero
+  hits either way, real or spurious, so no signal at all). **"Does it
+  decompose" carries no diagnostic power for this corpus.** Use the
+  algorithm's output as a fast starting point for a human reading the
+  real disassembly, never as the verdict itself.
+
+  **Executed on 3 of the 48**, each independently confirmed by hand
+  before running: `sub_80479DC`→2 functions, `sub_8084004`→2,
+  `sub_80E4308`→3 (`b3769c43`). Verified from-scratch each time and once
+  more for the whole batch. **The other 45, including the 92-function
+  `sub_8196ACC`, are still open** — same tool, same discipline, just not
+  reached yet. `write_multi_split(src_name, segments, src_text)` is
+  ready to use once a segmentation is confirmed: `segments[0]` keeps
+  `src_name`'s own identity (truncated in place), `segments[1:]` are
+  new symbols with fresh guards inserted right after it.
 - **`rescore_seeds.plain_score`/`validator._matches_in_plain_build` structurally
   cannot accept a candidate that references a known address via its
   MINTED NAME (`symbols.txt`) where retail's own disassembled `.s`
