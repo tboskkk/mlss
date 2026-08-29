@@ -7,30 +7,29 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_816D734.s\"");
-#else
-void sub_816D734(void *arg0) {
-    s32 temp_r0_10;
-    s32 temp_r3_9;
-    u32 temp_r0_18;
-    u32 temp_r0_31;
-
-    temp_r3_9 = (*(s32 *)((s8 *)(arg0) + (0x70)));
-    temp_r0_10 = (*(s32 *)((s8 *)(arg0) + (0x78))) + temp_r3_9;
-    (*(s32 *)((s8 *)(arg0) + (0x78))) = temp_r0_10;
-    if (temp_r0_10 <= 0x57FF) {
-        (*(s32 *)((s8 *)(arg0) + (0x78))) = 0x5800;
-        temp_r0_18 = 0 - temp_r3_9;
-        (*(s32 *)((s8 *)(arg0) + (0x70))) = (s32) ((s32) (temp_r0_18 + (temp_r0_18 >> 0x1F)) >> 1);
-    }
-    if ((s32) (*(s32 *)((s8 *)(arg0) + (0x78))) > 0x7800) {
-        (*(s32 *)((s8 *)(arg0) + (0x78))) = 0x7800;
-        temp_r0_31 = 0 - (*(s32 *)((s8 *)(arg0) + (0x70)));
-        (*(s32 *)((s8 *)(arg0) + (0x70))) = (s32) ((s32) (temp_r0_31 + (temp_r0_31 >> 0x1F)) >> 1);
-    }
+void sub_816D734(void *arg0)
+{
+  s32 temp_r0_10;
+  s32 temp_r3_9;
+  u32 temp_r0_18;
+  u32 temp_r0_31;
+  temp_r0_10 = *((s32 *) (((s8 *) arg0) + 0x78));
+  temp_r3_9 = *((s32 *) (((s8 *) arg0) + 0x70));
+  temp_r0_10 = temp_r0_10 + temp_r3_9;
+  *((s32 *) (((s8 *) arg0) + 0x78)) = temp_r0_10;
+  if (temp_r0_10 <= 0x57FF)
+  {
+    *((s32 *) (((s8 *) arg0) + 0x78)) = 0x5800;
+    temp_r0_18 = 0 - temp_r3_9;
+    *((s32 *) (((s8 *) arg0) + 0x70)) = (s32) (((s32) (temp_r0_18 + (temp_r0_18 >> 0x1F))) >> 1);
+  }
+  if (((s32) (*((s32 *) (((s8 *) arg0) + 0x78)))) > 0x7800)
+  {
+    *((s32 *) (((s8 *) arg0) + 0x78)) = 0x7800;
+    temp_r0_31 = 0 - (*((s32 *) (((s8 *) arg0) + 0x70)));
+    *((s32 *) (((s8 *) arg0) + 0x70)) = (s32) (((s32) (temp_r0_31 + (temp_r0_31 >> 0x1F))) >> 1);
+  }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_816D778.s\"");
