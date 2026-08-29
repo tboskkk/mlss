@@ -917,6 +917,30 @@ knowing before re-spending a session on either:
     (`perm_reorder_stmts`/`perm_condition`/etc.) operate on existing C
     loop constructs; none of them convert one loop SHAPE into another,
     so this may be genuinely unreachable by search as currently built.
+    **Re-confirmed 2026-08-29 with a direct `target.o`/`base.o` objdump
+    side-by-side** (`nonmatchings/sub_80292EC/`, best_score still 815,
+    escalation_count 8 — unchanged, still genuinely stuck, not an
+    artifact): the loop body + check together are the EXACT SAME 0x38
+    bytes on both sides (`0x0`–`0x38` retail, `0x0`–`0x38` candidate,
+    shared tail from `0x38` onward is byte-identical too) — this is not
+    "the candidate has extra instructions," it's "same instruction
+    count, wrong order," which is consistent with a rewording, not a
+    padding gap. Concretely: retail's is `b.n` straight to the check
+    ONCE (2 bytes), body, then the check block doubles as the loop-back
+    branch (`blt.n` back to the body) — no second unconditional branch
+    anywhere. The candidate's check sits at the TOP of the body, and
+    needs its own separate unconditional `b.n` back to the top after
+    the body runs, which retail's shape never needs. A genuinely
+    untried lever, not yet attempted: hand-write the C as an explicit
+    guarded `do`/`while` —
+    `if (var_r5_8 < N) { do { ...; var_r5_8++; } while (var_r5_8 < N); }`
+    — which directly hands the compiler retail's exact shape (test
+    once up front, then one shared test-and-loop-back at the bottom)
+    instead of relying on agbcc's own loop-rotation heuristic to find
+    it from a `for`/`while`, which is the thing the earlier `for`-loop
+    attempt showed doesn't fire the same way here. Not attempted this
+    session (diagnosis only, per what was asked) — flagged as the next
+    concrete thing to try before writing this off as unreachable.
   - `sub_8095028`: a register-PRESSURE/spill difference, the same
     class as the already-documented `sub_81458C8` case. Retail's real
     prologue is `push {r4,r5,r6,r7,lr}` (5 registers); the candidate's
@@ -1035,6 +1059,16 @@ knowing before re-spending a session on either:
   remaining diffs) — workable by the ordinary pipeline now, not a
   free win but no longer wasting search time on an unwinnable gap.
   Commits: `bc398eba`, `3fdf8a8b`; splits/matches follow from there.
+
+  **Re-verified 2026-08-29, ticket closed:** `sub_808C070`/`098`/`0C0`/
+  `sub_8098C78` (the 4 "twins" this whole entry is about) are all
+  `state='matched'` with real, unguarded C in `src/sub_808C064.c` /
+  `src/sub_8098710.c` and no `asm/nonmatching/*.s` fragment remaining —
+  genuinely done, not a stale terminal state. Their DB `iso_score`/
+  `objdiff_score` columns still show the pre-split numbers (12/91.7%
+  etc.) because nothing re-measures a row once it's `matched`; that's
+  cosmetic, per THE LAW's own "stored vs. live" caution — trust `state`
+  and the tracked source, not a scoring column, once a row is matched.
 
   **The 201 push-prologue candidates were batch-run 2026-08-28.** Result:
   **60 split cleanly** (verified from-scratch `mlss.gba: OK` under
@@ -1317,6 +1351,43 @@ knowing before re-spending a session on either:
   matches CLAUDE.md's own "Extern vs. cast address constant" clean
   negative (measurable only per-function, not corpus-wide), so left as
   a known, optional per-function seed lever rather than built in now.
+
+- **The 94-function bridge-decline pool, sampled and categorized
+  2026-08-29 — three genuinely different shapes, not one.** Random
+  sample of 3 (`sub_8046BC8`, `sub_8159E48`, `sub_816D61C`):
+  - `sub_8046BC8`: **valid code, real edge case, not yet handled.** Has
+    a literal pool EMBEDDED MID-FUNCTION (at file offsets `0x58`/`0x5c`/
+    `0x74`, sitting between real instructions and jumped around by a
+    `bne`/`b` pair), not one clean pool at the tail the way every
+    function this bridge already handles has. `reassemble_for_m2c()`'s
+    own safety check (every `ldr rX,[pc,#N]` target must land in the
+    tail pool it builds) correctly catches this and declines rather
+    than mis-rendering the mid-function words as bogus instructions.
+    Real, scoped future work: extend the pool-detection to ANY
+    `ldr`-referenced word, not just ones after the single return,
+    proving each is genuinely never executed (reachable only as a
+    `ldr` target, never falls into as straight-line code) before
+    labeling it — not attempted this session.
+  - `sub_8159E48`: **not a real edge case — a bug in this bridge**,
+    found and FIXED same day (see `bca89768`): the undecodable-span
+    guard checked the WHOLE disassembly instead of just the code before
+    the return, so a pool word that happens to decode as `UNDEFINED`
+    when misread as an instruction (harmless — it's data, never
+    reassembled as that bogus mnemonic) declined an otherwise perfectly
+    bridgeable 1088-byte function. Re-verified byte-identical after the
+    fix. `ruleset_version()`'s hash-based reopening (see above) means
+    this reopened every row this exact bug hit, no manual requeue.
+  - `sub_816D61C`: **a genuine multi-function merge, NOT among the 46
+    already resolved** — 3 real return-matching instructions (`bx r1`
+    at offsets `0x64`/`0x8c`/`0xa0`), i.e. a NEW instance of the exact
+    class the whole "48 flagged fragments" saga above is about, just
+    never flagged by that scan (it must have looked single-return
+    under whatever check ran then, or postdates it). Correctly declined
+    by the bridge rather than guessed at — this needs the same
+    hand-verified `write_multi_split()` treatment as the other 46, not
+    a bridge fix. Worth a fresh `split_trailing.py`-style sweep for
+    more of these rather than assuming 48 was the true final count.
+
 - **`rescore_seeds.plain_score`/`validator._matches_in_plain_build` structurally
   cannot accept a candidate that references a known address via its
   MINTED NAME (`symbols.txt`) where retail's own disassembled `.s`
