@@ -24,31 +24,29 @@ void sub_80E1AB0(struct Entity *arg0) {
     (*(s32 *)((s8 *)(arg0) + (4))) = 0;
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80E1AF0.s\"");
-#else
-s32 sub_80DF024(u16, s32, s32, s32, s32); /* extern */
-
-void sub_80E1AF0(void *arg0) {
-    u16 temp_r0_25;
-    void *temp_r5_14;
-
-    if (M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */) == 0) {
-        do {
-            temp_r5_14 = (*(void **)((s8 *)(arg0) + (0xC)));
-            sub_80DF024((*(u16 *)((s8 *)(temp_r5_14) + (0))), M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */), M2C_ERROR(/* unknown instruction: ldsh $r2, ($mem_loc_fictive_) */), M2C_ERROR(/* unknown instruction: ldsh $r3, ($mem_loc_fictive_) */), (*(s32 *)((s8 *)(arg0) + (8))));
-            temp_r0_25 = (*(u16 *)((s8 *)(temp_r5_14) + (2)));
-            (*(u16 *)((s8 *)(arg0) + (0x10))) = temp_r0_25;
-            (*(void **)((s8 *)(arg0) + (0xC))) = (void *) (temp_r5_14 + 4);
-        } while ((temp_r0_25 << 0x10) == 0);
+s32 sub_80DF024(u16, s16, s16, s16, s32);       /* extern */
+void sub_80E1AF0(void *arg0)
+{
+  u16 temp_r0_25;
+  void *temp_r5_14;
+  if ((*((s16 *) (((s8 *) arg0) + 0x10))) == 0)
+  {
+    do
+    {
+      temp_r5_14 = (void *) (*((void **) (((s8 *) arg0) + 0xC)));
+      sub_80DF024(*((u16 *) (((s8 *) temp_r5_14) + 0)), *((s16 *) (((s8 *) arg0) + 0x12)), *((s16 *) (((s8 *) arg0) + 0x14)), *((s16 *) (((s8 *) arg0) + 0x16)), *((s32 *) (((s8 *) arg0) + 8)));
+      temp_r0_25 = (*((s16 *) (((s8 *) arg0) + 0x10)) = *((u16 *) (((s8 *) temp_r5_14) + 2)));
+      *((void **) (((s8 *) arg0) + 0xC)) = (void *) (temp_r5_14 + 4);
     }
-    if ((s32) M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */) < 0) {
-        (*(s32 *)((s8 *)(arg0) + (4))) = 0;
-        return;
-    }
-    (*(u16 *)((s8 *)(arg0) + (0x10))) = (u16) ((*(u16 *)((s8 *)(arg0) + (0x10))) - 1);
+    while (((temp_r0_25 << 1) << 15) == 0);
+  }
+  if (((s32) (*((s16 *) (0x10 + ((s8 *) arg0))))) < 0)
+  {
+    *((s32 *) (((s8 *) arg0) + 4)) = 0;
+    return;
+  }
+  *((s16 *) (((s8 *) arg0) + 0x10)) = (s16) (((u16) (*((s16 *) (((s8 *) arg0) + 0x10)))) - 1);
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80E1B40.s\"");
