@@ -22,8 +22,8 @@ No retail ROM is needed to build. Everything comes from `asm/` and `src/` in thi
 
 | state | functions | share | meaning |
 |---|---:|---:|---|
-| **matched** | 1,786 | 27.8% | compiles byte-identical to retail |
-| **in progress** | 2,647 | 41.2% | extracted, a real C attempt exists |
+| **matched** | 1,785 | 27.8% | compiles byte-identical to retail |
+| **in progress** | 2,648 | 41.2% | extracted, a real C attempt exists |
 | **not started** | 1,975 | 30.7% | extracted, no attempt yet |
 | **not extracted** | 21 | 0.3% | still raw in `asm/*.s` |
 | | **6,429** | | **total (game proper)** |

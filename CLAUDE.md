@@ -1114,26 +1114,59 @@ knowing before re-spending a session on either:
     and is worth someone re-deriving why it worked before trusting it
     generalizes to `sub_8095028`'s similar-sounding but harder case
     above (200s of the same tool barely moved that one).
-  - `sub_80F3FE8`: **root-caused 2026-08-29** via the same direct
-    `target.o`/`base.o` objdump diff, and it's a FIFTH distinct shape,
-    not a repeat of any of the above (`in_context_permuter.
-    score_in_context`: 210 diff, size_delta -24). Both retail and the
-    candidate implement the same 3-way case dispatch (`cmp #6/bhi`,
-    `cmp #7/bgt`, else), but retail computes `r1 = arg0` ONCE at the
-    top of the function and every case body reuses that one register;
-    the candidate re-derives `arg0 + offset` FRESH inside each case
-    body instead of hoisting it — a shared-subexpression/variable-
-    lifetime difference, not a loop or a register-choice wall.
-    Structurally closer in kind to `sub_80292EC`'s class (a real CFG/
-    variable-reuse shape mismatch a `goto`/label-style rewrite could
-    plausibly fix by hand-hoisting the shared computation into one
-    up-front temp reused across all three case bodies) than to the
-    register-pressure or arithmetic-identity cases above. **Not
-    attempted this session** — this function is bigger and the
-    dispatch has 3 case bodies to rewrite rather than one loop body,
-    a bigger lift than the time budget here covered. Real, scoped next
-    candidate for the same technique, now that it's actually diagnosed
-    instead of "same symptom, unknown cause."
+  - `sub_80F3FE8`: **the hoisting theory from the prior session was
+    WRONG, tested and disproved 2026-08-29 — but the real fix landed
+    anyway, via a completely different, already-documented idiom.**
+    First checked whether retail actually reuses one register for
+    `arg0+offset` across all 3 case bodies (the earlier hypothesis):
+    it does NOT — retail RELOADS the byte fresh in at least one other
+    case block too, just like the candidate. Manually hoisting it
+    anyway made things WORSE (`size_delta` -24 → -44, diff 210 → 206)
+    — retail's real structure keeps more redundancy than the
+    candidate, not less. Reverted that guess.
+
+    The REAL gap, found by reading the actual tail bytes instead of
+    guessing from the case-dispatch shape: this is **the exact
+    `dword_3001038 + (&loc_819832C - &loc_8198220)` idiom already
+    documented above for `sub_8029080`/`sub_808F2A8`**, a THIRD
+    instance of it. The candidate's C had `(*(s32*)0x03001038 + 0x10C)`
+    — a raw hex literal agbcc constant-folds into a compact `movs+lsls`
+    immediate — where retail computes the address as a genuine runtime
+    subtraction of two real (unfoldable, relocatable) symbol addresses
+    whose difference happens to equal `0x10C`. Swapping in the proven
+    idiom (already used verbatim in `src/title_screen.c:718`) recovered
+    12 of the 24 missing bytes in one step (`size_delta` -24 → -12).
+    A SECOND, separate gap in the same expression: `(s32)(temp_r1_88 +
+    (temp_r1_88 >> 0x1F)) >> 1` (the standard round-toward-zero-divide-
+    by-2 idiom) was silently missing its `lsrs`/`adds` rounding step
+    entirely in BOTH the original candidate and my first fix — forcing
+    it into its own explicit statement (rather than one nested
+    expression) recovered the remaining rounding instructions exactly
+    (`size_delta` -12 → -8). What's left after both fixes is a pure
+    register-pressure difference (`push {r4,lr}` vs retail's
+    `push {r4,r5,lr}`) — the shared-subexpression/hoisting theory
+    turned out to explain none of the real gap.
+
+    **`--allocator-attack` (200s, stochastic) closes that remaining
+    register-pressure gap to a genuine penalty-band escape** — observed
+    twice independently (203 bytes at try 3863/157s in one run; 193
+    bytes at try 13-22 in a follow-up run), both with matching
+    relocations. **Not as cleanly saved as `sub_80F6250`'s, and that
+    gap is reported honestly rather than papered over**: 3 of 5 total
+    200s attempts on this function did NOT converge below the penalty
+    band at all (stochastic, consistent with the corpus's documented
+    ~15.6% convergence rate on a small sample), and the two that did
+    converge used a different specific mutation each time, so no
+    single standalone `.c` file was captured and independently
+    re-verified byte-for-byte the way `sub_80F6250`'s was. The real,
+    reproducible fact is: **the source-level fixes above are correct
+    and worth keeping (verified via direct `score_in_context`, not
+    just search noise)**, and a sub-200-byte, reloc-matching escape
+    from this exact starting point is real and has been seen twice —
+    resuming this needs another `--allocator-attack` run from the
+    fixed source (not the stale DB `candidate_body`) with `--out-file`
+    to capture the winning source directly through the CLI's own save
+    path, not a hand-rolled script.
 
 ## Housekeeping outstanding
 
