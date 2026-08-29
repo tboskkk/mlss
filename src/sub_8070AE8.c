@@ -7,27 +7,30 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8070AE8.s\"");
-#else
 extern s32 sub_8070E4C;
-
-s32 sub_8070AE8(void *arg0) {
-    s32 *var_r1_18;
-    s32 var_r0_19;
-
-    if (M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */) == -1) {
-        var_r1_18 = arg0 + 0xA0;
-        var_r0_19 = 0;
-    } else {
-        var_r1_18 = arg0 + 0xA0;
-        var_r0_19 = 1;
-    }
-    *var_r1_18 = var_r0_19;
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8070E4C;
-    return 1;
+s32 sub_8070AE8(void *arg0)
+{
+  void **new_var;
+  void **new_var3;
+  s32 *var_r1_18;
+  s32 *new_var2;
+  s32 var_r0_19;
+  new_var3 = &(*((void **) (((s8 *) arg0) + 0x2C)));
+  if ((*((s16 *) (((s8 *) (*((void **) (((s8 *) (*(new_var = new_var3))) + 0x28)))) + 0xEC))) == (-1))
+  {
+    var_r1_18 = (s32 *) (arg0 + 0xA0);
+    var_r0_19 = 0;
+  }
+  else
+  {
+    var_r1_18 = (s32 *) (arg0 + 0xA0);
+ do { var_r0_19 = 1; } while (0);
+  }
+  *var_r1_18 = var_r0_19;
+  new_var2 = &sub_8070E4C;
+  *((s32 **) (((s8 *) arg0) + 0x4C)) = new_var2;
+  return 1;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8070B1C.s\"");
