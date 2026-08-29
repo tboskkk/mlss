@@ -80,6 +80,95 @@ def _obj_bytes(stem: str) -> bytes | None:
         return None
 
 
+ISO_DIR = gitops.REPO / ".werror_casts_iso"
+STRICT_CFLAGS = ("-O2 -mthumb-interwork -fno-common -Wimplicit -Wparentheses "
+                  "-Werror -g -ffix-debug-line")
+
+
+def _compile_isolated(name: str, body: str, lax: bool):
+    """Same idea as gitops.compiles_in_isolation(), but keeping the .o and
+    returning the full CompletedProcess -- apply()'s round-loop needs the
+    object bytes for the identity proof and the stderr text to find which
+    line each warning is on, neither of which the bool-only original
+    exposes.
+
+    Exists as a FALLBACK for apply()'s real-file precondition check, not a
+    replacement for it: splicing into the real file and compiling the real
+    src/*.c (the original path, still tried first) lets declare_missing
+    repair a genuine "sibling defined later in this file" forward
+    reference, which isolation has no way to see. What isolation fixes
+    instead is the opposite failure mode -- an unrelated, differently
+    BROKEN sibling failing the whole translation unit for a reason that
+    has nothing to do with this candidate at all. Found live on
+    sub_810D3B8: its own file's neighbour sub_810D34C is not valid C at
+    all (raw register-name pseudocode -- `r3_val`, `r0_final`, `r12` --
+    undeclared identifiers, syntax errors), which fails apply()'s real-file
+    lax compile outright and reports "fails even with warnings allowed",
+    even though sub_810D3B8 itself has exactly one warning and nothing
+    else wrong. Isolation removes the neighbour from the picture entirely.
+    """
+    ISO_DIR.mkdir(parents=True, exist_ok=True)
+    src = ISO_DIR / f"{name}.c"
+    pre = ISO_DIR / f"{name}.i"
+    asm = ISO_DIR / f"{name}.s"
+    obj = ISO_DIR / f"{name}.o"
+    src.write_text('#include "global.h"\n#include "common.h"\n\n'
+                   + gitops.rom_symbol_declarations(body) + body + "\n")
+    rel_src = src.relative_to(gitops.REPO).as_posix()
+    rel_pre = pre.relative_to(gitops.REPO).as_posix()
+    rel_asm = asm.relative_to(gitops.REPO).as_posix()
+    rel_obj = obj.relative_to(gitops.REPO).as_posix()
+    cflags = LAX_CFLAGS.split("=", 1)[1] if lax else STRICT_CFLAGS
+    # Mirrors the real Makefile's $(C_BUILDDIR)/%.o recipe exactly (cpp ->
+    # agbcc -> the same trailing .align agbcc's own rule appends -> as),
+    # just against a standalone staged file instead of a real src/*.c.
+    script = (
+        f"arm-none-eabi-cpp -I tools/agbcc/include -nostdinc -undef "
+        f"-iquote include -Wno-trigraphs {rel_src} -o {rel_pre} && "
+        f"tools/agbcc/bin/agbcc {rel_pre} {cflags} -o {rel_asm} && "
+        f"printf '.text\\n\\t.align 2, 0\\n' >> {rel_asm} && "
+        f"arm-none-eabi-as -mcpu=arm7tdmi -I include -o {rel_obj} {rel_asm}"
+    )
+    r = gitops.run(["./container.sh", "bash", "-c", script])
+    obj_bytes = None
+    if r.returncode == 0:
+        try:
+            obj_bytes = obj.read_bytes()
+        except OSError:
+            pass
+    for f in (src, pre, asm, obj):
+        try:
+            f.unlink()
+        except FileNotFoundError:
+            pass
+    return r, obj_bytes
+
+
+def _poisoned_by_sibling(stderr: str, own_c_name: str) -> bool:
+    """True when a real-file lax compile's failure is entirely attributable
+    to a DIFFERENT function in the same file, not `own_c_name` itself --
+    the TU-poisoning shape (CLAUDE.md section I/THE LAW). Parses agbcc's
+    "In function `X':" headers to attribute each diagnostic; a plain
+    `grep 'rror'` over the whole blob would miss this distinction entirely
+    (THE LAW's own "filters that drop the evidence" entry) since it cannot
+    tell which function a given line belongs to."""
+    current = None
+    saw_error_elsewhere = False
+    for line in stderr.splitlines():
+        m = re.match(r".*In function `([^']+)':", line)
+        if m:
+            current = m.group(1)
+            continue
+        if ": warning:" in line:
+            continue
+        if re.match(r"^[^:]+:\d+:", line):
+            if current == own_c_name:
+                return False  # a genuine diagnostic IS attributed to us
+            if current is not None:
+                saw_error_elsewhere = True
+    return saw_error_elsewhere
+
+
 def _cast_assignment(line: str, to_pointer: bool) -> str | None:
     """`lhs = rhs;` -> `lhs = (cast)(rhs);` on the right-hand side only."""
     m = re.match(r"^(\s*)(.+?)(\s*=\s*)(.+?)(;\s*)$", line)
@@ -114,11 +203,65 @@ def _cast_comparison(line: str, distinct_pointers: bool = False) -> str | None:
         return None
     op = m.group(1)
     head, _, tail = line.partition(op)
-    # Cast whichever side dereferences or casts to a pointer.
+    head_s = head.strip()
+    tail_s = tail.rstrip().rstrip(";").strip()
+
+    def is_pointer_expr(s: str) -> bool:
+        """A side that is PROVABLY a pointer value, not merely a side that
+        happens to contain a '*' character. Those are not the same thing:
+        `*(s32 *)(...)` CONTAINS '*' twice but DEREFERENCES to a scalar
+        (s32) -- the '*' is syntax, not a signal about the resulting
+        value's type. `&name` is an actual pointer and contains no '*' at
+        all. Found live on sub_807DFE8's `(*(s32 *)((s8 *)(arg0) +
+        (0x4C))) == &sub_8086960` -- the old "*" in head` check cast the
+        already-scalar left side (a redundant, no-op (s32) around an s32),
+        left the true pointer side (`&sub_8086960`) untouched, and the
+        comparison warning never actually cleared."""
+        return bool(s.startswith("&")
+                    or re.match(r"^\(\s*[\w\s]+\*\*+\s*\)", s)
+                    or re.match(r"^\*\(\s*[\w\s]+\*\*+\s*\)", s))
+
+    def cast_tail(pred) -> str | None:
+        """Wrap the TAIL side in (s32), preserving whatever trailing
+        syntax follows the expression verbatim -- a plain statement's
+        trailing ';', or (found live on sub_807DFE8) an `if (a == b) {`
+        condition's leftover ') {' from the enclosing paren.
+
+        The old code did `tail.rstrip().rstrip(';')` and then always
+        appended a literal ';', which silently assumed every comparison
+        is a bare statement. On an `if (...) {` line that turned
+        `&sub_8086960) {` into `(s32)(&sub_8086960) {);` -- a stray `);`
+        grafted onto a syntactically complete if-condition, which the
+        next round's compile then reported as a plain syntax error with
+        no salvageable warning to act on. Matching the expression
+        PRECISELY and keeping everything after it untouched avoids
+        assuming line shape at all.
+        """
+        stripped = tail.lstrip()
+        lead_ws = tail[: len(tail) - len(stripped)]
+        m = re.match(r"&\w+|\*\([\w\s]+\*+\)\([^()]*\)|[A-Za-z_]\w*(?:\.\w+|\[[^\[\]]*\])*", stripped)
+        if not m or "(s32)" in stripped[: m.end()]:
+            return None
+        expr, rest = m.group(0), stripped[m.end():]
+        if not pred(expr):
+            return None
+        return f"{head}{op}{lead_ws}(s32)({expr}){rest}"
+
+    # Prefer the precise pointer check; fall back to the older, weaker
+    # "*" heuristic for shapes it still correctly covers (e.g. a bare
+    # pointer-typed local on one side, which has no '&' or '**' marker of
+    # its own but is still the side "*" would have matched before).
+    if is_pointer_expr(head_s) and "(s32)" not in head_s:
+        return f"(s32)({head_s}) {op} {tail}"
+    r = cast_tail(is_pointer_expr)
+    if r:
+        return r
     if "*" in head and "(s32)" not in head:
-        return f"(s32)({head.strip()}) {op} {tail}"
+        return f"(s32)({head_s}) {op} {tail}"
     if "*" in tail and "(s32)" not in tail:
-        return f"{head}{op} (s32)({tail.rstrip().rstrip(';')});"
+        r = cast_tail(lambda _: True)
+        if r:
+            return r
     return None
 
 
@@ -201,27 +344,58 @@ def apply(name: str, body: str) -> tuple[str | None, str]:
         declare_missing.repair_in_place(stem, _rom_symbols(), nonmatching=True)
 
         lax = _compile(stem, lax=True)
+        use_iso = False
         if lax.returncode != 0:
-            return None, "fails even with warnings allowed (a real error, not -Werror)"
-        reference = _obj_bytes(stem)
+            # Real-file precondition failed. Before giving up, check
+            # whether the failure is entirely attributable to a DIFFERENT
+            # function sharing this file -- TU poisoning (CLAUDE.md THE
+            # LAW), not a real problem with this candidate. Found live on
+            # sub_810D3B8: its neighbour sub_810D34C is not valid C at all
+            # (raw register-name pseudocode), which fails this precondition
+            # for every function in the file regardless of their own
+            # merit. Isolation sidesteps it by removing the neighbour.
+            stderr = lax.stderr or ""
+            if _poisoned_by_sibling(stderr, name):
+                iso_lax, _ = _compile_isolated(name, body, lax=True)
+                if iso_lax.returncode != 0:
+                    return None, "fails even isolated with warnings allowed (a real error, not -Werror)"
+                use_iso = True
+            else:
+                return None, "fails even with warnings allowed (a real error, not -Werror)"
+
+        reference = (_compile_isolated(name, body, lax=True)[1] if use_iso
+                     else _obj_bytes(stem))
 
         cur = body
         for _ in range(MAX_ROUNDS):
-            gitops.splice_into_else(name, cur)
-            strict = _compile(stem, lax=False)
+            if use_iso:
+                strict, after = _compile_isolated(name, cur, lax=False)
+                text = (strict.stdout or "") + (strict.stderr or "")
+                # Isolation stages its own scratch file, not the spliced
+                # real one -- line numbers are relative to the body's OWN
+                # start (after the two #include + declarations lines this
+                # module's staging always emits), not an offset found by
+                # searching the real file's text.
+                offset = 3 + gitops.rom_symbol_declarations(cur).count("\n")
+                body_lines = cur.splitlines()
+            else:
+                gitops.splice_into_else(name, cur)
+                strict = _compile(stem, lax=False)
+                after = _obj_bytes(stem) if strict.returncode == 0 else None
+                text = (strict.stdout or "") + (strict.stderr or "")
+                file_lines = c_path.read_text().splitlines()
+                body_lines = cur.splitlines()
+                # Where does the candidate body start in the spliced file?
+                try:
+                    offset = file_lines.index(body_lines[0])
+                except (ValueError, IndexError):
+                    return None, "could not locate the body in the spliced file"
             if strict.returncode == 0:
-                after = _obj_bytes(stem)
                 if reference is not None and after == reference:
-                    return cur, "clean under -Werror, object byte-identical"
+                    return cur, ("clean under -Werror, object byte-identical"
+                                 + (" (isolated, sibling was poisoning the real file)"
+                                    if use_iso else ""))
                 return None, "casts CHANGED codegen -- rejected"
-            text = (strict.stdout or "") + (strict.stderr or "")
-            file_lines = c_path.read_text().splitlines()
-            body_lines = cur.splitlines()
-            # Where does the candidate body start in the spliced file?
-            try:
-                offset = file_lines.index(body_lines[0])
-            except (ValueError, IndexError):
-                return None, "could not locate the body in the spliced file"
             changed = False
             for wl in text.splitlines():
                 m = WARN_RE.match(wl.strip())
