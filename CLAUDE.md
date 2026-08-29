@@ -989,8 +989,22 @@ knowing before re-spending a session on either:
     prologue is `push {r4,r5,r6,r7,lr}` (5 registers); the candidate's
     is `push {r4,lr}` (2) — retail keeps more locals alive in real
     registers across an indirect call rather than spilling and
-    reloading. This is exactly what `--allocator-attack` targets; it
-    just hasn't found the right combination in the runs so far.
+    reloading. This is exactly what `--allocator-attack` targets.
+
+    **Tested 2026-08-29, and ruled out as the wrong tool here too,
+    for a NEW reason distinct from `sub_80292EC`'s CFG mismatch**:
+    confirmed via direct objdump diff this function has NO loops at
+    all (one simple forward `beq`, nothing else) — so the `goto`/label
+    CFG-mirroring technique has no CFG mismatch to fix here; the gap
+    really is register pressure, exactly as diagnosed. Ran
+    `in_context_search.py --allocator-attack` for 200s/3,539 tries:
+    base score 10168 → best 10092. **Still deep in the +10000
+    reloc-mismatch penalty band** — the register-pressure difference
+    here isn't just a byte-count gap, it's tied to an actual
+    relocation/callee mismatch that 200s of random allocator pressure
+    injection barely dented (76 points). Not resolved; a real, harder
+    case than `sub_80F6250` below despite the similar-sounding
+    diagnosis.
   - `sub_81064F8`: an ARITHMETIC-IDENTITY / instruction-selection
     choice, a third distinct shape. The C computes `(orig - 1) -
     (val >> 8)`, already grouped the same way retail's disassembly
@@ -1004,6 +1018,18 @@ knowing before re-spending a session on either:
     retail does one `asrs #8`) that's mathematically equivalent for a
     promoted `s16`. Not reachable by rephrasing the source; this is the
     compiler picking a different identity, not a different computation.
+
+    **Re-tested 2026-08-29 with the operand-materialization technique
+    that worked for `sub_80292EC`** (forcing `(orig-1)` into its own
+    named temp, computed as a separate statement, exactly the trick
+    that fixed `sub_80292EC`'s register order): **zero change**
+    (in-context diff 102 before and after, byte-for-byte identical
+    output either way). Confirms — doesn't just repeat — the existing
+    diagnosis: this really is agbcc's own internal instruction-
+    selection choosing a different algebraic identity, not a
+    source-order or materialization issue, so no C-level lever reaches
+    it. Not a loop, so `goto`/label mirroring was never applicable
+    here to begin with.
   - `sub_80F6250`: a REGISTER-PRESSURE overflow into a high register,
     a fourth distinct shape (related to `sub_8095028`'s class but the
     opposite direction and with a second-order effect). Retail's real
@@ -1019,14 +1045,49 @@ knowing before re-spending a session on either:
     candidate's tighter register budget can't spare that pointer
     register, so it computes each field access as a separate `ldr` at
     a fixed offset instead — functionally identical, structurally
-    longer. Likely improvable by reducing the CANDIDATE's own C-level
-    temporary count (several of `temp_r1_16`/`temp_r2_24`/`temp_r6_28`
-    look mergeable), the opposite direction from `--allocator-attack`
-    (which ADDS pressure) — not attempted this session.
-  - `sub_80F3FE8`: same flat-penalty-band symptom observed, not yet
-    root-caused to this level of detail — grouped here by symptom, not
-    confirmed cause. Worth the same objdump-diff treatment before
-    assuming it matches any of the other four.
+    longer.
+
+    **Tested 2026-08-29 — `--allocator-attack` (the pressure-ADDING
+    tool, the opposite of the "reduce temp count" lever guessed
+    above) closed this to a real near-miss anyway, reproduced twice.**
+    Base in-context score 10178 (deep in the +10000 reloc-mismatch
+    band). Two independent 200s runs both found the SAME jump out of
+    that band — one at try 952/35s, the other at try 3044/99s
+    (stochastic, as CLAUDE.md's own throughput section already
+    documents) — landing on **diff_bytes=118, size_delta=+4,
+    relocs_equal=True**: a genuine near-miss, not a penalty-band
+    artifact. Saved to `nonmatchings/sub_80F6250/output-incontext-
+    best/` (verified compiling in isolation and re-scoring to the
+    exact same 118/True after stripping the permuter's own typedef
+    preamble, which conflicts with the real headers outside the
+    in-context splice path — same fix `sub_80292EC`'s save needed).
+    Not root-caused further — the "reduce temp count" theory above is
+    still untested and may close the remaining 118 bytes, but
+    allocator-attack reaching a real near-miss on a pressure-adding
+    tool for a pressure-REDUCING problem was not the expected outcome
+    and is worth someone re-deriving why it worked before trusting it
+    generalizes to `sub_8095028`'s similar-sounding but harder case
+    above (200s of the same tool barely moved that one).
+  - `sub_80F3FE8`: **root-caused 2026-08-29** via the same direct
+    `target.o`/`base.o` objdump diff, and it's a FIFTH distinct shape,
+    not a repeat of any of the above (`in_context_permuter.
+    score_in_context`: 210 diff, size_delta -24). Both retail and the
+    candidate implement the same 3-way case dispatch (`cmp #6/bhi`,
+    `cmp #7/bgt`, else), but retail computes `r1 = arg0` ONCE at the
+    top of the function and every case body reuses that one register;
+    the candidate re-derives `arg0 + offset` FRESH inside each case
+    body instead of hoisting it — a shared-subexpression/variable-
+    lifetime difference, not a loop or a register-choice wall.
+    Structurally closer in kind to `sub_80292EC`'s class (a real CFG/
+    variable-reuse shape mismatch a `goto`/label-style rewrite could
+    plausibly fix by hand-hoisting the shared computation into one
+    up-front temp reused across all three case bodies) than to the
+    register-pressure or arithmetic-identity cases above. **Not
+    attempted this session** — this function is bigger and the
+    dispatch has 3 case bodies to rewrite rather than one loop body,
+    a bigger lift than the time budget here covered. Real, scoped next
+    candidate for the same technique, now that it's actually diagnosed
+    instead of "same symptom, unknown cause."
 
 ## Housekeeping outstanding
 
@@ -1468,6 +1529,58 @@ knowing before re-spending a session on either:
     half, two near-duplicate reference-count-style functions back to
     back. Not a handler-setter instance — a reminder that the 41 is a
     mixed bag of shapes, not one pattern.
+
+  **Batch 2 processed 2026-08-29 (the next 5 off the 36-row remainder,
+  after excluding the 2 known false positives and the 3 already done
+  above): all 5 genuine, all resolved.** Built a small reusable
+  boundary-computer (`compute_segments()`, scratch-only, not
+  committed as a tool) rather than hand-arithmetic for each: for every
+  return-matching instruction, closes that segment at the return's own
+  end, extends past a 2-byte `0x0000` pad if present, then extends
+  again to cover any `ldr rX,[pc,#N]` pool word THAT SEGMENT's OWN
+  code actually references — the same cross-reference discipline
+  used everywhere else in this file, just automated instead of
+  hand-computed. For the one large case (`sub_81DC12C`, 708B, 10
+  segments) ran the same extra cross-check used on `sub_818B048`/
+  `sub_8196ACC`: counted real `push {...,lr}` prologues (10, exact
+  1:1 match with the 10 returns) AND checked no branch anywhere in
+  the function jumps OVER a candidate return (the `sub_801B0B8`
+  false-positive shape) — zero hits. All 5 executed via
+  `write_multi_split()`, all verified from-scratch `mlss.gba: OK`:
+  - `sub_81DD1EC` (80B → 4 functions): two near-identical BIOS
+    `svc 171` wrapper calls back to back, each with its own 4-byte
+    pool, plus a trailing 4-byte `return 1` stub.
+  - `sub_81DC12C` (708B → 10 functions): a per-type dispatch family,
+    same shape class as `sub_8196ACC`'s 92-way split — 7 near-
+    identical `push{r4,lr}`-prologued comparison wrappers, then 2
+    slightly different `push{lr}`-prologued lookup/clamp functions,
+    then one tiny final one.
+  - `sub_8171EB0` (148B → 3 functions): the middle function contains
+    a genuine internal COMPUTED jump table (`mov pc,r0` at offset
+    0x34, jumping into a set of 2-instruction case bodies within its
+    OWN body) — confirmed this doesn't corrupt return-counting (none
+    of the case bodies contain a `bx`/`pop{...,pc}`) and needed no
+    special handling for a plain byte-preserving split: the whole
+    jump table is just part of that one function's own bytes.
+  - `sub_816D81C` (124B → 3 functions), `sub_816B2F4` (68B → 2
+    functions): ordinary handler/flag-check leaf pairs, no surprises.
+
+  **Found and fixed a naming bug of my own during this batch**: the
+  boundary-computer's caller derived new symbol names via
+  `f"sub_{addr:08X}"`, which zero-pads to 8 hex digits — every
+  existing `sub_` name in this corpus is 7 digits (checked
+  `symbols.txt`: zero `sub_0XXXXXXX` names anywhere already). Purely
+  cosmetic, but renamed all 17 new symbols from this and the prior
+  5-function batch to match before it could propagate through
+  greps/tooling that assume the 7-digit shape (`f1070ac6`). Also hit,
+  and correctly worked around rather than fought: a bare `rm -rf
+  build/ && make` verification raced the LIVE factory's own
+  in-progress splices in two unrelated files mid-build (two different
+  spurious `warnings-as-errors` failures on two different reruns,
+  each file clean moments later) — exactly the contention CLAUDE.md's
+  own "Repo operations" landmine section already documents. Wrapping
+  the same verification in `gitops.repo_lock()` gave a clean,
+  uncontended `mlss.gba: OK` on the first try.
 
 - **`rescore_seeds.plain_score`/`validator._matches_in_plain_build` structurally
   cannot accept a candidate that references a known address via its
