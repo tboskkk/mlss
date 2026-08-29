@@ -1244,26 +1244,79 @@ knowing before re-spending a session on either:
   mechanical block that has applied to every one of these functions
   since the very first `split_trailing.py` split, confirmed by the
   `matched` count above: 0 of 402.
-  **Not fixed this session** — the real fix is teaching `write_split`/
-  `write_multi_split` (or a preprocessing step in `m2c_bridge.py`) to
-  emit genuine disassembled mnemonic text instead of `.byte`, the same
-  job `tools/decode_jumptable.py` already does for jump-table
-  fragments, likely by reassembling `split_trailing.disassemble()`'s
-  existing objdump output into resolved-label GNU-syntax source (branch
-  targets, literal-pool `.4byte`s, `bl`s) — real, scoped, and does NOT
-  touch the byte-safety guarantee `write_split`'s own docstring cares
-  about, since the reassembled mnemonics still get diffed against
-  retail bytes before being trusted, exactly like every other fragment.
-  No Luvdis wrapper exists in this repo (checked) to shortcut it.
-  Until this lands, these 402 functions (and the 117 from this
-  session's own batch) are NOT the "high surface area for immediate
-  matches" they look like from tractability metadata alone — they are
-  100% stuck at the first pipeline stage, and the live factory's
-  `tier1`/`tier2` never see them either (both depend on a seed
-  `tier_m2c` never produces). This also means the intended "3-worker,
-  300-second in-context search on the first batch of 10" from this
-  session's own request produced no scores to report: there is no
-  candidate body for the permuter to mutate yet on any of them.
+  **FIXED same day, 2026-08-29: `tools/factory/reassemble_bridge.py`
+  (new).** Reads the tracked pure-`.byte` fragment, disassembles the raw
+  bytes with the project's own `arm-none-eabi-objdump` (via
+  `split_trailing.disassemble()`, unchanged), and re-renders that into
+  legal GNU-`as` Thumb mnemonic text — the exact shape every OTHER
+  (Luvdis-derived) fragment already has. Deliberately NEVER writes to
+  the tracked fragment; the reassembled text only ever exists as an
+  in-memory string / scratch temp file fed to m2c for one invocation
+  (wired into `m2c_bridge.run_m2c()`), so the byte-safety guarantee
+  `write_split`'s own docstring cares about is untouched — the
+  candidate C this produces still goes through the identical
+  compile/diff/validate gate as every other seed.
+
+  Every literal-pool `ldr rX, [pc, #N]` is rewritten to `ldr rX, LABEL`
+  with a `LABEL: .4byte 0xVALUE` placed at the exact real address the
+  Thumb PC-relative formula (`((instr_off+4)&~3)+N`) computes — not
+  left as raw `[pc, #N]`, because m2c has no way to know what value
+  lives at an unlabeled address; it needs the value declared as data in
+  the same text it's parsing, exactly like every already-matched
+  fragment's own `@ =0xVALUE` convention. Branch/call targets outside
+  the fragment resolve to a real name via `mlss.map` (ground truth: it
+  lists every currently-linked symbol, matched or not) with a
+  `sub_<ADDR>` fallback — this project's own universal per-address
+  naming convention, not a guess, since a `bl` target is always a real
+  instruction-aligned entry point. Internal branch targets get a local
+  `_<ADDR>:` label, matching Luvdis's own naming.
+
+  Declines (never guesses) on: more than one return-matching
+  instruction (ambiguous control flow), any undecodable span
+  (`(bad)`/`.word`/`UNDEFINED` — likely ARM-mode or genuine data), or
+  any pool word not referenced by an in-function `ldr rX, [pc, #N]`
+  (the code/pool/padding boundary assumption not holding).
+
+  **Verified, not assumed, at three levels before rollout:**
+  1. Byte-identity: reassembled 3 hand-picked candidates (a trivial
+     4-byte `bx lr` stub and two ~64-byte dispatch-table stubs from the
+     `sub_8196ACC`/92-way split), assembled each standalone, linked at
+     its OWN real address against the just-built `mlss.elf` (critical —
+     linking at the wrong address silently corrupts `bl`/`ldr` encodings
+     without erroring, caught and fixed during this verification), and
+     diffed against the retail `.byte` bytes: exact match, all 3.
+  2. Scaled to an 80-function random sample of the 402-row declined
+     pool (seed 42): 63/80 (79%) bridge successfully, 17 correctly
+     declined by the safety checks above (0 exceptions). All 63
+     independently re-verified byte-identical the same way as step 1
+     (assemble, link at real address via `mlss.map`, objcopy, diff) —
+     63/63 exact.
+  3. Full pipeline, same 80-function sample, through
+     `m2c_bridge.generate()` (the real function `tier_m2c.py` calls,
+     including `fix_untyped_address_access` and friends): 63/80
+     generate real candidate C (up from 0/80 before this fix), and
+     54 of those 63 (86%) pass `gitops.compiles_in_isolation()`
+     immediately — a jump from "100% mechanically blocked" to "~68%
+     of the sample compiles on the very first pass."
+
+  **Reopened automatically, not by manual DB reset** — `ruleset_version()`
+  hashes `m2c_bridge.py`'s own bytes (now also `reassemble_bridge.py`'s,
+  added in the same change so a future edit to the bridge's OWN rules
+  reopens declined rows the same way, closing the exact gap CLAUDE.md
+  already documents for the ldsh/ldsb patch), so this fix changed the
+  ruleset stamp on its own and every `needs_attempt` row `tier_m2c`
+  previously declined under the old one became claimable again the
+  moment the worker restarted — no requeue script, exactly the
+  mechanism `_claim()`'s own docstring describes. `tier_m2c.py` is a
+  long-running worker that holds the code it imported at startup (THE
+  LAW, rule 6), so this was committed BEFORE restarting it (rule 7).
+
+  One deliberately-deferred refinement, not a correctness gap: a pool
+  word that happens to be a function pointer (e.g. `0x0818AD31`, thumb
+  bit set) renders as a raw hex literal rather than `&sub_818AD30` —
+  matches CLAUDE.md's own "Extern vs. cast address constant" clean
+  negative (measurable only per-function, not corpus-wide), so left as
+  a known, optional per-function seed lever rather than built in now.
 - **`rescore_seeds.plain_score`/`validator._matches_in_plain_build` structurally
   cannot accept a candidate that references a known address via its
   MINTED NAME (`symbols.txt`) where retail's own disassembled `.s`

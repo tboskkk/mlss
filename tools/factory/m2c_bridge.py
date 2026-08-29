@@ -37,10 +37,12 @@ import hashlib
 import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import gitops  # noqa: E402
+import reassemble_bridge  # noqa: E402
 
 M2C_PY = gitops.REPO / "tools" / "m2c" / "m2c.py"
 COMMON_H = gitops.REPO / "include" / "common.h"
@@ -112,6 +114,15 @@ def ruleset_version() -> str:
     """
     h = hashlib.sha1()
     h.update(Path(__file__).read_bytes())
+    # reassemble_bridge.py decides whether a pure-.byte split_trailing.py
+    # fragment can be bridged to m2c at all (see run_m2c()) -- a future
+    # change to ITS rules must reopen declined rows the same way a change
+    # to this file already does, or the same "fixed the rule, nothing got
+    # re-tried" gap CLAUDE.md documents for the ldsh/ldsb patch recurs here.
+    try:
+        h.update((Path(__file__).parent / "reassemble_bridge.py").read_bytes())
+    except Exception:
+        pass
     try:
         rev = subprocess.run(["git", "rev-parse", "HEAD:tools/m2c"],
                              cwd=gitops.REPO, capture_output=True, text=True).stdout.strip()
@@ -422,17 +433,45 @@ def run_m2c(name: str, extra_args: list[str] | None = None) -> str | None:
     frag = gitops.REPO / "asm" / "nonmatching" / f"{name}.s"
     if not frag.exists():
         return None
+
+    # split_trailing.py's write_split()/write_multi_split() emit trailing
+    # function bytes as raw `.byte` -- byte-safe by construction for the
+    # ROM, but m2c's own parser (asm_file.py's data_directives) treats
+    # `.byte` as DATA, so it never sees a single mnemonic and reports
+    # "contains no instructions" before decompilation is attempted. See
+    # CLAUDE.md's "MAJOR FINDING 2026-08-29" / reassemble_bridge.py's own
+    # docstring for the full diagnosis. Bridge to real disassembled
+    # mnemonic text in a SCRATCH temp file here -- the tracked fragment on
+    # disk is never touched, only what gets handed to m2c for this one
+    # invocation.
+    feed_path = frag
+    bridged_tmp: Path | None = None
+    if reassemble_bridge.is_pure_byte_fragment(frag.read_text()):
+        bridged = reassemble_bridge.reassemble_for_m2c(name)
+        if bridged is None:
+            return None  # bridge declined -- see its own docstring for why
+        fd = tempfile.NamedTemporaryFile(
+            mode="w", suffix=f"_{name}.s", delete=False,
+            dir=str(gitops.REPO / "tools" / "m2c"))
+        fd.write(bridged)
+        fd.close()
+        bridged_tmp = Path(fd.name)
+        feed_path = bridged_tmp
+
     cmd = [sys.executable, str(M2C_PY), "--target", "gba", "--valid-syntax",
            "--deterministic-vars"]
     ctx = ensure_context()
     if ctx is not None:
         cmd += ["--context", str(ctx)]
-    cmd += [*(extra_args or []), str(frag)]
+    cmd += [*(extra_args or []), str(feed_path)]
     try:
         r = subprocess.run(cmd, capture_output=True, text=True, timeout=120,
                            cwd=str(gitops.REPO / "tools" / "m2c"))
     except subprocess.TimeoutExpired:
         return None
+    finally:
+        if bridged_tmp is not None:
+            bridged_tmp.unlink(missing_ok=True)
     if r.returncode != 0 or not r.stdout.strip():
         return None
     return r.stdout
