@@ -130,6 +130,16 @@ void sub_8068C70(struct Entity *arg0) {
 }
 
 ASM_FUNC("asm/nonmatching/sub_8068C98.s", void sub_8068C98(void *arg0));
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8068D0C.s\"");
+#else
+/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
+   compiles a whole translation unit at a time, so an #error here fails
+   every OTHER function in this file under NONMATCHING=1. Guard intact, so
+   the real ROM still gets the verbatim retail bytes and progress.py still
+   counts this as unmatched. Write the C here, replacing this comment. */
+#endif
+
 void sub_8068D74(void *arg0)
 {
   u16 temp_r0_11;
