@@ -212,8 +212,7 @@ void sub_80C0930(void *arg0)
 }
 
 s32 sub_8087CE4();                              /* extern */
-extern s32 sub_80C0CC0;
-
+void sub_80C0CC0(void *arg0);
 void sub_80C0980(struct Entity *arg0) {
     void *temp_r5_8;
 
@@ -221,7 +220,7 @@ void sub_80C0980(struct Entity *arg0) {
     sub_8087CE4();
     if (0x20 & (*(u8 *)((s8 *)(arg0) + (0x79)))) {
         (*(s32 *)((s8 *)(arg0) + (0x4C))) = 0;
-        (*(s32 **)((s8 *)(temp_r5_8) + (0x4C))) = &sub_80C0CC0;
+        (*(s32 **)((s8 *)(temp_r5_8) + (0x4C))) = (s32 *) &sub_80C0CC0;
     }
 }
 
@@ -397,15 +396,24 @@ void sub_80C0C54(void *arg0)
   }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80C0CC0.s\"");
-#else
-/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
-   compiles a whole translation unit at a time, so an #error here fails
-   every OTHER function in this file under NONMATCHING=1. Guard intact, so
-   the real ROM still gets the verbatim retail bytes and progress.py still
-   counts this as unmatched. Write the C here, replacing this comment. */
-#endif
+s32 sub_8086700(void *);                        /* extern */
+void sub_80C0CC0(void *arg0)
+{
+  s32 temp_r4_9;
+  void *temp_r0_12;
+  temp_r4_9 = *((s32 *) (((s8 *) arg0) + 0xA8));
+  if (temp_r4_9 == 0)
+  {
+    temp_r0_12 = (void *) (*((void **) (((s8 *) arg0) + 0x28)));
+    *((u8 *) (((s8 *) temp_r0_12) + 0x111)) = (u8) ((-3) & (*(((s8 *) temp_r0_12) + 0x111)));
+    if ((*((s16 *) (((s8 *) (*((void **) (((s8 *) arg0) + 0x28)))) + 0xF6))) == 0)
+    {
+      sub_8086700(arg0);
+      return;
+    }
+    *((s32 *) (((s8 *) arg0) + 0x4C)) = temp_r4_9;
+  }
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80C0CFC.s\"");
