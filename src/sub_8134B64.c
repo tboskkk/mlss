@@ -14,16 +14,12 @@ u32 sub_8134B64(u32 param_1) {
     return param_1;
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8134B70.s\"");
-#else
 void sub_8134B70(void *arg0, s32 arg1) {
     (*(s32 *)((s8 *)(arg0) + (8))) = 0x08CDC460;
     if (1 & arg1) {
         free_heap_8018DA8(arg0);
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8134B90.s\"");
