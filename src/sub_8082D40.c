@@ -27,9 +27,6 @@ void sub_8082D60(void *arg0) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8082D74.s\"");
-#else
 s32 sub_805A230(void *, u8, s32, u8, s32, s32, s32); /* extern */
 
 void *sub_8082D74(void *arg0, u8 arg1, s32 arg2, u8 arg3, s32 arg4, s32 arg5, s32 arg6) {
@@ -41,7 +38,6 @@ void *sub_8082D74(void *arg0, u8 arg1, s32 arg2, u8 arg3, s32 arg4, s32 arg5, s3
     (*(s16 *)((s8 *)(arg0) + (0x776))) = 0;
     return arg0;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8082DD0.s\"");
