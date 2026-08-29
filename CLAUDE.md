@@ -15,7 +15,7 @@ in service of modding tools, asset editors, and understanding the engine
 (physics/collision is the maintainer's specific interest).
 
 **Run `tools/progress.py` for the live count. Never trust a number in a doc.**
-As of 2026-08-29: 1,778 of 6,263 matched (28.4%). `asm/mariobros.s` is a
+As of 2026-08-29: 1,778 of 6,275 matched (28.3%). `asm/mariobros.s` is a
 separate embedded Mario Bros. ROM — **out of scope by maintainer decision**,
 tracked apart from "game proper" everywhere.
 
@@ -1131,13 +1131,27 @@ knowing before re-spending a session on either:
   `sub_81366B8`→3, `sub_806C9FC`→3, `sub_8160FCC`→2, `sub_819AA9C`→4,
   `sub_8067948`→3, `sub_8136130`→3, `sub_813B2E0`→4, `sub_813B428`→3,
   `sub_8165374`→4, `sub_8085730`→2, `sub_8085C20`→2, `sub_80E548C`→3,
-  `sub_8134298`→4 (40 total). Verified from-scratch after each batch.
-  **The other 8, including the 92-function `sub_8196ACC`, are still
+  `sub_8134298`→4, `sub_8158FBC`→7, `sub_816800C`→7 (42 total). Verified
+  from-scratch after each batch. **`sub_8158FBC` is a SECOND confirmed
+  instance of the under-split bug first found on `sub_806E838`**: the
+  algorithm's own proposal reported one 152-byte span at `(124,276)`,
+  but reading the real disassembly found a 12-byte no-push leaf function
+  at `0x7c` (`ldr;adds;str;bx lr` — too short to individually clear
+  `MIN_SEGMENT_LEN`) immediately followed by a genuinely separate
+  140-byte function at `0x88`, both merged into the algorithm's one
+  reported span. Executed the hand-corrected 7-way split, not the
+  tool's own 6-way proposal. Reinforces: **every proposed span count
+  needs the real disassembly read, even the ones with a plausible-
+  looking small segment count** — this one didn't even LOOK suspicious
+  from the summary alone (152 bytes isn't unusually large for one
+  function), the merge was only visible by actually reading it.
+
+  **The other 6, including the 92-function `sub_8196ACC`, are still
   open** — same tool, same discipline, just not reached yet. The
-  remaining 8 are all medium-to-large (668B/6 segments, 648B/7,
-  1480B/25, and the 5628B/92-function one) and deserve a dedicated,
-  unhurried verification pass rather than being rushed through at the
-  tail of a long session. `write_multi_split(src_name,
+  remaining 6 are the largest in the batch (1480B/25 segments and the
+  5628B/92-function one, plus a few medium ones) and deserve a
+  dedicated, unhurried verification pass rather than being rushed
+  through at the tail of a long session. `write_multi_split(src_name,
   segments, src_text)` is ready to use once a segmentation is confirmed:
   `segments[0]` keeps `src_name`'s own identity (truncated in place),
   `segments[1:]` are new symbols with fresh guards inserted right after
