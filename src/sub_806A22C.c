@@ -31,27 +31,28 @@ void sub_806A24C(struct Entity *arg0) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_806A290.s\"");
-#else
-void sub_80695E4(void *arg0);                       /* extern */
-
-s32 sub_806A290(void *arg0) {
-    s32 *var_r1_18;
-    s32 var_r0_19;
-
-    if (M2C_ERROR(/* unknown instruction: ldsh $r1, ($mem_loc_fictive_) */) == -1) {
-        var_r1_18 = arg0 + 0x9C;
-        var_r0_19 = 0;
-    } else {
-        var_r1_18 = arg0 + 0x9C;
-        var_r0_19 = 1;
-    }
-    *var_r1_18 = var_r0_19;
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_80695E4;
-    return 1;
+extern s32 sub_80695E4;
+s32 sub_806A290(void *arg0)
+{
+  s8 *new_var2;
+  s32 *var_r1_18;
+  int new_var;
+  s32 var_r0_19;
+  new_var2 = (s8 *) arg0;
+  if ((*((s16 *) (((s8 *) (*((void **) (((s8 *) (*((void **) (((s8 *) arg0) + 0x2C)))) + 0x28)))) + 0xEC))) == (-1))
+  {
+    var_r1_18 = (s32 *) (arg0 + 0x9C);
+    var_r0_19 = 0;
+  }
+  else
+  {
+    var_r1_18 = (s32 *) (arg0 + 0x9C);
+ do { var_r0_19 = (new_var = 1); } while (0);
+  }
+  *var_r1_18 = var_r0_19;
+  *((s32 **) (new_var2 + 0x4C)) = &sub_80695E4;
+  return 1;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_806A2C4.s\"");
