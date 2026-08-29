@@ -54,9 +54,6 @@ void sub_8142BCC(s32 arg0, void *arg1, void *arg2)
   }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8142C18.s\"");
-#else
 s32 sub_80FBDE0(s32 *, void *, s32, s32);       /* extern */
 s32 sub_8139BB0(s32 *, void *, s32, s32);   /* extern */
 u8 sub_813B5B4(void *);                             /* extern */
@@ -65,15 +62,15 @@ void sub_813E618(void *arg0, void *arg1, s32 **arg2);                       /* e
 void sub_813F85C(s32 arg0, void *arg1, s32 **arg2);                       /* extern */
 
 void sub_8142C18(s32 arg0, void *arg1, void *arg2) {
-    s32 sp0;
+    s32 sp0[4];
     u8 temp_r3_13;
 
     temp_r3_13 = sub_813B5B4(arg1);
     if (temp_r3_13 == 0) {
         (*(s32 *)((s8 *)(arg1) + (0x2EC))) = (s32) ((*(s32 *)((s8 *)(arg1) + (0x14))) + (*(s32 *)((s8 *)(arg1) + (0x18))));
         (*(s32 *)((s8 *)(arg1) + (0x2F4))) = (s32) temp_r3_13;
-        sub_8139BB0(&sp0, arg1, 0x22, 0);
-        if ((sub_80FBDE0(&sp0, arg1, 0x7FFF, 0) << 0x18) != 0) {
+        sub_8139BB0(sp0, arg1, 0x22, 0);
+        if ((sub_80FBDE0(sp0, arg1, 0x7FFF, 0) << 0x18) != 0) {
             (*(s32 **)((s8 *)(arg2) + (0))) = &sub_813B360;
             (*(s32 **)((s8 *)(arg2) + (4))) = (s32 *) &sub_813E618;
             return;
@@ -81,7 +78,6 @@ void sub_8142C18(s32 arg0, void *arg1, void *arg2) {
         (*(s32 **)((s8 *)(arg2) + (0))) = (s32 *) &sub_813F85C;
     }
 }
-#endif
 
 void sub_8142C88(s32 arg0, void *arg1, void *arg2)
 {
