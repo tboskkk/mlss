@@ -216,15 +216,38 @@ asm_unified(".include \"asm/nonmatching/sub_813CE8C.s\"");
    counts this as unmatched. Write the C here, replacing this comment. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_813D048.s\"");
-#else
-/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
-   compiles a whole translation unit at a time, so an #error here fails
-   every OTHER function in this file under NONMATCHING=1. Guard intact, so
-   the real ROM still gets the verbatim retail bytes and progress.py still
-   counts this as unmatched. Write the C here, replacing this comment. */
-#endif
+s32 sub_8047154(void *, u32, s32);              /* extern */
+s32 sub_804761C(void *, s32);                   /* extern */
+s32 sub_804776C(void *, s32);                   /* extern */
+s32 sub_813A068(s32, void *, s32, s32, s32, s32, s32); /* extern */
+s32 sub_813D0F0(s32, void *, void *);           /* extern */
+extern s32 sub_813939C;
+void sub_813D64C(s32 arg0, void *arg1);
+void sub_813D048(s32 arg0, void *arg1)
+{
+  void *new_var;
+  s32 var_r0_58;
+  long long new_var2;
+  void *temp_r4_13;
+  temp_r4_13 = (void *) (*((void **) (((s8 *) arg1) + 0x344)));
+  sub_8138F64(arg0, 0xFF);
+  if ((sub_813A068(arg0, temp_r4_13, *((s32 *) (((s8 *) temp_r4_13) + 0xC)), *((s32 *) (((s8 *) temp_r4_13) + 0x10)), (*((s32 *) (((s8 *) temp_r4_13) + 0x14))) + (*((s32 *) (((s8 *) (new_var = temp_r4_13)) + 0x18))), 1, 0) << 0x18) != 0)
+  {
+    sub_804761C(temp_r4_13, 0);
+    sub_804776C(temp_r4_13, 0);
+    new_var2 = -8;
+    *((u8 *) (((s8 *) arg1) + 0x214)) = (u8) (3 | (new_var2 & (*((u8 *) (((s8 *) arg1) + 0x214)))));
+    sub_8047154(arg1, ((u32) ((*((u8 *) (((s8 *) arg1) + 0x24))) << 0x1D)) >> 0x1E, 0);
+    var_r0_58 = 0x198;
+  }
+  else
+  {
+    sub_813D0F0(arg0, arg1, arg1 + 0x1A0);
+    *((s32 **) (((s8 *) arg1) + 0x198)) = &sub_813939C;
+    var_r0_58 = 0x19C;
+  }
+  *((s32 *) (arg1 + var_r0_58)) = (s32) (&sub_813D64C);
+}
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_813D0F0.s\"");
