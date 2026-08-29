@@ -14902,6 +14902,16 @@ void sub_81969BC(void *arg0) {
 #endif
 
 #ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8196ACC.s\"");
+#else
+/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
+   compiles a whole translation unit at a time, so an #error here fails
+   every OTHER function in this file under NONMATCHING=1. Guard intact, so
+   the real ROM still gets the verbatim retail bytes and progress.py still
+   counts this as unmatched. Write the C here, replacing this comment. */
+#endif
+
+#ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81980C8.s\"");
 #else
 /* Undraftable by m2c: its seed did not compile. Deliberately left empty so
