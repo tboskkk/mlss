@@ -7,7 +7,25 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-ASM_FUNC("asm/nonmatching/sub_805C6B8.s", void sub_805C6B8(void *arg0));
+s32 sub_8029888(s32, s32);                      /* extern */
+
+void sub_805C6B8(void *arg0) {
+    void *temp_r0_15;
+    void *temp_r0_21;
+
+    *(s16 *)0x040000BA = 0;
+    sub_8029888(0, 0);
+    temp_r0_15 = *(void **)0x03000E0C;
+    if (temp_r0_15 != NULL) {
+        free_heap_8018D9C(temp_r0_15);
+    }
+    temp_r0_21 = *(void **)0x03000E08;
+    if (temp_r0_21 != NULL) {
+        free_heap_8018D9C(temp_r0_21);
+    }
+    (*(s8 *)((s8 *)(arg0) + (0x584))) = 0;
+}
+
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_805C700.s\"");
 #else
