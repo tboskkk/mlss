@@ -167,10 +167,6 @@ def reassemble_for_m2c(name: str) -> str | None:
     if not instrs:
         return None
 
-    for _, _, txt in instrs:
-        if _BAD_RE.search(txt):
-            return None  # undecodable span -- likely ARM-mode or real data
-
     return_idxs = [i for i, (_, _, txt) in enumerate(instrs) if _RETURN_RE.search(txt)]
     if len(return_idxs) != 1:
         return None  # ambiguous / multi-exit -- decline, don't guess
@@ -179,6 +175,23 @@ def reassemble_for_m2c(name: str) -> str | None:
     code_instrs = instrs[: ret_i + 1]
     code_start_off = code_instrs[0][0]
     code_end_off = code_instrs[-1][0] + code_instrs[-1][1]
+
+    # Only the REAL code (up to and including the return) needs to be
+    # decodable mnemonics -- bytes after the return are the function's own
+    # data (pool/padding) and objdump routinely garbage-decodes them as
+    # nonsense instructions (even `(bad)`/`UNDEFINED`) purely because a
+    # disassembler has no way to know a byte run is data vs code. That's
+    # fine: this module never reassembles those bytes as instructions, it
+    # emits them as `.4byte`/`.byte` further down. Checking the WHOLE
+    # disassembly here (as an earlier version of this function did) meant
+    # a single coincidentally-`UNDEFINED`-decoding pool WORD declined an
+    # otherwise perfectly bridgeable function -- confirmed live on
+    # `sub_8159E48`, whose only real problem was a pool word at file
+    # offset 0x3dc (well after its own single return) that happens to
+    # decode as `UNDEFINED` when misread as an instruction.
+    for _, _, txt in code_instrs:
+        if _BAD_RE.search(txt):
+            return None  # undecodable span in the REAL code -- likely ARM-mode
 
     tail = raw[code_end_off:]
     pad = b""
