@@ -45,6 +45,26 @@ asm_unified(".include \"asm/nonmatching/sub_80E548C.s\"");
 #endif
 
 #ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80E56DC.s\"");
+#else
+/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
+   compiles a whole translation unit at a time, so an #error here fails
+   every OTHER function in this file under NONMATCHING=1. Guard intact, so
+   the real ROM still gets the verbatim retail bytes and progress.py still
+   counts this as unmatched. Write the C here, replacing this comment. */
+#endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_80E56F8.s\"");
+#else
+/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
+   compiles a whole translation unit at a time, so an #error here fails
+   every OTHER function in this file under NONMATCHING=1. Guard intact, so
+   the real ROM still gets the verbatim retail bytes and progress.py still
+   counts this as unmatched. Write the C here, replacing this comment. */
+#endif
+
+#ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80E5780.s\"");
 #else
 void sub_80E5780(void) {
