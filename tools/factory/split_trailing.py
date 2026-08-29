@@ -221,6 +221,68 @@ def looks_complete(disasm: str) -> bool:
     return bool(re.search(r"\b(bx\s+r\d+|bx\s+lr|pop\s*\{[^}]*pc)", last))
 
 
+_LINE_RE = re.compile(r"^\s*([0-9a-f]+):\s+\S+\s+(.*)$")
+_RETURN_RE = re.compile(r"\b(bx\s+r\d+|bx\s+lr|pop\s*\{[^}]*pc)")
+_PC_REF_RE = re.compile(r"@\s*\(0x([0-9a-fA-F]+)\)")
+
+
+def looks_complete_with_pool(disasm: str, raw: bytes) -> bool:
+    """A second, more general check than looks_complete(): true when the
+    trailing blob's LAST genuine return is followed ONLY by that same
+    function's OWN literal pool -- verified by cross-referencing every
+    trailing word's real address against the `@ (0xADDR)` target objdump
+    itself already prints for every `ldr rX, [pc, #N]` line, not by
+    guessing that trailing bytes are "probably" data.
+
+    Exists because looks_complete() checks the LAST DISASSEMBLED line of
+    the WHOLE blob, and a real return followed by its own pool -- an
+    entirely ordinary Thumb function shape, not a special case -- makes
+    objdump keep decoding past the return into the pool bytes, which are
+    not code and disassemble as plausible-looking garbage. Measured live
+    2026-08-28: sampling 5 of the 135 candidates looks_complete() had
+    declined, ALL FIVE already end in an exit looks_complete() already
+    recognizes (`bx r0`/`bx r1`/`pop {...}; bx r0`) -- there is no
+    unrecognized exit idiom here at all, only this measurement gap. Kept
+    SEPARATE from looks_complete() (an additional check tried after it
+    fails) rather than merged in, so the simple, already-proven case
+    keeps its simple, already-proven logic -- this one has a real
+    correctness argument of its own (address cross-referencing) that is
+    worth being able to reason about on its own.
+    """
+    lines = [m for m in (_LINE_RE.match(l) for l in disasm.splitlines()) if m]
+    if not lines:
+        return False
+    ret_idx = None
+    for i, m in enumerate(lines):
+        if _RETURN_RE.search(m.group(2)):
+            ret_idx = i
+    if ret_idx is None:
+        return False
+    ret_off = int(lines[ret_idx].group(1), 16)
+    tail_start = ret_off + 2  # every Thumb return here is one 2-byte halfword
+    tail = raw[tail_start:]
+    if not tail:
+        return True  # nothing trails the return at all
+    # Referenced pool addresses, relative to the start of `raw` (objdump's
+    # own printed target minus this slice's own base -- disassemble()
+    # numbers from 0 regardless of the real ROM address, so `@ (0xADDR)`
+    # is already relative here, not absolute).
+    refs = {int(h, 16) for h in _PC_REF_RE.findall(disasm)}
+    # Up to 2 bytes of zero alignment padding may sit before the first
+    # real pool word (same shape as the handler-setter case above).
+    pad = 0
+    if len(tail) % 4 != 0 and tail[:2] == b"\x00\x00":
+        pad = 2
+    body = tail[pad:]
+    if len(body) % 4 != 0 or len(body) == 0:
+        return False
+    for i in range(0, len(body), 4):
+        word_addr = tail_start + pad + i
+        if word_addr not in refs:
+            return False  # an unaccounted-for word -- refuse, don't guess
+    return True
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("names", nargs="*")
@@ -272,10 +334,19 @@ def main():
             # itself, so completeness is proven by the signature, not by
             # this heuristic.
             complete = True
+        pool_verified = False
+        if not complete and looks_complete_with_pool(disasm, raw):
+            complete = True
+            pool_verified = True
         new_name = f"sub_{addr:08X}"[:3] + f"_{addr:X}"  # sub_8158E38 style
         new_name = f"sub_{addr:X}"
+        complete_note = "complete"
+        if complete and pool_verified:
+            complete_note = "complete (verified: return + own referenced literal pool)"
+        elif not complete:
+            complete_note = "INCOMPLETE"
         print(f"\n=== {name} -> {new_name} at 0x{addr:08X} "
-              f"({len(raw)} bytes, {'complete' if complete else 'INCOMPLETE'}) ===")
+              f"({len(raw)} bytes, {complete_note}) ===")
         for line in disasm.splitlines():
             if re.match(r"^\s+[0-9a-f]+:", line):
                 print("   ", line.strip())
