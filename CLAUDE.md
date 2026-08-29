@@ -998,13 +998,59 @@ knowing before re-spending a session on either:
     CFG-mirroring technique has no CFG mismatch to fix here; the gap
     really is register pressure, exactly as diagnosed. Ran
     `in_context_search.py --allocator-attack` for 200s/3,539 tries:
-    base score 10168 → best 10092. **Still deep in the +10000
-    reloc-mismatch penalty band** — the register-pressure difference
-    here isn't just a byte-count gap, it's tied to an actual
-    relocation/callee mismatch that 200s of random allocator pressure
-    injection barely dented (76 points). Not resolved; a real, harder
-    case than `sub_80F6250` below despite the similar-sounding
-    diagnosis.
+    base score 10168 → best 10092.
+
+    **Deep-dived further 2026-08-29 — one real, source-level fix found
+    and applied, one agbcc-internal choice confirmed unreachable, and
+    the earlier "relocation/callee mismatch" characterization above
+    corrected.** First, checked whether `relocs_equal=False` meant a
+    genuinely different callee (the user's own hypothesis: wrong
+    struct, wrong signature): it does not — `extract_symbol`'s own
+    relocation sets for candidate vs. retail name the IDENTICAL two
+    callees (`sub_80954DC`, `sub_8095468`) at offsets that differ by
+    exactly the function's own `size_delta` (12 bytes at the time).
+    **Ruled out**: no struct-size or inline-asm mismatch, no wrong
+    callee — this was always a pure byte-count gap wearing a
+    scarier-looking label.
+
+    Found the real, fixable piece by reading the actual byte-level
+    diff at offset 0x38: retail clears two separate bits with TWO
+    sequential `movs`+`negs`+`ands` triplets (`x &= -0x21; x &= ~0x40;`
+    — two masks, two operations); the candidate's C had both masks in
+    ONE expression (`(-0x21 & byte) & ~0x40`), which agbcc's constant
+    folder collapsed into a single precomputed mask (`movs r0,#0x9F;
+    ands`) before ever reaching instruction selection. Splitting it
+    back into two separate compound-assignment STATEMENTS (matching
+    retail's real structure) genuinely un-folds it: agbcc emits two
+    separate `ands` again, recovering exactly 4 bytes (`size_delta`
+    -16 → -12). This is a real, generalizable lesson distinct from
+    everything else in this section: **a single C expression combining
+    two compile-time-constant masks can get pre-folded across a
+    STATEMENT boundary that retail's source didn't have — split it
+    back into the number of statements retail's own instruction count
+    implies, don't just check that the algebra matches.**
+
+    What's left after that fix is NOT reachable, confirmed rather than
+    assumed: retail still builds each mask via `movs #positive; negs`
+    (2 instructions) where the split candidate uses a direct `movs
+    #already-negative-byte-value` (1 instruction, same final register
+    value) — tested removing the `(u8)` cast that looked like the
+    obvious suspect for early constant-folding; zero change either
+    way. This is agbcc picking its own shorter immediate-load encoding
+    for a compile-time-constant negative byte, the same "agbcc chooses
+    its own instruction selection for a constant, unreachable from C"
+    class as `sub_81064F8` below — a third confirmed instance of it,
+    not a coincidence.
+
+    Net result: real progress (`size_delta` -16 → -12, one genuine
+    source-level fix applied and worth keeping), but NOT a
+    penalty-band escape like `sub_80F6250`/`sub_80F3FE8` below —
+    `--allocator-attack` on the statement-split version still only
+    reached 10092 in 200s, confirming the remaining gap really is
+    the register-pressure difference originally diagnosed, now with
+    the two other candidate explanations (struct/callee mismatch,
+    foldable mask) definitively eliminated rather than just assumed
+    away.
   - `sub_81064F8`: an ARITHMETIC-IDENTITY / instruction-selection
     choice, a third distinct shape. The C computes `(orig - 1) -
     (val >> 8)`, already grouped the same way retail's disassembly
@@ -1581,6 +1627,38 @@ knowing before re-spending a session on either:
   own "Repo operations" landmine section already documents. Wrapping
   the same verification in `gitops.repo_lock()` gave a clean,
   uncontended `mlss.gba: OK` on the first try.
+
+  **Batch 3 processed 2026-08-29 (the next 8 off the 31-row
+  remainder): all 8 genuine, all resolved, using the same
+  boundary-computer + skip-check discipline** (this time correctly
+  formatted as `f"sub_{addr:X}"`, no leading zero, learning from the
+  batch-2 naming bug rather than repeating it):
+  - `sub_816B024` (188B → **7 functions**) — by far the busiest
+    fragment yet outside the dispatch-table cases: a mix of tiny
+    no-push leaf functions (`bx lr` with no setup at all, twice) and
+    ordinary `push{...,lr}` functions, none sharing a literal pool.
+  - `sub_8167F54` (164B → 2), `sub_816163C` (48B → 2),
+    `sub_815F7DC` (32B → 2), `sub_8159948` (44B → 2),
+    `sub_8159354` (32B → 2), `sub_8158D38` (72B → 2): ordinary pairs.
+  - **The automated skip-check flagged 2 false positives, both
+    correctly explained rather than trusted or blindly dismissed**:
+    `sub_8167F54` and `sub_816163C` each showed a "branch skips over
+    a return" warning pointing at an address with a wildly
+    out-of-range target (`0x160` in a 164-byte function; a negative-
+    looking `0xffffff78`) — in both cases the "branch" is a literal
+    POOL WORD garbage-decoded as a `bne`/`beq` instruction (the exact
+    same class of decode artifact `reassemble_bridge.py`'s `_BAD_RE`
+    scope bug already taught this session to expect), confirmed by
+    checking that address is inside that segment's own cross-
+    referenced pool range. The quick validation script itself was
+    never fixed to exclude pool bytes from branch-scanning (scratch,
+    not committed) — each hit was hand-verified instead, same
+    discipline as everywhere else in this file.
+  - Final consolidated verification: `rm -rf build/ && make` under
+    `repo_lock()` → clean `mlss.gba: OK` for the whole 8-function
+    batch in one pass. Multi-return backlog: 41 originally flagged →
+    2 confirmed false positives → 3 (batch 1) + 5 (batch 2) + 8
+    (batch 3) = 16 resolved → **23 remaining**, not yet reviewed.
 
 - **`rescore_seeds.plain_score`/`validator._matches_in_plain_build` structurally
   cannot accept a candidate that references a known address via its
