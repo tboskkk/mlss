@@ -16,15 +16,10 @@ void sub_815817C(void *arg0) {
     (*(s32 *)((s8 *)(arg0) + (0x14))) = 0;
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8158198.s\"");
-#else
-u32* sub_8158198(u32* param_1) {
-    *param_1 = 0x08CDCA30;
-    *(param_1 + 1) = 0;
-    return param_1;
+void sub_8158198(void *arg0) {
+    (*(s32 *)((s8 *)(arg0) + (4))) = 0x08CDCA30;
+    (*(s32 *)((s8 *)(arg0) + (0))) = 0;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81581A8.s\"");
