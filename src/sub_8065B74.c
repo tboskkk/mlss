@@ -15,20 +15,15 @@ int sub_8082B00();
 void sub_8065CC4(void *arg0);
 int sub_8082E1C();
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8065B74.s\"");
-#else
-extern s32 sub_8065C34;
-
+void sub_8065C34(struct Entity *arg0);
 s32 sub_8065B74(void *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0x9C))) == 0) {
         (*(s32 *)((s8 *)(arg0) + (0x9C))) = 2;
     }
     (*(s32 *)((s8 *)(arg0) + (0xA8))) = (s32) (*(s32 *)((s8 *)(arg0) + (0x9C)));
-    (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_8065C34;
+    (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_8065C34;
     return 1;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8065B9C.s\"");
