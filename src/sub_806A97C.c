@@ -19,18 +19,14 @@ void sub_806B3D0(struct Entity *arg0);
 int sub_810DD7C();
 
 s32 sub_8082E1C();
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_806A97C.s\"");
-#else
-void sub_806A510(void *arg0);                       /* extern */
+extern s32 sub_806A510;
 
 void sub_806A97C(void *arg0) {
     if ((*(s32 *)((s8 *)(arg0) + (0x80))) == 0) {
         (*(s16 *)((s8 *)(arg0) + (0xAC))) = 0x1E;
-        (*(s32 **)((s8 *)(arg0) + (0x4C))) = (s32 *) &sub_806A510;
+        (*(s32 **)((s8 *)(arg0) + (0x4C))) = &sub_806A510;
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_806A99C.s\"");
