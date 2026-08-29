@@ -7,16 +7,12 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_815F8BC.s\"");
-#else
-void sub_815F8BC(void* p0, s32 p1)
-{
-    *(u32*)((u8*)p0 + 0x04) = 0x08CDCF50;
-    if (p1 & 1)
-        free_heap_8018DA8(p0);
+void sub_815F8BC(void *arg0, s32 arg1) {
+    (*(s32 *)((s8 *)(arg0) + (4))) = 0x08CDCF50;
+    if (1 & arg1) {
+        free_heap_8018DA8(arg0);
+    }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_815F8DC.s\"");
