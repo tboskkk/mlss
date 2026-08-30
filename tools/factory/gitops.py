@@ -931,6 +931,24 @@ def asm_differ_matches(name: str) -> bool:
 TRAILING_DATA_RE = re.compile(r"^\s*\.byte\b", re.MULTILINE)
 
 
+def _parse_byte_lines(text: str) -> bytes:
+    """Raw bytes from a run of `.byte 0x.., 0x.., ...` lines, in order.
+    Ignores any non-.byte line (labels, comments) rather than erroring --
+    callers that need a byte-exact count already checked what they passed
+    in, and a permissive parse here just means the least useful case (an
+    unexpected non-.byte line) yields fewer bytes, not a crash."""
+    out = bytearray()
+    for ln in text.splitlines():
+        s = ln.strip()
+        if not s.startswith(".byte"):
+            continue
+        for v in s.split(".byte", 1)[1].split(","):
+            v = v.strip()
+            if v:
+                out.append(int(v, 16))
+    return bytes(out)
+
+
 def fragment_trailing_bytes(name: str) -> str | None:
     """Raw `.byte` content sitting AFTER this function's literal pool.
 
@@ -976,11 +994,48 @@ def fragment_trailing_bytes(name: str) -> str | None:
     else:
         lines = text.splitlines()
         last_insn = -1
+        label_idx = None
+        label_re = re.compile(rf"^{re.escape(name)}:\s*$")
         for i, ln in enumerate(lines):
             stripped = ln.strip()
+            if label_re.match(stripped):
+                label_idx = i
             if stripped and not stripped.startswith((".byte", "@")):
                 last_insn = i
         tail = "\n".join(lines[last_insn + 1:])
+        # A fragment write_split()/write_multi_split() produced is 100%
+        # raw .byte from its OWN label onward -- no mnemonic lines at all
+        # (see those functions' own docstrings: byte-identical BY
+        # CONSTRUCTION, never reconstructed assembly). For one of those,
+        # the loop above never finds a "real instruction" line to anchor
+        # on, so `last_insn` lands on the opening LABEL itself -- meaning
+        # NOTHING of `name`'s own body was ever recognized as code, and
+        # `tail` above is actually this exact symbol's own complete body,
+        # not separate hidden content. Confirmed hitting this live
+        # (2026-08-29) landing sub_814DD34, sub_816D898 and sub_80841B8:
+        # each is a genuinely complete, correct, tiny function that this
+        # check refused to let finish_match() delete.
+        #
+        # Verify rather than assume: reuse split_trailing's own
+        # looks_complete_with_pool(), the same conservative,
+        # address-cross-referenced check already used for "is this raw
+        # blob ONE safe, complete function" elsewhere in this project --
+        # fires ONLY when the blob decodes to EXACTLY ONE return, with
+        # everything else accounted for as that same return's own
+        # literal pool. A genuinely hidden SECOND function (the real
+        # landmine this whole check exists to catch) has its own return
+        # in the MIDDLE of the raw run with real code still following
+        # it, which this still correctly declines -- narrower than "the
+        # label lines up", on purpose, so a multi-function raw blob
+        # (most of this session's own phantom-gap sweep) is untouched by
+        # this carve-out and still refused exactly as before.
+        if last_insn == label_idx and tail.strip():
+            raw = _parse_byte_lines(tail)
+            if raw:
+                import split_trailing  # local: split_trailing itself imports gitops
+                disasm = split_trailing.disassemble(raw, 0)
+                if disasm and split_trailing.looks_complete_with_pool(disasm, raw):
+                    return None
     if not tail.strip():
         return None
     data_lines = [ln for ln in tail.splitlines() if TRAILING_DATA_RE.match(ln)]

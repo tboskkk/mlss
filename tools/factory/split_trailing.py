@@ -366,7 +366,19 @@ def looks_complete_with_pool(disasm: str, raw: bytes) -> bool:
     # real pool word (same shape as the handler-setter case above).
     pad = 2 if (len(tail) % 4 != 0 and tail[:2] == b"\x00\x00") else 0
     body = tail[pad:]
-    if len(body) % 4 != 0 or len(body) == 0:
+    # An empty body here means the WHOLE tail was consumed by the pad
+    # check above -- e.g. a bare 2-byte return (tail length 2) with
+    # nothing following but its own alignment pad, no pool at all. That
+    # is fully accounted for (nothing left to verify against `refs`), not
+    # a failure -- confirmed live 2026-08-29 finding gitops.
+    # fragment_trailing_bytes() couldn't trust this function for exactly
+    # that shape (a tiny write_split()-produced stub, bx lr + 2-byte pad,
+    # nothing else) because this line returned False for it. Only a
+    # NON-empty body that isn't a whole number of pool words is the real
+    # failure case.
+    if len(body) == 0:
+        return True
+    if len(body) % 4 != 0:
         return False
     return all(tail_start + pad + i in refs for i in range(0, len(body), 4))
 
