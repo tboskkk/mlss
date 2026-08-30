@@ -7,13 +7,9 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_815EC8C.s\"");
-#else
-s32 sub_815EC8C(s32 arg0) {
-    return M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */);
+s16 sub_815EC8C(void *arg0) {
+    return (*(s16 *)((s8 *)(arg0) + (0x18)));
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_815EC92.s\"");
