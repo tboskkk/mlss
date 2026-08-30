@@ -20,9 +20,6 @@ void sub_815FA40(struct Sprite **arg0) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_815FA50.s\"");
-#else
 void sub_815FA50(struct Sprite **arg0) {
     struct Sprite *temp_r0_7;
 
@@ -31,7 +28,6 @@ void sub_815FA50(struct Sprite **arg0) {
         sprite_show_8020CBC(temp_r0_7);
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_815FA60.s\"");
