@@ -22,3 +22,13 @@ void sub_807FA50(void) {
     (*(u8 *)((s8 *)(temp_r0_11) + (0xC))) = (u8) (-0x20 & (*(u8 *)((s8 *)(temp_r0_11) + (0xC))));
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_807FA7C.s\"");
+#else
+/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
+   compiles a whole translation unit at a time, so an #error here fails
+   every OTHER function in this file under NONMATCHING=1. Guard intact, so
+   the real ROM still gets the verbatim retail bytes and progress.py still
+   counts this as unmatched. Write the C here, replacing this comment. */
+#endif
