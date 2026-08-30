@@ -64,16 +64,12 @@ void sub_8171B60(void *arg0, s32 arg1) {
     process_remove(arg0, arg1);
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8171BF0.s\"");
-#else
 s32 sub_8163A24(s32);                           /* extern */
 
 void sub_8171BF0(void *arg0) {
     sub_8163A24((*(s32 *)((s8 *)(arg0) + (0x6C))));
     sub_8163A24((*(s32 *)((s8 *)(arg0) + (0x70))));
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8171C06.s\"");
