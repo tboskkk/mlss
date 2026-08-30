@@ -2973,3 +2973,73 @@ asymmetry matters: a saved seed survives; a saved sentence doesn't.
    in-flight permuter cleanup needs the room). Confirm with
    `ps aux | grep tools/factory` and `podman ps` before treating it as
    stopped. Resume by re-running the supervisor.
+
+## Phantom Gap batches 2-3: 18 more functions split, 3 real matches unblocked (2026-08-29)
+
+Fixed the anchor bug from batch 2 (the `sub_81141F8`/`sub_814DD14`
+mis-derivation: collecting raw bytes from "after the function's own
+label" instead of "after the LAST labeled `.4byte` pool line" double-
+counts pad/pool bytes that belong to the real function). With the
+correct anchor, ran a 12-candidate batch (batch 3) with **zero
+boundary errors** — every one matched its cross-checked total on the
+first try, a real improvement over batch 2's 2-of-6 failure rate.
+Landed: `sub_8075F4C`(6), `sub_80F8DE0`(4), `sub_814B5D0`(1, no
+subdivision needed), `sub_809A6CC`(2), `sub_815F474`(3),
+`sub_8051ACC`(3), `sub_808BED0`(5), `sub_815EB70`(2), `sub_80DEB78`(5),
+`sub_80DD600`(5), `sub_806B424`(3), `sub_8089C00`(6) — 45 new symbols
+total. 87 candidates remain in the vetted pool (~93 minus these 6... 12
+processed this batch, one batch-2 leftover already excluded).
+
+**A background job I launched got killed mid-`write_split()` by an
+unrelated `kill` I issued to a DIFFERENT stray process** (launched with
+a bare `&` instead of the tracked backgrounding mechanism, so its
+output was going nowhere and I killed what I thought was a duplicate).
+Caught immediately via `git status` showing a half-applied edit;
+verified it was actually complete and byte-identical (a fresh
+`rm -rf build && make` passed) before manually finishing what
+`write_split()`'s own commit step would have done. No corruption, but
+a reminder: prefer the harness's own tracked background execution over
+a bare shell `&`, specifically so output and process identity stay
+recoverable if something needs to be aborted.
+
+**A second, narrower `finish_match()` false-positive found landing the
+newly-unblocked `sub_814DD34`** (a genuine 4-byte no-op stub,
+`bx lr` + pad, split out of `sub_814DD14`'s trailing data): every
+fragment `write_split()`/`write_multi_split()` produce is 100% raw
+`.byte` under a `thumb_func_start` label BY DESIGN (byte-identical by
+construction, no reconstructed mnemonics — see `write_split()`'s own
+docstring). `fragment_trailing_bytes()`'s no-literal-pool fallback
+("everything after the LAST REAL INSTRUCTION LINE is trailing") finds
+no instruction line at all in a pure-`.byte` fragment, so `last_insn`
+stays at its initial `-1` and the ENTIRE body gets flagged as
+"trailing content," refusing deletion even for a fragment that is
+provably nothing but its own complete, correct body. Confirmed via
+direct force-thumb disassembly (one instruction + a 2-byte pad, nothing
+else) before bypassing the check by hand for this one, verified case —
+this is a real, narrow gap in `fragment_trailing_bytes()`'s own
+"no pool" fallback specifically for split-tool-produced fragments, not
+fixed at the tool level this session (a targeted fix: recognize a
+fragment whose OWN content is 100% `.byte` under a `thumb_func_start`
+with a length matching a real, single, unambiguous return near the end
+as safe-by-construction, distinct from a genuinely ambiguous multi-
+instruction Luvdis fragment).
+
+**A real bug in a combining script, not in `finish_match()`**: an
+attempt to land two functions (`sub_816D898` + `sub_814DD34`) in one
+script failed on the SECOND one and its own revert path restored BOTH
+functions' C source text to the pre-edit state — but `finish_match()`
+had ALREADY DELETED `sub_816D898`'s fragment as a side effect of its
+own successful first call, and the naive revert didn't know to restore
+that file too. Left the tree in a real (if quickly caught and fixed)
+broken state: a guard referencing a deleted fragment. **Generalized
+lesson**: any script landing multiple functions per invocation must
+snapshot and restore EVERY side effect a partial success can produce
+(fragment deletions included, not just the C source text it directly
+edited), or land each function as its own fully-independent
+`repo_lock()`-scoped operation instead of batching — the latter is
+simpler and was what actually fixed it here.
+
+Net from attacking the batch-2-unblocked targets: **3 real matches** —
+`sub_816D898`, `sub_814DD34`, and `sub_80841B8` (the last already had a
+correct hand-drafted C attempt sitting in its guard, just never
+verified against the now-correctly-measured retail bytes).
