@@ -13,15 +13,11 @@ s32 sub_809C59C();
 void sub_809CAC8(struct Entity *arg0);
 
 s32 sub_8082E1C();
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_809C9DC.s\"");
-#else
 void sub_809C9DC(void *arg0) {
     if (8 & (*(u8 *)((s8 *)((*(void **)((s8 *)(arg0) + (8)))) + (0x12)))) {
         (*(s32 *)((s8 *)(arg0) + (0x4C))) = 0;
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_809C9F4.s\"");
