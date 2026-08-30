@@ -42,14 +42,10 @@ asm_unified(".include \"asm/nonmatching/sub_816D868.s\"");
    counts this as unmatched. Write the C here, replacing this comment. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_816D898.s\"");
-#else
 void sub_816D898(void *arg0) {
     (*(s32 *)((s8 *)(arg0) + (0x18))) = 0x3C;
     (*(s32 *)((s8 *)(arg0) + (0x1C))) = 0;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_816D8A2.s\"");
