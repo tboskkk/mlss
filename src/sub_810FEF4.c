@@ -258,7 +258,7 @@ asm_unified(".include \"asm/nonmatching/sub_8110970.s\"");
 #endif
 
 #ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8110978.s\"");
+asm_unified(".include \"asm/nonmatching/sub_811097C.s\"");
 #else
 /* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
    compiles a whole translation unit at a time, so an #error here fails
