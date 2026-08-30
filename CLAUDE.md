@@ -15,7 +15,7 @@ in service of modding tools, asset editors, and understanding the engine
 (physics/collision is the maintainer's specific interest).
 
 **Run `tools/progress.py` for the live count. Never trust a number in a doc.**
-As of 2026-08-29: 1,794 of 6,496 matched (27.6%). `asm/mariobros.s` is a
+As of 2026-08-29: 1,795 of 6,505 matched (27.6%). `asm/mariobros.s` is a
 separate embedded Mario Bros. ROM — **out of scope by maintainer decision**,
 tracked apart from "game proper" everywhere.
 
@@ -1603,6 +1603,143 @@ of 8 (register-swap wall) and the attack improved all 6 of the
 remaining 6 to `diff=1` in 60s each — validates both halves of the
 pipeline before trusting it unattended. Launched for real at
 `--limit 100 --parallel 6 --seconds-per-fn 180` immediately after.
+
+**Real bug found and fixed in the triage itself, same day**: the
+original mnemonic-only comparison compares full operand TEXT, so a
+pure register swap (`ldr r2,...` vs `ldr r1,...`) counts as "DIFFERS"
+— confirmed live, the very first real run queued `sub_816B0E0`/
+`816B21C`/`816B2E0`, CLAUDE.md's own ~330,000-try-proven-unreachable
+wall group, for a fresh attack. Added a register-blind second compare
+(every bare register token mapped to a placeholder) to catch same-
+mnemonic/same-immediate/only-register-differs cases. **Still an
+accepted, documented limitation, not fully closed**: triage builds in
+ISOLATION (`compiler_variants.stage()`, cheap, batchable), but the wall
+is a REAL-FILE, whole-translation-unit effect — confirmed on
+`sub_816B0E0` itself, whose isolated diff is just alignment padding,
+not the real in-context register swap, so it still evades both
+checks. This is a throughput cost, not a correctness risk: the attack
+itself always does the real in-context compile and just plateaus
+exactly as it always did on this row.
+
+**Full 100-row run finished, 2026-08-29**: 80 of 100 rows were worth
+attacking (20 parked automatically by the fixed triage). **80 of 80
+improved to single-digit near-misses** (2-7 bytes, 180s each, 6-way
+parallel, ~2552s total) — every one saved to
+`nonmatchings/<name>/output-incontext-best/` and fed back into the
+DB's `candidate_body`/`notes`. Zero reached true zero directly, exactly
+as expected (the tool deliberately never claims a match itself), but
+this is now 80 real, verified seeds sitting in the DB for the live
+validator/tier2 pipeline to pick up on its own — the same mechanism
+that turned this session's `sub_8087444` near-miss into a real
+committed match with no manual intervention.
+
+## THE LAW, instance nineteen: clobbered by a concurrent commit, not just a concurrent edit
+
+**A new shape of the already-documented edit-outside-the-lock race,
+found live 2026-08-29 landing `sub_8136470`.** The known version of
+this bug (`sub_814B4F4`, earlier the same day) was: edit a file, THEN
+call `finish_match()` as a separate step — a live worker's revert
+lands in the gap and wipes the uncommitted edit. This time the edit
+AND `finish_match()` were correctly inside one `repo_lock()` (the
+prescribed fix), and it still broke, because the vulnerable gap moved
+one step later: `git add` + `git commit` were run as separate,
+UNLOCKED commands AFTER the lock was released. In that gap, a live
+factory worker landed its OWN real match for a sibling function
+(`sub_81365DC`) in the exact same file, and when the manual `git add
+src/sub_8136470.c` ran moments later, it staged and committed
+WHATEVER was on disk at that instant — the factory's edit layered on
+top of an already-correct file — rather than the specific change the
+commit message claimed. The result: a commit titled "Match
+sub_8136470" whose actual diff was the factory's unrelated
+`sub_81365DC` insertion, while the sub_8136470 fix itself silently
+never made it in, leaving HEAD referencing a fragment the commit had
+also deleted — genuinely broken, only surfaced by a from-scratch
+rebuild.
+
+**Root-caused a step further, not just re-described**: the "factory's
+own match" itself turned out to be a **real false match that had never
+gone through `finish_match()`'s actual gate at all** — its `.s`
+fragment was still sitting on disk, untouched, the whole time (checked
+via `git log` on that path: never deleted). What actually happened is
+narrower and stranger than "the factory landed a bad match": some live
+process's OWN in-memory edit (almost certainly a candidate being
+speculatively written to `src/*.c` for review, mid-cycle, never
+verified or intended to be committed) got vacuumed into my `git add`
+by simple proximity, in the same file, at the same moment. Confirmed
+by isolating each piece with a from-scratch build starting from the
+pristine post-split state (`60a4127a`) plus exactly one variable at a
+time: `sub_81365DC`'s specific C body, alone, with every sibling
+otherwise pristine, reproduces a real ROM sha1 mismatch and an 8-byte
+`check_layout.py` shift with no other cause needed. **THE LAW's
+guarantee held** — no false match ever reached a real gate — but a
+plainly-false, never-verified fragment of C sat in a real commit's
+diff regardless, which is exactly the kind of thing that gate exists
+to prevent from being TRUSTED, even though this instance never
+actually re-entered the ROM.
+
+**The fix, generalized**: the lesson from `sub_814B4F4` ("the edit
+needs to be inside the lock") was necessary but not sufficient — **the
+commit itself must be inside the same lock as the edit and the
+build**, for exactly the same reason. `git add <specific path>` is not
+a safe boundary against concurrent writes to that same path; only
+holding the lock through the literal `git commit` call is. Repaired via
+one atomic script (revert the phantom `sub_81365DC` body back to
+raw/guarded, re-apply the verified `sub_8136470` fix, rebuild, check
+layout, commit — all inside one `repo_lock()` acquisition) rather than
+patched around.
+
+## `decode_jumptable.py`: two real fixes landed, one real limitation found and NOT worked around
+
+Reconstructing `sub_81604A8`'s jump table (Luvdis's `mov pc, rX` blind
+spot — see Phase 3's still-open jump-table item) surfaced two genuine,
+narrow, verified bugs in the tool itself:
+
+- **The verify step's relocation resolver didn't understand a `bl` to
+  a bare absolute address.** `bl 0x826061e` (a real, valid call target
+  with no symbol anywhere in `mlss.map` — not yet extracted) assembles
+  to an `R_ARM_THM_CALL` against binutils' own `*ABS*+0xADDR`
+  pseudo-symbol, not a real symbol table entry; the resolver only knew
+  `.text` and named symbols, so it refused a genuinely fine relocation
+  as "unresolved" even though the target address is already fully
+  known from the pseudo-symbol's own printed name. Fixed by parsing
+  that address directly. Verified non-regressing against the full
+  `--all` sweep (only gains, no losses) before landing. **This fix is
+  safe and committed** (`c5b7465d`) — `sub_81604A8` itself ships using
+  the bare-hex form this fix unblocks, verified byte-identical AND
+  confirmed clean in the real project build (`check_layout.py` OK).
+
+- **Naming that same `bl` target as a real symbol (`sub_826061E`,
+  minted via the established `name = 0xADDR;` equality convention in
+  `symbols.txt`) was tried, tested at length, and is NOT landed —
+  it breaks the real link.** Motivation: m2c's own parser hard-crashes
+  on a bare numeric `bl` operand (`MagicFuncPattern.replace()` asserts
+  the first arg is an `AsmGlobalSymbol`), so a named target is what
+  m2c would need to ever see this function's real control flow at all.
+  But minting the symbol and rebuilding the real ROM reproducibly grows
+  the linked output by exactly 8 bytes, shifting everything after it
+  (first visible as an unrelated-looking `mariobros.o` layout shift,
+  root-caused via bisection to this one symbol) — almost certainly an
+  automatic ARM/Thumb interworking veneer GNU `ld` inserts for a direct
+  `bl` against a `--just-symbols` absolute-value symbol with no ELF
+  symbol-type information attached (unlike a real compiled function,
+  which carries `STT_FUNC`+Thumb-bit metadata `ld` can act on).
+  Confirmed it isn't about the Thumb bit specifically: setting bit 0 on
+  the minted address (`0x0826061F` instead of `0x0826061E`) made no
+  difference. **No existing equality symbol in this project
+  (`sub_800063C`, `loc_819832C`, etc.) had ever been the direct target
+  of a `bl` before** — every prior use is either an address VALUE
+  (pointer arithmetic, the `dword_3001038 + (&loc_X - &loc_Y)` idiom)
+  or called through a `_call_via_rX` veneer, both of which sidestep
+  this. This is the first time anything hit it. **Deliberately left
+  unresolved rather than forced**: the honest, verified fix is to
+  actually extract and name `sub_826061E` as a real function (not
+  scoped here), not to keep guessing at linker-script workarounds.
+  `symbolize()`'s `bl`/`blx` `sub_<ADDR>` naming fallback was written,
+  tested, found to trigger exactly this, and reverted rather than kept
+  half-working — do not re-add it as a default without also solving
+  the veneer problem, or it will silently produce a "verified
+  byte-identical" rewrite that is NOT byte-identical in the real link,
+  for any future jump table calling an unextracted function directly.
 
 ## Housekeeping outstanding
 
