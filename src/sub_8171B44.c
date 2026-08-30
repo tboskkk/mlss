@@ -163,19 +163,20 @@ void sub_8171DD4(void *arg0) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8171DF0.s\"");
-#else
-void sub_8171DF0(void *arg0) {
-    u16 temp_r0_9;
-
-    temp_r0_9 = (*(u16 *)((s8 *)(arg0) + (0xEA)));
-    if (temp_r0_9 == 0) {
-        (*(u16 *)((s8 *)(arg0) + (0xEA))) = (u16) (temp_r0_9 + 1);
-        play_sfx_80195B4(0x97, -1);
-    }
+void play_sfx_80195B4(int, int);
+void sub_8171DF0(void *arg0)
+{
+  u16 temp_r0_9;
+  u16 new_var;
+  ;
+  ;
+  if ((*((u16 *) (((s8 *) arg0) + 0xEA))) == 0)
+  {
+    *((u16 *) (((s8 *) arg0) + 0xEA)) = (u16) ((*((u16 *) (((s8 *) arg0) + 0xEA))) + 1);
+    play_sfx_80195B4(0x97, -1);
+ do { } while (0);
+  }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8171E0E.s\"");
