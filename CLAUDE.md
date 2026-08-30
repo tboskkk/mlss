@@ -2933,3 +2933,43 @@ plus a `movs r0,#65; negs r0,r0` vs a raw `movs r0,#0xBF` immediate-
 encoding difference for the same effective byte mask) — not chased
 further this session. Saved to
 `nonmatchings/sub_80AB404/output-incontext-best/`.
+
+## Manual DB `notes` writes race the live factory — a new recurring shape for THE LAW
+
+Parking `sub_80AB404` (see above) was written to the DB's `notes`
+column while the factory was still running. Minutes later the note was
+gone — a live `tier_m2c` worker re-claimed the row (still sitting in
+`tier2_ready`, still a normal target for the pipeline's own routine
+claim/resolve/reseed cycle) and overwrote `notes` with its own generic
+message, silently discarding the diagnostic writeup with no error or
+warning anywhere. This is the exact class CLAUDE.md's own Housekeeping
+section already names for `flag_dead_ends.py` ("the pipeline's own
+routine claim/resolve/reseed writes to that same column reliably
+clobbered the tag") — this is a second, independent instance of it,
+this time hitting a human's own manual annotation rather than a tool's.
+
+**The `output-incontext-best/` filesystem artifact was untouched** —
+only the DB `notes` text was at risk, because nothing else in the
+pipeline writes to that directory for a row it doesn't own. That
+asymmetry matters: a saved seed survives; a saved sentence doesn't.
+
+**Rule, to prevent losing diagnostic work again:**
+1. **Manual `notes` annotations are only durable on a row in a terminal
+   state** (`matched`, or `parked`/`dead_end_reason`-style states
+   nothing re-claims) **— never on a row still sitting in
+   `tier2_ready`/`needs_attempt`/any state the live pipeline actively
+   processes**, unless the factory is stopped first (see
+   `kill -TERM` on the supervisor PID, below).
+2. If the factory must stay running, write the annotation to a
+   dedicated column nothing else touches (the `flag_dead_ends.py`
+   precedent: `dead_end_reason`, never the shared `notes` field) or to
+   this file / a memory file instead of the DB.
+3. **To pause the factory safely for this or any other reason**: find
+   the `tools/factory/supervisor.py` PID and send `SIGTERM` (not
+   `SIGKILL`, not `podman kill --all` — see the incident above about
+   why a blanket container kill is never the right tool). The
+   supervisor's own signal handler stops all 8 workers cleanly and
+   sweeps orphaned containers, taking up to ~90s (`tier2`'s own
+   in-flight permuter cleanup needs the room). Confirm with
+   `ps aux | grep tools/factory` and `podman ps` before treating it as
+   stopped. Resume by re-running the supervisor.
