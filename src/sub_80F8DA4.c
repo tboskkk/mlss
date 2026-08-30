@@ -7,20 +7,9 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80F8DA4.s\"");
-#else
-u16 sub_80F8DA4(u32* param_1, s16 param_2) {
-    u32* puVar1;
-    u16 uVar2;
-    
-    puVar1 = param_1 + 0xB;
-    uVar2 = *puVar1;
-    uVar2 = uVar2 + param_2;
-    uVar2 = uVar2 + 0x1A0;
-    return *(u16*)((u32)uVar2);
+u16 sub_80F8DA4(void *arg0, s32 arg1) {
+    return (*(u16 *)((s8 *)(((*(s32 *)((s8 *)(arg0) + (0x2C))) + (u16) (arg1 << 8))) + (0x1A0)));
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80F8DB6.s\"");
