@@ -234,7 +234,7 @@ void sub_801B5A0(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5, s
 }
 
 #ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_801B5EE.s\"");
+asm_unified(".include \"asm/nonmatching/sub_801B5E2.s\"");
 #else
 /* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
    compiles a whole translation unit at a time, so an #error here fails
