@@ -2580,6 +2580,55 @@ CI already runs `tools/gen_readme_progress.py --check` (closes the old
 carries the corrected PROPAGATE/DEDUPLICATE numbers — both done, this
 section no longer needs to track them.
 
+## agbcc compiler quirks (accumulated findings)
+
+Consolidated here so a future session checks this list BEFORE re-deriving
+one of these from scratch via a wasted search or a "why did this get
+worse" surprise. Each was found and verified on a real function, not
+reasoned about in the abstract.
+
+- **Non-table `switch` statements emit their case BODIES in the exact
+  source-code order of the `case` labels, not numeric value order.**
+  Found on `sub_81148B8` (2026-08-29, see below): m2c emitted `case 1:
+  case 2: case 0:` in that arbitrary order, and agbcc laid out the
+  compiled blocks in THAT order, physically out of numeric sequence —
+  while retail's real block order was 0, 1, 2. Reordering the C
+  source's case labels to match retail's real PHYSICAL layout (readable
+  straight off the disassembly's address order, not the dispatch
+  chain's comparison order) closed a large structural gap (598→185
+  bytes) with no other change. This only applies to a `cmp`/`beq`-chain
+  switch (few, sparse, or irregular case values) — a dense switch that
+  agbcc compiles as a real jump table has no such source-order
+  dependency to exploit, since a table's layout is the numeric case
+  order by construction.
+- **agbcc does not rotate loops from ANY higher-level C construct** —
+  not `for`, `while`, or `do`/`while`; it compiles literally whatever
+  CFG shape the C already expresses. When retail's disassembly shows a
+  rotated (check-at-bottom, jump-to-check-first) loop, the fix is
+  writing the already-rotated shape directly as `goto`/label C matching
+  retail's real CFG edge-for-edge — not reaching for a different C loop
+  keyword and hoping. Full derivation: `sub_80292EC` in "Heuristic
+  walls found 2026-08-28" above. **Not universal, tested and found to
+  cut the other way on `sub_80E9594`** (2026-08-29, see below): the
+  same rotation rewrite made that function's diff WORSE (60→69 bytes).
+  The CFG-matching principle is real, but whether it nets a win still
+  depends on what it does to register allocation downstream in that
+  SPECIFIC function — check with an actual score before keeping the
+  rewrite, don't apply it as a standing rule.
+- **A `register T asm("rN")` hint is silently ignored for an ordinary
+  scalar in a plain statement, but IS honored for a function-pointer
+  variable used immediately in an indirect call** — forces the matching
+  `_call_via_rN` veneer. See "Veneer-symbol wall: partially reachable
+  after all" above for the worked example and the ~330,000-try proof
+  that the plain-scalar case never works.
+- **A single C expression combining two compile-time-constant masks can
+  get pre-folded across a STATEMENT boundary retail's own source
+  didn't have.** Splitting one combined mask expression back into the
+  number of separate statements retail's own instruction count implies
+  (not just checking the algebra matches) un-folds it. See
+  `sub_8095028`/`sub_814A814`/`sub_80F5B5C` in the "Tier 2 near-miss
+  landscape" and "Continued Tier 2 sweep" sections above.
+
 ## sub_81148B8 was a measurement artifact, not a CFG bug (2026-08-29)
 
 The "genuine goto-heavy CFG misreconstruction" flagged for `sub_81148B8`
@@ -2711,3 +2760,176 @@ spill, so the gap is m2c's specific stack-temp assignment differing from
 retail's rather than a structural or measurement bug. Not attempted
 further this session; a real target for a future dedicated
 register-pressure reconstruction pass.
+
+## Systematic phantom-gap sweep (2026-08-29, continued)
+
+Built a corpus-wide version of the manual check that found
+`sub_8136470`/`sub_81148B8`/`sub_80E9594`: reuse
+`gitops.fragment_trailing_bytes()` (already the exact primitive
+`finish_match()` uses to refuse deleting a fragment with real trailing
+content) across the whole `tier2_ready` pool instead of one function at
+a time.
+
+**A naive pass massively over-counts.** The first cut flagged 452 of
+2,701 rows — implausibly high. Two real false-positive classes found
+and filtered before trusting the number:
+
+1. **Already-classified data regions** (`unk_ADDR:`/`custom_lz_ADDR:`
+   etc., Phase 3's own labeling convention) sitting in the SAME `.s`
+   file as a real function — `fragment_trailing_bytes()` doesn't know
+   about that labeling scheme, so it flags genuinely-solved, correctly
+   left-alone data (e.g. `sub_81C0F7E`'s already-known 104KB
+   unclassified blob) as if it were a new discovery. Filtered by
+   checking for a `label:...len=N` line matching that convention.
+2. **Jump-table / multi-pool complexity**: a function with an internal
+   `lbl_`-style jump table (or a second literal pool under a different
+   naming shape) can have real, live CASE-BODY code running past the
+   LAST pool line `fragment_trailing_bytes()` recognizes, which then
+   gets misread as "trailing junk" even though it's genuinely part of
+   ONE function's own body (confirmed false positive on
+   `sub_8167510`). Filtered by requiring the WHOLE tail span to be pure
+   `.byte` lines (plus bare address labels) all the way to EOF — no
+   stray real mnemonic or a second `.4byte`-labeled pool entry allowed
+   anywhere in the span.
+3. **Whole-function-never-disassembled cases** (the function's OWN
+   first line after its label is already raw `.byte`, not a real
+   mnemonic) are a DIFFERENT, unrelated defect — Luvdis/split_func
+   failed to decode the function's own body at all, not "extra hidden
+   function(s) trailing a real one." Excluded from this sweep
+   (`sub_80E548C`/`sub_80DFFD8` are examples) since fixing them needs a
+   different lever entirely, not `write_multi_split()`.
+
+**After all three filters: 97 genuine candidates**, ranked by trailing
+byte count, all confirmed to start with a real disassembled prologue
+and end in pure raw data with no complicating structure. Top of the
+list: `sub_81980C8` (4,940 bytes — see below), `sub_81DB670` (502),
+`sub_80F1CF8` (436), `sub_801B5A0` (358, already flagged in
+`gitops.fragment_trailing_bytes()`'s own docstring as a known
+325-ish-byte case, just never split).
+
+**`sub_81980C8`: confirmed genuine, but requires NEW tooling — deferred,
+not attempted.** Its hidden content disassembles cleanly, but as ARM
+mode, not Thumb — a register-block-copy dispatch routine (`push
+{r4-r9,sl,fp,lr}` / `stmia`/`ldmia` unrolled-copy variants selected via
+a `sub pc, pc, r2`-style computed jump, likely BIOS-adjacent, akin to
+`CpuFastSet`). This project's `write_split()`/`write_multi_split()`
+only know `thumb_func_start`/`non_word_aligned_thumb_func_start`
+(`asm/macros.inc` does have a matching `arm_func_start` macro already,
+just never exercised by any tool or any extracted function in this
+corpus so far — this would be the first). Extending the split tooling
+to support ARM-mode segments is real, scoped, worthwhile follow-up
+work; not done here to avoid rushing untested new-tooling logic under
+time pressure.
+
+**Two of the three remaining top candidates split clean, one hit a
+real, instructive naming bug:**
+
+- `sub_81DB670` → 7 functions (`sub_81DB76E`/`79C`/`7E8`/`834`/`880`/
+  `8CC`/`918`): a family of near-identical comparison wrappers, each
+  calling `sub_81DAE94` twice and recursing into `sub_81DB670` itself.
+  Commits `33b92bb3`/`b8ec8e8b`.
+- `sub_80F1CF8` → 8 functions (`sub_80F1D34`/`D94`/`DD4`/`DF8`/`E1C`/
+  `E44`/`EB8`/`ECC`): a mixed family of small flag-toggle helpers plus
+  one larger dispatcher; one segment (`sub_80F1D34`) has its own
+  literal pool EMBEDDED mid-body with real code continuing after it —
+  confirmed harmless (the pool is still wholly inside that one
+  segment's own span), same shape already known from `sub_8046BC8`.
+  Commits `ed93caea`/`9a85d3af`.
+- `sub_801B5A0`: hit a genuine **address-naming bug, self-inflicted,
+  not a tooling defect** — see its own entry immediately below.
+
+## sub_801B5A0/sub_801B5E2: an address computed without the size cross-check was wrong by 12 bytes
+
+Landing `sub_801B5A0`'s split skipped the "assemble the WHOLE original
+fragment, measure its real total size, subtract the known trailing byte
+count" cross-check that both `sub_81DB670` and `sub_80F1CF8` used
+successfully — the address for the new split-out fragment was instead
+read off the file's own visual layout by eye. That produced
+`sub_801B5EE`, which built and linked with a byte-identical ROM (the
+content was correct throughout — nothing was ever actually broken) but
+`check_layout.py` immediately caught the real problem: the symbol
+*named* `sub_801B5EE` (implying address `0x0801B5EE` by this project's
+own address-equals-name convention) actually links at `0x0801B5E2`, 12
+bytes earlier. Fixed with a pure rename (content untouched) to
+`sub_801B5E2`, commit `de1a24b0`.
+
+**Compounding factor, not the root cause**: partway through
+investigating this, `sub_801B748` (12/20/32-byte confusion — its real,
+already-matched size is `0x14`/20 bytes per `mlss.map`, not the 12 a
+first guess assumed) turned out to be a THIRD-party complication: a
+function that used to be part of the same original raw blob as
+`sub_801B5A0`, already independently extracted and matched by an
+EARLIER, unrelated session (`src/sub_801B748.c`, dated 2026-08-26).
+Attempting to re-split those same bytes into a NEW `sub_801B748` symbol
+correctly failed at the LINK stage (`multiple definition of
+'sub_801B748'`) rather than silently corrupting anything — a real,
+useful safety net, not a bug. The lesson generalizes: **before creating
+ANY new address-named symbol during a split, grep the tree for that
+exact name first** — a stale/never-shrunk neighboring fragment can
+contain bytes that were already claimed by an independent extraction
+elsewhre, and the tool has no way to know that on its own.
+
+**Also hit and fixed, purely a scripting mistake, not a tooling or
+project bug**: an early attempt at this used an UNQUOTED heredoc
+(`<< PYEOF` instead of `<< 'PYEOF'`) to embed a Python script containing
+escaped quotes (`\\"`) inside generated C source text — bash's own
+heredoc expansion silently stripped the backslashes, corrupting the
+generated `asm_unified(".include \"...\"")` calls into invalid C
+(`asm_unified(".include "..."")`), caught immediately by a real
+compiler syntax error, not a silent corruption. **Always use a quoted
+heredoc delimiter (`<< 'EOF'`) for any embedded script containing
+backslash escapes**, and pass paths as hardcoded values rather than
+shell-substituting `$VARIABLE` into an unquoted heredoc if the two ever
+conflict.
+
+**One more near-miss avoided by `repo_lock()` doing its job**: the live
+factory independently found and committed a real match for
+`sub_801B5A0` itself (`9dbbc66e`, `source=tier2`) WHILE this
+investigation was still running its own multi-step
+edit/build/verify/revert cycles on the neighboring `sub_801B5EE`
+fragment. Because every one of those cycles was wrapped in its own
+`gitops.repo_lock()` acquisition (per this session's own earlier
+"THE LAW, instance nineteen" lesson), the factory's commit and this
+investigation's reverts were correctly serialized with no collision —
+confirmed by checking `git status`/the actual file contents immediately
+after, not assumed safe.
+
+## sub_80AB404's "register-pressure spill" was an isolation-only artifact
+
+The `mov r7,r8; push {r7}` spill this file's own "Two large
+register-pressure targets" entry above diagnosed for `sub_80AB404` was
+measured via `compiler_variants.stage()` (isolated single-function
+compile). Re-measured properly via `in_context_permuter.py` (the real
+45-function translation unit) before spending search time on it: **the
+candidate's real-TU prologue already matches retail exactly** —
+`push {r4,r5,r6,r7,lr}; sub sp,#4`, no r8 anywhere. This is precisely
+the isolation-vs-real-file register pressure gap this file's own
+"In-context permuter" section already names as the whole reason that
+tool exists — just caught here as a live case of trusting an isolated
+diagnosis instead of re-checking it, exactly the mistake THE LAW warns
+against. **Practical rule**: before spending a session's `--allocator-
+attack` budget "fixing" a register-pressure spill, confirm the spill is
+real in the SAME context the search will run in (`in_context_permuter`,
+not `compiler_variants.stage()`) — it may already be gone.
+
+The REAL remaining gap (122 bytes at the time): a divide-by-256
+round-toward-zero idiom (`if (x<0) x += 0xFF; ...x >> 8`, applied to 3
+struct fields, called twice in the function on different structs) where
+m2c's C self-mutates 3 separately-named locals in place before shifting
+each in the call expression; retail's real codegen reuses ONE scratch
+register across all 3 reads/adjustments, then does a combined move+shift
+(`asrs rDest, rScratch, #8`) into each argument register separately.
+Splitting the shift result out into its OWN freshly-declared variable
+per field (instead of shifting the same variable that was just
+self-mutated) reproduces retail's move+shift pattern and closed
+122→95→67 bytes across the two occurrences — a new, generalizable
+variant of the already-documented "materialize an intermediate into its
+own variable" lever, this time for a shift-of-an-adjusted-value rather
+than a raw address computation. `--allocator-attack` closed the
+remainder to **65 bytes, reloc-equal, size_delta=0**. A second,
+undiagnosed idiom remains in the gap (an immediate array-index style
+access the candidate expresses as pointer-offset arithmetic instead,
+plus a `movs r0,#65; negs r0,r0` vs a raw `movs r0,#0xBF` immediate-
+encoding difference for the same effective byte mask) — not chased
+further this session. Saved to
+`nonmatchings/sub_80AB404/output-incontext-best/`.
