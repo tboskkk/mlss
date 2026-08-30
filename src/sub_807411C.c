@@ -254,9 +254,6 @@ void sub_80743C4(void *arg0)
   }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_807442C.s\"");
-#else
 s32 sub_8082E1C(void *, s32, s32, s32);         /* extern */
 
 void sub_807442C(void *arg0) {
@@ -265,7 +262,6 @@ void sub_807442C(void *arg0) {
         (*(s32 *)((s8 *)(arg0) + (0x4C))) = 0;
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8074452.s\"");
