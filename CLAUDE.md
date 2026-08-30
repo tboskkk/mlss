@@ -3043,3 +3043,54 @@ Net from attacking the batch-2-unblocked targets: **3 real matches** —
 `sub_816D898`, `sub_814DD34`, and `sub_80841B8` (the last already had a
 correct hand-drafted C attempt sitting in its guard, just never
 verified against the now-correctly-measured retail bytes).
+
+## Phantom Gap backlog: CLOSED (batches 4-6, 2026-08-30)
+
+Batches 4 (20), 5 (30), and 6 (24, final) all ran clean with the fixed
+pool-anchor + pad-absorption boundary logic — **74 more candidates, 0
+boundary errors across all three batches** (vs. batch 2's 2/6 failure
+rate before the anchor bug was found). One self-inflicted naming typo
+in batch 6 (`sub_8110978` written instead of the verified `sub_811097C`
+— same class as the earlier `sub_801B5EE` incident, just a plain
+transcription slip this time, not a derivation bug): caught immediately
+by the batch's own consolidated `check_layout.py` pass, fixed with a
+pure rename, no content change.
+
+**The vetted phantom-gap pool is now empty** except the one
+deliberately-deferred entry: `sub_81980C8`, whose hidden content is
+genuine ARM-mode code (a register-block-copy dispatch routine) that
+this project's split tooling doesn't support yet (see the original
+diagnosis above). Every Thumb-mode trailing-data candidate this
+session's systematic sweep could find has been split. A future sweep
+should re-run the same sweep script fresh rather than assume this
+stays empty forever — new candidates can still surface as the corpus
+keeps changing.
+
+## Sign-extension type-mismatch sweep: one real hit, not a systemic class
+
+Following `sub_80DD600`'s fix (m2c guessing a 16-bit return type where
+retail's real type was 32-bit, producing spurious `lsl`/`asr #16`
+pairs), searched the DB for other high-escalation `tier2_ready` rows
+whose OWN candidate declares a narrow (`s8`/`u8`/`s16`/`u16`) return
+type — 27 hits at escalation >= 9. Tested the 5 closest-to-matching
+(`sub_80FA7C4`, `sub_80F1648`, `sub_80F18C4`, `sub_80F14D4`,
+`sub_80F155C`) by widening both the function's own return type and its
+callee's to `s32`/`u32`.
+
+**None were the same bug.** `sub_80FA7C4`'s real retail disassembly
+DOES truncate to `u8` before returning (`lsls r0,r0,#24; lsrs
+r0,r0,#24`) — widening it removed real, necessary code and made the
+diff worse; its actual (much smaller) gap is the already-proven
+register-swap wall, unrelated to type width at all. The other four
+share a bigger, genuine structural gap (real byte-length differences,
+not just register churn) that widening didn't touch either way.
+
+**Honest conclusion**: a narrow declared return type on a
+high-escalation row is not, by itself, evidence of the `sub_80DD600`
+class of bug — it can just as easily coexist with an unrelated wall.
+`sub_80DD600` was a real, individually-diagnosed fix, not the first
+instance of a broad new lever. Don't widen a type based on the
+declaration alone; confirm via a direct objdump diff (does retail's
+own disassembly actually skip the truncation?) before touching it,
+exactly the same discipline this file already documents for every
+other near-miss class.
