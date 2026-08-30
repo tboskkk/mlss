@@ -12,17 +12,13 @@ s32 sub_81387C8();
 s32 sub_8139030();
 extern s32 sub_8139420;
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_813C368.s\"");
-#else
-void sub_813C368(void *arg1) {
-    void *temp_r2_10;
-
-    temp_r2_10 = (*(void **)((s8 *)(arg1) + (0x294)));
-    (*(u8 *)((s8 *)(temp_r2_10) + (0x11))) = (u8) ((*(u8 *)((s8 *)(temp_r2_10) + (0x11))) | 0x40);
-    (*(u8 *)((s8 *)(arg1) + (0x214))) = (u8) ((-8 & (*(u8 *)((s8 *)(arg1) + (0x214)))) | 4);
+void sub_813C368(s32 arg0, void *arg1)
+{
+  void *temp_r2_10;
+  temp_r2_10 = (void *) (*((void **) (((s8 *) arg1) + 0x294)));
+  *((u8 *) (((s8 *) temp_r2_10) + 0x11)) = (u8) ((*((u8 *) (((s8 *) temp_r2_10) + 0x11))) | 0x40);
+  *((u8 *) (((s8 *) arg1) + 0x214)) = (u8) ((0, ((-8) & (*(((s8 *) arg1) + 0x214))) | 4));
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_813C390.s\"");
