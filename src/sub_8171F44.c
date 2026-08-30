@@ -7,14 +7,10 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8171F44.s\"");
-#else
 void sub_8171F44(void *arg0) {
     (*(s32 *)((s8 *)(arg0) + (0x6C))) = 0xB4;
     (*(s32 *)((s8 *)(arg0) + (0x70))) = 0;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8171F4E.s\"");
