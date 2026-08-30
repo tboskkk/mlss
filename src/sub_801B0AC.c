@@ -225,21 +225,13 @@ asm_unified(".include \"asm/nonmatching/sub_801B52C.s\"");
    counts this as unmatched. Write the C here, replacing this comment. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_801B5A0.s\"");
-#else
-void sub_801B5A0(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5, s32 arg6, s32 arg7, s32 arg8, s32 arg9) {
-    (*(s32 *)((s8 *)(arg0) + (0))) = arg1;
-    (*(s32 *)((s8 *)(arg0) + (4))) = arg2;
-    (*(s32 *)((s8 *)(arg0) + (8))) = arg3;
-    (*(s32 *)((s8 *)(arg0) + (0xC))) = arg4;
-    (*(s32 *)((s8 *)(arg0) + (0x10))) = arg5;
-    (*(s32 *)((s8 *)(arg0) + (0x14))) = arg6;
-    (*(s16 *)((s8 *)(arg0) + (0x18))) = (s16) arg7;
-    (*(s16 *)((s8 *)(arg0) + (0x1A))) = (s16) arg8;
-    (*(s16 *)((s8 *)(arg0) + (0x1C))) = (s16) arg9;
+void sub_801B5A0(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5, s32 arg6, s32 arg7, s32 arg8, s32 arg9)
+{
+  s16 new_var2;
+  s8 *new_var3;
+  s8 *new_var;
+ do { *((s32 *) (((s8 *) arg0) + 0)) = arg1; *((s32 *) (((s8 *) arg0) + 4)) = arg2; do { *((s32 *) ((new_var = (s8 *) arg0) + 8)) = arg3; *((s32 *) (((s8 *) arg0) + 0xC)) = arg4; new_var3 = (s8 *) arg0; *((s32 *) (new_var + 0x10)) = arg5; *((s32 *) (new_var3 + 0x14)) = arg6; *((s16 *) (new_var3 + 0x18)) = (s16) arg7; new_var2 = (s16) arg8; *((s16 *) (new_var + 0x1A)) = new_var2; *((s16 *) (((s8 *) arg0) + 0x1C)) = (s16) arg9; } while (0); } while (0);
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_801B5EE.s\"");
