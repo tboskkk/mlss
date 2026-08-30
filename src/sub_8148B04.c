@@ -71,3 +71,13 @@ void sub_8148C20(void *arg0) {
     (*(u8 *)((s8 *)(arg0) + (0x20F))) = (u8) (-5 & (*(u8 *)((s8 *)(arg0) + (0x20F))));
 }
 #endif
+
+#ifndef NONMATCHING
+asm_unified(".include \"asm/nonmatching/sub_8148C60.s\"");
+#else
+/* No C attempt yet. Deliberately EMPTY rather than an #error: agbcc
+   compiles a whole translation unit at a time, so an #error here fails
+   every OTHER function in this file under NONMATCHING=1. Guard intact, so
+   the real ROM still gets the verbatim retail bytes and progress.py still
+   counts this as unmatched. Write the C here, replacing this comment. */
+#endif
