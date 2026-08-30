@@ -47,16 +47,12 @@ asm_unified(".include \"asm/nonmatching/sub_81615B0.s\"");
    counts this as unmatched. Write the C here, replacing this comment. */
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_81615B4.s\"");
-#else
-void sub_81615B4(void* p0, s32 p1)
-{
-    *(u32*)((u8*)p0 + 0x04) = 0x08CDD090;
-    if (p1 & 1)
-        free_heap_8018DA8(p0);
+void sub_81615B4(void *arg0, s32 arg1) {
+    (*(s32 *)((s8 *)(arg0) + (4))) = 0x08CDD090;
+    if (1 & arg1) {
+        free_heap_8018DA8(arg0);
+    }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_81615D4.s\"");
