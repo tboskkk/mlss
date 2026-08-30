@@ -17,22 +17,18 @@ void *tld_init_8127A94(struct Entity *arg0, u8 arg1) {
     return arg0;
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8127AB0.s\"");
-#else
 u8 sub_8116620(s32);                                /* extern */
-
-s32 sub_8127AB0(void *arg0) {
-    u8 temp_r1_14;
-
-    temp_r1_14 = sub_8116620((*(s32 *)((s8 *)(arg0) + (0x15C))));
-    if (temp_r1_14 != 0) {
-        return 1;
-    }
-    (*(u8 *)((s8 *)(arg0) + (0xEF))) = temp_r1_14;
-    return 0;
+s32 sub_8127AB0(void *arg0)
+{
+  u8 temp_r1_14;
+  temp_r1_14 = sub_8116620(*((s32 *) (((s8 *) arg0) + 0x15C)));
+  if (temp_r1_14 != 0)
+  {
+    return 1;
+  }
+  *((u8 *) (((s8 *) arg0) + 0xEF)) = (float) temp_r1_14;
+  return 0;
 }
-#endif
 
 void sub_8127ADC(void *arg0, u16 arg1) {
     sub_81151E4((*(s32 *)((s8 *)(arg0) + (0x15C))), 4, arg1, 0x10, 0xFFFF, 0xFFFF, 0, 0);
