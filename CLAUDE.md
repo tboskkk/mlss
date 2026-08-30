@@ -2579,3 +2579,135 @@ CI already runs `tools/gen_readme_progress.py --check` (closes the old
 "no CI posts a progress badge" item) and `twins.py`'s docstring already
 carries the corrected PROPAGATE/DEDUPLICATE numbers — both done, this
 section no longer needs to track them.
+
+## sub_81148B8 was a measurement artifact, not a CFG bug (2026-08-29)
+
+The "genuine goto-heavy CFG misreconstruction" flagged for `sub_81148B8`
+in the broad Tier 2 pool survey above was wrong — or rather, incomplete:
+the FIRST look was based on a partial diff window that never reached the
+real cause. Full re-diagnosis found the SAME trailing-orphaned-data
+landmine already hit repeatedly this session: the retail fragment
+carried 204 bytes of hidden, unlabeled, real Thumb functions
+(`sub_8114A80` — a 4-byte `bx lr` stub, `sub_8114A84`, `sub_8114AB8`,
+`sub_8114B30`) immediately after the real function's own return, which
+had inflated the measured diff from a real 456 bytes to 660. Split via
+`write_split()` + `write_multi_split()` (commits `f7690b47`,
+`ad5e6a61`), all boundaries cross-verified against each segment's own
+literal-pool references before executing, matching this session's
+established discipline.
+
+With the measurement fixed, there WAS a real, smaller structural gap
+underneath, closed in stages: 598 (mismeasured) → 416 (correct
+boundary) → 185 (reordering the C `switch` statement's case bodies to
+match retail's actual PHYSICAL layout order — case 0's body, then case
+1's, then case 2's, not m2c's arbitrary 1/2/0 emission order; agbcc lays
+out non-jump-table switch case bodies in source order, so this is a
+real, generalizable lesson distinct from everything documented in the
+in-context-permuter sections above) → 83 → 80 bytes via
+`--allocator-attack`. Final state: reloc-equal, size_delta=0, a genuine
+near-miss, saved to `nonmatchings/sub_81148B8/output-incontext-best/`.
+
+**One more idiom tested and REJECTED, reproducibly, worth recording as a
+clean negative**: retail loads `gGameState`'s base address ONCE and
+reuses the register for two later field accesses (`field_2A`, then
+`field_2E` twice more), while the candidate's raw-hex-literal casts
+(`*(u16*)(0x0300034C+0x2A)` etc.) reload the same literal three separate
+times. Rewriting to the established `gGameState.field_2A`/`.field_2E`
+idiom (already used elsewhere in this codebase, e.g.
+`src/opening_sequence.c`) DOES make the specific instructions at that
+site byte-identical to retail — confirmed via objdump — but reproducibly
+triggers a GLOBAL register-renumbering cascade across the rest of the
+function (185→426 on one base, 83→430 on a later, already-improved
+base), tested twice on two different starting points with the same
+result both times. A real, generalizable finding distinct from the
+already-documented gGameState-reuse win elsewhere in this project:
+whether reusing a real symbol's base register helps or hurts is not
+predictable from the local site alone — it depends on how the change
+reshuffles register pressure across the WHOLE function, and here it
+reliably hurt. Left as raw-hex-literal casts; not worth re-attempting
+without a way to test cheaply first.
+
+## sub_819B2E0: a wrong m2c pointer-arithmetic stride, not a wall — MATCHED
+
+Found sampling `allocator_sweep.py`'s own best (lowest-`iso_score`)
+results for genuinely closeable 1-byte near-misses instead of assuming
+they're all the parked register-swap wall. Three sampled:
+`sub_80EB09C`/`sub_81585B0` were confirmed via objdump as the real,
+already-parked wall (`adds r5,r2,#0` vs `adds r5,r3,#0`; `lsls
+r4,r1,#16` vs `lsls r4,r2,#16` — same op/immediate, only the register
+differs) and left parked with a note explaining why. `sub_819B2E0` was
+NOT: its 1-byte-away seed showed `adds r4,#64` (candidate) vs `adds
+r4,#32` (retail) — a genuinely different IMMEDIATE, not a register.
+Root cause: `var_r4_9` is `u16 *`, and the m2c seed advanced it by `+=
+0x20` ELEMENTS (0x40 bytes); retail's real stride is 0x20 BYTES (0x10
+elements). One-character fix (`0x20` → `0x10`), byte-exact and
+reloc-equal. Matched, commit `ef17ceb0`.
+
+**Generalizable point for future sweeps of `allocator_sweep.py`'s own
+near-zero results**: don't assume every 1-2-byte gap in that pool is the
+parked wall just because most of them are — a quick objdump diff at the
+one differing offset separates "same instruction, different register"
+(park it) from "different immediate/opcode" (real bug, usually a
+one-line fix) in under a minute per function.
+
+## sub_80E9594: a THIRD trailing-orphaned-data instance found via broad Tier 2 sampling (2026-08-29)
+
+Sampling 3 random `tier2_ready` rows at `iso_score > 200` (the "terrible
+score, low escalation" broad-pool technique from the earlier survey
+above) for a fresh wall-diagnosis pass turned up a third instance of the
+same landmine already hit twice this session: `sub_80E9594`'s retail
+fragment was 384 bytes, but its real code (a signed-magnitude integer
+scale helper ending in `bx r1`) is only 96 bytes — the remaining 288
+bytes were two more hidden, unlabeled, near-identical per-type
+bit-dispatch functions (`sub_80E95F4`, `sub_80E9688`), which is why the
+row's `objdiff_score` measured a flat **0%** despite the real function's
+candidate being basically correct. Split via the same `write_split()` +
+`write_multi_split()` two-step, boundaries cross-verified against each
+segment's own literal-pool references (commits follow the same pattern
+as `sub_81148B8`'s). Post-split: 60-byte real diff → `--allocator-attack`
+→ 29 bytes, reloc-equal, size_delta=-2. Saved to
+`nonmatchings/sub_80E9594/output-incontext-best/`.
+
+**Tested and rejected here too**: rewriting the m2c `goto`-based
+check-at-top loop into the "already-rotated" `goto`/label form that
+fixed `sub_80292EC`'s loop-shape wall (see the in-context-permuter
+section above) made this function WORSE (69 vs 60 bytes), not better —
+confirmed via objdump, not assumed. This is a real, useful correction to
+how broadly that lesson generalizes: matching retail's *loop-rotation
+shape* is not a universal win independent of the specific register
+choices agbcc then makes downstream; it has to be checked per function,
+not applied as a standing rule.
+
+**Three confirmed instances of the trailing-orphaned-data landmine in
+one session now** (`sub_8136470`, `sub_81148B8`, `sub_80E9594`), found
+by three different routes (hand-picked Tier 2 target, re-diagnosing a
+flagged CFG "bug", and random broad-pool sampling). This strongly
+suggests the landmine is NOT rare in the current `tier2_ready`/far pool
+— any function whose measured `objdiff_score` looks anomalously bad
+relative to how simple its candidate C looks is worth a first check
+against `gitops.fragment_trailing_bytes()` / a raw retail-object length
+comparison before assuming a real structural bug. Not swept
+systematically this session (each was found individually); a dedicated
+corpus-wide sweep for "candidate is dramatically shorter than its
+retail object, and the retail object's real code ends in a return well
+before the object's own end" is a real, cheap, well-scoped lever for a
+future session.
+
+## sub_817A41C, sub_80AB404: two large register-pressure targets, not closed (2026-08-29)
+
+The other two of the same 3-function broad-pool sample. `sub_80AB404`'s
+candidate needs one more live register than fits in r0-r7, spilling
+through r8 via an explicit `mov r7,r8; push {r7}` pair — the exact
+`sub_80F6250`-class register-pressure signature already documented
+above, and `--allocator-attack` is the already-proven lever for it (not
+yet confirmed closed as of this writing — a search was launched and the
+result should be checked in the DB/`output-incontext-best/` rather than
+assumed). `sub_817A41C` is a bigger, different case: BOTH retail and the
+candidate already use all three extra high registers (r8/r9/sl) with an
+explicit mov-to-low-then-push prologue and a large stack frame (retail
+`sub sp,#52`, candidate `sub sp,#48`) — this is a genuinely
+register-pressure-heavy function on both sides, not a candidate-only
+spill, so the gap is m2c's specific stack-temp assignment differing from
+retail's rather than a structural or measurement bug. Not attempted
+further this session; a real target for a future dedicated
+register-pressure reconstruction pass.
