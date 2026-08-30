@@ -15,15 +15,18 @@ s32 sub_8150DEC(void *arg0) {
     return (*(s32 *)((s8 *)(arg0) + (0x34)));
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8150DF0.s\"");
-#else
-void sub_8150DF0(void *arg0, s32 arg1) {
-    (*(u16 *)((s8 *)(arg0) + (0x2C))) = (u16) (4 | (*(u16 *)((s8 *)(arg0) + (0x2C))));
-    (*(s32 *)((s8 *)(arg0) + (0x38))) = arg1;
-    (*(s32 *)((s8 *)(arg0) + (0x3C))) = (s32) ((s32) (arg1 - (*(s32 *)((s8 *)(arg0) + (0x34)))) / 10);
+void sub_8150DF0(void *arg0, s32 arg1)
+{
+  s32 *new_var2;
+  int new_var3;
+  void *new_var;
+  new_var3 = 4 | (*((u16 *) (((s8 *) arg0) + 0x2C)));
+  new_var2 = &arg1;
+  *((u16 *) (((s8 *) arg0) + 0x2C)) = (u16) new_var3;
+  *((s32 *) (((s8 *) arg0) + 0x38)) = arg1;
+  new_var = arg0;
+  *((s32 *) (((s8 *) arg0) + 0x3C)) = (s32) (((s32) ((*new_var2) - (*((s32 *) (((s8 *) new_var) + 0x34))))) / 10);
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8150E12.s\"");
