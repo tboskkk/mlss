@@ -7,9 +7,6 @@
 
 asm_unified(".include \"asm/macros.inc\"");
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80841B8.s\"");
-#else
 u8 sub_80841B8(void *arg0) {
     u8 var_r1_8;
     void *temp_r2_7;
@@ -21,7 +18,6 @@ u8 sub_80841B8(void *arg0) {
     }
     return var_r1_8;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80841CE.s\"");
