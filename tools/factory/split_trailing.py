@@ -255,6 +255,48 @@ def disassemble(raw: bytes, base: int) -> str | None:
     return r.stdout
 
 
+def disassemble_arm(raw: bytes, base: int) -> str | None:
+    """ARM-disassemble `raw` -- the ARM-mode sibling of disassemble().
+
+    Same objdump, same -b binary/-m arm invocation, but WITHOUT
+    `-M force-thumb`: that flag is what makes disassemble() decode every
+    halfword as a 2-byte Thumb instruction, and forcing it onto real
+    4-byte ARM words is exactly what produced garbage/UNDEFINED output
+    misdiagnosing sub_81980C8's trailing content on the first attempt
+    (2026-08-30) -- objdump's plain `-m arm` with no mode override
+    decodes 4-byte-aligned words as ARM by default, which is what every
+    real ARM function in this ROM needs.
+    """
+    tmp = gitops.REPO / "_split_trailing_arm.bin"
+    tmp.write_bytes(raw)
+    try:
+        r = subprocess.run(
+            ["./container.sh", "arm-none-eabi-objdump", "-D", "-b", "binary",
+             "-m", "arm", tmp.name],
+            cwd=str(gitops.REPO), capture_output=True, text=True, timeout=60)
+    finally:
+        tmp.unlink(missing_ok=True)
+    if r.returncode != 0:
+        return None
+    return r.stdout
+
+
+# ARM's own return idioms, distinct from Thumb's `bx lr`/`pop {...,pc}`:
+# `bx lr` still exists (same mnemonic, different encoding -- objdump prints
+# it identically either way), `mov pc, lr` is a plain branch-free return,
+# and `ldm{fd,ia,...} rX!, {..., pc}` (optionally with a trailing `^` that
+# restores CPSR from SPSR, used by exception-mode handlers) is ARM's
+# multi-register-pop-and-return. Matched against real content in
+# sub_81980C8's own trailing blob: `mov pc, lr` (x3) and `bx lr` are both
+# confirmed genuine returns there; the `ldm r7!, {...,pc}^` occurrences
+# sit inside a region that direct disassembly (stccc/out-of-range bl
+# targets nearby) shows is actually misdecoded DATA, not code -- so this
+# regex alone is not sufficient to trust blindly the way the Thumb
+# _RETURN_RE mostly can; always cross-check against real disassembled
+# context, same discipline as everywhere else in this file.
+_ARM_RETURN_RE = re.compile(r"\b(bx\s+lr|mov\s+pc,\s*lr|ldm\w*\s+\w+!?,\s*\{[^}]*pc\}\^?)")
+
+
 def looks_complete(disasm: str) -> bool:
     """A function we're willing to claim ends the way Thumb functions end."""
     tail = [l for l in disasm.splitlines() if re.match(r"^\s+[0-9a-f]+:", l)]
@@ -471,7 +513,7 @@ def format_bytes(raw: bytes) -> str:
 
 
 def write_split(src_name: str, new_name: str, addr: int, raw: bytes,
-                src_text: str) -> tuple[bool, str]:
+                src_text: str, mode: str = "thumb") -> tuple[bool, str]:
     """Give the trailing bytes their own labeled fragment + guard block.
 
     Emits `.byte` data under the label rather than reconstructed assembly.
@@ -483,9 +525,22 @@ def write_split(src_name: str, new_name: str, addr: int, raw: bytes,
     not-yet-decompiled function is in -- the pipeline can pick it up
     normally from there.
 
+    `mode="arm"` picks `arm_func_start` instead of the Thumb macros --
+    for content this project's own Luvdis pass never disassembles as ARM
+    at all (sub_81980C8's trailing content is the first confirmed
+    instance: a real ARM-mode block, not Thumb misdecoded). ARM has no
+    non-word-aligned variant to worry about the way Thumb does -- every
+    ARM instruction is 4 bytes and 4-byte aligned by construction, so
+    the alignment branch Thumb needs collapses to a single macro choice,
+    checked (not assumed) via addr % 4.
+
     Everything is verified by a from-scratch build before it is kept; any
     failure reverts the whole change.
     """
+    if mode not in ("thumb", "arm"):
+        return False, f"unknown mode {mode!r}"
+    if mode == "arm" and addr % 4 != 0:
+        return False, f"ARM content at 0x{addr:08X} is not 4-byte aligned"
     frag_dir = gitops.REPO / "asm" / "nonmatching"
     new_frag = frag_dir / f"{new_name}.s"
     src_frag = frag_dir / f"{src_name}.s"
@@ -508,12 +563,28 @@ def write_split(src_name: str, new_name: str, addr: int, raw: bytes,
     # function that genuinely isn't word-aligned that would INSERT padding
     # and shift every following byte, so pick the macro that matches
     # reality rather than assuming.
-    macro = "thumb_func_start" if addr % 4 == 0 else "non_word_aligned_thumb_func_start"
+    if mode == "arm":
+        macro = "arm_func_start"
+    else:
+        macro = "thumb_func_start" if addr % 4 == 0 else "non_word_aligned_thumb_func_start"
 
+    # thumb_func_start reasserts `.thumb` itself, so a Thumb fragment never
+    # cares what mode preceded it. arm_func_start does the mirror image
+    # (asserts `.arm`) but has no way to know whether anything AFTER this
+    # fragment in the same combined per-file assembly stream expects Thumb
+    # -- and ordinary compiler-emitted C (outside any guard) carries no
+    # mode directive of its own to fall back on, so it silently inherits
+    # whatever mode this fragment leaves the assembler in. Confirmed live
+    # 2026-08-30 splitting sub_81980C8's trailing ARM content: omitting
+    # this made the ROM stop being byte-identical (everything after this
+    # fragment in its translation unit misassembled). Restoring `.thumb`
+    # after the raw ARM bytes is required, not cosmetic.
+    mode_restore = "\n\t.thumb\n" if mode == "arm" else ""
     new_text = (
         "\t.syntax unified\n\t.text\n\n"
         f"\t{macro} {new_name}\n{new_name}:\n"
         f"{format_bytes(raw)}\n"
+        f"{mode_restore}"
     )
 
     # Strip the trailing run off the source fragment.
