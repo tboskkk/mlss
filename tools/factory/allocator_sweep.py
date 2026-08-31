@@ -280,14 +280,19 @@ def main() -> int:
                 dest_dir.mkdir(parents=True, exist_ok=True)
                 (dest_dir / "source.c").write_text(seed)
                 (dest_dir / "score.txt").write_text(str(best))
-                notes = (f"allocator_sweep.py: --allocator-attack "
+                sweep_notes = (f"allocator_sweep.py: --allocator-attack "
                          f"{args.seconds_per_fn:.0f}s, base={base} -> best={best}. "
                          f"See nonmatchings/{n}/output-incontext-best/.")
+                # sweep_notes, not notes: tier2.py's resolve() overwrites
+                # `notes` on essentially every ordinary search cycle for a
+                # tier2_ready row (see db.py's MIGRATIONS entry for the
+                # full incident) -- a write there does not survive. This
+                # dedicated column is never touched by the live pipeline.
                 with db.tx(conn):
                     conn.execute(
-                        "UPDATE functions SET candidate_body=?, notes=? WHERE name=? "
+                        "UPDATE functions SET candidate_body=?, sweep_notes=? WHERE name=? "
                         "AND worker_id IS NULL",
-                        (seed, notes, n))
+                        (seed, sweep_notes, n))
 
     dt = time.time() - t0
     print(f"\nswept {len(worth)} in {dt:.0f}s: {zeros} genuine zero(s), "

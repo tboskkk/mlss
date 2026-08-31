@@ -179,6 +179,26 @@ MIGRATIONS = [
     # the whole tool unreliable unattended. A dedicated column nothing else
     # in the pipeline ever writes to is immune to that by construction.
     ("dead_end_reason", "TEXT"),
+    # Dedicated column for human/diagnostic annotations on a near-miss row
+    # (allocator_sweep.py and ad-hoc manual diagnosis), same shape of fix as
+    # dead_end_reason above, for the same reason: `notes` is NOT a spare
+    # scratch field, it's tier2.py's own bookkeeping AND tier_m2c.py's
+    # ruleset-staleness stamp (_declined() writes `m2c:{ruleset_version()}:
+    # ...` into it, and _claim() reads that stamp back to decide whether a
+    # decline is stale and the row should be reopened -- the actual
+    # mechanism behind every "ruleset bump reopened N rows" note elsewhere
+    # in this file). tier2.py's resolve() overwrites `notes` on essentially
+    # every search cycle for a tier2_ready row, including a plain stall
+    # with no body change -- confirmed live 2026-08-30, a manual
+    # allocator_sweep.py note written to `notes` on a tier2_ready row does
+    # not survive the row's next ordinary tier2 search. Making `notes`
+    # itself append-only or unconditionally-omitted-from-update (the
+    # naive fix) would have been actively worse: it would freeze every
+    # row's ruleset-staleness stamp at its first-ever value forever,
+    # permanently disabling the auto-reopen mechanism for the whole
+    # corpus. A dedicated column nothing else in the pipeline writes to
+    # sidesteps the conflict instead of fighting it.
+    ("sweep_notes", "TEXT"),
 ]
 
 
