@@ -110,19 +110,15 @@ s32 sub_80F095C(void *arg0, s32 *arg2) {
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80F0984.s\"");
-#else
 u8 sub_8027378(s32);                                /* extern */
 
 s32 sub_80F0984(void *arg0, void *arg1) {
-    if (sub_8027378((*(s32 *)((s8 *)(arg0) + (0x14)))) != 1) {
-        return 1;
+    if (sub_8027378((*(s32 *)((s8 *)(arg0) + (0x14)))) == 1) {
+        (*(s32 *)((s8 *)(arg1) + (0))) = (s32) (*(s32 *)((s8 *)(arg1) + (0x14)));
+        return 0;
     }
-    (*(s32 *)((s8 *)(arg1) + (0))) = (s32) (*(s32 *)((s8 *)(arg1) + (0x14)));
-    return 0;
+    return 1;
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_80F09A8.s\"");
