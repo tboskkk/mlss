@@ -2587,6 +2587,33 @@ one of these from scratch via a wasted search or a "why did this get
 worse" surprise. Each was found and verified on a real function, not
 reasoned about in the abstract.
 
+- **A negated early-return guard clause (`if (!cond) return X; ...body...;
+  return Y;`) is NOT the same compiled shape as the direct form
+  (`if (cond) { ...body...; return Y; } return X;`), even though they're
+  semantically identical C.** m2c reliably emits the guard-clause form for
+  this idiom; retail's real source apparently often used the direct form,
+  and agbcc does not normalize between them — the guard form compiles to a
+  physically different block order and an inverted branch condition
+  (`beq`/`bne`, `blt`/`bge`, etc. swapped) from what retail actually has.
+  Diagnostic signature: a near-miss whose diff shows an inverted branch
+  condition PLUS the surrounding blocks in swapped physical order (the
+  "then" and early-return blocks trade places) — not a loop, so distinct
+  from the already-documented CFG-rotation class above. Fix: rewrite the
+  guard clause into the direct if/else form (or vice versa) matching
+  retail's real block order, which is readable straight off the
+  disassembly's address order. **Found and closed 8-for-8 in one batch,
+  2026-09-07** (`sub_8163C40`, `sub_8163C94`, `script_cmd_wait_for_
+  user_input`, `sub_80F0984`, `sub_80F7E84`, `sub_80877C0`, `sub_813444C`,
+  `sub_81251F0`) — every single instance tried this session closed clean
+  to a byte-exact match once rewritten, no exceptions, making this one of
+  the most reliable single levers found this session. A closely related
+  variant closes the SAME way: two candidate branches share ONE C
+  statement written once, after their if/else merges back together, where
+  retail's real source had that statement duplicated into each branch (a
+  fresh reload in one branch, reuse of an already-loaded value in the
+  other) — same rewrite discipline, write out what each branch actually
+  does rather than trusting m2c's single shared-statement simplification.
+
 - **Non-table `switch` statements emit their case BODIES in the exact
   source-code order of the `case` labels, not numeric value order.**
   Found on `sub_81148B8` (2026-08-29, see below): m2c emitted `case 1:
@@ -3094,3 +3121,139 @@ declaration alone; confirm via a direct objdump diff (does retail's
 own disassembly actually skip the truncation?) before touching it,
 exactly the same discipline this file already documents for every
 other near-miss class.
+
+## LLM wall-triage experiment (2026-09-06) — a real, narrow, mixed signal, not a repeat of the closed generation question
+
+Distinct from the already-closed "can an LLM generate the matching C"
+question (this file's own benchmark, and mlbis-decomp's `bench_llm.py`
+— both lost decisively to m2c). This tests something narrower and
+previously untested: can a prompted model **classify** a near-miss
+into an already-diagnosed wall type (register-swap wall, `ldmia`-vs-
+`ldr`, CFG rotation, etc. — this file's own taxonomy) when given a
+condensed reference of those patterns, vs. the same model with no
+reference. Run using free Colab compute (Qwen2.5-Coder-14B-Instruct
+via `transformers`+`bitsandbytes`, tunneled to a local benchmark
+script) against 25 hand-verified near-misses.
+
+**Ground truth was re-verified against actual diff content before
+trusting it, and this caught a real mislabel**: `sub_814A814` was
+tagged `stack_size_mismatch` (its ORIGINAL diagnosis), but the saved
+candidate already has that fix applied and the current diff is a pure
+register-swap signature — relabeled. `stack_size_mismatch` as a class
+was dropped from the test entirely once relabeled, since its other
+known instances are all already `matched`, leaving no clean current
+example.
+
+**A first 2-arm run (baseline vs. reference) showed 72%→80%, which
+looked like a clean win — a 3rd arm caught why that was misleading.**
+Added a length-matched control of totally irrelevant GBA-hardware
+trivia (memory map, PPU modes, cartridge header format — real facts,
+zero relevance to compiler codegen) to separate "the reference's
+content helps" from "the prompt just got longer." Result, on the
+dominant class (`register_swap_wall`, n=8):
+
+| arm | overall | register_swap_wall |
+|---|---|---|
+| baseline | 72% (18/25) | 3/8 |
+| control (irrelevant filler) | 76% (19/25) | 5/8 |
+| reference (real content) | 80% (20/25) | 7/8 |
+
+**Roughly half the apparent "reference helps" effect was just prompt
+length, not content** — the irrelevant control alone closed half the
+gap. The real, isolated content effect (control→reference) is smaller
+than the naive baseline→reference comparison suggested: +2/8 on the
+one class it helped, flat or negative everywhere else. Two specific,
+reproducible regressions appeared ONLY in the reference arm (not
+baseline, not control): `sub_81604A8` (`jumptable_misdecompiled`,
+confused for `arithmetic_identity_choice`) and `sub_80F3FE8`
+(`register_pressure_spillable`, confused for `register_swap_wall`).
+`ldmia_vs_ldr` (n=10) was 100% in every arm — its signature is visible
+in the raw mnemonic text, not a fair test of the reference mattering.
+`veneer_symbol_wall` (n=1) failed in all three arms.
+
+**Standing lesson, generalizable beyond this one experiment**: a
+before/after LLM prompting comparison without a length-matched
+irrelevant-content control can overstate a "content" effect by
+roughly 2x — the same "suspect the instrument" discipline this file's
+own THE LAW already applies to measurement tooling, just for a prompt
+experiment instead of a scoring script.
+
+**Diagnosed the two regressions properly instead of guessing, by
+capturing the model's FULL reply text (not just the parsed class) —
+found three distinct, concrete, fixable prompt bugs**: (1) one
+"evidence" line was pure regurgitation of a class's prose description
+with zero grounding in the actual diff (the model can satisfy "give
+one line of evidence" by paraphrasing the reference instead of reading
+the diff, if not explicitly forbidden); (2) `register_swap_wall`'s
+definition didn't exclude a case where TWO registers change in one
+instruction (a broader realloc cascade, not this narrow wall) or a
+case where only an immediate OFFSET differs with the same register
+both sides; (3) `register_pressure_spillable`'s defining signature
+wasn't prioritized over a coexisting, more superficial `ldmia_vs_ldr`
+or register-swap symptom in the same diff (the pressure gap often
+produces BOTH).
+
+Fixed the reference doc (require quoted diff evidence, not paraphrase;
+worked positive+negative examples pinning `register_swap_wall`'s exact
+boundary; explicit "check this signature first" priority note for
+`register_pressure_spillable`) and re-ran the full 3-arm test:
+
+| arm | overall | register_swap_wall (n=8) | register_pressure_spillable (n=2) |
+|---|---|---|---|
+| baseline | 76% (19/25) | 4/8 | 1/2 |
+| control (irrelevant filler) | 76% (19/25) | 5/8 | 1/2 |
+| reference (fixed doc) | 92% (23/25) | 8/8 | 2/2 |
+
+**Baseline and control landed identically this run** — unlike the
+first pass, the entire jump to 92% is now cleanly attributable to the
+reference's real content, not prompt length. This is a genuine,
+controlled positive result, not a mixed one.
+
+**Two failures remain, deliberately left unfixed**: `sub_81604A8`
+(`jumptable_misdecompiled`, still misread as `register_swap_wall`) and
+`sub_813CAEC` (`veneer_symbol_wall`, n=1) both resisted correction
+even after a near-verbatim worked negative example targeted the exact
+failure — a real capability ceiling for this 14B model on this
+specific counting-based distinction, not a prompt-wording gap.
+Stopped hand-patching the reference doc against these exact 25
+examples at that point on purpose: continuing risks overfitting the
+reference to this one eval set rather than testing whether it
+generalizes — the same discipline this project applies to every other
+measured claim. **Caveat**: n=25 is still small, and the baseline
+number itself moved 4 points between the two full runs from sampling
+noise alone (temperature 0.1, not fully deterministic) — treat the
+exact percentages as approximate, not to the decimal.
+
+**Validated on a fresh, never-tuned-against set the same night — this
+is the strongest result of the whole experiment.** Pulled 12 brand-new
+near-misses straight from the live `tier2_ready` pool, hand-diagnosed
+by reading the actual differing instructions (never seen while writing
+or fixing the reference doc): 11 genuine `register_swap_wall`
+instances plus one deliberately novel pattern outside the whole
+taxonomy (`sprite_hide_8021F20`: `lsrs` vs `asrs`, identical register
+AND immediate, only the opcode differs — true label `other_structural`,
+included specifically to test whether the model forces a wrong known
+label onto something new).
+
+| arm | fresh set (n=12) |
+|---|---|
+| baseline | 8.3% (1/12) |
+| control | 16.7% (2/12) |
+| reference | 91.7% (11/12) |
+
+The baseline model is actually bad at this cold — it systematically
+misread every fresh register-swap case as `register_pressure_
+spillable`. The reference doc gets 11/11 real cases right on functions
+it never saw during tuning: genuine generalization, not memorization
+of the original 25. The one miss is exactly the deliberately-novel
+case: the model forced it into `arithmetic_identity_choice` (plausible
+but wrong) instead of correctly falling back to `other_structural` —
+a real, distinct, honestly-documented gap (over-eager categorization
+of genuinely novel patterns), not chased further this session.
+
+**Status: a real, validated positive result — the first of three LLM
+angles tried across this project and mlbis-decomp that didn't fail
+outright, now confirmed on held-out data, not just the tuned set.**
+Named remaining gap: the `other_structural` fallback isn't reliable
+yet for genuinely novel patterns. Full experiment, infra notes, and
+files: memory `mlss-llm-triage-experiment.md`.
