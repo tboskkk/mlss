@@ -27,37 +27,18 @@ void sub_8087790(u32 param_1)
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_80877C0.s\"");
-#else
-void sub_80877C0(u32* p0)
-{
-    u32* r4;
-    u16* r2;
-    u32 r1;
-    u32 r0;
-    u32* r3;
+s32 sub_80877C0(void *arg0) {
+    s32 temp_r0_19;
+    s32 temp_r1_23;
 
-    r3 = p0;
-    r2 = (u16*)((u8*)p0 + 0x92);
-    r4 = (u32*)((u8*)p0 + 0x94);
-    r1 = *(u32*)r4;
-    r0 = *(u16*)r2;
-    r0 += r1;
-    *(u16*)r2 = r0;
-    r0 = 0;
-    r1 = *(s16*)((u8*)r2 + r0);
-    r0 = *(u32*)((u8*)p0 + 0x40);
-    r0 += r1;
-    *(u32*)((u8*)p0 + 0x18) = r0;
-    r1 = *(u32*)((u8*)p0 + 0x98);
-    if (r1 < r0)
-        r0 = 0;
-    else
-    {
-        *(u32*)((u8*)p0 + 0x18) = r1;
-        *(u32*)r4 = 0;
-        r0 = 1;
+    (*(u16 *)((s8 *)(arg0) + (0x92))) = (u16) ((*(u16 *)((s8 *)(arg0) + (0x92))) + (*(s32 *)((s8 *)(arg0) + (0x94))));
+    temp_r0_19 = (*(s32 *)((s8 *)(arg0) + (0x40))) + (s16) (*(u16 *)((s8 *)(arg0) + (0x92)));
+    (*(s32 *)((s8 *)(arg0) + (0x18))) = temp_r0_19;
+    temp_r1_23 = (*(s32 *)((s8 *)(arg0) + (0x98)));
+    if (temp_r1_23 < temp_r0_19) {
+        return 0;
     }
+    (*(s32 *)((s8 *)(arg0) + (0x18))) = temp_r1_23;
+    (*(s32 *)((s8 *)(arg0) + (0x94))) = 0;
+    return 1;
 }
-#endif
