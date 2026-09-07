@@ -109,17 +109,14 @@ void sub_8163C40(void *arg0, void *arg1) {
     }
 }
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8163C94.s\"");
-#else
 void sub_8163C94(void *arg0, void *arg1) {
     void *temp_r0_12;
     void *temp_r0_26;
     void *temp_r1_9;
 
-    temp_r1_9 = (*(void **)((s8 *)(arg1) + (4)));
+    temp_r1_9 = (void *) ((*(void **)((s8 *)(arg1) + (4))));
     if (temp_r1_9 != NULL) {
-        temp_r0_12 = (*(void **)((s8 *)(arg1) + (8)));
+        temp_r0_12 = (void *) ((*(void **)((s8 *)(arg1) + (8))));
         if (temp_r0_12 != NULL) {
             (*(void **)((s8 *)(temp_r1_9) + (8))) = temp_r0_12;
             (*(void **)((s8 *)((*(void **)((s8 *)(arg1) + (8)))) + (4))) = (void *) (*(void **)((s8 *)(arg1) + (4)));
@@ -128,17 +125,17 @@ void sub_8163C94(void *arg0, void *arg1) {
             (*(void **)((s8 *)(arg0) + (4))) = (void *) (*(void **)((s8 *)(arg1) + (4)));
         }
     } else {
-        temp_r0_26 = (*(void **)((s8 *)(arg1) + (8)));
+        temp_r0_26 = (void *) ((*(void **)((s8 *)(arg1) + (8))));
         if (temp_r0_26 != NULL) {
             (*(void **)((s8 *)(temp_r0_26) + (4))) = temp_r1_9;
+            (*(void **)((s8 *)(arg0) + (0))) = (*(void **)((s8 *)(arg1) + (8)));
         } else {
             (*(void **)((s8 *)(arg0) + (4))) = temp_r0_26;
+            (*(void **)((s8 *)(arg0) + (0))) = temp_r0_26;
         }
-        (*(void **)((s8 *)(arg0) + (0))) = (*(void **)((s8 *)(arg1) + (8)));
     }
     (*(s32 *)((s8 *)(arg0) + (8))) = (s32) ((*(s32 *)((s8 *)(arg0) + (8))) - 1);
 }
-#endif
 
 void sub_8163CD4(void *arg0, void *arg1) {
     void *temp_r0_18;
