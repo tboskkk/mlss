@@ -76,17 +76,15 @@ loop_11:
 }
 #endif
 
-#ifndef NONMATCHING
-asm_unified(".include \"asm/nonmatching/sub_8163C40.s\"");
-#else
 void sub_8163C40(void *arg0, void *arg1) {
     void *temp_r0_12;
     void *temp_r0_26;
+    void *temp_r1_42;
     void *temp_r1_9;
 
-    temp_r1_9 = (*(void **)((s8 *)(arg1) + (4)));
+    temp_r1_9 = (void *) ((*(void **)((s8 *)(arg1) + (4))));
     if (temp_r1_9 != NULL) {
-        temp_r0_12 = (*(void **)((s8 *)(arg1) + (8)));
+        temp_r0_12 = (void *) ((*(void **)((s8 *)(arg1) + (8))));
         if (temp_r0_12 != NULL) {
             (*(void **)((s8 *)(temp_r1_9) + (8))) = temp_r0_12;
             (*(void **)((s8 *)((*(void **)((s8 *)(arg1) + (8)))) + (4))) = (void *) (*(void **)((s8 *)(arg1) + (4)));
@@ -95,20 +93,21 @@ void sub_8163C40(void *arg0, void *arg1) {
             (*(void **)((s8 *)(arg0) + (4))) = (void *) (*(void **)((s8 *)(arg1) + (4)));
         }
     } else {
-        temp_r0_26 = (*(void **)((s8 *)(arg1) + (8)));
+        temp_r0_26 = (void *) ((*(void **)((s8 *)(arg1) + (8))));
         if (temp_r0_26 != NULL) {
             (*(void **)((s8 *)(temp_r0_26) + (4))) = temp_r1_9;
+            (*(void **)((s8 *)(arg0) + (0))) = (*(void **)((s8 *)(arg1) + (8)));
         } else {
             (*(void **)((s8 *)(arg0) + (4))) = temp_r0_26;
+            (*(void **)((s8 *)(arg0) + (0))) = temp_r0_26;
         }
-        (*(void **)((s8 *)(arg0) + (0))) = (*(void **)((s8 *)(arg1) + (8)));
     }
     (*(s32 *)((s8 *)(arg0) + (8))) = (s32) ((*(s32 *)((s8 *)(arg0) + (8))) - 1);
     if (arg1 != NULL) {
-        (*(s32 (**)(void *, s32))((s8 *)((*(void **)((s8 *)(arg1) + (0xC)))) + (0xC)))(arg1 + M2C_ERROR(/* unknown instruction: ldsh $r0, ($mem_loc_fictive_) */), 3);
+        temp_r1_42 = (void *) ((*(void **)((s8 *)(arg1) + (0xC))));
+        (*(s32 (**)(void *, s32))((s8 *)(temp_r1_42) + (0xC)))(arg1 + (*(s16 *)((s8 *)(temp_r1_42) + (8))), 3);
     }
 }
-#endif
 
 #ifndef NONMATCHING
 asm_unified(".include \"asm/nonmatching/sub_8163C94.s\"");
