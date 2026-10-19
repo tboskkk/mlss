@@ -421,21 +421,20 @@ extern struct struc_203FFF8 stru_203FFF8;
 // reloaded every access in retail code so treated as volatile here.
 extern vu16 word_2000004;
 
-// The buffer open_init_8055A00 allocates into dword_3000DA0 (340 bytes,
-// tag "ORST") - only the fields open_8056224 actually touches are known
-// so far; extend as more of its consumers get decompiled.
-struct struc_3000DA0 {
-    s8 field_0[5];
-    u8 field_5[0xF];
-    u16 field_14;
-    u16 field_16;
+// ORST: the buffer open_init_8055A00 allocates into dword_3000DA0 (340 bytes,
+// tagged "ORST"); layout from jellees' match of open_8056224.
+struct ORSTData {
+    s32 field_0[5];  /* palette scroll accumulators, fixed-point */
+    u16 field_14;    /* BG1HOFS value */
+    u16 field_16;    /* BG0HOFS source for DMA */
+    u8 _pad[316];
 };
 
 // IWRAM
 extern struct struc_3000D0C* dword_3000D0C;
 extern void (*dword_3000D48)(int, int);
 extern int (*dword_3000D4C)(int, int);
-extern struct struc_3000DA0* dword_3000DA0;
+extern struct ORSTData* dword_3000DA0;
 extern struct EeprStruct1* dword_3000FFC;
 extern struct GameState gGameState;
 extern void (*dword_3000C78)();
