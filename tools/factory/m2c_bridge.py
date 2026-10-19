@@ -458,6 +458,24 @@ def run_m2c(name: str, extra_args: list[str] | None = None) -> str | None:
         bridged_tmp = Path(fd.name)
         feed_path = bridged_tmp
 
+    # Fragments converted to ASM_FUNC (commit 43626c7aa) are bare instruction
+    # text: no `.syntax`/`.text` header and no `NAME:` label, because the
+    # label comes from the macro in the .c file. m2c reports every
+    # instruction in such a file as "outside of function" and produces
+    # nothing, so ~1,000 functions were declined for a reason that has
+    # nothing to do with their code. Give m2c the header and label in a
+    # scratch copy; the tracked fragment is never touched.
+    if bridged_tmp is None and not re.search(
+            rf"^{re.escape(name)}:", frag.read_text(), re.M):
+        fd = tempfile.NamedTemporaryFile(
+            mode="w", suffix=f"_{name}.s", delete=False,
+            dir=str(gitops.REPO / "tools" / "m2c"))
+        fd.write(f"\t.syntax unified\n\t.text\n\n\tthumb_func_start {name}\n"
+                 f"{name}:\n{frag.read_text()}")
+        fd.close()
+        bridged_tmp = Path(fd.name)
+        feed_path = bridged_tmp
+
     cmd = [sys.executable, str(M2C_PY), "--target", "gba", "--valid-syntax",
            "--deterministic-vars"]
     ctx = ensure_context()
