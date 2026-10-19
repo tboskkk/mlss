@@ -110,7 +110,7 @@ $(foreach f,$(LINK_DEBUG_BUG_SRCS),$(eval $(C_BUILDDIR)/$(f).o: CFLAGS := $(CFLA
 # sub_819B2E0 in sub_819B22C.c) keeps a 12-iteration loop rolled and stops
 # matching with the flag on. Of 886 compiled files, only that one changed.
 # So it is switched on per file, as each file's functions need it.
-UNROLL_LOOPS_SRCS := option_screens title_screen
+UNROLL_LOOPS_SRCS := option_screens title_screen sub_8052EFC
 $(foreach f,$(UNROLL_LOOPS_SRCS),$(eval $(C_BUILDDIR)/$(f).o: CFLAGS += -funroll-loops))
 
 $(C_BUILDDIR)/%.o : $(C_SUBDIR)/%.c
